@@ -86,3 +86,4 @@ class AnimationGenerator:
         except Exception as e:
             logger.error(f"Error creating static frames: {e}")
             return output_dir
+

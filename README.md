@@ -46,6 +46,26 @@ cd WhyWouldYou-v1
 pip install -r requirements.txt
 ```
 
+**Note:** The current `requirements.txt` has `dlib` and `face_alignment` commented out because they require CMake to compile. If you need face processing capabilities:
+
+**Option A: Use the included alternative (recommended)**
+- The current setup uses `mediapipe` as an alternative to `dlib`
+- This works without CMake and provides similar functionality
+
+**Option B: Install dlib and face_alignment**
+```bash
+# Install CMake first
+# Windows: Download from https://cmake.org/download/
+# macOS: brew install cmake
+# Linux: sudo apt install cmake
+
+# Then run the helper script
+python install_dlib.py
+
+# Or manually uncomment in requirements.txt and install
+# pip install dlib face_alignment
+```
+
 ### 3. Install FFmpeg
 
 **Windows:**
@@ -236,7 +256,17 @@ The script supports different cartoon styles:
    python -c "import torch; print(torch.cuda.is_available())"
    ```
 
-4. **Memory issues**
+4. **dlib/CMake installation errors**
+   ```bash
+   # If you get CMake errors when installing dlib:
+   # Option 1: Use the alternative (mediapipe)
+   pip install mediapipe
+   
+   # Option 2: Install CMake and dlib properly
+   python install_dlib.py
+   ```
+
+5. **Memory issues**
    - Reduce image resolution in the script
    - Process fewer scenes at once
    - Use CPU instead of GPU

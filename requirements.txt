@@ -13,9 +13,12 @@ opencv-python
 
 # Machine learning and computer vision
 torch
-dlib
-face_alignment
+# dlib  # Requires CMake - install separately if needed
+# face_alignment  # Requires dlib
 transformers
+
+# Alternative face processing (no CMake required)
+mediapipe
 
 # Scientific computing
 scipy

@@ -63,7 +63,41 @@ def install_ffmpeg():
 
 def install_python_dependencies():
     """Install Python dependencies."""
+    print("📋 Installing Python dependencies...")
+    print("Note: dlib and face_alignment are commented out due to CMake requirements.")
+    print("If you need face processing, install CMake first, then uncomment them in requirements.txt")
     return run_command("pip install -r requirements.txt", "Installing Python dependencies")
+
+def install_cmake():
+    """Install CMake for dlib compilation."""
+    system = platform.system().lower()
+    
+    if system == "windows":
+        print("📋 Installing CMake on Windows...")
+        print("Please install CMake manually:")
+        print("1. Download from: https://cmake.org/download/")
+        print("2. Run the installer and make sure to add CMake to PATH")
+        print("3. Restart your terminal after installation")
+        return False
+    
+    elif system == "darwin":  # macOS
+        return run_command("brew install cmake", "Installing CMake via Homebrew")
+    
+    elif system == "linux":
+        # Try different package managers
+        if run_command("which apt-get", "Checking for apt-get"):
+            return run_command("sudo apt update && sudo apt install -y cmake", "Installing CMake via apt")
+        elif run_command("which yum", "Checking for yum"):
+            return run_command("sudo yum install -y cmake", "Installing CMake via yum")
+        elif run_command("which dnf", "Checking for dnf"):
+            return run_command("sudo dnf install -y cmake", "Installing CMake via dnf")
+        else:
+            print("❌ Could not determine package manager. Please install CMake manually.")
+            return False
+    
+    else:
+        print(f"❌ Unsupported operating system: {system}")
+        return False
 
 def setup_wav2lip():
     """Set up Wav2Lip."""
@@ -133,6 +167,16 @@ def main():
     
     # Install Python dependencies
     success &= install_python_dependencies()
+    
+    # Install CMake (optional, for dlib)
+    print("\n📋 CMake Installation (Optional)")
+    print("CMake is required if you want to use dlib for face processing.")
+    print("The current setup uses mediapipe as an alternative.")
+    cmake_choice = input("Do you want to install CMake for dlib support? (y/N): ").lower().strip()
+    if cmake_choice in ['y', 'yes']:
+        success &= install_cmake()
+        print("After installing CMake, you can uncomment dlib and face_alignment in requirements.txt")
+        print("Then run: pip install dlib face_alignment")
     
     # Set up Wav2Lip
     success &= setup_wav2lip()

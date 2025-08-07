@@ -79,3 +79,4 @@ class LipSyncProcessor:
         except Exception as e:
             logger.error(f"Error in simple audio overlay: {e}")
             return video_path
+

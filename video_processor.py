@@ -190,3 +190,4 @@ class VideoProcessor:
         except Exception as e:
             logger.error(f"Error compiling final video: {e}")
             return clips[0] if clips else ""
+
