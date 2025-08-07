@@ -48,11 +48,11 @@ def install_ffmpeg():
     elif system == "linux":
         # Try different package managers
         if run_command("which apt-get", "Checking for apt-get"):
-            return run_command("sudo apt update && sudo apt install -y ffmpeg", "Installing FFmpeg via apt")
+            return run_command(" apt update &&  apt install -y ffmpeg", "Installing FFmpeg via apt")
         elif run_command("which yum", "Checking for yum"):
-            return run_command("sudo yum install -y ffmpeg", "Installing FFmpeg via yum")
+            return run_command(" yum install -y ffmpeg", "Installing FFmpeg via yum")
         elif run_command("which dnf", "Checking for dnf"):
-            return run_command("sudo dnf install -y ffmpeg", "Installing FFmpeg via dnf")
+            return run_command(" dnf install -y ffmpeg", "Installing FFmpeg via dnf")
         else:
             print("❌ Could not determine package manager. Please install FFmpeg manually.")
             return False
@@ -86,11 +86,11 @@ def install_cmake():
     elif system == "linux":
         # Try different package managers
         if run_command("which apt-get", "Checking for apt-get"):
-            return run_command("sudo apt update && sudo apt install -y cmake", "Installing CMake via apt")
+            return run_command(" apt update &&  apt install -y cmake", "Installing CMake via apt")
         elif run_command("which yum", "Checking for yum"):
-            return run_command("sudo yum install -y cmake", "Installing CMake via yum")
+            return run_command(" yum install -y cmake", "Installing CMake via yum")
         elif run_command("which dnf", "Checking for dnf"):
-            return run_command("sudo dnf install -y cmake", "Installing CMake via dnf")
+            return run_command(" dnf install -y cmake", "Installing CMake via dnf")
         else:
             print("❌ Could not determine package manager. Please install CMake manually.")
             return False
