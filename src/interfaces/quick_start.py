@@ -25,7 +25,7 @@ def quick_generate():
     
     try:
         # Import and run the generator
-        from generate_cartoon_short import CartoonShortsGenerator, VideoConfig
+        from src.core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
         
         # Create simple config
         config = VideoConfig(
