@@ -108,22 +108,21 @@ class AnimationGenerator:
             return self._create_static_frames(image_path, output_dir, num_frames)
     
     def _create_cinematic_zoom_pan(self, image_path: str, output_dir: str, num_frames: int) -> str:
-        """Create cinematic zoom and pan animation with smooth easing."""
+        """Create cinematic zoom and pan animation with smooth easing.
+
+        Uses zoompan with frame index variable 'on' (not 't') for FFmpeg 4.4 compatibility.
+        Falls back to smooth slide animation if zoompan is unavailable.
+        """
         try:
-            # Advanced easing function for smooth motion
-            easing = "easeInOutCubic"
-            zoom_factor = 1.0 + (num_frames * 0.001)  # Gentle zoom based on duration
-            
-            # Note: Do NOT include shell quotes inside the filter string when using subprocess with arg lists
-            # Simpler z expression for FFmpeg 4.4 compatibility (avoid min())
-            # Gentle zoom without clamp: z=1+0.0008*t
+            # For FFmpeg 4.4, the zoompan filter does not support 't' (time) variable.
+            # Use 'on' (output frame index) to drive motion and zoom.
             vf = (
-                f"scale=1200:1600:force_original_aspect_ratio=decrease,"
-                f"pad=1200:1600:(ow-iw)/2:(oh-ih)/2,"
-                f"zoompan=z=1+0.0008*t:d={num_frames}:"
-                f"x=iw/2-(iw/zoom/2)+sin(t*0.01)*20:"
-                f"y=ih/2-(ih/zoom/2)+cos(t*0.01)*15:"
-                f"s=768x1024"
+                "scale=1200:1600:force_original_aspect_ratio=decrease,"
+                "pad=1200:1600:(ow-iw)/2:(oh-ih)/2,"
+                f"zoompan=z=1+on*0.001:d={num_frames}:"
+                "x=iw/2-(iw/zoom/2)+sin(on*0.1)*20:"
+                "y=ih/2-(ih/zoom/2)+cos(on*0.1)*15:"
+                "s=768x1024"
             )
             cmd = [
                 'ffmpeg', '-y',
@@ -151,7 +150,11 @@ class AnimationGenerator:
             except Exception:
                 pass
             logger.error(f"Error creating cinematic animation: {e}")
-            return self._create_static_frames(image_path, output_dir, num_frames)
+            # Fallback to a motion-based effect instead of static frames
+            try:
+                return self._create_smooth_slide_animation(image_path, output_dir, num_frames)
+            except Exception:
+                return self._create_static_frames(image_path, output_dir, num_frames)
     
     def _create_smooth_slide_animation(self, image_path: str, output_dir: str, num_frames: int) -> str:
         """Create smooth sliding animation with organic motion."""
