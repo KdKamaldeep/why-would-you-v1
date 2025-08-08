@@ -12,10 +12,18 @@ pydub
 opencv-python
 
 # Machine learning and computer vision
-torch
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
 # dlib  # Requires CMake - install separately if needed
 # face_alignment  # Requires dlib
 transformers
+
+# AI Image Generation (Stable Diffusion)
+diffusers
+accelerate
+safetensors
+xformers  # Optional but recommended for memory efficiency
 
 # Alternative face processing (no CMake required)
 mediapipe
