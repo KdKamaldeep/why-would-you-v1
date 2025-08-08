@@ -7,7 +7,7 @@ A complete Python CLI tool for creating vertical cartoon-style YouTube Shorts vi
 - **🤖 AI Script Generation**: Uses OpenAI GPT-4 to create engaging scripts
 - **🎨 Cartoon Image Generation**: Generates cartoon-style images using Stable Diffusion (ToonYou model)
 - **🎵 AI Narration**: Creates natural-sounding voiceovers using ElevenLabs
-- **🎭 Lip-Sync**: Applies lip-sync to characters using Wav2Lip
+- **🎵 Audio Integration**: Syncs audio with animated video clips
 - **🎬 Video Processing**: Compiles everything into vertical YouTube Shorts format
 - **📝 Subtitles**: Automatically adds styled subtitles
 - **🎯 Vertical Format**: Optimized for 9:16 aspect ratio (1080x1920)
@@ -17,7 +17,7 @@ A complete Python CLI tool for creating vertical cartoon-style YouTube Shorts vi
 - **OpenAI GPT-4** → Script and visual prompt generation
 - **Stable Diffusion (ToonYou)** → Cartoon image generation
 - **ElevenLabs** → High-quality text-to-speech narration
-- **Wav2Lip** → Lip-sync character faces to narration
+- **Audio Processing** → Integrates narration with video clips
 - **FFmpeg** → Video processing, stitching, and final compilation
 - **Python** → Core orchestration and automation
 
@@ -94,26 +94,7 @@ sudo apt install ffmpeg
 ffmpeg -version
 ```
 
-### 4. Install Wav2Lip
-
-**Clone and setup Wav2Lip:**
-```bash
-# Clone the repository
-git clone https://github.com/Rudrabha/Wav2Lip.git
-cd Wav2Lip
-
-# Download pretrained models
-wget 'https://iiitaphyd-my.sharepoint.com/personal/radrabha_m_research_iiit_ac_in/_layouts/15/download.aspx?share=EdjI7bZlgApMqsVoEUUXpLsBxqXbn5z8VTmoxpQY6fQSlA' -O 'checkpoints/wav2lip.pth'
-wget 'https://iiitaphyd-my.sharepoint.com/personal/radrabha_m_research_iiit_ac_in/_layouts/15/download.aspx?share=EdjI7bZlgApMqsVoEUUXpLsBxqXbn5z8VTmoxpQY6fQSlA' -O 'checkpoints/wav2lip_gan.pth'
-
-# Install Wav2Lip dependencies
-pip install -r requirements.txt
-
-# Return to project root
-cd ..
-```
-
-### 5. Download AI Models
+### 4. Download AI Models
 
 **Create models directory:**
 ```bash

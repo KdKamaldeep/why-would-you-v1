@@ -4,8 +4,6 @@
 First, create the necessary directories:
 ```bash
 mkdir -p models
-mkdir -p Wav2Lip/checkpoints
-mkdir -p Wav2Lip/face_detection/detection/sfd
 mkdir -p loras
 ```
 
@@ -50,28 +48,7 @@ curl -L "https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/resolve/main/
      --progress-bar
 ```
 
-## Wav2Lip Models
 
-### Wav2Lip Pretrained Model
-```bash
-curl -L "https://iiitaphyd-my.sharepoint.com/personal/radrabha_m_research_iiit_ac_in/_layouts/15/download.aspx?share=EdjI7bZlgApMqsVoEUUXpLsBxqXbn5z8VTmoxpQY6fQSlA" \
-     -o "Wav2Lip/checkpoints/wav2lip.pth" \
-     --progress-bar
-```
-
-### Wav2Lip GAN Model (Higher Quality)
-```bash
-curl -L "https://iiitaphyd-my.sharepoint.com/personal/radrabha_m_research_iiit_ac_in/_layouts/15/download.aspx?share=Eb56pIgZgnRAqCwhKKWKoLwBnha3qLh3KdN7bfXb9XnXfQ" \
-     -o "Wav2Lip/checkpoints/wav2lip_gan.pth" \
-     --progress-bar
-```
-
-### Face Detection Model
-```bash
-curl -L "https://www.adrianbulat.com/downloads/python-fan/s3fd-619a316812.pth" \
-     -o "Wav2Lip/face_detection/detection/sfd/s3fd.pth" \
-     --progress-bar
-```
 
 ## Windows PowerShell Commands
 
@@ -102,14 +79,7 @@ Invoke-WebRequest -Uri "https://huggingface.co/guoyww/animatediff/resolve/main/m
 Invoke-WebRequest -Uri "https://huggingface.co/latent-consistency/lcm-lora-sdv1-5/resolve/main/pytorch_lora_weights.safetensors" -OutFile "loras/animov.safetensors"
 ```
 
-### Wav2Lip Models
-```powershell
-Invoke-WebRequest -Uri "https://iiitaphyd-my.sharepoint.com/personal/radrabha_m_research_iiit_ac_in/_layouts/15/download.aspx?share=EdjI7bZlgApMqsVoEUUXpLsBxqXbn5z8VTmoxpQY6fQSlA" -OutFile "Wav2Lip/checkpoints/wav2lip.pth"
 
-Invoke-WebRequest -Uri "https://iiitaphyd-my.sharepoint.com/personal/radrabha_m_research_iiit_ac_in/_layouts/15/download.aspx?share=Eb56pIgZgnRAqCwhKKWKoLwBnha3qLh3KdN7bfXb9XnXfQ" -OutFile "Wav2Lip/checkpoints/wav2lip_gan.pth"
-
-Invoke-WebRequest -Uri "https://www.adrianbulat.com/downloads/python-fan/s3fd-619a316812.pth" -OutFile "Wav2Lip/face_detection/detection/sfd/s3fd.pth"
-```
 
 ## Model Sizes (Approximate)
 - ToonYou: ~2.3 GB
@@ -117,10 +87,8 @@ Invoke-WebRequest -Uri "https://www.adrianbulat.com/downloads/python-fan/s3fd-61
 - AnimateDiff v1.5: ~1.7 GB
 - Motion Module: ~1.8 GB
 - Cartoon LoRA: ~144 MB
-- Wav2Lip models: ~338 MB total
-- Face detection: ~89 MB
 
-**Total download size: ~8.7 GB**
+**Total download size: ~6.0 GB**
 
 ## Notes
 - Make sure you have sufficient disk space before downloading

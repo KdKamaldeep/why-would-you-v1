@@ -99,22 +99,7 @@ def install_cmake():
         print(f"❌ Unsupported operating system: {system}")
         return False
 
-def setup_wav2lip():
-    """Set up Wav2Lip."""
-    if Path("Wav2Lip").exists():
-        print("✅ Wav2Lip directory already exists")
-        return True
-    
-    print("📋 Setting up Wav2Lip...")
-    print("Please follow these steps manually:")
-    print("1. git clone https://github.com/Rudrabha/Wav2Lip.git")
-    print("2. cd Wav2Lip")
-    print("3. pip install -r requirements.txt")
-    print("4. Download pretrained models:")
-    print("   wget 'https://iiitaphyd-my.sharepoint.com/personal/radrabha_m_research_iiit_ac_in/_layouts/15/download.aspx?share=EdjI7bZlgApMqsVoEUUXpLsBxqXbn5z8VTmoxpQY6fQSlA' -O 'checkpoints/wav2lip.pth'")
-    print("   wget 'https://iiitaphyd-my.sharepoint.com/personal/radrabha_m_research_iiit_ac_in/_layouts/15/download.aspx?share=EdjI7bZlgApMqsVoEUUXpLsBxqXbn5z8VTmoxpQY6fQSlA' -O 'checkpoints/wav2lip_gan.pth'")
-    print("5. cd ..")
-    return False
+
 
 def download_models():
     """Download AI models."""
@@ -178,8 +163,7 @@ def main():
         print("After installing CMake, you can uncomment dlib and face_alignment in requirements.txt")
         print("Then run: pip install dlib face_alignment")
     
-    # Set up Wav2Lip
-    success &= setup_wav2lip()
+
     
     # Download models
     success &= download_models()
@@ -196,8 +180,7 @@ def main():
         print("\nNext steps:")
         print("1. Edit .env file and add your API keys")
         print("2. Download the required AI models")
-        print("3. Set up Wav2Lip")
-        print("4. Add background music to the 'music/' directory")
+        print("3. Add background music to the 'music/' directory")
         print("5. Run: python generate_cartoon_short.py --prompt 'Your story prompt'")
     else:
         print("⚠️  Setup completed with some issues.")

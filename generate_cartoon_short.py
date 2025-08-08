@@ -7,7 +7,7 @@ This script follows a specific flow:
 2. Create cartoon images with Stable Diffusion (ToonYou/MeinaMix)
 3. Animate images with AnimateDiff + cartoon LoRA
 4. Generate narration with ElevenLabs
-5. Apply lip-sync with Wav2Lip
+5. Add audio to video clips
 6. Add subtitles and background music
 7. Compile final vertical video
 
@@ -34,7 +34,7 @@ from image_generator import ImageGenerator
 from voice_generator import VoiceGenerator
 from animation_generator import AnimationGenerator
 from video_processor import VideoProcessor, VideoConfig as VPConfig
-from lip_sync_processor import LipSyncProcessor
+
 
 # Load environment variables
 load_dotenv()
@@ -77,7 +77,7 @@ class CartoonShortsGenerator:
         self.image_generator = ImageGenerator()
         self.animation_generator = AnimationGenerator()
         self.voice_generator = VoiceGenerator(os.getenv('ELEVENLABS_API_KEY', ''))
-        self.lip_sync = LipSyncProcessor()
+
         
         # Create video config for processor
         video_config = VPConfig(
@@ -132,13 +132,9 @@ class CartoonShortsGenerator:
                 str(narration_path)
             )
             
-            # Step 6: Apply lip-sync with Wav2Lip
-            logger.info("Step 6: Applying lip-sync...")
-            lip_sync_clips = self.lip_sync.process_multiple_videos(
-                video_clips,
-                str(narration_path),
-                str(self.output_dir)
-            )
+            # Step 6: Use video clips directly (no lip-sync)
+            logger.info("Step 6: Preparing video clips...")
+            final_clips = video_clips
             
             # Step 7: Create subtitles
             logger.info("Step 7: Creating subtitles...")
@@ -153,7 +149,7 @@ class CartoonShortsGenerator:
             logger.info("Step 9: Compiling final video...")
             final_output = self.output_dir / "final_short.mp4"
             self.video_processor.compile_final_video(
-                lip_sync_clips,
+                final_clips,
                 str(narration_path),
                 background_music,
                 str(subtitles_path),
