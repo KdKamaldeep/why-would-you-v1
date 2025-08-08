@@ -25,22 +25,40 @@ class ImageGenerator:
         
     def _initialize_pipeline(self):
         """Initialize the Stable Diffusion pipeline."""
+        # Import dependencies first, handle ImportError narrowly
         try:
-            # Try to import required packages
             from diffusers import StableDiffusionPipeline
-            import safetensors
-            
+            import safetensors  # noqa: F401
+        except ImportError as e:
+            logger.warning(f"⚠️ Diffusers stack not available: {e}")
+            logger.info("📦 Installing required packages...")
+            try:
+                import subprocess
+                subprocess.run([
+                    "pip", "install",
+                    "diffusers>=0.25.0",
+                    "transformers>=4.30.0",
+                    "accelerate>=0.20.0",
+                    "safetensors>=0.3.0"
+                ], check=True)
+                logger.info("✅ Packages installed! Please restart the script.")
+            except Exception as install_error:
+                logger.error(f"❌ Failed to install packages: {install_error}")
+                logger.info("💡 Please install manually: pip install diffusers transformers accelerate safetensors")
+            return
+
+        try:
             logger.info(f"🚀 Initializing Stable Diffusion pipeline...")
             logger.info(f"💻 Device: {self.device}")
             logger.info(f"📁 Model path: {self.model_path}")
-            
+
             # Check if model file exists
             if not Path(self.model_path).exists():
                 logger.warning(f"⚠️ Model file not found: {self.model_path}")
                 logger.info("💡 Will use placeholder images instead")
                 logger.info("📥 Run: bash download_models.sh to download models")
                 return
-            
+
             # Load the pipeline with the custom model
             logger.info("📦 Loading Stable Diffusion model...")
             self.pipe = StableDiffusionPipeline.from_single_file(
@@ -50,35 +68,25 @@ class ImageGenerator:
                 requires_safety_checker=False,
                 use_safetensors=True
             )
-            
+
             if self.device == 'cuda':
                 self.pipe = self.pipe.to(self.device)
-                # Enable memory optimizations
+                # Enable memory optimizations (best-effort, never fail)
                 if hasattr(self.pipe, 'enable_memory_efficient_attention'):
-                    self.pipe.enable_memory_efficient_attention()
+                    try:
+                        self.pipe.enable_memory_efficient_attention()
+                    except Exception:
+                        pass
                 if hasattr(self.pipe, 'enable_xformers_memory_efficient_attention'):
-                    self.pipe.enable_xformers_memory_efficient_attention()
-            
+                    try:
+                        self.pipe.enable_xformers_memory_efficient_attention()
+                    except Exception:
+                        logger.info("ℹ️ xFormers not available; continuing without it")
+
             self.sd_available = True
             logger.info("✅ Stable Diffusion pipeline initialized successfully!")
             logger.info("🎨 Ready to generate professional cartoon images!")
-            
-        except ImportError as e:
-            logger.warning(f"⚠️ Diffusers not available: {e}")
-            logger.info("📦 Installing required packages...")
-            try:
-                import subprocess
-                subprocess.run([
-                    "pip", "install", 
-                    "diffusers>=0.25.0", 
-                    "transformers>=4.30.0", 
-                    "accelerate>=0.20.0", 
-                    "safetensors>=0.3.0"
-                ], check=True)
-                logger.info("✅ Packages installed! Please restart the script.")
-            except Exception as install_error:
-                logger.error(f"❌ Failed to install packages: {install_error}")
-                logger.info("💡 Please install manually: pip install diffusers transformers accelerate safetensors")
+
         except Exception as e:
             logger.warning(f"❌ Failed to initialize SD pipeline: {e}")
             logger.info("💡 Will use placeholder images instead")
