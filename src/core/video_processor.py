@@ -17,6 +17,13 @@ class VideoConfig:
     fps: int = 15
     width: int = 768
     height: int = 1024
+    # Encoding options (optimize for smaller files)
+    codec: str = "libx265"           # Use HEVC for ~40-60% smaller files
+    crf: int = 28                     # Lower = higher quality. 28 is good for social/cartoon
+    preset: str = "medium"           # slower = smaller; keep reasonable CPU cost
+    tune: str = "animation"          # better compression for cartoons
+    audio_bitrate: str = "96k"       # narration-friendly bitrate
+    faststart: bool = True            # enable moov atom at front for streaming
 
 class VideoProcessor:
     """Handles video processing and compilation using FFmpeg."""
@@ -31,12 +38,18 @@ class VideoProcessor:
                 'ffmpeg', '-y',
                 '-framerate', str(fps),
                 '-i', f'{frames_dir}/frame_%04d.png',
-                '-c:v', 'libx264',
-                '-preset', 'fast',
-                '-crf', '23',
-                '-pix_fmt', 'yuv420p',
-                output_path
+                '-c:v', self.config.codec,
+                '-preset', self.config.preset,
+                '-crf', str(self.config.crf),
+                '-tune', self.config.tune,
+                '-pix_fmt', 'yuv420p'
             ]
+            # Improve compatibility for HEVC in MP4 (especially on Safari)
+            if self.config.codec == 'libx265':
+                cmd.extend(['-tag:v', 'hvc1'])
+            if self.config.faststart:
+                cmd.extend(['-movflags', '+faststart'])
+            cmd.append(output_path)
             
             subprocess.run(cmd, check=True, capture_output=True)
             logger.info(f"Created video from frames: {output_path}")
@@ -145,23 +158,40 @@ class VideoProcessor:
             
             subprocess.run(cmd, check=True, capture_output=True)
             
+            # Probe temp video duration to cap final output length safely
+            try:
+                probe_cmd = [
+                    'ffprobe', '-v', 'error',
+                    '-show_entries', 'format=duration',
+                    '-of', 'default=nw=1:nk=1',
+                    temp_video
+                ]
+                result = subprocess.run(probe_cmd, check=True, capture_output=True)
+                video_duration_str = result.stdout.decode('utf-8', errors='ignore').strip()
+                video_duration = float(video_duration_str)
+            except Exception:
+                video_duration = None
+
             # Prepare audio inputs
             audio_inputs = ['-i', narration_audio]
-            if background_music and os.path.exists(background_music):
+            have_music = bool(background_music and os.path.exists(background_music))
+            if have_music:
                 audio_inputs.extend(['-i', background_music])
             
             # Build FFmpeg command
             cmd = ['ffmpeg', '-y', '-i', temp_video] + audio_inputs
             
             # Add audio mixing filter
-            if background_music and os.path.exists(background_music):
+            if have_music:
+                # Mix narration and bgm to the longest, then pad to ensure audio covers full video duration
                 cmd.extend([
-                    '-filter_complex', '[1:a]volume=0.3[a1];[2:a]volume=0.1[a2];[a1][a2]amix=inputs=2:duration=longest[aout]',
+                    '-filter_complex', '[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad[aout]',
                     '-map', '0:v',
                     '-map', '[aout]'
                 ])
             else:
-                cmd.extend(['-map', '0:v', '-map', '1:a'])
+                # Single narration track: pad with silence to ensure full coverage
+                cmd.extend(['-map', '0:v', '-map', '1:a', '-af', 'apad'])
             
             # Add subtitle overlay if provided
             if subtitles_path and os.path.exists(subtitles_path):
@@ -169,14 +199,25 @@ class VideoProcessor:
                     '-vf', f'subtitles={subtitles_path}:force_style=\'FontSize=32,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1\''
                 ])
             
-            # Final output settings
+            # Final output settings (size-focused)
             cmd.extend([
-                '-c:v', 'libx264',
+                '-c:v', self.config.codec,
+                '-preset', self.config.preset,
+                '-crf', str(self.config.crf),
+                '-tune', self.config.tune,
                 '-c:a', 'aac',
-                '-shortest',
-                '-pix_fmt', 'yuv420p',
-                output_path
+                '-b:a', self.config.audio_bitrate,
+                '-pix_fmt', 'yuv420p'
             ])
+            # Cap final muxing to video duration to prevent runaway outputs
+            if video_duration is not None and video_duration > 0:
+                cmd.extend(['-t', f"{video_duration:.3f}"])
+            # Do NOT use -shortest; we want full video length regardless of audio length
+            if self.config.codec == 'libx265':
+                cmd.extend(['-tag:v', 'hvc1'])
+            if self.config.faststart:
+                cmd.extend(['-movflags', '+faststart'])
+            cmd.append(output_path)
             
             subprocess.run(cmd, check=True, capture_output=True)
             

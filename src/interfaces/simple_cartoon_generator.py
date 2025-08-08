@@ -131,6 +131,12 @@ Examples:
     )
     
     parser.add_argument(
+        "--no-reuse",
+        action="store_true",
+        help="Force regeneration of all assets (ignore cached outputs)"
+    )
+    
+    parser.add_argument(
         "--check-only",
         action="store_true",
         help="Only check requirements, don't generate video"
@@ -170,7 +176,8 @@ Examples:
                 title=title,
                 description=description,
                 custom_scenes=scenes,
-                scene_duration=scene_duration
+                scene_duration=scene_duration,
+                reuse_existing=(not args.no_reuse)
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()

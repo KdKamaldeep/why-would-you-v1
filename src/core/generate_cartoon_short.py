@@ -69,6 +69,8 @@ class VideoConfig:
     description: Optional[str] = None
     custom_scenes: Optional[List[DictType]] = None  # Each item may contain: title, visual_prompt, duration (optional)
     scene_duration: int = 8  # Used when custom_scenes is provided and per-scene duration not specified
+    # Reuse assets to speed up repeated runs
+    reuse_existing: bool = True
 
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
@@ -98,8 +100,22 @@ class CartoonShortsGenerator:
         logger.info(f"Starting video generation for prompt: {self.config.prompt}")
         
         try:
+            # Early exit if final video already exists and reuse is enabled
+            final_output = self.output_dir / "final_short.mp4"
+            if self.config.reuse_existing and final_output.exists():
+                logger.info(f"Final video already exists and reuse is enabled: {final_output}")
+                return str(final_output)
             # Step 1: Generate story
-            if self.config.custom_scenes and len(self.config.custom_scenes) > 0:
+            script_path = self.output_dir / "script.json"
+            if self.config.reuse_existing and script_path.exists():
+                logger.info(f"Reusing existing script: {script_path}")
+                with open(script_path, 'r', encoding='utf-8') as f:
+                    script = json.load(f)
+                try:
+                    self.config.duration = int(script.get('total_duration', self.config.duration))
+                except Exception:
+                    pass
+            elif self.config.custom_scenes and len(self.config.custom_scenes) > 0:
                 logger.info("Step 1: Using custom storyboard scenes provided by user...")
                 script = self.script_generator.generate_script_from_custom(
                     title=self.config.title or f"Story: {self.config.prompt}",
@@ -113,19 +129,27 @@ class CartoonShortsGenerator:
                     self.config.duration = max(self.config.duration, total_duration)
                 except Exception:
                     pass
+                # Save script for reuse
+                with open(script_path, 'w', encoding='utf-8') as f:
+                    json.dump(script, f, indent=2)
             else:
                 logger.info("Step 1: Generating 3-scene story...")
                 script = self.script_generator.generate_script(self.config.prompt, self.config.duration)
+                with open(script_path, 'w', encoding='utf-8') as f:
+                    json.dump(script, f, indent=2)
             
             # Step 2: Generate cartoon images with Stable Diffusion
             logger.info("Step 2: Generating cartoon images...")
             image_paths = []
             for i, scene in enumerate(script['scenes']):
                 image_path = self.output_dir / f"scene_{i+1}.png"
-                self.image_generator.generate_cartoon_image(
-                    scene['visual_prompt'], 
-                    str(image_path)
-                )
+                if self.config.reuse_existing and image_path.exists():
+                    logger.info(f"Skipping image generation (exists): {image_path}")
+                else:
+                    self.image_generator.generate_cartoon_image(
+                        scene['visual_prompt'], 
+                        str(image_path)
+                    )
                 image_paths.append(str(image_path))
             
             # Step 3: Animate images with AnimateDiff
@@ -146,29 +170,49 @@ class CartoonShortsGenerator:
             logger.info(f"Frames per scene: {frames_per_scene}")
             logger.info("🎬 Using enhanced animation system (unlimited length capability)")
             
-            frame_dirs = self.animation_generator.animate_multiple_images_with_duration(
-                image_paths,
-                str(self.output_dir),
-                frames_per_scene,
-                prompts=scene_prompts
-            )
+            frame_dirs: List[str] = []
+            for i, image_path in enumerate(image_paths):
+                frames_dir = self.output_dir / f"scene_{i+1}_frames"
+                expected_frames = frames_per_scene[i]
+                if self.config.reuse_existing and frames_dir.exists():
+                    # Count frames
+                    existing = list(frames_dir.glob("frame_*.png"))
+                    if len(existing) >= expected_frames:
+                        logger.info(f"Skipping animation (frames ready): {frames_dir} ({len(existing)} frames)")
+                        frame_dirs.append(str(frames_dir))
+                        continue
+                # Generate frames
+                dir_path = self.animation_generator.animate_image(
+                    image_path,
+                    str(frames_dir),
+                    num_frames=expected_frames,
+                    prompt=scene_prompts[i] if i < len(scene_prompts) else ""
+                )
+                frame_dirs.append(dir_path)
             
             # Step 4: Convert frames to MP4 videos
             logger.info("Step 4: Converting frames to videos...")
-            video_clips = self.video_processor.frames_to_multiple_videos(
-                frame_dirs,
-                str(self.output_dir),
-                fps=15
-            )
+            video_clips: List[str] = []
+            for i, frames_dir in enumerate(frame_dirs):
+                clip_path = self.output_dir / f"scene_{i+1}.mp4"
+                if self.config.reuse_existing and clip_path.exists():
+                    logger.info(f"Skipping frames->video (exists): {clip_path}")
+                    video_clips.append(str(clip_path))
+                    continue
+                video_path = self.video_processor.frames_to_video(frames_dir, str(clip_path), fps=self.config.fps)
+                video_clips.append(video_path)
             
             # Step 5: Generate narration with ElevenLabs
             logger.info("Step 5: Generating narration...")
             narration_path = self.output_dir / "narration.mp3"
-            self.voice_generator.generate_narration_from_script(
-                script,
-                self.config.voice_id,
-                str(narration_path)
-            )
+            if self.config.reuse_existing and narration_path.exists():
+                logger.info(f"Skipping narration (exists): {narration_path}")
+            else:
+                self.voice_generator.generate_narration_from_script(
+                    script,
+                    self.config.voice_id,
+                    str(narration_path)
+                )
             
             # Step 6: Use video clips directly (no lip-sync)
             logger.info("Step 6: Preparing video clips...")
@@ -177,7 +221,10 @@ class CartoonShortsGenerator:
             # Step 7: Create subtitles
             logger.info("Step 7: Creating subtitles...")
             subtitles_path = self.output_dir / "subtitles.srt"
-            self.video_processor.create_subtitles_srt(script, str(subtitles_path))
+            if self.config.reuse_existing and subtitles_path.exists():
+                logger.info(f"Skipping subtitles (exists): {subtitles_path}")
+            else:
+                self.video_processor.create_subtitles_srt(script, str(subtitles_path))
             
             # Step 8: Select background music
             logger.info("Step 8: Adding background music...")
@@ -185,7 +232,6 @@ class CartoonShortsGenerator:
             
             # Step 9: Compile final video
             logger.info("Step 9: Compiling final video...")
-            final_output = self.output_dir / "final_short.mp4"
             self.video_processor.compile_final_video(
                 final_clips,
                 str(narration_path),
