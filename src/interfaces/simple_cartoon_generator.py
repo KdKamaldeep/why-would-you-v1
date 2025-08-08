@@ -58,7 +58,7 @@ def generate_cartoon(prompt, style="cartoon", duration=30):
     """Generate a cartoon video with the given prompt."""
     try:
         # Import the main generator
-        from generate_cartoon_short import CartoonShortsGenerator, VideoConfig
+        from ..core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
         
         print(f"🎬 Starting cartoon generation...")
         print(f"📝 Prompt: {prompt}")

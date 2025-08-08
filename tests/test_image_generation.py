@@ -6,7 +6,11 @@ Test script for Stable Diffusion image generation
 import os
 import logging
 from pathlib import Path
-from image_generator import ImageGenerator
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+from core.image_generator import ImageGenerator
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

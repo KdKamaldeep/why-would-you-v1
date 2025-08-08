@@ -29,11 +29,11 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 # Import modular classes
-from script_generator import ScriptGenerator
-from image_generator import ImageGenerator
-from voice_generator import VoiceGenerator
-from animation_generator import AnimationGenerator
-from video_processor import VideoProcessor, VideoConfig as VPConfig
+from .script_generator import ScriptGenerator
+from .image_generator import ImageGenerator
+from .voice_generator import VoiceGenerator
+from .animation_generator import AnimationGenerator
+from .video_processor import VideoProcessor, VideoConfig as VPConfig
 
 
 # Load environment variables
