@@ -6,7 +6,7 @@ Script Generator Module - Handles story and script generation using OpenAI GPT-4
 import json
 import logging
 import requests
-from typing import Dict
+from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +95,50 @@ class ScriptGenerator:
             logger.error(f"Error generating script: {e}")
             # Fallback script
             return self._generate_fallback_script(prompt, duration)
+
+    def generate_script_from_custom(
+        self,
+        title: str,
+        description: str,
+        scenes: List[Dict],
+        default_scene_duration: int = 8
+    ) -> Dict:
+        """Build a script object from user-provided storyboard scenes.
+
+        Each scene in `scenes` should contain at least a `visual_prompt` key and may optionally
+        include `narration`, `subtitle`, and `duration`.
+        """
+        total_duration = 0
+        normalized_scenes: List[Dict] = []
+        for idx, scene in enumerate(scenes):
+            visual_prompt = scene.get("visual_prompt") or scene.get("prompt") or scene.get("description")
+            if not visual_prompt:
+                # Skip invalid scene entries silently but log
+                logger.warning(f"Custom scene #{idx+1} missing visual_prompt/description; skipping")
+                continue
+            duration = int(scene.get("duration", default_scene_duration))
+            total_duration += duration
+            normalized_scenes.append({
+                "duration": duration,
+                "description": scene.get("description", visual_prompt),
+                "visual_prompt": visual_prompt,
+                "narration": scene.get("narration", scene.get("subtitle", "")),
+                "subtitle": scene.get("subtitle", scene.get("narration", "")) or f"Scene {idx+1}"
+            })
+
+        if not normalized_scenes:
+            logger.warning("No valid custom scenes provided; falling back to default script generation")
+            return self._generate_fallback_script(title, max(default_scene_duration*3, 24))
+
+        script: Dict = {
+            "title": title,
+            "description": description,
+            "total_duration": total_duration,
+            "scenes": normalized_scenes,
+            "tags": ["cartoon", "storybook", "adventure"]
+        }
+        logger.info(f"Built script from {len(normalized_scenes)} custom scenes (total {total_duration}s)")
+        return script
     
     def _generate_fallback_script(self, prompt: str, duration: int) -> Dict:
         """Generate a simple fallback script if API fails."""

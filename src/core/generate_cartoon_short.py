@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import List, Dict
 import logging
 from dataclasses import dataclass
+from typing import Optional, List, Dict as DictType
 from dotenv import load_dotenv
 
 # Import modular classes
@@ -63,6 +64,11 @@ class VideoConfig:
     voice_id: str = "pNInz6obpgDQGcFmaJgB"  # ElevenLabs voice ID
     language: str = "en"
     num_scenes: int = 3
+    # Optional storyboard support
+    title: Optional[str] = None
+    description: Optional[str] = None
+    custom_scenes: Optional[List[DictType]] = None  # Each item may contain: title, visual_prompt, duration (optional)
+    scene_duration: int = 8  # Used when custom_scenes is provided and per-scene duration not specified
 
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
@@ -92,9 +98,24 @@ class CartoonShortsGenerator:
         logger.info(f"Starting video generation for prompt: {self.config.prompt}")
         
         try:
-            # Step 1: Generate 3-scene story with OpenAI GPT-4
-            logger.info("Step 1: Generating 3-scene story...")
-            script = self.script_generator.generate_script(self.config.prompt, self.config.duration)
+            # Step 1: Generate story
+            if self.config.custom_scenes and len(self.config.custom_scenes) > 0:
+                logger.info("Step 1: Using custom storyboard scenes provided by user...")
+                script = self.script_generator.generate_script_from_custom(
+                    title=self.config.title or f"Story: {self.config.prompt}",
+                    description=self.config.description or f"An adventure about: {self.config.prompt}",
+                    scenes=self.config.custom_scenes,
+                    default_scene_duration=self.config.scene_duration
+                )
+                # Overwrite duration based on resulting script
+                try:
+                    total_duration = sum(scene.get('duration', self.config.scene_duration) for scene in script['scenes'])
+                    self.config.duration = max(self.config.duration, total_duration)
+                except Exception:
+                    pass
+            else:
+                logger.info("Step 1: Generating 3-scene story...")
+                script = self.script_generator.generate_script(self.config.prompt, self.config.duration)
             
             # Step 2: Generate cartoon images with Stable Diffusion
             logger.info("Step 2: Generating cartoon images...")

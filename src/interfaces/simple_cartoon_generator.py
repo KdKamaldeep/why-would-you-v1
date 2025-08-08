@@ -38,18 +38,13 @@ def check_requirements():
         print("❌ Models directory not found. Please run download_models.bat first.")
         return False
     
-    # Check for essential model files
-    essential_models = [
+    # Check for at least one supported model (others optional)
+    preferred_models = [
         "models/toonyou_beta6.safetensors",
-        "models/meina_mix.safetensors",
-        "models/mm_sd_v15_v2.safetensors"
+        "models/meina_mix.safetensors"
     ]
-    
-    for model in essential_models:
-        if not Path(model).exists():
-            print(f"❌ Model not found: {model}")
-            print("Please run download_models.bat to download required models.")
-            return False
+    if not any(Path(m).exists() for m in preferred_models):
+        print("⚠️ No preferred SD models found (toonyou or meina). The app will use placeholder images.")
     
     print("✅ All requirements satisfied!")
     return True
@@ -128,6 +123,12 @@ Examples:
         default=30,
         help="Video duration in seconds (default: 30)"
     )
+
+    parser.add_argument(
+        "--storyboard",
+        type=str,
+        help="Path to a JSON file with custom storyboard scenes (title, description, scenes[])"
+    )
     
     parser.add_argument(
         "--check-only",
@@ -150,7 +151,34 @@ Examples:
         sys.exit(0)
     
     # Generate cartoon
-    output_path = generate_cartoon(args.prompt, args.style, args.duration)
+    if args.storyboard:
+        try:
+            import json
+            from ..core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
+            with open(args.storyboard, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            scenes = data.get('scenes', [])
+            title = data.get('title')
+            description = data.get('description')
+            scene_duration = data.get('scene_duration', 8)
+
+            config = VideoConfig(
+                prompt=args.prompt,
+                duration=args.duration,
+                style=args.style,
+                output_path="output",
+                title=title,
+                description=description,
+                custom_scenes=scenes,
+                scene_duration=scene_duration
+            )
+            generator = CartoonShortsGenerator(config)
+            output_path = generator.generate()
+        except Exception as e:
+            print(f"❌ Failed to use storyboard: {e}")
+            output_path = None
+    else:
+        output_path = generate_cartoon(args.prompt, args.style, args.duration)
     
     if output_path:
         print(f"\n🎊 Success! Your cartoon is ready at: {output_path}")
