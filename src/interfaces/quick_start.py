@@ -49,5 +49,9 @@ def quick_generate():
         print("2. Download models with: download_models.bat")
         print("3. Set up your API keys in .env file")
 
+def main():
+    """Entry point wrapper to satisfy package imports."""
+    quick_generate()
+
 if __name__ == "__main__":
     quick_generate()
