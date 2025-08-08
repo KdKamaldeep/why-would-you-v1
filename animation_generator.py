@@ -6,9 +6,7 @@ Animation Generator Module - Professional quality unlimited length video generat
 import os
 import logging
 import subprocess
-import shutil
 import torch
-import numpy as np
 from pathlib import Path
 from typing import List, Optional
 from PIL import Image
