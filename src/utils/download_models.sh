@@ -10,6 +10,7 @@ echo "=" * 60
 echo "📁 Creating directories..."
 mkdir -p models
 mkdir -p loras
+mkdir -p models/tts
 
 echo "✅ Directories created"
 
@@ -61,6 +62,65 @@ else
 fi
 
 
+# Coqui TTS Models
+echo "\n📋 Downloading Coqui TTS Models..."
+
+# Prefer huggingface-cli if available; otherwise, fall back to Python API
+TARGET_TTS_DIR="models/tts/XTTS-v2"
+if command -v huggingface-cli >/dev/null 2>&1; then
+    echo "⬇️  Using huggingface-cli to download coqui/XTTS-v2..."
+    huggingface-cli download --repo-type model coqui/XTTS-v2 \
+        --local-dir "$TARGET_TTS_DIR" \
+        --local-dir-use-symlinks False
+    if [ $? -eq 0 ]; then
+        echo "✅ Coqui XTTS v2 downloaded to $TARGET_TTS_DIR"
+    else
+        echo "❌ huggingface-cli download failed, attempting Python fallback"
+        USE_PYTHON_FALLBACK=1
+    fi
+else
+    USE_PYTHON_FALLBACK=1
+fi
+
+if [ "${USE_PYTHON_FALLBACK}" = "1" ]; then
+    if command -v python3 >/dev/null 2>&1; then
+        echo "⬇️  Using Python (huggingface_hub) to download coqui/XTTS-v2..."
+        python3 - <<'PY'
+import sys
+from pathlib import Path
+try:
+    from huggingface_hub import snapshot_download
+except Exception as e:
+    print("[ERROR] huggingface_hub not available. Install it with: pip install huggingface_hub")
+    sys.exit(1)
+
+target_dir = Path("models/tts/XTTS-v2")
+target_dir.mkdir(parents=True, exist_ok=True)
+try:
+    snapshot_download(
+        repo_id="coqui/XTTS-v2",
+        repo_type="model",
+        local_dir=str(target_dir),
+        local_dir_use_symlinks=False,
+        ignore_patterns=["*.md", "*.png", "*.jpg", "*.jpeg"],
+        resume_download=True,
+    )
+    print("[OK] Coqui XTTS v2 downloaded to", target_dir)
+except Exception as e:
+    print("[ERROR] Failed to download Coqui XTTS v2:", e)
+    sys.exit(1)
+PY
+        if [ $? -eq 0 ]; then
+            echo "✅ Coqui XTTS v2 downloaded to $TARGET_TTS_DIR"
+        else
+            echo "❌ Failed to download Coqui XTTS v2. Ensure 'huggingface_hub' is installed or try installing requirements first."
+        fi
+    else
+        echo "❌ Python3 not found. Cannot download Coqui XTTS v2 without huggingface-cli."
+    fi
+fi
+
+
 
 echo ""
 echo "=" * 60
@@ -77,6 +137,8 @@ echo "  │   ├── Anything v5 (cartoon style): models/toonyou_beta6.safete
 echo "  │   └── AnimaGine XL (anime style): models/meina_mix.safetensors"
 echo "  └── ⚡ LoRA Models:"
 echo "      └── SDXL Lightning LoRA: loras/sdxl_lightning_4step.safetensors"
+echo "  ├── 🔊 TTS Models:"
+echo "  │   └── Coqui XTTS v2: models/tts/XTTS-v2"
 
 echo ""
 echo "🎬 PROFESSIONAL FEATURES ENABLED:"

@@ -23,19 +23,17 @@ def check_requirements():
     
     # Check API keys
     openai_key = os.getenv('OPENAI_API_KEY')
-    elevenlabs_key = os.getenv('ELEVENLABS_API_KEY')
+    # Coqui TTS does not require an API key when using local models
     
     if not openai_key or openai_key == 'your_openai_api_key_here':
         print("❌ OpenAI API key not configured in .env file")
         return False
         
-    if not elevenlabs_key or elevenlabs_key == 'your_elevenlabs_api_key_here':
-        print("❌ ElevenLabs API key not configured in .env file")
-        return False
+    # No ElevenLabs key needed; ensure TTS model directory exists if using local models
     
     # Check if models directory exists
     if not Path("models").exists():
-        print("❌ Models directory not found. Please run download_models.bat first.")
+        print("❌ Models directory not found. Please run the model download script first.")
         return False
     
     # Check for at least one supported model (others optional)

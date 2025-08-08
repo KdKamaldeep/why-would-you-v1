@@ -6,7 +6,7 @@ This script follows a specific flow:
 1. Generate 3-scene story with OpenAI GPT-4
 2. Create cartoon images with Stable Diffusion (ToonYou/MeinaMix)
 3. Animate images with AnimateDiff + cartoon LoRA
-4. Generate narration with ElevenLabs
+4. Generate narration with Coqui TTS (XTTS v2)
 5. Add audio to video clips
 6. Add subtitles and background music
 7. Compile final vertical video
@@ -61,7 +61,7 @@ class VideoConfig:
     height: int = 1024  # Vertical format for Shorts
     output_path: str = "output"
     style: str = "cartoon"
-    voice_id: str = "pNInz6obpgDQGcFmaJgB"  # ElevenLabs voice ID
+    voice_id: str = ""  # Optional path to reference speaker WAV for Coqui XTTS
     language: str = "en"
     num_scenes: int = 3
     # Optional storyboard support
@@ -84,7 +84,8 @@ class CartoonShortsGenerator:
         self.script_generator = ScriptGenerator(os.getenv('OPENAI_API_KEY', ''))
         self.image_generator = ImageGenerator()
         self.animation_generator = AnimationGenerator()
-        self.voice_generator = VoiceGenerator(os.getenv('ELEVENLABS_API_KEY', ''))
+        # Initialize Coqui TTS voice generator (uses local model if available)
+        self.voice_generator = VoiceGenerator(language=config.language)
 
         
         # Create video config for processor
@@ -209,7 +210,7 @@ class CartoonShortsGenerator:
                 video_path = self.video_processor.frames_to_video(frames_dir, str(clip_path), fps=self.config.fps)
                 video_clips.append(video_path)
             
-            # Step 5: Generate narration with ElevenLabs
+            # Step 5: Generate narration with Coqui TTS
             logger.info("Step 5: Generating narration...")
             narration_path = self.output_dir / "narration.mp3"
             scene_audio_paths = []
@@ -330,13 +331,13 @@ def main():
     parser.add_argument("--duration", type=int, default=30, help="Video duration in seconds")
     parser.add_argument("--output", default="output", help="Output directory")
     parser.add_argument("--style", default="cartoon", help="Visual style")
-    parser.add_argument("--voice", default="pNInz6obpgDQGcFmaJgB", help="ElevenLabs voice ID")
+    parser.add_argument("--voice", default="", help="Reference speaker WAV path for Coqui XTTS (optional)")
     parser.add_argument("--language", default="en", help="Language for narration")
     
     args = parser.parse_args()
     
     # Validate environment variables
-    required_env_vars = ['OPENAI_API_KEY', 'ELEVENLABS_API_KEY']
+    required_env_vars = ['OPENAI_API_KEY']
     missing_vars = [var for var in required_env_vars if not os.getenv(var)]
     
     if missing_vars:
