@@ -6,6 +6,24 @@ echo "🚀 Downloading AI Models for Professional Cartoon Generation"
 echo "🎬 Enhanced Animation System with Unlimited Length Capability"
 echo "=" * 60
 
+# Parse flags
+REDOWNLOAD=false
+for arg in "$@"; do
+    case "$arg" in
+        --re-download|--force)
+            REDOWNLOAD=true
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: bash src/utils/download_models.sh [--re-download]"
+            echo "  --re-download  Force re-downloading models even if present"
+            exit 0
+            ;;
+        *)
+            ;;
+    esac
+done
+
 # Create necessary directories
 echo "📁 Creating directories..."
 mkdir -p models
@@ -18,27 +36,37 @@ echo "✅ Directories created"
 echo "📋 Downloading Stable Diffusion Models..."
 
 # ToonYou model (cartoon style) - Alternative: Use Anything v5 model
-echo "⬇️  Downloading Anything v5 model (cartoon style alternative)..."
-curl -L "https://huggingface.co/genai-archive/anything-v5/resolve/main/anything-v5.safetensors" \
-     -o "models/toonyou_beta6.safetensors" \
-     --progress-bar
-
-if [ $? -eq 0 ]; then
-    echo "✅ Anything v5 model downloaded successfully"
+if [ -f "models/toonyou_beta6.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping Anything v5 (already exists): models/toonyou_beta6.safetensors"
 else
-    echo "❌ Failed to download Anything v5 model"
+    [ "$REDOWNLOAD" = true ] && rm -f "models/toonyou_beta6.safetensors"
+    echo "⬇️  Downloading Anything v5 model (cartoon style alternative)..."
+    curl -L "https://huggingface.co/genai-archive/anything-v5/resolve/main/anything-v5.safetensors" \
+         -o "models/toonyou_beta6.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ Anything v5 model downloaded successfully"
+    else
+        echo "❌ Failed to download Anything v5 model"
+    fi
 fi
 
 # AnimaGine XL model (anime style) - Alternative for MeinaMix
-echo "⬇️  Downloading AnimaGine XL model (anime style)..."
-curl -L "https://huggingface.co/cagliostrolab/animagine-xl-3.1/resolve/main/animagine-xl-3.1.safetensors" \
-     -o "models/meina_mix.safetensors" \
-     --progress-bar
-
-if [ $? -eq 0 ]; then
-    echo "✅ AnimaGine XL model downloaded successfully"
+if [ -f "models/meina_mix.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping AnimaGine XL (already exists): models/meina_mix.safetensors"
 else
-    echo "❌ Failed to download AnimaGine XL model"
+    [ "$REDOWNLOAD" = true ] && rm -f "models/meina_mix.safetensors"
+    echo "⬇️  Downloading AnimaGine XL model (anime style)..."
+    curl -L "https://huggingface.co/cagliostrolab/animagine-xl-3.1/resolve/main/animagine-xl-3.1.safetensors" \
+         -o "models/meina_mix.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ AnimaGine XL model downloaded successfully"
+    else
+        echo "❌ Failed to download AnimaGine XL model"
+    fi
 fi
 
 # Enhanced Animation System - Professional Quality Video Generation
@@ -50,42 +78,56 @@ echo "💡 No additional model downloads required - uses advanced FFmpeg techniq
 echo "📋 Downloading LoRA Models..."
 
 # SDXL Lightning LoRA (fast generation)
-echo "⬇️  Downloading SDXL Lightning LoRA..."
-curl -L "https://huggingface.co/ByteDance/SDXL-Lightning/resolve/main/sdxl_lightning_4step_lora.safetensors" \
-     -o "loras/sdxl_lightning_4step.safetensors" \
-     --progress-bar
-
-if [ $? -eq 0 ]; then
-    echo "✅ SDXL Lightning LoRA downloaded successfully"
+if [ -f "loras/sdxl_lightning_4step.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping SDXL Lightning LoRA (already exists): loras/sdxl_lightning_4step.safetensors"
 else
-    echo "❌ Failed to download SDXL Lightning LoRA"
+    [ "$REDOWNLOAD" = true ] && rm -f "loras/sdxl_lightning_4step.safetensors"
+    echo "⬇️  Downloading SDXL Lightning LoRA..."
+    curl -L "https://huggingface.co/ByteDance/SDXL-Lightning/resolve/main/sdxl_lightning_4step_lora.safetensors" \
+         -o "loras/sdxl_lightning_4step.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ SDXL Lightning LoRA downloaded successfully"
+    else
+        echo "❌ Failed to download SDXL Lightning LoRA"
+    fi
 fi
 
 
 # Coqui TTS Models
 echo "\n📋 Downloading Coqui TTS Models..."
 
-# Prefer huggingface-cli if available; otherwise, fall back to Python API
 TARGET_TTS_DIR="models/tts/XTTS-v2"
-if command -v huggingface-cli >/dev/null 2>&1; then
-    echo "⬇️  Using huggingface-cli to download coqui/XTTS-v2..."
-    huggingface-cli download --repo-type model coqui/XTTS-v2 \
-        --local-dir "$TARGET_TTS_DIR" \
-        --local-dir-use-symlinks False
-    if [ $? -eq 0 ]; then
-        echo "✅ Coqui XTTS v2 downloaded to $TARGET_TTS_DIR"
+if [ -d "$TARGET_TTS_DIR" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping Coqui XTTS v2 (already exists): $TARGET_TTS_DIR"
+else
+    if [ "$REDOWNLOAD" = true ] && [ -d "$TARGET_TTS_DIR" ]; then
+        echo "🧹 Removing existing directory for re-download: $TARGET_TTS_DIR"
+        rm -rf "$TARGET_TTS_DIR"
+    fi
+
+    # Prefer huggingface-cli if available; otherwise, fall back to Python API
+    if command -v huggingface-cli >/dev/null 2>&1; then
+        echo "⬇️  Using huggingface-cli to download coqui/XTTS-v2..."
+        huggingface-cli download --repo-type model coqui/XTTS-v2 \
+            --local-dir "$TARGET_TTS_DIR" \
+            --local-dir-use-symlinks False
+        if [ $? -eq 0 ]; then
+            echo "✅ Coqui XTTS v2 downloaded to $TARGET_TTS_DIR"
+            USE_PYTHON_FALLBACK=0
+        else
+            echo "❌ huggingface-cli download failed, attempting Python fallback"
+            USE_PYTHON_FALLBACK=1
+        fi
     else
-        echo "❌ huggingface-cli download failed, attempting Python fallback"
         USE_PYTHON_FALLBACK=1
     fi
-else
-    USE_PYTHON_FALLBACK=1
-fi
 
-if [ "${USE_PYTHON_FALLBACK}" = "1" ]; then
-    if command -v python3 >/dev/null 2>&1; then
-        echo "⬇️  Using Python (huggingface_hub) to download coqui/XTTS-v2..."
-        python3 - <<'PY'
+    if [ "${USE_PYTHON_FALLBACK}" = "1" ]; then
+        if command -v python3 >/dev/null 2>&1; then
+            echo "⬇️  Using Python (huggingface_hub) to download coqui/XTTS-v2..."
+            python3 - <<'PY'
 import sys
 from pathlib import Path
 try:
@@ -110,13 +152,14 @@ except Exception as e:
     print("[ERROR] Failed to download Coqui XTTS v2:", e)
     sys.exit(1)
 PY
-        if [ $? -eq 0 ]; then
-            echo "✅ Coqui XTTS v2 downloaded to $TARGET_TTS_DIR"
+            if [ $? -eq 0 ]; then
+                echo "✅ Coqui XTTS v2 downloaded to $TARGET_TTS_DIR"
+            else
+                echo "❌ Failed to download Coqui XTTS v2. Ensure 'huggingface_hub' is installed or try installing requirements first."
+            fi
         else
-            echo "❌ Failed to download Coqui XTTS v2. Ensure 'huggingface_hub' is installed or try installing requirements first."
+            echo "❌ Python3 not found. Cannot download Coqui XTTS v2 without huggingface-cli."
         fi
-    else
-        echo "❌ Python3 not found. Cannot download Coqui XTTS v2 without huggingface-cli."
     fi
 fi
 
