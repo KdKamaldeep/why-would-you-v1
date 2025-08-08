@@ -19,12 +19,17 @@ torchaudio>=2.0.0
 # face_alignment  # Requires dlib
 transformers
 
-# AI Image Generation (Stable Diffusion)
-diffusers[animatediff]
-accelerate
-safetensors
-xformers  # Optional but recommended for memory efficiency
-imageio-ffmpeg  # For AnimateDiff video export
+# Enhanced Animation System (Professional Quality)
+diffusers>=0.25.0
+transformers>=4.30.0
+accelerate>=0.20.0
+safetensors>=0.3.0
+xformers>=0.0.20  # Optional but recommended for memory efficiency
+huggingface_hub>=0.16.0
+einops
+omegaconf
+ftfy
+regex
 
 # Alternative face processing (no CMake required)
 mediapipe

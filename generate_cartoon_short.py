@@ -108,13 +108,27 @@ class CartoonShortsGenerator:
                 image_paths.append(str(image_path))
             
             # Step 3: Animate images with AnimateDiff
-            logger.info("Step 3: Animating images with AnimateDiff...")
-            # Extract scene prompts for better animation
+            logger.info("Step 3: Creating professional quality animations...")
+            # Calculate frames needed for each scene based on duration
             scene_prompts = [scene['visual_prompt'] for scene in script['scenes']]
-            frame_dirs = self.animation_generator.animate_multiple_images(
+            scene_durations = [scene['duration'] for scene in script['scenes']]
+            
+            # Calculate frames per scene: duration * fps
+            # Note: Enhanced animation system supports unlimited length!
+            frames_per_scene = []
+            for duration in scene_durations:
+                # Professional quality animation with proper timing
+                total_frames = max(30, int(duration * self.config.fps))  # Minimum 2 seconds per scene
+                frames_per_scene.append(total_frames)
+            
+            logger.info(f"Scene durations: {scene_durations} seconds")
+            logger.info(f"Frames per scene: {frames_per_scene}")
+            logger.info("🎬 Using enhanced animation system (unlimited length capability)")
+            
+            frame_dirs = self.animation_generator.animate_multiple_images_with_duration(
                 image_paths,
                 str(self.output_dir),
-                num_frames=24,
+                frames_per_scene,
                 prompts=scene_prompts
             )
             

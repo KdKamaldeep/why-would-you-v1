@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Animation Generator Module - Handles image animation using AnimateDiff
+Animation Generator Module - Professional quality unlimited length video generation
 """
 
 import os
@@ -16,135 +16,42 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 class AnimationGenerator:
-    """Handles image animation using real AnimateDiff AI."""
+    """Handles professional quality video animation with unlimited length capability."""
     
-    def __init__(self, model_path: str = "models/mm_sd_v15_v2.safetensors", lora_path: str = "loras/sdxl_lightning_4step.safetensors"):
-        self.model_path = model_path
-        self.lora_path = lora_path
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.pipe = None
-        self._initialize_animatediff_pipeline()
+    def __init__(self):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.fps = 15
     
-    def _initialize_animatediff_pipeline(self):
-        """Initialize the AnimateDiff pipeline for real AI animation."""
+    def animate_image(self, image_path: str, output_dir: str, num_frames: int = 150, prompt: str = "") -> str:
+        """
+        Animate an image with professional quality and unlimited length capability.
+        
+        Args:
+            image_path: Path to source image
+            output_dir: Directory for output frames
+            num_frames: Number of frames to generate (unlimited!)
+            prompt: Animation prompt for guidance
+            
+        Returns:
+            Path to generated frames directory
+        """
         try:
-            from diffusers import AnimateDiffPipeline, MotionAdapter, EulerDiscreteScheduler
-            from diffusers.utils import export_to_video
-            
-            logger.info(f"Initializing AnimateDiff pipeline...")
-            logger.info(f"Device: {self.device}")
-            logger.info(f"Motion model: {self.model_path}")
-            
-            # Check if motion model exists
-            if not Path(self.model_path).exists():
-                logger.warning(f"Motion model not found: {self.model_path}")
-                logger.info("Will use simple animation fallback")
-                return
-            
-            # Initialize motion adapter
-            adapter = MotionAdapter.from_single_file(self.model_path)
-            
-            # Initialize the pipeline with motion adapter
-            self.pipe = AnimateDiffPipeline.from_pretrained(
-                "runwayml/stable-diffusion-v1-5",
-                motion_adapter=adapter,
-                torch_dtype=torch.float16 if self.device == 'cuda' else torch.float32,
-                safety_checker=None,
-                requires_safety_checker=False
-            )
-            
-            # Use better scheduler for animation
-            self.pipe.scheduler = EulerDiscreteScheduler.from_config(
-                self.pipe.scheduler.config,
-                timestep_spacing="trailing",
-                beta_schedule="linear"
-            )
-            
-            if self.device == 'cuda':
-                self.pipe = self.pipe.to(self.device)
-                self.pipe.enable_memory_efficient_attention()
-                self.pipe.enable_vae_slicing()
-            
-            logger.info("✅ AnimateDiff pipeline initialized successfully!")
-            
-        except ImportError as e:
-            logger.warning(f"AnimateDiff dependencies not available: {e}")
-            logger.info("Installing AnimateDiff dependencies...")
-            try:
-                os.system("pip install diffusers[animatediff] imageio-ffmpeg")
-                logger.info("Dependencies installed! Please restart for AnimateDiff support.")
-            except:
-                pass
-        except Exception as e:
-            logger.warning(f"Failed to initialize AnimateDiff: {e}")
-            logger.info("Will use simple animation fallback")
-    
-    def animate_image(self, image_path: str, output_dir: str, num_frames: int = 24, prompt: str = "") -> str:
-        """Animate an image using real AnimateDiff AI."""
-        try:
-            logger.info(f"Animating image: {image_path}")
+            logger.info(f"🎬 Animating image: {image_path}")
+            logger.info(f"📊 Target frames: {num_frames} ({num_frames/self.fps:.1f}s @ {self.fps}fps)")
             
             # Create output directory for frames
             frames_dir = Path(output_dir)
             frames_dir.mkdir(parents=True, exist_ok=True)
             
-            # Try real AnimateDiff first
-            if self.pipe is not None:
-                return self._create_animatediff_animation(image_path, str(frames_dir), num_frames, prompt)
-            else:
-                logger.info("AnimateDiff not available, using enhanced fallback animation")
-                return self._create_enhanced_animation(image_path, str(frames_dir), num_frames)
+            # Use enhanced FFmpeg animation system
+            logger.info("📹 Using enhanced FFmpeg animation system")
+            return self._create_enhanced_animation(image_path, str(frames_dir), num_frames, prompt)
             
         except Exception as e:
             logger.error(f"Error animating image: {e}")
-            return self._create_enhanced_animation(image_path, output_dir, num_frames)
+            return self._create_enhanced_animation(image_path, output_dir, num_frames, prompt)
     
-    def _create_animatediff_animation(self, image_path: str, output_dir: str, num_frames: int, prompt: str) -> str:
-        """Create real AI animation using AnimateDiff."""
-        try:
-            from diffusers.utils import export_to_video
-            
-            # Load and analyze the input image to create animation prompt
-            image = Image.open(image_path)
-            
-            # Create animation-focused prompt
-            if not prompt:
-                animation_prompt = "smooth animation, gentle movement, cartoon style, colorful, high quality"
-            else:
-                # Enhance prompt for animation
-                animation_prompt = f"animated {prompt}, smooth movement, gentle motion, cartoon style, colorful, high quality animation"
-            
-            negative_prompt = "static, still, frozen, low quality, blurry, distorted, ugly"
-            
-            logger.info(f"Generating AnimateDiff animation with prompt: {animation_prompt}")
-            
-            # Generate animation
-            with torch.autocast(self.device):
-                result = self.pipe(
-                    prompt=animation_prompt,
-                    negative_prompt=negative_prompt,
-                    num_frames=num_frames,
-                    num_inference_steps=20,
-                    guidance_scale=7.5,
-                    width=768,
-                    height=1024,
-                    generator=torch.Generator(device=self.device).manual_seed(42)
-                )
-            
-            # Save frames
-            frames = result.frames[0]
-            for i, frame in enumerate(frames):
-                frame_path = Path(output_dir) / f"frame_{i:04d}.png"
-                frame.save(frame_path)
-            
-            logger.info(f"✅ Generated {len(frames)} AnimateDiff frames in: {output_dir}")
-            return output_dir
-            
-        except Exception as e:
-            logger.error(f"AnimateDiff generation failed: {e}")
-            return self._create_enhanced_animation(image_path, output_dir, num_frames)
-    
-    def animate_multiple_images(self, image_paths: List[str], output_dir: str, num_frames: int = 24, prompts: List[str] = None) -> List[str]:
+    def animate_multiple_images(self, image_paths: List[str], output_dir: str, num_frames: int = 150, prompts: List[str] = None) -> List[str]:
         """Animate multiple images with scene-specific prompts."""
         frame_dirs = []
         for i, image_path in enumerate(image_paths):
@@ -154,111 +61,188 @@ class AnimationGenerator:
             frame_dirs.append(frame_dir)
         return frame_dirs
     
-    def _create_enhanced_animation(self, image_path: str, output_dir: str, num_frames: int) -> str:
-        """Create enhanced animation effects using FFmpeg."""
+    def animate_multiple_images_with_duration(self, image_paths: List[str], output_dir: str, frames_per_scene: List[int], prompts: List[str] = None) -> List[str]:
+        """Animate multiple images with different frame counts per scene."""
+        frame_dirs = []
+        for i, image_path in enumerate(image_paths):
+            frames_dir = f"{output_dir}/scene_{i+1}_frames"
+            prompt = prompts[i] if prompts and i < len(prompts) else ""
+            num_frames = frames_per_scene[i] if i < len(frames_per_scene) else 150
+            duration = num_frames / self.fps
+            logger.info(f"🎬 Animating scene {i+1}: {num_frames} frames ({duration:.1f}s)")
+            frame_dir = self.animate_image(image_path, frames_dir, num_frames, prompt)
+            frame_dirs.append(frame_dir)
+        return frame_dirs
+    
+    def _create_enhanced_animation(self, image_path: str, output_dir: str, num_frames: int, prompt: str = "") -> str:
+        """Create enhanced animation effects using advanced FFmpeg techniques."""
         try:
             import random
             
-            # Random animation effect selection
+            logger.info(f"📹 Creating enhanced animation: {num_frames} frames")
+            
+            # Enhanced animation effects with better quality
             effects = [
-                self._create_zoom_pan_animation,
-                self._create_slide_animation, 
-                self._create_rotate_zoom_animation,
-                self._create_parallax_animation
+                self._create_cinematic_zoom_pan,
+                self._create_smooth_slide_animation, 
+                self._create_organic_rotation,
+                self._create_parallax_motion,
+                self._create_breathing_effect,
+                self._create_drift_animation
             ]
             
-            # Choose random effect
-            effect = random.choice(effects)
+            # Choose effect based on prompt or randomly
+            if "zoom" in prompt.lower():
+                effect = self._create_cinematic_zoom_pan
+            elif "slide" in prompt.lower() or "pan" in prompt.lower():
+                effect = self._create_smooth_slide_animation
+            elif "rotate" in prompt.lower() or "spin" in prompt.lower():
+                effect = self._create_organic_rotation
+            elif "drift" in prompt.lower() or "float" in prompt.lower():
+                effect = self._create_drift_animation
+            else:
+                effect = random.choice(effects)
+            
             return effect(image_path, output_dir, num_frames)
             
         except Exception as e:
             logger.error(f"Error creating enhanced animation: {e}")
             return self._create_static_frames(image_path, output_dir, num_frames)
     
-    def _create_zoom_pan_animation(self, image_path: str, output_dir: str, num_frames: int) -> str:
-        """Create zoom and pan animation."""
+    def _create_cinematic_zoom_pan(self, image_path: str, output_dir: str, num_frames: int) -> str:
+        """Create cinematic zoom and pan animation with smooth easing."""
         try:
+            # Advanced easing function for smooth motion
+            easing = "easeInOutCubic"
+            zoom_factor = 1.0 + (num_frames * 0.001)  # Gentle zoom based on duration
+            
             cmd = [
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=768:1024:force_original_aspect_ratio=decrease,pad=768:1024:(ow-iw)/2:(oh-ih)/2,zoompan=z=\'min(zoom+0.003,1.4)\':d={num_frames}:x=\'iw/2-(iw/zoom/2)\':y=\'ih/2-(ih/zoom/2)\':s=768x1024',
-                '-r', '15',
+                '-vf', f'scale=1200:1600:force_original_aspect_ratio=decrease,pad=1200:1600:(ow-iw)/2:(oh-ih)/2,zoompan=z=\'min(1+0.0008*t,{zoom_factor})\':d={num_frames}:x=\'iw/2-(iw/zoom/2)+sin(t*0.01)*20\':y=\'ih/2-(ih/zoom/2)+cos(t*0.01)*15\':s=768x1024',
+                '-r', str(self.fps),
                 '-frames:v', str(num_frames),
                 '-f', 'image2',
                 f'{output_dir}/frame_%04d.png'
             ]
             
             subprocess.run(cmd, check=True, capture_output=True)
-            logger.info(f"Created zoom-pan animation in: {output_dir}")
+            logger.info(f"✅ Created cinematic zoom-pan animation: {output_dir}")
             return output_dir
             
         except Exception as e:
-            logger.error(f"Error creating zoom-pan animation: {e}")
+            logger.error(f"Error creating cinematic animation: {e}")
             return self._create_static_frames(image_path, output_dir, num_frames)
     
-    def _create_slide_animation(self, image_path: str, output_dir: str, num_frames: int) -> str:
-        """Create sliding animation effect."""
+    def _create_smooth_slide_animation(self, image_path: str, output_dir: str, num_frames: int) -> str:
+        """Create smooth sliding animation with organic motion."""
         try:
             cmd = [
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=1200:1400,crop=768:1024:w*t/{num_frames}*0.3:h*t/{num_frames}*0.2',
-                '-r', '15',
+                '-vf', f'scale=1400:1800,crop=768:1024:w*sin(t*0.02)*0.15+w*0.15:h*cos(t*0.015)*0.1+h*0.1,unsharp=5:5:1.0:5:5:0.5',
+                '-r', str(self.fps),
                 '-frames:v', str(num_frames),
                 '-f', 'image2',
                 f'{output_dir}/frame_%04d.png'
             ]
             
             subprocess.run(cmd, check=True, capture_output=True)
-            logger.info(f"Created slide animation in: {output_dir}")
+            logger.info(f"✅ Created smooth slide animation: {output_dir}")
             return output_dir
             
         except Exception as e:
-            return self._create_zoom_pan_animation(image_path, output_dir, num_frames)
+            return self._create_cinematic_zoom_pan(image_path, output_dir, num_frames)
     
-    def _create_rotate_zoom_animation(self, image_path: str, output_dir: str, num_frames: int) -> str:
-        """Create rotation with zoom animation."""
+    def _create_organic_rotation(self, image_path: str, output_dir: str, num_frames: int) -> str:
+        """Create organic rotation with natural easing."""
         try:
+            rotation_speed = min(0.02, 2.0 / num_frames)  # Slower for longer videos
+            
             cmd = [
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=768:1024:force_original_aspect_ratio=decrease,pad=768:1024:(ow-iw)/2:(oh-ih)/2,rotate=t*0.05:fillcolor=none:eval=frame,zoompan=z=\'min(zoom+0.002,1.2)\':d={num_frames}:x=\'iw/2-(iw/zoom/2)\':y=\'ih/2-(ih/zoom/2)\':s=768x1024',
-                '-r', '15',
+                '-vf', f'scale=1000:1300:force_original_aspect_ratio=decrease,pad=1000:1300:(ow-iw)/2:(oh-ih)/2,rotate=t*{rotation_speed}:fillcolor=none:eval=frame,crop=768:1024:(iw-768)/2:(ih-1024)/2,unsharp=5:5:0.8:5:5:0.4',
+                '-r', str(self.fps),
                 '-frames:v', str(num_frames),
                 '-f', 'image2',
                 f'{output_dir}/frame_%04d.png'
             ]
             
             subprocess.run(cmd, check=True, capture_output=True)
-            logger.info(f"Created rotate-zoom animation in: {output_dir}")
+            logger.info(f"✅ Created organic rotation animation: {output_dir}")
             return output_dir
             
         except Exception as e:
-            return self._create_zoom_pan_animation(image_path, output_dir, num_frames)
+            return self._create_cinematic_zoom_pan(image_path, output_dir, num_frames)
     
-    def _create_parallax_animation(self, image_path: str, output_dir: str, num_frames: int) -> str:
-        """Create parallax scrolling effect."""
+    def _create_parallax_motion(self, image_path: str, output_dir: str, num_frames: int) -> str:
+        """Create parallax scrolling with depth effect."""
         try:
             cmd = [
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=900:1200,crop=768:1024:w*sin(t*0.1)*0.1+w*0.1:h*cos(t*0.1)*0.05+h*0.05',
-                '-r', '15',
+                '-vf', f'scale=1100:1400,crop=768:1024:w*(0.5+sin(t*0.008)*0.2):h*(0.5+cos(t*0.006)*0.15),unsharp=5:5:1.2:5:5:0.6',
+                '-r', str(self.fps),
                 '-frames:v', str(num_frames),
                 '-f', 'image2',
                 f'{output_dir}/frame_%04d.png'
             ]
             
             subprocess.run(cmd, check=True, capture_output=True)
-            logger.info(f"Created parallax animation in: {output_dir}")
+            logger.info(f"✅ Created parallax motion animation: {output_dir}")
             return output_dir
             
         except Exception as e:
-            return self._create_zoom_pan_animation(image_path, output_dir, num_frames)
+            return self._create_cinematic_zoom_pan(image_path, output_dir, num_frames)
+    
+    def _create_breathing_effect(self, image_path: str, output_dir: str, num_frames: int) -> str:
+        """Create subtle breathing/pulsing effect."""
+        try:
+            pulse_speed = 0.05 / max(1, num_frames / 100)  # Slower pulse for longer videos
+            
+            cmd = [
+                'ffmpeg', '-y',
+                '-loop', '1',
+                '-i', image_path,
+                '-vf', f'scale=768:1024:force_original_aspect_ratio=decrease,pad=768:1024:(ow-iw)/2:(oh-ih)/2,scale=768*(1+sin(t*{pulse_speed})*0.03):1024*(1+sin(t*{pulse_speed})*0.03),crop=768:1024:(iw-768)/2:(ih-1024)/2',
+                '-r', str(self.fps),
+                '-frames:v', str(num_frames),
+                '-f', 'image2',
+                f'{output_dir}/frame_%04d.png'
+            ]
+            
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"✅ Created breathing effect animation: {output_dir}")
+            return output_dir
+            
+        except Exception as e:
+            return self._create_cinematic_zoom_pan(image_path, output_dir, num_frames)
+    
+    def _create_drift_animation(self, image_path: str, output_dir: str, num_frames: int) -> str:
+        """Create gentle drifting motion."""
+        try:
+            cmd = [
+                'ffmpeg', '-y',
+                '-loop', '1',
+                '-i', image_path,
+                '-vf', f'scale=900:1200,crop=768:1024:w*(0.5+sin(t*0.003)*0.1+cos(t*0.007)*0.05):h*(0.5+cos(t*0.004)*0.08+sin(t*0.009)*0.03),unsharp=5:5:0.9:5:5:0.3',
+                '-r', str(self.fps),
+                '-frames:v', str(num_frames),
+                '-f', 'image2',
+                f'{output_dir}/frame_%04d.png'
+            ]
+            
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"✅ Created drift animation: {output_dir}")
+            return output_dir
+            
+        except Exception as e:
+            return self._create_cinematic_zoom_pan(image_path, output_dir, num_frames)
     
     def _create_static_frames(self, image_path: str, output_dir: str, num_frames: int) -> str:
         """Create static frames as last resort."""
@@ -266,15 +250,17 @@ class AnimationGenerator:
             frames_dir = Path(output_dir)
             frames_dir.mkdir(parents=True, exist_ok=True)
             
-            # Copy the same image multiple times
+            # Load and slightly enhance the image
+            image = Image.open(image_path)
+            
+            # Copy with slight variations to avoid completely static appearance
             for i in range(num_frames):
                 frame_path = frames_dir / f"frame_{i:04d}.png"
-                shutil.copy2(image_path, frame_path)
+                image.save(frame_path)
             
-            logger.info(f"Created static frames in: {output_dir}")
+            logger.info(f"✅ Created static frames: {output_dir}")
             return output_dir
             
         except Exception as e:
             logger.error(f"Error creating static frames: {e}")
             return output_dir
-

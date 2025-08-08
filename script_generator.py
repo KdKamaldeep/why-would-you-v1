@@ -19,46 +19,57 @@ class ScriptGenerator:
         
     def generate_script(self, prompt: str, duration: int) -> Dict:
         """Generate a 3-scene story script for the video."""
+        scene_duration = max(8, duration // 3)  # Minimum 8 seconds per scene
         gpt_prompt = f"""
         Create a {duration}-second YouTube Shorts story based on this prompt: "{prompt}"
         
         Requirements:
-        - Create exactly 3 scenes, each {duration//3} seconds long
+        - Create exactly 3 scenes, each approximately {scene_duration} seconds long
         - Make it engaging and entertaining for social media
-        - Include detailed visual descriptions for cartoon-style image generation
-        - Add humor and personality
+        - Include VERY detailed visual descriptions for accurate cartoon-style image generation
+        - Add humor, emotion, and personality
         - Optimized for vertical video format (768x1024)
-        - Include narration text for each scene
+        - Include clear, engaging narration text for each scene
+        - Make sure the visual descriptions match the story content EXACTLY
+        - Include specific details about characters, expressions, actions, and settings
         
         Return the response as a JSON object with:
         {{
-            "title": "Story title",
-            "description": "Brief description",
+            "title": "Engaging story title",
+            "description": "Brief description of the complete story",
+            "total_duration": {duration},
             "scenes": [
                 {{
-                    "duration": {duration//3},
-                    "description": "What happens in this scene",
-                    "visual_prompt": "Detailed cartoon-style description for Stable Diffusion image generation",
-                    "narration": "Text to be narrated by ElevenLabs",
-                    "subtitle": "Text to display as subtitle"
+                    "duration": {scene_duration},
+                    "description": "Detailed description of what happens in this scene",
+                    "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
+                    "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
+                    "subtitle": "Concise subtitle text that matches the narration"
                 }},
                 {{
-                    "duration": {duration//3},
-                    "description": "What happens in this scene", 
-                    "visual_prompt": "Detailed cartoon-style description for Stable Diffusion image generation",
-                    "narration": "Text to be narrated by ElevenLabs",
-                    "subtitle": "Text to display as subtitle"
+                    "duration": {scene_duration},
+                    "description": "Detailed description of what happens in this scene", 
+                    "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
+                    "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
+                    "subtitle": "Concise subtitle text that matches the narration"
                 }},
                 {{
-                    "duration": {duration//3},
-                    "description": "What happens in this scene",
-                    "visual_prompt": "Detailed cartoon-style description for Stable Diffusion image generation", 
-                    "narration": "Text to be narrated by ElevenLabs",
-                    "subtitle": "Text to display as subtitle"
+                    "duration": {scene_duration},
+                    "description": "Detailed description of what happens in this scene",
+                    "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
+                    "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
+                    "subtitle": "Concise subtitle text that matches the narration"
                 }}
             ],
             "tags": ["cartoon", "story", "fun"]
         }}
+        
+        IMPORTANT: 
+        - Make the story creative, fun, and appropriate for all ages
+        - Ensure visual descriptions are EXTREMELY detailed and accurate to the story
+        - Each scene should clearly connect to the overall narrative
+        - Use vivid, descriptive language for image generation
+        - Include emotional expressions and dynamic poses for characters
         """
         
         headers = {
