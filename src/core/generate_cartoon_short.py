@@ -71,6 +71,8 @@ class VideoConfig:
     scene_duration: int = 8  # Used when custom_scenes is provided and per-scene duration not specified
     # Reuse assets to speed up repeated runs
     reuse_existing: bool = True
+    # Control subtitle rendering
+    add_subtitles: bool = True
 
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
@@ -241,13 +243,16 @@ class CartoonShortsGenerator:
             logger.info("Step 6: Preparing video clips...")
             final_clips = video_clips
             
-            # Step 7: Create subtitles
-            logger.info("Step 7: Creating subtitles...")
+            # Step 7: Create subtitles (optional)
             subtitles_path = self.output_dir / "subtitles.srt"
-            if self.config.reuse_existing and subtitles_path.exists():
-                logger.info(f"Skipping subtitles (exists): {subtitles_path}")
+            if self.config.add_subtitles:
+                logger.info("Step 7: Creating subtitles...")
+                if self.config.reuse_existing and subtitles_path.exists():
+                    logger.info(f"Skipping subtitles (exists): {subtitles_path}")
+                else:
+                    self.video_processor.create_subtitles_srt(script, str(subtitles_path))
             else:
-                self.video_processor.create_subtitles_srt(script, str(subtitles_path))
+                logger.info("Step 7: Subtitles disabled; skipping SRT generation and overlay")
             
             # Step 8: Select background music
             logger.info("Step 8: Adding background music...")
@@ -259,7 +264,7 @@ class CartoonShortsGenerator:
                 final_clips,
                 str(narration_path) if isinstance(narration_path, (str, Path)) else narration_path,
                 background_music,
-                str(subtitles_path),
+                str(subtitles_path) if self.config.add_subtitles else None,
                 str(final_output)
             )
             
