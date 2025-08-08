@@ -115,10 +115,11 @@ class AnimationGenerator:
             zoom_factor = 1.0 + (num_frames * 0.001)  # Gentle zoom based on duration
             
             # Note: Do NOT include shell quotes inside the filter string when using subprocess with arg lists
+            # Escape comma inside min() to prevent FFmpeg from treating it as a filter separator
             vf = (
                 f"scale=1200:1600:force_original_aspect_ratio=decrease,"
                 f"pad=1200:1600:(ow-iw)/2:(oh-ih)/2,"
-                f"zoompan=z=min(1+0.0008*t,{zoom_factor}):d={num_frames}:"
+                f"zoompan=z=min(1+0.0008*t\\,{zoom_factor}):d={num_frames}:"
                 f"x=iw/2-(iw/zoom/2)+sin(t*0.01)*20:"
                 f"y=ih/2-(ih/zoom/2)+cos(t*0.01)*15:"
                 f"s=768x1024"
