@@ -1,38 +1,54 @@
+###############################################
 # Core dependencies
+###############################################
 openai==1.3.5
 requests
 python-dotenv
 Pillow
 numpy
 
+###############################################
 # Video processing
+###############################################
 moviepy
 ffmpeg-python
 pydub
 opencv-python
 
-# Machine learning and computer vision
-torch>=2.0.0
-torchvision>=0.15.0
-torchaudio>=2.0.0
-# dlib  # Requires CMake - install separately if needed
-# face_alignment  # Requires dlib
-transformers
+###############################################
+# PyTorch stack (install separately on Linux)
+#
+# Install one of the following BEFORE installing this file:
+# - CPU only:
+#   pip3 install --index-url https://download.pytorch.org/whl/cpu \
+#       torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1
+# - CUDA 12.1:
+#   pip3 install --index-url https://download.pytorch.org/whl/cu121 \
+#       torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1
+#
+# Keep these packages out of this file to avoid resolver backtracking
+# and to ensure correct wheels are selected for your system.
+###############################################
 
-# Enhanced Animation System (Professional Quality)
-diffusers>=0.25.0
-transformers>=4.30.0
-accelerate>=0.20.0
-safetensors>=0.3.0
-xformers>=0.0.20  # Optional but recommended for memory efficiency
-huggingface_hub>=0.16.0
-einops
-omegaconf
-ftfy
-regex
+###############################################
+# Hugging Face and related ML libraries (pinned)
+###############################################
+diffusers==0.30.2
+transformers==4.52.1
+accelerate==0.27.2
+safetensors==0.4.3
+huggingface_hub==0.23.4
+einops==0.7.0
+omegaconf==2.3.0
+ftfy==6.1.3
+regex==2023.12.25
 
+###############################################
 # Alternative face processing (no CMake required)
+###############################################
 mediapipe
 
+###############################################
 # Scientific computing
+###############################################
 scipy
