@@ -6,7 +6,7 @@ Video Processor Module - Handles video processing and compilation using FFmpeg
 import os
 import logging
 import subprocess
-from typing import List, Dict
+from typing import List, Dict, Union
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
@@ -58,6 +58,49 @@ class VideoProcessor:
         except Exception as e:
             logger.error(f"Error creating video from frames: {e}")
             return self._create_simple_clip(f"{frames_dir}/frame_0000.png", 10, output_path)
+
+    def adjust_audio_to_duration(self, input_audio: str, target_duration_sec: float, output_audio: str) -> str:
+        """Pad with silence or trim audio to exactly target duration."""
+        try:
+            cmd = [
+                'ffmpeg', '-y',
+                '-i', input_audio,
+                '-af', 'apad',
+                '-t', f"{target_duration_sec:.3f}",
+                '-c:a', 'aac',
+                '-b:a', self.config.audio_bitrate,
+                output_audio
+            ]
+            subprocess.run(cmd, check=True, capture_output=True)
+            return output_audio
+        except Exception as e:
+            logger.error(f"Error fitting audio to duration: {e}")
+            return input_audio
+
+    def concat_audios(self, audio_files: List[str], output_audio: str) -> str:
+        """Concatenate multiple audio files into one AAC file."""
+        try:
+            concat_list = 'audio_concat_list.txt'
+            with open(concat_list, 'w') as f:
+                for p in audio_files:
+                    f.write(f"file '{p}'\n")
+            cmd = [
+                'ffmpeg', '-y',
+                '-f', 'concat', '-safe', '0',
+                '-i', concat_list,
+                '-c:a', 'aac',
+                '-b:a', self.config.audio_bitrate,
+                output_audio
+            ]
+            subprocess.run(cmd, check=True, capture_output=True)
+            try:
+                os.remove(concat_list)
+            except Exception:
+                pass
+            return output_audio
+        except Exception as e:
+            logger.error(f"Error concatenating audios: {e}")
+            return audio_files[0] if audio_files else ''
     
     def frames_to_multiple_videos(self, frame_dirs: List[str], output_dir: str, fps: int = 15) -> List[str]:
         """Convert multiple frame directories to MP4 videos."""
@@ -136,7 +179,7 @@ class VideoProcessor:
             logger.error(f"Error adding subtitles to video: {e}")
             return video_path
     
-    def compile_final_video(self, clips: List[str], narration_audio: str, background_music: str = None, subtitles_path: str = None, output_path: str = "output/final_short.mp4") -> str:
+    def compile_final_video(self, clips: List[str], narration_audio: Union[str, List[str]], background_music: str = None, subtitles_path: str = None, output_path: str = "output/final_short.mp4") -> str:
         """Compile final video with all components."""
         try:
             # Create concat file for video clips
@@ -171,6 +214,11 @@ class VideoProcessor:
                 video_duration = float(video_duration_str)
             except Exception:
                 video_duration = None
+
+            # If narration_audio is a list, first concatenate into one track
+            if isinstance(narration_audio, list):
+                merged_narration = 'merged_narration.aac'
+                narration_audio = self.concat_audios(narration_audio, merged_narration)
 
             # Prepare audio inputs
             audio_inputs = ['-i', narration_audio]

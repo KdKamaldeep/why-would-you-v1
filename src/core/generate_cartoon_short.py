@@ -138,6 +138,15 @@ class CartoonShortsGenerator:
                 with open(script_path, 'w', encoding='utf-8') as f:
                     json.dump(script, f, indent=2)
             
+            # Save a human-friendly storyboard alongside the raw script
+            storyboard_path = self.output_dir / "storyboard.json"
+            try:
+                with open(storyboard_path, 'w', encoding='utf-8') as f:
+                    json.dump(script, f, indent=2)
+                logger.info(f"Saved storyboard: {storyboard_path}")
+            except Exception as e:
+                logger.warning(f"Failed to save storyboard: {e}")
+
             # Step 2: Generate cartoon images with Stable Diffusion
             logger.info("Step 2: Generating cartoon images...")
             image_paths = []
@@ -146,10 +155,8 @@ class CartoonShortsGenerator:
                 if self.config.reuse_existing and image_path.exists():
                     logger.info(f"Skipping image generation (exists): {image_path}")
                 else:
-                    self.image_generator.generate_cartoon_image(
-                        scene['visual_prompt'], 
-                        str(image_path)
-                    )
+                    prompt = self._compose_image_prompt(scene)
+                    self.image_generator.generate_cartoon_image(prompt, str(image_path))
                 image_paths.append(str(image_path))
             
             # Step 3: Animate images with AnimateDiff
@@ -205,14 +212,29 @@ class CartoonShortsGenerator:
             # Step 5: Generate narration with ElevenLabs
             logger.info("Step 5: Generating narration...")
             narration_path = self.output_dir / "narration.mp3"
-            if self.config.reuse_existing and narration_path.exists():
-                logger.info(f"Skipping narration (exists): {narration_path}")
-            else:
-                self.voice_generator.generate_narration_from_script(
-                    script,
-                    self.config.voice_id,
-                    str(narration_path)
-                )
+            scene_audio_paths = []
+            try:
+                # Generate per-scene audio to match durations more tightly
+                for i, scene in enumerate(script['scenes']):
+                    scene_audio = self.output_dir / f"audio_scene_{i+1}.mp3"
+                    if not (self.config.reuse_existing and scene_audio.exists()):
+                        self.voice_generator.generate_narration(scene.get('narration', ''), self.config.voice_id, str(scene_audio))
+                    # Fit each scene audio to scene duration
+                    fitted_audio = self.output_dir / f"audio_scene_{i+1}_fit.m4a"
+                    self.video_processor.adjust_audio_to_duration(str(scene_audio), float(scene.get('duration', 8)), str(fitted_audio))
+                    scene_audio_paths.append(str(fitted_audio))
+                # Combine per-scene into one track
+                merged_audio = self.output_dir / "narration_fitted.m4a"
+                self.video_processor.concat_audios(scene_audio_paths, str(merged_audio))
+                narration_path = merged_audio
+            except Exception as e:
+                logger.warning(f"Per-scene audio fitting failed; falling back to single track: {e}")
+                if not (self.config.reuse_existing and narration_path.exists()):
+                    self.voice_generator.generate_narration_from_script(
+                        script,
+                        self.config.voice_id,
+                        str(narration_path)
+                    )
             
             # Step 6: Use video clips directly (no lip-sync)
             logger.info("Step 6: Preparing video clips...")
@@ -234,7 +256,7 @@ class CartoonShortsGenerator:
             logger.info("Step 9: Compiling final video...")
             self.video_processor.compile_final_video(
                 final_clips,
-                str(narration_path),
+                str(narration_path) if isinstance(narration_path, (str, Path)) else narration_path,
                 background_music,
                 str(subtitles_path),
                 str(final_output)
@@ -279,6 +301,27 @@ class CartoonShortsGenerator:
             json.dump(metadata, f, indent=2)
         
         logger.info(f"Generated metadata: {metadata_path}")
+
+    def _compose_image_prompt(self, scene: Dict) -> str:
+        """Compose an image prompt that bakes in exactly two character specs if available."""
+        base = scene.get('visual_prompt', scene.get('description', ''))
+        characters = scene.get('characters', [])
+        if characters:
+            char_bits = []
+            for idx, ch in enumerate(characters[:2], start=1):
+                part = (
+                    f"({idx}) {ch.get('name','Character')} - {ch.get('role','role')}; "
+                    f"appearance: {ch.get('appearance','consistent look')}; "
+                    f"clothing: {ch.get('clothing','simple outfit')}; "
+                    f"emotion: {ch.get('emotion','neutral')}; "
+                    f"action: {ch.get('action','standing')}"
+                )
+                char_bits.append(part)
+            char_text = " Include two characters: " + " | ".join(char_bits) + "."
+        else:
+            char_text = ""
+        suffix = " Vertical 768x1024 cartoon, clean lines, vibrant colors, family-friendly, both characters clearly visible, consistent traits across scenes."
+        return (base or "Cartoon scene") + char_text + suffix
 
 def main():
     """Main CLI entry point."""

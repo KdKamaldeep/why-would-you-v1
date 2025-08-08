@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
-Script Generator Module - Handles story and script generation using OpenAI GPT-4
+Script Generator Module - Handles story and script generation using OpenAI GPT-4.
+
+Enhancements:
+- Each scene explicitly includes exactly two characters via a `characters` array.
+- Character objects include name, role, appearance (consistent traits), clothing, emotion, and action.
 """
 
 import json
@@ -18,7 +22,7 @@ class ScriptGenerator:
         self.base_url = "https://api.openai.com/v1/chat/completions"
         
     def generate_script(self, prompt: str, duration: int) -> Dict:
-        """Generate a 3-scene story script for the video."""
+        """Generate a 3-scene story script for the video with two characters per scene."""
         scene_duration = max(8, duration // 3)  # Minimum 8 seconds per scene
         gpt_prompt = f"""
         Create a {duration}-second YouTube Shorts story based on this prompt: "{prompt}"
@@ -32,6 +36,7 @@ class ScriptGenerator:
         - Include clear, engaging narration text for each scene
         - Make sure the visual descriptions match the story content EXACTLY
         - Include specific details about characters, expressions, actions, and settings
+        - IMPORTANT: Each scene must feature exactly TWO characters and describe them clearly
         
         Return the response as a JSON object with:
         {{
@@ -44,21 +49,47 @@ class ScriptGenerator:
                     "description": "Detailed description of what happens in this scene",
                     "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
                     "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
-                    "subtitle": "Concise subtitle text that matches the narration"
+                    "subtitle": "Concise subtitle text that matches the narration",
+                    "characters": [
+                        {{
+                            "name": "Character A name",
+                            "role": "their story role",
+                            "appearance": "consistent physical traits (hair/fur, colors, size)",
+                            "clothing": "typical outfit or accessories",
+                            "emotion": "current emotion",
+                            "action": "what they are doing in this scene"
+                        }},
+                        {{
+                            "name": "Character B name",
+                            "role": "their story role",
+                            "appearance": "consistent physical traits (hair/fur, colors, size)",
+                            "clothing": "typical outfit or accessories",
+                            "emotion": "current emotion",
+                            "action": "what they are doing in this scene"
+                        }}
+                    ]
                 }},
                 {{
                     "duration": {scene_duration},
                     "description": "Detailed description of what happens in this scene", 
                     "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
                     "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
-                    "subtitle": "Concise subtitle text that matches the narration"
+                    "subtitle": "Concise subtitle text that matches the narration",
+                    "characters": [
+                        {{"name": "Character A name", "role": "their story role", "appearance": "consistent physical traits", "clothing": "typical outfit", "emotion": "emotion", "action": "action"}},
+                        {{"name": "Character B name", "role": "their story role", "appearance": "consistent physical traits", "clothing": "typical outfit", "emotion": "emotion", "action": "action"}}
+                    ]
                 }},
                 {{
                     "duration": {scene_duration},
                     "description": "Detailed description of what happens in this scene",
                     "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
                     "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
-                    "subtitle": "Concise subtitle text that matches the narration"
+                    "subtitle": "Concise subtitle text that matches the narration",
+                    "characters": [
+                        {{"name": "Character A name", "role": "their story role", "appearance": "consistent physical traits", "clothing": "typical outfit", "emotion": "emotion", "action": "action"}},
+                        {{"name": "Character B name", "role": "their story role", "appearance": "consistent physical traits", "clothing": "typical outfit", "emotion": "emotion", "action": "action"}}
+                    ]
                 }}
             ],
             "tags": ["cartoon", "story", "fun"]
@@ -70,6 +101,7 @@ class ScriptGenerator:
         - Each scene should clearly connect to the overall narrative
         - Use vivid, descriptive language for image generation
         - Include emotional expressions and dynamic poses for characters
+        - Keep character visual traits consistent across scenes to preserve identity
         """
         
         headers = {
@@ -123,7 +155,8 @@ class ScriptGenerator:
                 "description": scene.get("description", visual_prompt),
                 "visual_prompt": visual_prompt,
                 "narration": scene.get("narration", scene.get("subtitle", "")),
-                "subtitle": scene.get("subtitle", scene.get("narration", "")) or f"Scene {idx+1}"
+                "subtitle": scene.get("subtitle", scene.get("narration", "")) or f"Scene {idx+1}",
+                "characters": scene.get("characters", [])[:2]  # ensure at most two
             })
 
         if not normalized_scenes:
@@ -141,33 +174,70 @@ class ScriptGenerator:
         return script
     
     def _generate_fallback_script(self, prompt: str, duration: int) -> Dict:
-        """Generate a simple fallback script if API fails."""
-        scene_duration = duration // 3
+        """Generate a simple fallback script if API fails, enforcing two characters per scene."""
+        scene_duration = max(8, duration // 3)
+        character_a = {
+            "name": "Alex",
+            "role": "optimistic lead",
+            "appearance": "short, bright hair, colorful outfit",
+            "clothing": "striped hoodie and sneakers",
+            "emotion": "curious",
+            "action": "looking around with excitement"
+        }
+        character_b = {
+            "name": "Riley",
+            "role": "clever friend",
+            "appearance": "tall, dark hair or fur, glasses",
+            "clothing": "scarf and backpack",
+            "emotion": "confident",
+            "action": "pointing something out"
+        }
+        scenes: List[Dict] = [
+            {
+                "duration": scene_duration,
+                "description": f"Scene 1: Introduction to {prompt}",
+                "visual_prompt": (
+                    f"Two friends begin an adventure about {prompt}. Vertical cartoon style, vibrant, clean lines, "
+                    f"background setting related to the story."
+                ),
+                "narration": f"Alex and Riley spot the start of an unexpected adventure: {prompt}.",
+                "subtitle": "A New Adventure",
+                "characters": [character_a, character_b]
+            },
+            {
+                "duration": scene_duration,
+                "description": f"Scene 2: The adventure continues",
+                "visual_prompt": (
+                    f"Alex and Riley face a fun challenge tied to {prompt}. Expressive faces, dynamic poses, "
+                    f"colorful environment, whimsical props."
+                ),
+                "narration": f"Together they improvise, using wit and teamwork to move forward.",
+                "subtitle": "Teamwork!",
+                "characters": [
+                    {**character_a, "emotion": "determined", "action": "taking the lead"},
+                    {**character_b, "emotion": "focused", "action": "supporting with a clever idea"}
+                ]
+            },
+            {
+                "duration": scene_duration,
+                "description": f"Scene 3: Happy ending",
+                "visual_prompt": (
+                    f"Cheerful resolution of {prompt} with Alex and Riley celebrating. Warm lighting, confetti or sparkles, "
+                    f"joyful expressions, tidy composition for 768x1024."
+                ),
+                "narration": f"In the end, they succeed—and share a laugh, already dreaming of the next adventure.",
+                "subtitle": "We Did It!",
+                "characters": [
+                    {**character_a, "emotion": "joyful", "action": "cheering"},
+                    {**character_b, "emotion": "proud", "action": "smiling with relief"}
+                ]
+            }
+        ]
+
         return {
             "title": f"Story: {prompt}",
             "description": f"A fun cartoon story about {prompt}",
-            "scenes": [
-                {
-                    "duration": scene_duration,
-                    "description": f"Scene 1: Introduction to {prompt}",
-                    "visual_prompt": f"Cartoon illustration of {prompt}, colorful, fun, animated style, high quality",
-                    "narration": f"Once upon a time, there was {prompt}. Let me tell you this amazing story!",
-                    "subtitle": f"Story: {prompt}"
-                },
-                {
-                    "duration": scene_duration,
-                    "description": f"Scene 2: The adventure continues",
-                    "visual_prompt": f"Cartoon scene showing {prompt} in action, vibrant colors, detailed",
-                    "narration": f"The adventure continues as {prompt} faces exciting challenges!",
-                    "subtitle": "The Adventure Continues"
-                },
-                {
-                    "duration": scene_duration,
-                    "description": f"Scene 3: Happy ending",
-                    "visual_prompt": f"Cartoon happy ending scene with {prompt}, joyful, celebration, colorful",
-                    "narration": f"And they all lived happily ever after! What an amazing story about {prompt}!",
-                    "subtitle": "Happy Ending!"
-                }
-            ],
+            "total_duration": scene_duration * 3,
+            "scenes": scenes,
             "tags": [prompt, "cartoon", "story", "fun"]
         }

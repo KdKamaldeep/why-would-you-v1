@@ -167,6 +167,32 @@ Examples:
             title = data.get('title')
             description = data.get('description')
             scene_duration = data.get('scene_duration', 8)
+            # Normalize characters: map names in scenes to structured cast entries
+            cast_list = data.get('cast', []) or []
+            name_to_cast = {}
+            for entry in cast_list:
+                if isinstance(entry, dict) and entry.get('name'):
+                    name_to_cast[entry['name']] = entry
+                elif isinstance(entry, str):
+                    name_to_cast[entry] = {"name": entry, "role": "character"}
+
+            normalized_scenes = []
+            for scene in scenes:
+                scene_copy = dict(scene)
+                scene_chars = scene_copy.get('characters', [])
+                structured_chars = []
+                for ch in scene_chars:
+                    if isinstance(ch, dict):
+                        structured_chars.append(ch)
+                    elif isinstance(ch, str):
+                        base = name_to_cast.get(ch, {"name": ch, "role": "character"})
+                        structured_chars.append({
+                            "name": base.get("name", ch),
+                            "role": base.get("role", "character")
+                        })
+                # Enforce two-character focus
+                scene_copy['characters'] = structured_chars[:2]
+                normalized_scenes.append(scene_copy)
 
             config = VideoConfig(
                 prompt=args.prompt,
@@ -175,7 +201,7 @@ Examples:
                 output_path="output",
                 title=title,
                 description=description,
-                custom_scenes=scenes,
+                custom_scenes=normalized_scenes,
                 scene_duration=scene_duration,
                 reuse_existing=(not args.no_reuse)
             )
