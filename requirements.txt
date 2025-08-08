@@ -20,10 +20,11 @@ torchaudio>=2.0.0
 transformers
 
 # AI Image Generation (Stable Diffusion)
-diffusers
+diffusers[animatediff]
 accelerate
 safetensors
 xformers  # Optional but recommended for memory efficiency
+imageio-ffmpeg  # For AnimateDiff video export
 
 # Alternative face processing (no CMake required)
 mediapipe

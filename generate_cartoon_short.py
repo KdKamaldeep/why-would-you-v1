@@ -109,10 +109,13 @@ class CartoonShortsGenerator:
             
             # Step 3: Animate images with AnimateDiff
             logger.info("Step 3: Animating images with AnimateDiff...")
+            # Extract scene prompts for better animation
+            scene_prompts = [scene['visual_prompt'] for scene in script['scenes']]
             frame_dirs = self.animation_generator.animate_multiple_images(
                 image_paths,
                 str(self.output_dir),
-                num_frames=24
+                num_frames=24,
+                prompts=scene_prompts
             )
             
             # Step 4: Convert frames to MP4 videos
