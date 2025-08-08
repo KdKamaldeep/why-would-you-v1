@@ -64,7 +64,8 @@ def generate_cartoon(prompt, style="cartoon", duration=30):
             prompt=prompt,
             duration=duration,
             style=style,
-            output_path="output"
+            output_path="output",
+            add_subtitles=False
         )
         
         # Initialize generator
@@ -201,7 +202,8 @@ Examples:
                 description=description,
                 custom_scenes=normalized_scenes,
                 scene_duration=scene_duration,
-                reuse_existing=(not args.no_reuse)
+                reuse_existing=(not args.no_reuse),
+                add_subtitles=False
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
