@@ -81,6 +81,8 @@ class CoquiVoiceSynthesizer:
             lang = (self.config.language or "en").lower()
             # For non-English targets, try multilingual XTTS first
             if lang != "en":
+                # Prefer the newer hub-style alias first, then legacy id
+                fallback_models.append("coqui/XTTS-v2")
                 fallback_models.append("tts_models/multilingual/multi-dataset/xtts_v2")
             # Always try the explicitly configured model next
             fallback_models.append(self.config.model_name)
@@ -151,24 +153,52 @@ class CoquiVoiceSynthesizer:
                 speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
                 # Ensure a valid speaker is passed for XTTS if no reference wav
                 xtts_speaker = self._select_xtts_speaker(speaker if speaker_wav_arg is None else None)
+
+                def _xtts_call(speaker_value: Optional[str]) -> None:
+                    try:
+                        self.tts.tts_to_file(
+                            text=full_text,
+                            file_path=output_path,
+                            speaker_wav=speaker_wav_arg,
+                            speaker=speaker_value,
+                            language=self.config.language,
+                            progress_bar=self.config.progress_bar,
+                        )
+                    except TypeError:
+                        # Older TTS may not accept progress_bar; retry without
+                        self.tts.tts_to_file(
+                            text=full_text,
+                            file_path=output_path,
+                            speaker_wav=speaker_wav_arg,
+                            speaker=speaker_value,
+                            language=self.config.language,
+                        )
+
                 try:
-                    self.tts.tts_to_file(
-                        text=full_text,
-                        file_path=output_path,
-                        speaker_wav=speaker_wav_arg,
-                        speaker=xtts_speaker,
-                        language=self.config.language,
-                        progress_bar=self.config.progress_bar,
-                    )
-                except TypeError:
-                    # Older TTS may not accept progress_bar; retry without
-                    self.tts.tts_to_file(
-                        text=full_text,
-                        file_path=output_path,
-                        speaker_wav=speaker_wav_arg,
-                        speaker=xtts_speaker,
-                        language=self.config.language,
-                    )
+                    _xtts_call(xtts_speaker)
+                except Exception as e:
+                    # Retry strategy for XTTS when speaker is not accepted
+                    err_msg = str(e)
+                    logger.warning(f"XTTS initial synthesis failed: {err_msg}")
+                    retry_candidates: List[Optional[str]] = []
+                    builtin = self._get_builtin_speakers()
+                    if builtin:
+                        retry_candidates.extend([str(s) for s in builtin])
+                    # Add generic fallbacks commonly accepted in some builds
+                    retry_candidates.extend(["random", "female", "male", None])
+                    tried = set()
+                    for cand in retry_candidates:
+                        key = str(cand)
+                        if key in tried:
+                            continue
+                        tried.add(key)
+                        try:
+                            logger.info(f"XTTS retry with speaker={cand}")
+                            _xtts_call(cand)
+                            break
+                        except Exception as e2:
+                            logger.warning(f"XTTS retry failed for speaker={cand}: {e2}")
+                            continue
             else:
                 # Non-XTTS models: use speaker registry in voice_dir
                 current_speaker = speaker or self.config.speaker
@@ -217,14 +247,25 @@ class CoquiVoiceSynthesizer:
             # Many models expose a simple .speakers list
             speakers = getattr(self.tts, "speakers", None)
             if speakers:
-                return list(speakers)
+                try:
+                    spk_list = list(speakers)
+                except Exception:
+                    # Some implementations expose a dict-like mapping
+                    spk_list = list(speakers.keys()) if hasattr(speakers, 'keys') else []
+                logger.info(f"XTTS available speakers: {spk_list}")
+                return spk_list
             # Some expose a speaker_manager with various fields
             sm = getattr(self.tts, "speaker_manager", None)
             if sm is not None:
                 for attr in ("speaker_names", "speaker_ids", "speakers"):
                     val = getattr(sm, attr, None)
                     if val:
-                        return list(val)
+                        try:
+                            spk_list = list(val)
+                        except Exception:
+                            spk_list = list(val.keys()) if hasattr(val, 'keys') else []
+                        logger.info(f"XTTS available speakers (speaker_manager): {spk_list}")
+                        return spk_list
         except Exception:
             pass
         return []
@@ -253,11 +294,8 @@ class CoquiVoiceSynthesizer:
             except Exception:
                 pass
 
-        # Fallback to commonly available tokens in XTTS v2
-        for candidate in ("female-en-5", "female-en-4", "male-en-2", "female-en-3", "af_sarah"):
-            return candidate
-        # As a last resort, return a generic token
-        return "female-en-5"
+        # Fallback: some XTTS builds accept 'random' to pick an internal voice
+        return "random"
     
     def clone_voice(self, 
                    audio_file_path: str, 
