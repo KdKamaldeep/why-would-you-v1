@@ -14,10 +14,15 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 class ImageGenerator:
-    """Handles cartoon image generation using Stable Diffusion."""
+    """Handles cartoon image generation using Stable Diffusion.
+
+    Supports optional LoRA for style adaptation.
+    """
     
-    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors"):
+    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8):
         self.model_path = model_path
+        self.lora_path = lora_path
+        self.lora_scale = lora_scale
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.pipe = None
         self.sd_available = False
@@ -83,6 +88,31 @@ class ImageGenerator:
                     except Exception:
                         logger.info("ℹ️ xFormers not available; continuing without it")
 
+            # Optionally load a LoRA for style adaptation
+            if self.lora_path and Path(self.lora_path).exists():
+                try:
+                    logger.info(f"🎭 Loading LoRA: {self.lora_path}")
+                    load_ok = False
+                    # Newer diffusers API
+                    if hasattr(self.pipe, 'load_lora_weights'):
+                        self.pipe.load_lora_weights(self.lora_path)
+                        load_ok = True
+                        # Try to fuse or set scale depending on API
+                        if hasattr(self.pipe, 'fuse_lora'):
+                            try:
+                                self.pipe.fuse_lora(lora_scale=self.lora_scale)
+                            except Exception:
+                                pass
+                        elif hasattr(self.pipe, 'set_adapters'):
+                            try:
+                                self.pipe.set_adapters(["default"], adapter_weights=[self.lora_scale])
+                            except Exception:
+                                pass
+                    if load_ok:
+                        logger.info(f"✅ LoRA loaded with scale ~ {self.lora_scale}")
+                except Exception as le:
+                    logger.warning(f"⚠️ Failed to load LoRA '{self.lora_path}': {le}")
+
             self.sd_available = True
             logger.info("✅ Stable Diffusion pipeline initialized successfully!")
             logger.info("🎨 Ready to generate professional cartoon images!")
@@ -113,8 +143,15 @@ class ImageGenerator:
         """Generate image using Stable Diffusion."""
         try:
             # Enhanced prompt for better cartoon results
-            enhanced_prompt = f"cartoon style, animated, colorful, cute, {prompt}, high quality, digital art, illustration, vibrant colors, clean lines"
-            negative_prompt = "photorealistic, realistic, photo, blurry, low quality, dark, scary, violent, adult content, nsfw"
+            enhanced_prompt = (
+                f"cartoon style, storybook illustration, matte shading, soft outlines, {prompt}, "
+                f"high quality, digital art, vibrant colors, clean lines"
+            )
+            # Strengthen anti-anime bias for Indian style intent
+            negative_prompt = (
+                "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
+                "blurry, low quality, dark, scary, violent, adult content, nsfw"
+            )
             
             logger.info(f"🎯 Enhanced prompt: {enhanced_prompt}")
             

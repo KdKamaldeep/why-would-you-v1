@@ -149,8 +149,10 @@ class CoquiVoiceSynthesizer:
             if "xtts" in model_name_lower:
                 logger.info("Generating audio with XTTS (multilingual)")
                 speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
-                # Some XTTS wrappers require a speaker when no reference wav is provided
-                xtts_speaker = (speaker or self.config.speaker) if speaker_wav_arg is None else None
+                # Do NOT pass placeholder speakers like 'random' to XTTS
+                xtts_speaker = None
+                if speaker_wav_arg is None and speaker and str(speaker).lower() not in ("", "random"):
+                    xtts_speaker = speaker
                 try:
                     self.tts.tts_to_file(
                         text=full_text,

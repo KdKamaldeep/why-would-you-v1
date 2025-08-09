@@ -84,7 +84,16 @@ class CartoonShortsGenerator:
         
         # Initialize components using modular classes
         self.script_generator = ScriptGenerator(os.getenv('OPENAI_API_KEY', ''))
-        self.image_generator = ImageGenerator()
+        # Choose a more neutral/non-anime base when Indian style is requested
+        default_model = "models/toonyou_beta6.safetensors"
+        indian_pref_model = os.getenv("INDIAN_STYLE_MODEL", default_model)
+        model_path = indian_pref_model if (config.style or "").lower() in {"indian", "indian_cartoon", "desi", "bollywood"} else default_model
+        lora_path = os.getenv("INDIAN_STYLE_LORA", "") or None
+        try:
+            self.image_generator = ImageGenerator(model_path=model_path, lora_path=lora_path, lora_scale=0.85)
+        except TypeError:
+            # Fallback for older ImageGenerator signature
+            self.image_generator = ImageGenerator(model_path=model_path)
         self.animation_generator = AnimationGenerator()
         # Initialize Coqui TTS voice synthesizer
         self.voice_synthesizer = CoquiVoiceSynthesizer(
