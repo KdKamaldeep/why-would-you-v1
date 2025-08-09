@@ -197,7 +197,7 @@ class CoquiVoiceSynthesizer:
                 self.tts.tts_to_file(
                     text=full_text,
                     file_path=output_path,
-                    voice_dir=self.config.voice_dir,
+                    voice_dir=self.config.voice_dir
                 )
             
             if os.path.exists(output_path):
@@ -363,9 +363,7 @@ class CoquiVoiceSynthesizer:
             self.tts.tts_to_file(
                 text=test_text,
                 file_path=test_output_path,
-                voice_dir=self.config.voice_dir,
-                speaker=speaker_name,
-                progress_bar=True
+                voice_dir=self.config.voice_dir                
             )
             
             if os.path.exists(test_output_path):
@@ -450,8 +448,7 @@ def test_coqui_voice():
     try:
         # Initialize synthesizer
         config = CoquiVoiceConfig(
-            gpu=torch.cuda.is_available(),
-            speaker="random"
+            gpu=torch.cuda.is_available()            
         )
         
         synthesizer = CoquiVoiceSynthesizer(config)
