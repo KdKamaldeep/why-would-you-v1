@@ -75,7 +75,7 @@ def test_voice_generation_hindi():
 
     # Initialize voice generator with Hindi
     print("🚀 Initializing Coqui Voice Synthesizer (Hindi)...")
-    vg = CoquiVoiceSynthesizer(CoquiVoiceConfig(language="hi"))
+    vg = CoquiVoiceSynthesizer(CoquiVoiceConfig(language="hi", speaker="default"))
 
     # Short Hindi text (Devanagari)
     sample_text_hi = (
@@ -85,7 +85,7 @@ def test_voice_generation_hindi():
 
     print("🎙️  Generating Hindi narration...")
     try:
-        path = vg.synthesize_voice([sample_text_hi], output_path=str(output_path), speaker=None, voice_clone_audio=None)
+        path = vg.synthesize_voice([sample_text_hi], output_path=str(output_path), speaker="default", voice_clone_audio=None)
         if Path(path).exists():
             size_kb = Path(path).stat().st_size / 1024
             print(f"✅ Hindi audio generated: {path} ({size_kb:.1f} KB)")

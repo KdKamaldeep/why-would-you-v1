@@ -42,7 +42,7 @@ class CoquiVoiceConfig(BaseModel):
     model_name: str = "tts_models/en/ljspeech/tacotron2-DDC"
     gpu: bool = True
     voice_dir: str = "tts_voices/"
-    speaker: str = "random"
+    speaker: str = "default"
     text_temp: float = 0.7
     waveform_temp: float = 0.7
     progress_bar: bool = True
@@ -294,8 +294,8 @@ class CoquiVoiceSynthesizer:
             except Exception:
                 pass
 
-        # Fallback: some XTTS builds accept 'random' to pick an internal voice
-        return "random"
+        # Fallback: many XTTS builds accept 'default' to pick a bundled voice
+        return "default"
     
     def clone_voice(self, 
                    audio_file_path: str, 
