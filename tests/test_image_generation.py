@@ -40,17 +40,18 @@ def test_image_generation():
         print("💡 To enable SD, run: bash download_models.sh")
     
     # Test prompts
-    test_prompts = [
+    test_prompts =[
   "Golden hour wide shot of an Indian village, dusty lane stretching into the distance, mud houses with thatched roofs, neem trees swaying gently in warm sunlight.",
   "A person in a red-yellow lehenga walks along the lane, silver anklet glinting on their foot, dupatta flowing behind, long shadows stretching on the dusty ground.",
   "Close-up of the silver anklet slipping off the foot and falling softly onto the dusty lane, a small cloud of dust rising around it.",
-  "The anklet rolls forward on the dusty lane, leading toward a lively street market with colorful stalls and bustling activity.",
-  "A child in an off-white cotton kurta crouches near the market, eyes fixed on the shiny silver anklet resting on the ground.",
-  "Small hands reach out and gently pick up the anklet, sunlight catching the intricate silver as a playful smile appears.",
-  "Two figures meet on the village lane, one handing over the anklet while the other receives it with a look of relief.",
-  "Close-up of hands exchanging warm golden jalebis wrapped in brown paper, glowing softly in the sunset light.",
-  "Sunset wide shot of the village lane painted in orange and pink hues, the two figures walking away together as the camera slowly pulls back."
+  "The anklet rolls slowly along the dusty lane toward the colorful market stalls bustling with people.",
+  "A curious child in an off-white cotton kurta crouches near the anklet, watching it glint on the ground.",
+  "The child’s small hands carefully pick up the silver anklet, sunlight sparkling on its detailed design.",
+  "Later on the village lane, two people meet; one hands the anklet over, and the other receives it gratefully.",
+  "Close-up of hands exchanging warm, golden jalebis wrapped in brown paper, glowing softly in the sunset light.",
+  "A peaceful sunset wide shot shows the village lane bathed in orange and pink hues as the two figures walk away together."
 ]
+
 
 
     
