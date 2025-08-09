@@ -166,12 +166,23 @@ class CoquiVoiceSynthesizer:
 
                 def _xtts_call(speaker_value: Optional[str]) -> None:
                     # Avoid passing progress_bar to suppress model_kwargs warnings
-                    self.tts.tts_to_file(
-                        text=full_text,
-                        file_path=output_path,
-                        speaker_wav=speaker_wav_arg,
-                        language=self.config.language,
-                    )
+                    if speaker_wav_arg is not None:
+                        # Reference voice provided: do not pass speaker token
+                        self.tts.tts_to_file(
+                            text=full_text,
+                            file_path=output_path,
+                            speaker_wav=speaker_wav_arg,
+                            language=self.config.language,
+                        )
+                    else:
+                        # No reference: pass an explicit speaker token
+                        chosen_speaker = speaker_value or self.config.speaker or "default"
+                        self.tts.tts_to_file(
+                            text=full_text,
+                            file_path=output_path,
+                            speaker=chosen_speaker,
+                            language=self.config.language,
+                        )
 
                 try:
                     _xtts_call(xtts_speaker)
