@@ -11,7 +11,7 @@
     {
       "duration": 10,
       "description": "Meera walks through the dusty lanes of her Rajasthani village, her silver anklet jingling in rhythm.",
-      "visual_prompt": "Ultra realistic cinematic photograph, golden sunset over rural Rajasthani village, traditional mud houses with thatched roofs, narrow dusty lane, Indian woman Meera with medium-brown skin tone wearing a bright red and yellow lehenga and dupatta, traditional silver jewelry, soft breeze moving her dupatta, warm ambient lighting, 50mm lens depth of field.",
+      "visual_prompt": "Ultra detailed cinematic Indian village scene at golden hour — narrow dusty lane lined with traditional mud houses and thatched roofs, warm light casting long shadows, Meera with medium-brown skin wearing a bright red and yellow lehenga and dupatta, intricate silver jewelry catching the sunlight, soft breeze lifting her dupatta, distant sounds of village chatter, depth of field focused on Meera with blurred background, vibrant festive palette, Indian cartoon style, avoid anime/manga.",
       "narration": "In a small Rajasthani village, Meera walks through the dusty lanes, her silver anklet jingling in rhythm.",
       "subtitle": "Meera’s Walk",
       "characters": ["Meera"]
@@ -19,7 +19,7 @@
     {
       "duration": 8,
       "description": "The anklet slips off and rolls into the bustling village bazaar.",
-      "visual_prompt": "Close-up ultra realistic shot, detailed silver anklet falling onto dusty ground, motion blur as it rolls forward, crowded Indian bazaar in background with colorful sari stalls, bangle displays, spice mounds, people wearing traditional Rajasthani turbans, authentic street textures.",
+      "visual_prompt": "Close-up cinematic shot of an ornate silver anklet tumbling onto dusty ground, tiny puff of dust rising, motion blur as it rolls forward towards a vibrant bazaar — stalls overflowing with colorful saris, shimmering bangles, and mounds of spices in vivid reds, yellows, and browns, shopkeepers in traditional Rajasthani turbans calling out to customers, strong sunlight highlighting dust particles in the air, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
       "narration": "Suddenly, the anklet slips off… and rolls into the bustling bazaar.",
       "subtitle": "The Lost Anklet",
       "characters": ["Meera"]
@@ -27,7 +27,7 @@
     {
       "duration": 8,
       "description": "A mischievous young boy spots the anklet, picks it up, and smiles slyly.",
-      "visual_prompt": "Ultra realistic cinematic frame of an 8-year-old Indian boy with medium-brown skin, wearing simple off-white cotton kurta and loose pajama pants, short messy black hair, holding silver anklet in hand, mischievous smile, goats grazing in background, children playing in dirt lane, natural afternoon light.",
+      "visual_prompt": "Ultra realistic and richly colored Indian village lane — 8-year-old boy with medium-brown skin wearing an off-white cotton kurta and loose pajama pants, short messy black hair glinting in sunlight, crouched down holding the silver anklet with a mischievous grin, goats grazing nearby, children playing with sticks in the background, textured earthen walls framing the scene, warm ambient lighting, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
       "narration": "A young boy spots it, picks it up, and smiles mischievously.",
       "subtitle": "The Finder",
       "characters": ["Young Boy"]
@@ -35,7 +35,7 @@
     {
       "duration": 10,
       "description": "Meera searches frantically, asking shopkeepers and neighbors.",
-      "visual_prompt": "Photorealistic mid-shot, Meera speaking to elderly Indian shopkeeper wearing white dhoti and turban, pointing towards the ground, worried expression, stacks of colorful fabrics behind, rustic shop with wooden shelves, strong sunlight casting shadows.",
+      "visual_prompt": "Photorealistic village market scene — Meera speaking urgently to an elderly shopkeeper in a white dhoti and neatly tied turban, his wrinkled hand pointing down the lane, behind them shelves stacked with colorful folded fabrics, baskets of vibrant textiles spilling onto the counter, bright midday sunlight streaming in through a thatched awning, casting dappled shadows across their faces, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
       "narration": "Meera searches frantically, asking shopkeepers and neighbors.",
       "subtitle": "The Search",
       "characters": ["Meera", "Shopkeeper"]
@@ -43,7 +43,7 @@
     {
       "duration": 12,
       "description": "The boy appears, holding the anklet like a treasure.",
-      "visual_prompt": "Ultra realistic warm-toned close-up, young boy extending silver anklet towards Meera, shy smile, Meera’s expression changing to relief and gratitude, blurred village market background, cinematic lighting.",
+      "visual_prompt": "Warm-toned cinematic moment — boy stepping forward through the lively market crowd, extending the silver anklet with both hands towards Meera, his shy smile lit by late afternoon sunlight, Meera’s eyes widening in relief, blurred background of sari stalls and spice vendors glowing in golden light, dust motes floating in the air, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
       "narration": "The boy finally appears, holding the anklet like a treasure.",
       "subtitle": "A Precious Return",
       "characters": ["Meera", "Young Boy"]
@@ -51,7 +51,7 @@
     {
       "duration": 12,
       "description": "Meera thanks the boy with fresh jalebis, ending the day with sweetness.",
-      "visual_prompt": "Cinematic ultra realistic shot, Meera handing golden jalebis wrapped in brown paper to the boy, both smiling warmly, Indian village street in background, soft sunset glow, shallow depth of field.",
+      "visual_prompt": "Cinematic village street scene at sunset — Meera handing a bundle of golden jalebis wrapped in brown paper to the smiling boy, the jalebis glistening with syrup in the warm glow, both of them laughing gently, behind them mud houses and flowering plants along the lane, long shadows stretching across the ground, orange sky fading to pink, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
       "narration": "She thanks him with a handful of fresh jalebis… a sweet end to a small adventure.",
       "subtitle": "Sweet Gratitude",
       "characters": ["Meera", "Young Boy"]
