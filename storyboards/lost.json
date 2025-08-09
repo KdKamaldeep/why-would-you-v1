@@ -1,0 +1,61 @@
+{
+  "title": "The Lost Anklet",
+  "description": "In a quaint Rajasthani village, Meera’s silver anklet slips off and sparks a small yet heartwarming adventure through the bustling bazaar.",
+  "total_duration": 60,
+  "cast": [
+    {"name": "Meera", "role": "protagonist"},
+    {"name": "Young Boy", "role": "mischievous helper"},
+    {"name": "Shopkeeper", "role": "village elder"}
+  ],
+  "scenes": [
+    {
+      "duration": 10,
+      "description": "Meera walks through the dusty lanes of her Rajasthani village, her silver anklet jingling in rhythm.",
+      "visual_prompt": "Ultra realistic cinematic photograph, golden sunset over rural Rajasthani village, traditional mud houses with thatched roofs, narrow dusty lane, Indian woman Meera with medium-brown skin tone wearing a bright red and yellow lehenga and dupatta, traditional silver jewelry, soft breeze moving her dupatta, warm ambient lighting, 50mm lens depth of field.",
+      "narration": "In a small Rajasthani village, Meera walks through the dusty lanes, her silver anklet jingling in rhythm.",
+      "subtitle": "Meera’s Walk",
+      "characters": ["Meera"]
+    },
+    {
+      "duration": 8,
+      "description": "The anklet slips off and rolls into the bustling village bazaar.",
+      "visual_prompt": "Close-up ultra realistic shot, detailed silver anklet falling onto dusty ground, motion blur as it rolls forward, crowded Indian bazaar in background with colorful sari stalls, bangle displays, spice mounds, people wearing traditional Rajasthani turbans, authentic street textures.",
+      "narration": "Suddenly, the anklet slips off… and rolls into the bustling bazaar.",
+      "subtitle": "The Lost Anklet",
+      "characters": ["Meera"]
+    },
+    {
+      "duration": 8,
+      "description": "A mischievous young boy spots the anklet, picks it up, and smiles slyly.",
+      "visual_prompt": "Ultra realistic cinematic frame of an 8-year-old Indian boy with medium-brown skin, wearing simple off-white cotton kurta and loose pajama pants, short messy black hair, holding silver anklet in hand, mischievous smile, goats grazing in background, children playing in dirt lane, natural afternoon light.",
+      "narration": "A young boy spots it, picks it up, and smiles mischievously.",
+      "subtitle": "The Finder",
+      "characters": ["Young Boy"]
+    },
+    {
+      "duration": 10,
+      "description": "Meera searches frantically, asking shopkeepers and neighbors.",
+      "visual_prompt": "Photorealistic mid-shot, Meera speaking to elderly Indian shopkeeper wearing white dhoti and turban, pointing towards the ground, worried expression, stacks of colorful fabrics behind, rustic shop with wooden shelves, strong sunlight casting shadows.",
+      "narration": "Meera searches frantically, asking shopkeepers and neighbors.",
+      "subtitle": "The Search",
+      "characters": ["Meera", "Shopkeeper"]
+    },
+    {
+      "duration": 12,
+      "description": "The boy appears, holding the anklet like a treasure.",
+      "visual_prompt": "Ultra realistic warm-toned close-up, young boy extending silver anklet towards Meera, shy smile, Meera’s expression changing to relief and gratitude, blurred village market background, cinematic lighting.",
+      "narration": "The boy finally appears, holding the anklet like a treasure.",
+      "subtitle": "A Precious Return",
+      "characters": ["Meera", "Young Boy"]
+    },
+    {
+      "duration": 12,
+      "description": "Meera thanks the boy with fresh jalebis, ending the day with sweetness.",
+      "visual_prompt": "Cinematic ultra realistic shot, Meera handing golden jalebis wrapped in brown paper to the boy, both smiling warmly, Indian village street in background, soft sunset glow, shallow depth of field.",
+      "narration": "She thanks him with a handful of fresh jalebis… a sweet end to a small adventure.",
+      "subtitle": "Sweet Gratitude",
+      "characters": ["Meera", "Young Boy"]
+    }
+  ],
+  "tags": ["Indian culture", "village life", "kindness", "Rajasthan", "short story"]
+}
