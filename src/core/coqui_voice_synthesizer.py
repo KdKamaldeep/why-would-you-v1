@@ -149,11 +149,14 @@ class CoquiVoiceSynthesizer:
             if "xtts" in model_name_lower:
                 logger.info("Generating audio with XTTS (multilingual)")
                 speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
+                # Some XTTS wrappers require a speaker when no reference wav is provided
+                xtts_speaker = (speaker or self.config.speaker) if speaker_wav_arg is None else None
                 try:
                     self.tts.tts_to_file(
                         text=full_text,
                         file_path=output_path,
                         speaker_wav=speaker_wav_arg,
+                        speaker=xtts_speaker,
                         language=self.config.language,
                         progress_bar=self.config.progress_bar,
                     )
@@ -163,6 +166,7 @@ class CoquiVoiceSynthesizer:
                         text=full_text,
                         file_path=output_path,
                         speaker_wav=speaker_wav_arg,
+                        speaker=xtts_speaker,
                         language=self.config.language,
                     )
             else:

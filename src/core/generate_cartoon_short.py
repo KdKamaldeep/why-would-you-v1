@@ -324,6 +324,21 @@ class CartoonShortsGenerator:
         """Compose an image prompt that bakes in exactly two character specs if available."""
         base = scene.get('visual_prompt', scene.get('description', ''))
         characters = scene.get('characters', [])
+        # Style preset additions
+        style_suffix = ""
+        style_key = (self.config.style or "").lower()
+        if style_key in {"indian", "indian_cartoon", "desi", "bollywood"}:
+            style_suffix = (
+                " Indian cartoon style, inspired by Indian children's book illustrations and Amar Chitra Katha; "
+                "vibrant festive palette (marigold, vermilion, indigo), matte shading, soft outlines; "
+                "traditional Indian clothing and accessories where natural (kurta, sari, bangles); "
+                "background motifs like bazaars, auto-rickshaws, kites, forts or temples when relevant; "
+                "warm sunlight, friendly expression, family-friendly, avoid anime/manga aesthetics."
+            )
+        else:
+            style_suffix = (
+                " Vertical 768x1024 cartoon, clean lines, vibrant colors, family-friendly, both characters clearly visible, consistent traits across scenes."
+            )
         if characters:
             char_bits = []
             for idx, ch in enumerate(characters[:2], start=1):
@@ -338,8 +353,7 @@ class CartoonShortsGenerator:
             char_text = " Include two characters: " + " | ".join(char_bits) + "."
         else:
             char_text = ""
-        suffix = " Vertical 768x1024 cartoon, clean lines, vibrant colors, family-friendly, both characters clearly visible, consistent traits across scenes."
-        return (base or "Cartoon scene") + char_text + suffix
+        return (base or "Cartoon scene") + char_text + style_suffix
 
 def main():
     """Main CLI entry point."""
