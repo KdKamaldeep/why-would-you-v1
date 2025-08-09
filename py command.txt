@@ -1,0 +1,3 @@
+python command for stories
+python3 -m src.interfaces.simple_cartoon_generator --prompt "Animal friends adventure" --storyboard storyboards/lost_map.json 
+    --no-reuse running
