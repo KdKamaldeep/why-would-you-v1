@@ -190,25 +190,6 @@ class CoquiVoiceSynthesizer:
                     # Retry strategy for XTTS when speaker is not accepted
                     err_msg = str(e)
                     logger.warning(f"XTTS initial synthesis failed: {err_msg}")
-                    retry_candidates: List[Optional[str]] = []
-                    builtin = self._get_builtin_speakers()
-                    if builtin:
-                        retry_candidates.extend([str(s) for s in builtin])
-                    # Add generic fallbacks commonly accepted in some builds
-                    retry_candidates.extend(["random", "female", "male", None])
-                    tried = set()
-                    for cand in retry_candidates:
-                        key = str(cand)
-                        if key in tried:
-                            continue
-                        tried.add(key)
-                        try:
-                            logger.info(f"XTTS retry with speaker={cand}")
-                            _xtts_call(cand)
-                            break
-                        except Exception as e2:
-                            logger.warning(f"XTTS retry failed for speaker={cand}: {e2}")
-                            continue
             else:
                 # Non-XTTS models: use speaker registry in voice_dir
                 current_speaker = speaker or self.config.speaker
