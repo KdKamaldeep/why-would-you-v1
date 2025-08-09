@@ -38,14 +38,15 @@ _patch_torch_load()
 
 class CoquiVoiceConfig(BaseModel):
     """Configuration for Coqui TTS voice synthesis"""
-    model_name: str = "tts_models/en/ljspeech/tacotron2-DDC"  # Using a stable, reliable model
+    # Prefer a small, reliable English model by default; will switch to XTTS for multilingual
+    model_name: str = "tts_models/en/ljspeech/tacotron2-DDC"
     gpu: bool = True
     voice_dir: str = "tts_voices/"
     speaker: str = "random"
     text_temp: float = 0.7
     waveform_temp: float = 0.7
     progress_bar: bool = True
-    language: str = "en"  # Default language
+    language: str = "en"  # Target language (e.g., 'en', 'hi', 'es', ...)
 
 class CoquiVoiceSynthesizer:
     def __init__(self, config: Optional[CoquiVoiceConfig] = None):
@@ -75,13 +76,23 @@ class CoquiVoiceSynthesizer:
 
             device = "cuda" if self.config.gpu and torch.cuda.is_available() else "cpu"
             
-            # List of fallback models to try if the primary model fails
-            fallback_models = [
-                self.config.model_name,  # tacotron2-DDC
+            # Build a prioritized list of models based on requested language
+            fallback_models = []
+            lang = (self.config.language or "en").lower()
+            # For non-English targets, try multilingual XTTS first
+            if lang != "en":
+                fallback_models.append("tts_models/multilingual/multi-dataset/xtts_v2")
+            # Always try the explicitly configured model next
+            fallback_models.append(self.config.model_name)
+            # Add robust alternates
+            fallback_models.extend([
                 "tts_models/en/ljspeech/fast_pitch",
                 "tts_models/en/vctk/vits",
-                "tts_models/multilingual/multi-dataset/your_tts"
-            ]
+                # YourTTS is multilingual but quality varies; leave lower priority
+                "tts_models/multilingual/multi-dataset/your_tts",
+                # Ensure XTTS is attempted even for English if earlier attempts failed
+                "tts_models/multilingual/multi-dataset/xtts_v2",
+            ])
             
             for model_name in fallback_models:
                 try:
@@ -132,37 +143,57 @@ class CoquiVoiceSynthesizer:
             full_text = " ".join(narration_lines)
             logger.info(f"Synthesizing voice for text: {full_text[:100]}...")
             
-            # Use provided speaker or default
-            current_speaker = speaker or self.config.speaker
-            
-            # Handle voice cloning if audio file provided
-            if voice_clone_audio and os.path.exists(voice_clone_audio):
-                logger.info(f"Cloning voice from: {voice_clone_audio}")
-                
-                # Create speaker directory
-                speaker_name = os.path.splitext(os.path.basename(voice_clone_audio))[0]
-                speaker_dir = os.path.join(self.config.voice_dir, speaker_name)
-                os.makedirs(speaker_dir, exist_ok=True)
-                
-                # Copy audio file to speaker directory
-                import shutil
-                speaker_audio_path = os.path.join(speaker_dir, "speaker.wav")
-                shutil.copy2(voice_clone_audio, speaker_audio_path)
-                
-                # Use the cloned voice
-                current_speaker = speaker_name
-            
-            # Generate audio using Coqui TTS
-            logger.info(f"Generating audio with speaker: {current_speaker}")
-            
-            # Standard TTS API
-            self.tts.tts_to_file(
-                text=full_text,
-                file_path=output_path,
-                voice_dir=self.config.voice_dir,
-                speaker=current_speaker,
-                progress_bar=self.config.progress_bar
-            )
+            model_name_lower = (getattr(self.config, 'model_name', '') or '').lower()
+
+            # For XTTS, prefer direct reference wav and pass language
+            if "xtts" in model_name_lower:
+                logger.info("Generating audio with XTTS (multilingual)")
+                speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
+                try:
+                    self.tts.tts_to_file(
+                        text=full_text,
+                        file_path=output_path,
+                        speaker_wav=speaker_wav_arg,
+                        language=self.config.language,
+                        progress_bar=self.config.progress_bar,
+                    )
+                except TypeError:
+                    # Older TTS may not accept progress_bar; retry without
+                    self.tts.tts_to_file(
+                        text=full_text,
+                        file_path=output_path,
+                        speaker_wav=speaker_wav_arg,
+                        language=self.config.language,
+                    )
+            else:
+                # Non-XTTS models: use speaker registry in voice_dir
+                current_speaker = speaker or self.config.speaker
+                # Optional: create a named speaker from provided audio for YourTTS-like models
+                if voice_clone_audio and os.path.exists(voice_clone_audio):
+                    logger.info(f"Cloning voice (registry) from: {voice_clone_audio}")
+                    speaker_name = os.path.splitext(os.path.basename(voice_clone_audio))[0]
+                    speaker_dir = os.path.join(self.config.voice_dir, speaker_name)
+                    os.makedirs(speaker_dir, exist_ok=True)
+                    import shutil
+                    speaker_audio_path = os.path.join(speaker_dir, "speaker.wav")
+                    shutil.copy2(voice_clone_audio, speaker_audio_path)
+                    current_speaker = speaker_name
+                logger.info(f"Generating audio with speaker: {current_speaker}")
+                try:
+                    self.tts.tts_to_file(
+                        text=full_text,
+                        file_path=output_path,
+                        voice_dir=self.config.voice_dir,
+                        speaker=current_speaker,
+                        progress_bar=self.config.progress_bar,
+                    )
+                except TypeError:
+                    self.tts.tts_to_file(
+                        text=full_text,
+                        file_path=output_path,
+                        voice_dir=self.config.voice_dir,
+                        speaker=current_speaker,
+                    )
             
             if os.path.exists(output_path):
                 logger.info(f"✅ Voice synthesized successfully: {output_path}")
