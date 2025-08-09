@@ -6,7 +6,8 @@ Voice Generator Module - Coqui TTS (XTTS v2)
 import os
 import glob
 import logging
-from typing import List
+from pathlib import Path
+from typing import List, Optional, Union
 
 from pydub import AudioSegment
 
@@ -88,11 +89,15 @@ class VoiceGenerator:
         # Hardcoded local model directory for Coqui XTTS v2
         self.model_dir = "models/tts/XTTS-v2"
         self.tts = None
-        self.default_speaker: str | None = None
-        self.default_ref_wav: str | None = None
+        self.default_speaker: Optional[str] = None
+        self.default_ref_wav: Optional[Path] = None
+        self.tts_available: bool = False
         self._load_model()
 
     def _load_model(self) -> None:
+        logger.info("🚀 Initializing Coqui TTS (XTTS v2)...")
+        logger.info(f"📁 Model directory: {self.model_dir}")
+
         if TTS is None:
             logger.warning("Coqui TTS library not installed. Install with: pip install TTS==0.22.0")
             return
@@ -105,28 +110,37 @@ class VoiceGenerator:
         # Try local model load first (provide explicit config path for compatibility)
         local_dir = self.model_dir
         try:
-            if local_dir and os.path.isdir(local_dir):
-                config_path = os.path.join(local_dir, "config.json")
-                if os.path.isfile(config_path):
-                    logger.info(f"Loading Coqui XTTS v2 from local directory: {local_dir}")
+            dir_path = Path(local_dir)
+            if dir_path.exists() and dir_path.is_dir():
+                config_path = dir_path / "config.json"
+                if config_path.is_file():
+                    logger.info(f"📦 Loading Coqui XTTS v2 from local directory: {dir_path}")
                     # Many TTS versions accept directory for model_path with config_path provided
-                self.tts = TTS(model_path=local_dir, config_path=config_path)
-                self._init_default_speaker()
-                self._init_default_reference()
-                return
+                    self.tts = TTS(model_path=str(dir_path), config_path=str(config_path))
+                    self._init_default_speaker()
+                    self._init_default_reference()
+                    self.tts_available = True
+                    return
+                else:
+                    logger.warning(f"⚠️ config.json not found in {dir_path}. Run: bash src/utils/download_models.sh")
+            else:
+                logger.warning(f"⚠️ Model directory not found: {dir_path}")
+                logger.info("💡 Run: bash src/utils/download_models.sh to download Coqui XTTS model")
         except Exception as e:
             logger.warning(f"Failed to load local Coqui XTTS v2 from '{local_dir}': {e}")
 
-        # Fallback: model hub name (may trigger a download)
-        try:
-            logger.info("Loading Coqui XTTS v2 by model name (may require internet access)...")
-            # Pin model name to avoid resolution issues across versions
-            self.tts = TTS(model_name="tts_models/multilingual/multi-dataset/xtts_v2")
-            self._init_default_speaker()
-            self._init_default_reference()
-        except Exception as e:
-            logger.error(f"Failed to initialize Coqui TTS: {e}")
-            self.tts = None
+        # Optional: online fallback if explicitly enabled
+        if str(os.getenv("COQUI_TTS_ENABLE_ONLINE_FALLBACK", "0")).lower() in ("1", "true", "yes"): 
+            try:
+                logger.info("🌐 Loading Coqui XTTS v2 by model name (online fallback)...")
+                self.tts = TTS(model_name="tts_models/multilingual/multi-dataset/xtts_v2")
+                self._init_default_speaker()
+                self._init_default_reference()
+                self.tts_available = True
+            except Exception as e:
+                logger.error(f"Failed to initialize Coqui TTS (online fallback): {e}")
+                self.tts = None
+                self.tts_available = False
 
     def _init_default_speaker(self) -> None:
         """Pick a default speaker if model is multi-speaker and none is provided.
@@ -141,67 +155,84 @@ class VoiceGenerator:
     def _init_default_reference(self) -> None:
         """Pick a default reference WAV bundled with the model snapshot."""
         try:
-            candidates = []
+            candidates: list[Path] = []
             # Common sample locations
+            dir_path = Path(self.model_dir)
             for sub in ("samples", "."):
-                glob_path = os.path.join(self.model_dir, sub, "*.wav")
-                candidates.extend(glob.glob(glob_path))
+                for p in (dir_path / sub).glob("*.wav"):
+                    candidates.append(p)
             if candidates:
                 # Prefer an English sample if present
-                en_candidates = [p for p in candidates if any(tag in os.path.basename(p).lower() for tag in ("en", "english"))]
+                en_candidates = [p for p in candidates if any(tag in p.name.lower() for tag in ("en", "english"))]
                 chosen = en_candidates[0] if en_candidates else candidates[0]
                 self.default_ref_wav = chosen
         except Exception:
             self.default_ref_wav = None
 
-    def generate_narration(self, text: str, voice_id: str, output_path: str) -> str:
+    def generate_narration(self, text: str, voice_id: Union[str, Path], output_path: Union[str, Path]) -> str:
         """Generate narration audio using Coqui TTS.
 
         voice_id: Optional path to a reference speaker WAV for cloning.
         """
+        # Normalize paths
+        out_path = Path(output_path)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+
         if not text:
-            return self._generate_silent_audio(output_path)
+            return self._generate_silent_audio(str(out_path))
 
-        if self.tts is None:
+        if self.tts is None or not self.tts_available:
             logger.error("Coqui TTS is not available. Generating silent audio.")
-            return self._generate_silent_audio(output_path)
+            return self._generate_silent_audio(str(out_path))
 
-        speaker_wav = voice_id if (voice_id and os.path.isfile(voice_id)) else None
-        if speaker_wav is None and self.default_ref_wav and os.path.isfile(self.default_ref_wav):
-            speaker_wav = self.default_ref_wav
+        speaker_wav: Optional[str]
+        if isinstance(voice_id, Path):
+            speaker_wav = str(voice_id) if voice_id.is_file() else None
+        else:
+            speaker_wav = voice_id if (voice_id and os.path.isfile(voice_id)) else None
+        if speaker_wav is None and self.default_ref_wav and self.default_ref_wav.is_file():
+            speaker_wav = str(self.default_ref_wav)
 
         try:
             # XTTS v2 supports speaker_wav for cloning; language is required
             self.tts.tts_to_file(
                 text=text,
-                file_path=output_path,
+                file_path=str(out_path),
                 speaker_wav=speaker_wav,
                 speaker=None if speaker_wav else self.default_speaker,
                 language=self.language,
             )
-            logger.info(f"Generated narration audio: {output_path}")
-            return output_path
+            logger.info(f"Generated narration audio: {out_path}")
+            return str(out_path)
         except Exception as e:
             logger.error(f"Error generating audio with Coqui TTS: {e}")
-            return self._generate_silent_audio(output_path)
+            return self._generate_silent_audio(str(out_path))
 
-    def generate_narration_from_script(self, script: dict, voice_id: str, output_path: str) -> str:
+    def is_tts_available(self) -> bool:
+        """Check if Coqui TTS is available and initialized."""
+        return self.tts_available and self.tts is not None
+
+    def generate_narration_from_script(self, script: dict, voice_id: Union[str, Path], output_path: Union[str, Path]) -> str:
         """Generate narration from script scenes (concatenated text)."""
         narration_text = " ".join([scene.get('narration', '') for scene in script.get('scenes', [])])
         return self.generate_narration(narration_text, voice_id, output_path)
 
-    def generate_individual_narrations(self, script: dict, voice_id: str, output_dir: str) -> List[str]:
+    def generate_individual_narrations(self, script: dict, voice_id: Union[str, Path], output_dir: Union[str, Path]) -> List[str]:
         """Generate individual narration files for each scene."""
+        out_dir = Path(output_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
         audio_paths: List[str] = []
         for i, scene in enumerate(script.get('scenes', [])):
-            output_path = f"{output_dir}/audio_{i+1}.mp3"
+            output_path = out_dir / f"audio_{i+1}.mp3"
             audio_path = self.generate_narration(scene.get('narration', ''), voice_id, output_path)
             audio_paths.append(audio_path)
         return audio_paths
 
-    def _generate_silent_audio(self, output_path: str) -> str:
+    def _generate_silent_audio(self, output_path: Union[str, Path]) -> str:
         """Generate silent audio as fallback."""
+        out_path = Path(output_path)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
         audio = AudioSegment.silent(duration=3000)  # 3 seconds
-        audio.export(output_path, format="mp3")
-        logger.info(f"Generated silent audio: {output_path}")
-        return output_path
+        audio.export(str(out_path), format="mp3")
+        logger.info(f"Generated silent audio: {out_path}")
+        return str(out_path)
