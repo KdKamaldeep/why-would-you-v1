@@ -47,7 +47,7 @@ def check_requirements():
     print("✅ All requirements satisfied!")
     return True
 
-def generate_cartoon(prompt, style="cartoon", duration=30):
+def generate_cartoon(prompt, style="cartoon", duration=30, language="en"):
     """Generate a cartoon video with the given prompt."""
     try:
         # Import the main generator
@@ -57,6 +57,7 @@ def generate_cartoon(prompt, style="cartoon", duration=30):
         print(f"📝 Prompt: {prompt}")
         print(f"🎨 Style: {style}")
         print(f"⏱️ Duration: {duration} seconds")
+        print(f"🗣️ Language: {language}")
         print("-" * 50)
         
         # Create video configuration
@@ -65,7 +66,8 @@ def generate_cartoon(prompt, style="cartoon", duration=30):
             duration=duration,
             style=style,
             output_path="output",
-            add_subtitles=False
+            add_subtitles=False,
+            language=language
         )
         
         # Initialize generator
@@ -121,6 +123,12 @@ Examples:
         type=int,
         default=30,
         help="Video duration in seconds (default: 30)"
+    )
+
+    parser.add_argument(
+        "--language", "-l",
+        default="en",
+        help="Narration language (e.g., en, hi, es). For Hindi use 'hi'"
     )
 
     parser.add_argument(
@@ -203,7 +211,8 @@ Examples:
                 custom_scenes=normalized_scenes,
                 scene_duration=scene_duration,
                 reuse_existing=(not args.no_reuse),
-                add_subtitles=False
+                add_subtitles=False,
+                language=args.language
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
@@ -211,7 +220,7 @@ Examples:
             print(f"❌ Failed to use storyboard: {e}")
             output_path = None
     else:
-        output_path = generate_cartoon(args.prompt, args.style, args.duration)
+        output_path = generate_cartoon(args.prompt, args.style, args.duration, args.language)
     
     if output_path:
         print(f"\n🎊 Success! Your cartoon is ready at: {output_path}")
