@@ -96,6 +96,6 @@ def test_voice_generation_hindi():
 
 
 if __name__ == "__main__":
-    test_voice_generation()
+    test_voice_generation_hindi()
 
 
