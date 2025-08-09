@@ -41,15 +41,15 @@ def test_image_generation():
     
     # Test prompts
     test_prompts = [
-  "Wide shot of Indian village at golden hour, dusty lane, mud houses, thatched roofs, neem trees, Indian cartoon style, vibrant festive palette.",
-  "Meera in red-yellow lehenga, silver anklet, dupatta flowing, walking down lane, Indian cartoon style, vibrant festive palette.",
-  "Close-up silver anklet falling on dusty ground, Indian cartoon style, vibrant festive palette.",
-  "Silver anklet rolling towards bazaar stalls, Indian cartoon style, vibrant festive palette.",
-  "8-year-old boy in off-white kurta, crouching, noticing silver anklet, Indian cartoon style, vibrant festive palette.",
-  "Close-up boy holding anklet, mischievous smile, Indian cartoon style, vibrant festive palette.",
-  "Boy giving anklet to Meera, both smiling, Indian cartoon style, vibrant festive palette.",
-  "Meera giving golden jalebis to boy, sunset glow, Indian cartoon style, vibrant festive palette.",
-  "Wide shot of village lane at sunset, warm colors, Indian cartoon style, vibrant festive palette."
+  "Wide shot of Indian village at golden hour, dusty lane, mud houses, thatched roofs, neem trees.",
+  "Person in red-yellow lehenga with silver anklet, dupatta flowing, walking down lane.",
+  "Close-up ornate silver anklet falling on dusty ground.",
+  "Silver anklet rolling towards street market stalls.",
+  "Child in off-white cotton kurta crouching and looking down.",
+  "Close-up of small hands holding ornate silver anklet, mischievous smile.",
+  "Two figures exchanging silver anklet, both smiling.",
+  "Hands giving golden jalebis wrapped in brown paper, sunset glow.",
+  "Wide shot of village lane at sunset, warm colors."
 ]
 
     
