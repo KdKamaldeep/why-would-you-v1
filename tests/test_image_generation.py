@@ -41,8 +41,17 @@ def test_image_generation():
     
     # Test prompts
     test_prompts = [
-        "Wide shot of Indian village at golden hour, dusty lane, mud houses, thatched roofs, neem trees, Indian cartoon style, vibrant festive palette"
-    ]
+  "Wide shot of Indian village at golden hour, dusty lane, mud houses, thatched roofs, neem trees, Indian cartoon style, vibrant festive palette.",
+  "Meera in red-yellow lehenga, silver anklet, dupatta flowing, walking down lane, Indian cartoon style, vibrant festive palette.",
+  "Close-up silver anklet falling on dusty ground, Indian cartoon style, vibrant festive palette.",
+  "Silver anklet rolling towards bazaar stalls, Indian cartoon style, vibrant festive palette.",
+  "8-year-old boy in off-white kurta, crouching, noticing silver anklet, Indian cartoon style, vibrant festive palette.",
+  "Close-up boy holding anklet, mischievous smile, Indian cartoon style, vibrant festive palette.",
+  "Boy giving anklet to Meera, both smiling, Indian cartoon style, vibrant festive palette.",
+  "Meera giving golden jalebis to boy, sunset glow, Indian cartoon style, vibrant festive palette.",
+  "Wide shot of village lane at sunset, warm colors, Indian cartoon style, vibrant festive palette."
+]
+
     
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
     
