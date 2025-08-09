@@ -61,11 +61,26 @@ def test_generate_image_with_indian_style():
     """Compose an Indian style prompt and ensure an image is produced by ImageGenerator."""
     self_obj = build_dummy_self('indian')
     scene = {
-        'visual_prompt': 'A festive village square with kites and lanterns',
-        'description': 'Village celebration with bazaar stalls and colorful flags',
+        'visual_prompt': (
+            "Ultra detailed, vibrant Indian village garden scene during golden hour, "
+            "lush green grass carpeted with scattered marigold, rose, jasmine, and sunflower blooms, "
+            "colorful flower beds lining a small winding stone path, "
+            "two cheerful Indian children playing — "
+            "a boy around 8 years old in a bright yellow silk kurta and crisp white pajama pants, "
+            "and a girl around 7 years old in a pink and gold embroidered lehenga with a flowing dupatta, "
+            "boy holding a soft red ball mid-throw, girl reaching out to catch it, "
+            "butterflies of orange and blue fluttering above the flowers, "
+            "tall neem and gulmohar trees swaying gently in the warm breeze, "
+            "background dotted with traditional mud houses and a low stone boundary wall, "
+            "soft golden sunlight filtering through tree branches creating dappled light on the ground, "
+            "happy expressions on both children, Indian festive mood, "
+            "cinematic composition with shallow depth of field, vivid colors, "
+            "Indian cartoon style, vibrant festive palette, avoid anime/manga"
+        ),
+        'description': 'Two happy Indian children playing with a ball in a colorful village flower garden during golden hour.',
         'characters': [
-            {'name': 'Aarav', 'role': 'boy', 'appearance': 'cheerful', 'clothing': 'kurta', 'emotion': 'happy', 'action': 'running'},
-            {'name': 'Meera', 'role': 'girl', 'appearance': 'playful', 'clothing': 'sari', 'emotion': 'excited', 'action': 'waving'},
+            {'name': 'Aarav', 'role': 'boy', 'appearance': 'cheerful', 'clothing': 'bright yellow silk kurta, white pajama', 'emotion': 'joyful', 'action': 'throwing a red ball'},
+            {'name': 'Meera', 'role': 'girl', 'appearance': 'playful', 'clothing': 'pink and gold embroidered lehenga with dupatta', 'emotion': 'laughing', 'action': 'catching the ball'},
         ],
     }
 
@@ -73,7 +88,7 @@ def test_generate_image_with_indian_style():
 
     out_dir = Path('test_output')
     out_dir.mkdir(exist_ok=True)
-    out_path = out_dir / 'indian_style_scene.png'
+    out_path = out_dir / 'indian_style_garden_scene.png'
 
     img_gen = ImageGenerator()
     result_path = img_gen.generate_cartoon_image(prompt, str(out_path))
