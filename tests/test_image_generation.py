@@ -41,16 +41,17 @@ def test_image_generation():
     
     # Test prompts
     test_prompts = [
-  "Wide shot of Indian village at golden hour, dusty lane, mud houses, thatched roofs, neem trees.",
-  "Person in red-yellow lehenga with silver anklet, dupatta flowing, walking down lane.",
-  "Close-up ornate silver anklet falling on dusty ground.",
-  "Silver anklet rolling towards street market stalls.",
-  "Child in off-white cotton kurta crouching and looking down.",
-  "Close-up of small hands holding ornate silver anklet, mischievous smile.",
-  "Two figures exchanging silver anklet, both smiling.",
-  "Hands giving golden jalebis wrapped in brown paper, sunset glow.",
-  "Wide shot of village lane at sunset, warm colors."
+  "Golden hour wide shot of an Indian village, dusty lane stretching into the distance, mud houses with thatched roofs, neem trees swaying gently in warm sunlight.",
+  "A person in a red-yellow lehenga walks along the lane, silver anklet glinting on their foot, dupatta flowing behind, long shadows stretching on the dusty ground.",
+  "Close-up of the silver anklet slipping off the foot and falling softly onto the dusty lane, a small cloud of dust rising around it.",
+  "The anklet rolls forward on the dusty lane, leading toward a lively street market with colorful stalls and bustling activity.",
+  "A child in an off-white cotton kurta crouches near the market, eyes fixed on the shiny silver anklet resting on the ground.",
+  "Small hands reach out and gently pick up the anklet, sunlight catching the intricate silver as a playful smile appears.",
+  "Two figures meet on the village lane, one handing over the anklet while the other receives it with a look of relief.",
+  "Close-up of hands exchanging warm golden jalebis wrapped in brown paper, glowing softly in the sunset light.",
+  "Sunset wide shot of the village lane painted in orange and pink hues, the two figures walking away together as the camera slowly pulls back."
 ]
+
 
     
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
