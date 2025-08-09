@@ -41,10 +41,7 @@ def test_image_generation():
     
     # Test prompts
     test_prompts = [
-        "A cute cartoon dragon learning to bake cookies",
-        "Space pirates discovering treasure on a colorful planet",
-        "A magical cat teaching other animals to dance",
-        "A robot and a fairy becoming best friends"
+        "Wide shot of Indian village at golden hour, dusty lane, mud houses, thatched roofs, neem trees, Indian cartoon style, vibrant festive palette"
     ]
     
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
