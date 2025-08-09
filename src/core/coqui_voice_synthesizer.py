@@ -151,6 +151,12 @@ class CoquiVoiceSynthesizer:
             if "xtts" in model_name_lower:
                 logger.info("Generating audio with XTTS (multilingual)")
                 speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
+                # Auto-discover a language-appropriate speaker WAV if none provided
+                if speaker_wav_arg is None:
+                    auto_wav = self._discover_speaker_wav(self.config.language)
+                    if auto_wav:
+                        logger.info(f"Using discovered speaker_wav for language '{self.config.language}': {auto_wav}")
+                        speaker_wav_arg = auto_wav
                 # Ensure a valid speaker is passed for XTTS if no reference wav
                 requested_speaker = (
                     speaker if (speaker is not None and str(speaker).strip() != "") else self.config.speaker
@@ -244,6 +250,63 @@ class CoquiVoiceSynthesizer:
             logger.error(f"❌ Failed to synthesize voice with Coqui TTS: {e}")
             logger.info("Creating fallback silent audio")
             return self._create_silent_audio(output_path, len(narration_lines) * 3)
+
+    def _discover_speaker_wav(self, language: str) -> Optional[str]:
+        """Discover a language-appropriate speaker WAV file on disk.
+
+        Heuristics:
+        - Check language-specific env vars (e.g., HINDI_SPEAKER_WAV)
+        - Check common folders like 'tts-speaker', 'tts_speaker', 'tts_voices'
+        - Prefer filenames containing the language or gender hints when possible
+        """
+        try:
+            lang = (language or "").lower()
+            # Environment overrides
+            env_map = {
+                "hi": os.getenv("HINDI_SPEAKER_WAV"),
+            }
+            if lang in env_map and env_map[lang] and os.path.exists(env_map[lang]):
+                return env_map[lang]
+
+            candidates: List[str] = []
+            # Common directories
+            roots = [
+                os.path.join("tts-speaker", "male_hindi_speaker.wav"),
+                os.path.join("tts_speaker", "male_hindi_speaker.wav"),
+                os.path.join("tts_voices", "male_hindi_speaker.wav"),
+            ]
+            for p in roots:
+                if os.path.exists(p):
+                    candidates.append(p)
+
+            # Broader search for any wav under tts-speaker-like dirs
+            for folder in ["tts-speaker", "tts_speaker", "tts_voices"]:
+                if os.path.isdir(folder):
+                    try:
+                        for name in os.listdir(folder):
+                            if name.lower().endswith(".wav"):
+                                full = os.path.join(folder, name)
+                                candidates.append(full)
+                    except Exception:
+                        pass
+
+            # Rank: prefer names with 'hindi' then 'male'
+            def score(path: str) -> int:
+                name = os.path.basename(path).lower()
+                s = 0
+                if "hindi" in name:
+                    s += 2
+                if "male" in name:
+                    s += 1
+                return s
+
+            candidates = sorted(set(candidates), key=lambda p: (-score(p), p))
+            for c in candidates:
+                if os.path.exists(c):
+                    return c
+        except Exception:
+            pass
+        return None
 
     def _get_builtin_speakers(self) -> List[str]:
         """Attempt to retrieve a list of available speakers from the loaded TTS model."""
