@@ -57,12 +57,65 @@ class ImageGenerator:
             logger.info(f"💻 Device: {self.device}")
             logger.info(f"📁 Model path: {self.model_path}")
 
-            # Check if model file exists
+            # Check if model file exists; if not, try loading from Hugging Face repo id
             if not Path(self.model_path).exists():
                 logger.warning(f"⚠️ Model file not found: {self.model_path}")
-                logger.info("💡 Will use placeholder images instead")
-                logger.info("📥 Run: bash download_models.sh to download models")
-                return
+                repo_id = os.getenv("SD_REPO_ID")
+                if not repo_id:
+                    # Default to SD 1.5 base to ensure images can still be generated
+                    repo_id = "runwayml/stable-diffusion-v1-5"
+                    logger.info(f"💡 Falling back to pretrained model: {repo_id}")
+                else:
+                    logger.info(f"💡 Loading pretrained model from repo id: {repo_id}")
+                try:
+                    from diffusers import StableDiffusionPipeline
+                    self.pipe = StableDiffusionPipeline.from_pretrained(
+                        repo_id,
+                        torch_dtype=torch.float16 if self.device == 'cuda' else torch.float32,
+                        safety_checker=None,
+                        requires_safety_checker=False
+                    )
+                    if self.device == 'cuda':
+                        self.pipe = self.pipe.to(self.device)
+                        if hasattr(self.pipe, 'enable_memory_efficient_attention'):
+                            try:
+                                self.pipe.enable_memory_efficient_attention()
+                            except Exception:
+                                pass
+                        if hasattr(self.pipe, 'enable_xformers_memory_efficient_attention'):
+                            try:
+                                self.pipe.enable_xformers_memory_efficient_attention()
+                            except Exception:
+                                logger.info("ℹ️ xFormers not available; continuing without it")
+                    # Optionally load LoRA after from_pretrained as well
+                    if self.lora_path and Path(self.lora_path).exists():
+                        try:
+                            logger.info(f"🎭 Loading LoRA: {self.lora_path}")
+                            load_ok = False
+                            if hasattr(self.pipe, 'load_lora_weights'):
+                                self.pipe.load_lora_weights(self.lora_path)
+                                load_ok = True
+                                if hasattr(self.pipe, 'fuse_lora'):
+                                    try:
+                                        self.pipe.fuse_lora(lora_scale=self.lora_scale)
+                                    except Exception:
+                                        pass
+                                elif hasattr(self.pipe, 'set_adapters'):
+                                    try:
+                                        self.pipe.set_adapters(["default"], adapter_weights=[self.lora_scale])
+                                    except Exception:
+                                        pass
+                            if load_ok:
+                                logger.info(f"✅ LoRA loaded with scale ~ {self.lora_scale}")
+                        except Exception as le:
+                            logger.warning(f"⚠️ Failed to load LoRA '{self.lora_path}': {le}")
+                    self.sd_available = True
+                    logger.info("✅ Stable Diffusion pipeline initialized from pretrained repo!")
+                    return
+                except Exception as e:
+                    logger.warning(f"❌ Failed to load pretrained pipeline '{repo_id}': {e}")
+                    logger.info("💡 Will use placeholder images instead. To enable SD, set SD_REPO_ID or place a .safetensors model.")
+                    return
 
             # Load the pipeline with the custom model
             logger.info("📦 Loading Stable Diffusion model...")
