@@ -1,61 +1,61 @@
 {
-  "title": "The Lost Anklet",
-  "description": "In a quaint Rajasthani village, Meera’s silver anklet slips off and sparks a small yet heartwarming adventure through the bustling bazaar.",
+  "title": "गुम हुई पायल",
+  "description": "एक प्यारे से राजस्थानी गाँव में, मीरा की चाँदी की पायल खो जाती है और यह उसे एक छोटे पर दिल को छू लेने वाले रोमांच में ले जाती है।",
   "total_duration": 60,
   "cast": [
-    {"name": "Meera", "role": "protagonist"},
-    {"name": "Young Boy", "role": "mischievous helper"},
-    {"name": "Shopkeeper", "role": "village elder"}
+    {"name": "मीरा", "role": "मुख्य पात्र"},
+    {"name": "लड़का", "role": "शरारती मददगार"},
+    {"name": "दुकानदार", "role": "गाँव के बुज़ुर्ग"}
   ],
   "scenes": [
     {
       "duration": 10,
-      "description": "Meera walks through the dusty lanes of her Rajasthani village, her silver anklet jingling in rhythm.",
-      "visual_prompt": "Ultra detailed cinematic Indian village scene at golden hour — narrow dusty lane lined with traditional mud houses and thatched roofs, warm light casting long shadows, Meera with medium-brown skin wearing a bright red and yellow lehenga and dupatta, intricate silver jewelry catching the sunlight, soft breeze lifting her dupatta, distant sounds of village chatter, depth of field focused on Meera with blurred background, vibrant festive palette, Indian cartoon style, avoid anime/manga.",
-      "narration": "In a small Rajasthani village, Meera walks through the dusty lanes, her silver anklet jingling in rhythm.",
-      "subtitle": "Meera’s Walk",
-      "characters": ["Meera"]
+      "description": "मीरा राजस्थानी गाँव की धूल भरी गलियों में चल रही है, उसकी पायल छन-छन बज रही है।",
+      "visual_prompt": "अत्यंत विस्तृत और सिनेमैटिक भारतीय गाँव का दृश्य — सुनहरी शाम की रोशनी में सँकरी धूल भरी गली, किनारों पर कच्चे मिट्टी के घर और घास-फूस की छतें, गर्म रोशनी में लंबी परछाइयाँ, मध्यम साँवली त्वचा वाली मीरा लाल और पीले लहंगे व दुपट्टे में, पारंपरिक चाँदी के गहनों के साथ, हल्की हवा में लहराता दुपट्टा, पृष्ठभूमि में गाँव की आवाज़ें, गहराई वाले दृश्य में मीरा स्पष्ट और पृष्ठभूमि धुंधली, भारतीय कार्टून शैली, चमकीला त्यौहार जैसा रंग संयोजन, एनीमे/मंगा से परहेज़।",
+      "narration": "एक छोटे से राजस्थानी गाँव में, मीरा धूल भरी गलियों से गुज़र रही है, उसकी पायल छनक रही है।",
+      "subtitle": "मीरा की चाल",
+      "characters": ["मीरा"]
     },
     {
       "duration": 8,
-      "description": "The anklet slips off and rolls into the bustling village bazaar.",
-      "visual_prompt": "Close-up cinematic shot of an ornate silver anklet tumbling onto dusty ground, tiny puff of dust rising, motion blur as it rolls forward towards a vibrant bazaar — stalls overflowing with colorful saris, shimmering bangles, and mounds of spices in vivid reds, yellows, and browns, shopkeepers in traditional Rajasthani turbans calling out to customers, strong sunlight highlighting dust particles in the air, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
-      "narration": "Suddenly, the anklet slips off… and rolls into the bustling bazaar.",
-      "subtitle": "The Lost Anklet",
-      "characters": ["Meera"]
+      "description": "पायल अचानक उतर जाती है और बाज़ार की ओर लुढ़क जाती है।",
+      "visual_prompt": "करीबी सिनेमैटिक दृश्य — जटिल नक्काशी वाली चाँदी की पायल धूल भरी ज़मीन पर गिरती है, हल्की धूल उड़ती है, लुढ़कते समय हल्का मोशन ब्लर, सामने रंग-बिरंगे साड़ी के स्टॉल, चमकते चूड़ी के ढेर, लाल-पीले-भूरे रंग के मसालों के टीले, पारंपरिक राजस्थानी पगड़ी पहने दुकानदार, तेज़ धूप में तैरते धूल के कण, भारतीय कार्टून शैली, चमकीला त्यौहार जैसा रंग संयोजन, एनीमे/मंगा से परहेज़।",
+      "narration": "अचानक, पायल उतर जाती है… और भीड़-भाड़ वाले बाज़ार में लुढ़क जाती है।",
+      "subtitle": "गुम हुई पायल",
+      "characters": ["मीरा"]
     },
     {
       "duration": 8,
-      "description": "A mischievous young boy spots the anklet, picks it up, and smiles slyly.",
-      "visual_prompt": "Ultra realistic and richly colored Indian village lane — 8-year-old boy with medium-brown skin wearing an off-white cotton kurta and loose pajama pants, short messy black hair glinting in sunlight, crouched down holding the silver anklet with a mischievous grin, goats grazing nearby, children playing with sticks in the background, textured earthen walls framing the scene, warm ambient lighting, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
-      "narration": "A young boy spots it, picks it up, and smiles mischievously.",
-      "subtitle": "The Finder",
-      "characters": ["Young Boy"]
+      "description": "एक शरारती लड़का पायल देखता है, उठाता है और मुस्कुराता है।",
+      "visual_prompt": "अत्यंत यथार्थपूर्ण और रंगीन भारतीय गाँव का दृश्य — लगभग 8 साल का लड़का, मध्यम साँवली त्वचा, ऑफ-व्हाइट सूती कुर्ता और ढीली पायजामा पहने, बिखरे काले बालों में सूरज की रोशनी चमकती हुई, झुककर पायल उठाते हुए, चेहरे पर शरारती मुस्कान, पास में चरती बकरियाँ, पृष्ठभूमि में खेलते बच्चे, मिट्टी की दीवारें और गर्म रोशनी, भारतीय कार्टून शैली, चमकीला त्यौहार जैसा रंग संयोजन, एनीमे/मंगा से परहेज़।",
+      "narration": "एक लड़का पायल देखता है, उठाता है और शरारत से मुस्कुराता है।",
+      "subtitle": "खोजकर्ता",
+      "characters": ["लड़का"]
     },
     {
       "duration": 10,
-      "description": "Meera searches frantically, asking shopkeepers and neighbors.",
-      "visual_prompt": "Photorealistic village market scene — Meera speaking urgently to an elderly shopkeeper in a white dhoti and neatly tied turban, his wrinkled hand pointing down the lane, behind them shelves stacked with colorful folded fabrics, baskets of vibrant textiles spilling onto the counter, bright midday sunlight streaming in through a thatched awning, casting dappled shadows across their faces, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
-      "narration": "Meera searches frantically, asking shopkeepers and neighbors.",
-      "subtitle": "The Search",
-      "characters": ["Meera", "Shopkeeper"]
+      "description": "मीरा बेचैनी से दुकानदारों और पड़ोसियों से पूछताछ करती है।",
+      "visual_prompt": "फोटोरियलिस्टिक गाँव का बाज़ार — मीरा चिंतित होकर एक बुज़ुर्ग दुकानदार से बात कर रही है, जो सफेद धोती और साफ़ बंधी पगड़ी में है, उसका झुर्रियों भरा हाथ गली की ओर इशारा कर रहा है, पीछे रंग-बिरंगे कपड़ों के ढेर, टोकरी में रखे चमकीले वस्त्र, दोपहर की तेज़ धूप में छप्पर की छाँव से छनकर आती रोशनी, भारतीय कार्टून शैली, चमकीला त्यौहार जैसा रंग संयोजन, एनीमे/मंगा से परहेज़।",
+      "narration": "मीरा बेचैनी से दुकानदारों और पड़ोसियों से पूछताछ करती है।",
+      "subtitle": "खोज",
+      "characters": ["मीरा", "दुकानदार"]
     },
     {
       "duration": 12,
-      "description": "The boy appears, holding the anklet like a treasure.",
-      "visual_prompt": "Warm-toned cinematic moment — boy stepping forward through the lively market crowd, extending the silver anklet with both hands towards Meera, his shy smile lit by late afternoon sunlight, Meera’s eyes widening in relief, blurred background of sari stalls and spice vendors glowing in golden light, dust motes floating in the air, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
-      "narration": "The boy finally appears, holding the anklet like a treasure.",
-      "subtitle": "A Precious Return",
-      "characters": ["Meera", "Young Boy"]
+      "description": "लड़का पायल को ख़ज़ाने की तरह पकड़े सामने आता है।",
+      "visual_prompt": "गर्माहट से भरा सिनेमैटिक दृश्य — लड़का भीड़भाड़ वाले बाज़ार से मीरा की ओर आता हुआ, दोनों हाथों से पायल बढ़ाता हुआ, चेहरे पर संकोची मुस्कान, मीरा के चेहरे पर राहत और खुशी, पृष्ठभूमि में साड़ी के स्टॉल और मसाले बेचने वाले, सुनहरी शाम की रोशनी में चमकते, हवा में तैरते धूल के कण, भारतीय कार्टून शैली, चमकीला त्यौहार जैसा रंग संयोजन, एनीमे/मंगा से परहेज़।",
+      "narration": "लड़का सामने आता है, पायल को ख़ज़ाने की तरह पकड़े हुए।",
+      "subtitle": "कीमती वापसी",
+      "characters": ["मीरा", "लड़का"]
     },
     {
       "duration": 12,
-      "description": "Meera thanks the boy with fresh jalebis, ending the day with sweetness.",
-      "visual_prompt": "Cinematic village street scene at sunset — Meera handing a bundle of golden jalebis wrapped in brown paper to the smiling boy, the jalebis glistening with syrup in the warm glow, both of them laughing gently, behind them mud houses and flowering plants along the lane, long shadows stretching across the ground, orange sky fading to pink, Indian cartoon style, vibrant festive palette, avoid anime/manga.",
-      "narration": "She thanks him with a handful of fresh jalebis… a sweet end to a small adventure.",
-      "subtitle": "Sweet Gratitude",
-      "characters": ["Meera", "Young Boy"]
+      "description": "मीरा लड़के को ताज़ा जलेबियाँ देकर धन्यवाद करती है।",
+      "visual_prompt": "गाँव की गली में सूर्यास्त का सिनेमैटिक दृश्य — मीरा सुनहरी जलेबियों का कागज़ में लिपटा पैकेट लड़के को देती हुई, जलेबियाँ शहद की तरह चमक रही हैं, दोनों के चेहरों पर मुस्कान, पीछे कच्चे घर और गमलों में खिले फूल, लंबी परछाइयाँ, आसमान में नारंगी और गुलाबी रंग, भारतीय कार्टून शैली, चमकीला त्यौहार जैसा रंग संयोजन, एनीमे/मंगा से परहेज़।",
+      "narration": "वह लड़के को ताज़ा जलेबियाँ देकर धन्यवाद करती है… एक मीठा अंत।",
+      "subtitle": "मीठा आभार",
+      "characters": ["मीरा", "लड़का"]
     }
   ],
-  "tags": ["Indian culture", "village life", "kindness", "Rajasthan", "short story"]
+  "tags": ["भारतीय संस्कृति", "गाँव का जीवन", "दयालुता", "राजस्थान", "लघु कहानी"]
 }
