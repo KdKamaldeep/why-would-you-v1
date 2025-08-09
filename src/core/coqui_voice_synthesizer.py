@@ -152,7 +152,11 @@ class CoquiVoiceSynthesizer:
                 logger.info("Generating audio with XTTS (multilingual)")
                 speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
                 # Ensure a valid speaker is passed for XTTS if no reference wav
-                xtts_speaker = self._select_xtts_speaker(speaker if speaker_wav_arg is None else None)
+                requested_speaker = (
+                    speaker if (speaker is not None and str(speaker).strip() != "") else self.config.speaker
+                )
+                xtts_speaker = self._select_xtts_speaker(requested_speaker if speaker_wav_arg is None else None)
+                logger.info(f"XTTS selected speaker: {xtts_speaker if speaker_wav_arg is None else 'speaker_wav provided'}")
 
                 def _xtts_call(speaker_value: Optional[str]) -> None:
                     try:
