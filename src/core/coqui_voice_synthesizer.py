@@ -165,24 +165,13 @@ class CoquiVoiceSynthesizer:
                 logger.info(f"XTTS selected speaker: {xtts_speaker if speaker_wav_arg is None else 'speaker_wav provided'}")
 
                 def _xtts_call(speaker_value: Optional[str]) -> None:
-                    try:
-                        self.tts.tts_to_file(
-                            text=full_text,
-                            file_path=output_path,
-                            speaker_wav=speaker_wav_arg,
-                            speaker=speaker_value,
-                            language=self.config.language,
-                            progress_bar=self.config.progress_bar,
-                        )
-                    except TypeError:
-                        # Older TTS may not accept progress_bar; retry without
-                        self.tts.tts_to_file(
-                            text=full_text,
-                            file_path=output_path,
-                            speaker_wav=speaker_wav_arg,
-                            speaker=speaker_value,
-                            language=self.config.language,
-                        )
+                    # Avoid passing progress_bar to suppress model_kwargs warnings
+                    self.tts.tts_to_file(
+                        text=full_text,
+                        file_path=output_path,
+                        speaker_wav=speaker_wav_arg,
+                        language=self.config.language,
+                    )
 
                 try:
                     _xtts_call(xtts_speaker)
@@ -204,21 +193,12 @@ class CoquiVoiceSynthesizer:
                     shutil.copy2(voice_clone_audio, speaker_audio_path)
                     current_speaker = speaker_name
                 logger.info(f"Generating audio with speaker: {current_speaker}")
-                try:
-                    self.tts.tts_to_file(
-                        text=full_text,
-                        file_path=output_path,
-                        voice_dir=self.config.voice_dir,
-                        speaker=current_speaker,
-                        progress_bar=self.config.progress_bar,
-                    )
-                except TypeError:
-                    self.tts.tts_to_file(
-                        text=full_text,
-                        file_path=output_path,
-                        voice_dir=self.config.voice_dir,
-                        speaker=current_speaker,
-                    )
+                # Avoid passing progress_bar to suppress model_kwargs warnings
+                self.tts.tts_to_file(
+                    text=full_text,
+                    file_path=output_path,
+                    voice_dir=self.config.voice_dir,
+                )
             
             if os.path.exists(output_path):
                 logger.info(f"✅ Voice synthesized successfully: {output_path}")
