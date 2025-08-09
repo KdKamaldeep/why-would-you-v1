@@ -8,8 +8,13 @@ import sys
 import logging
 from pathlib import Path
 
-# Ensure 'src' is on the import path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+"""Test Coqui TTS voice generation.
+
+To avoid package __init__ side-effects and circular imports, put 'src' at the
+front of sys.path so 'core' resolves to the local source tree.
+"""
+# Ensure 'src' is on the import path (at highest priority)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from core.coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 
