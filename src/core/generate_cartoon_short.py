@@ -32,7 +32,7 @@ from dotenv import load_dotenv
 # Import modular classes
 from .script_generator import ScriptGenerator
 from .image_generator import ImageGenerator
-from .voice_generator import VoiceGenerator
+from .coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 from .animation_generator import AnimationGenerator
 from .video_processor import VideoProcessor, VideoConfig as VPConfig
 
@@ -86,8 +86,10 @@ class CartoonShortsGenerator:
         self.script_generator = ScriptGenerator(os.getenv('OPENAI_API_KEY', ''))
         self.image_generator = ImageGenerator()
         self.animation_generator = AnimationGenerator()
-        # Initialize Coqui TTS voice generator (uses local model if available)
-        self.voice_generator = VoiceGenerator(language=config.language)
+        # Initialize Coqui TTS voice synthesizer
+        self.voice_synthesizer = CoquiVoiceSynthesizer(
+            CoquiVoiceConfig(language=config.language)
+        )
 
         
         # Create video config for processor
@@ -214,14 +216,21 @@ class CartoonShortsGenerator:
             
             # Step 5: Generate narration with Coqui TTS
             logger.info("Step 5: Generating narration...")
-            narration_path = self.output_dir / "narration.mp3"
+            narration_path = self.output_dir / "narration.wav"
             scene_audio_paths = []
             try:
                 # Generate per-scene audio to match durations more tightly
                 for i, scene in enumerate(script['scenes']):
-                    scene_audio = self.output_dir / f"audio_scene_{i+1}.mp3"
+                    scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
                     if not (self.config.reuse_existing and scene_audio.exists()):
-                        self.voice_generator.generate_narration(scene.get('narration', ''), self.config.voice_id, str(scene_audio))
+                        generated_audio = self.voice_synthesizer.synthesize_voice(
+                            [scene.get('narration', '')],
+                            str(scene_audio),
+                            speaker=None,
+                            voice_clone_audio=self.config.voice_id or None,
+                        )
+                        # Use actual generated path (may switch extension on fallback)
+                        scene_audio = Path(generated_audio)
                     # Fit each scene audio to scene duration
                     fitted_audio = self.output_dir / f"audio_scene_{i+1}_fit.m4a"
                     self.video_processor.adjust_audio_to_duration(str(scene_audio), float(scene.get('duration', 8)), str(fitted_audio))
@@ -233,11 +242,14 @@ class CartoonShortsGenerator:
             except Exception as e:
                 logger.warning(f"Per-scene audio fitting failed; falling back to single track: {e}")
                 if not (self.config.reuse_existing and narration_path.exists()):
-                    self.voice_generator.generate_narration_from_script(
-                        script,
-                        self.config.voice_id,
-                        str(narration_path)
+                    narration_lines = [scene.get('narration', '') for scene in script.get('scenes', [])]
+                    generated_audio = self.voice_synthesizer.synthesize_voice(
+                        narration_lines,
+                        str(narration_path),
+                        speaker=None,
+                        voice_clone_audio=self.config.voice_id or None,
                     )
+                    narration_path = Path(generated_audio)
             
             # Step 6: Use video clips directly (no lip-sync)
             logger.info("Step 6: Preparing video clips...")
