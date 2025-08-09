@@ -196,10 +196,7 @@ class ImageGenerator:
         """Generate image using Stable Diffusion."""
         try:
             # Enhanced prompt for better cartoon results
-            enhanced_prompt = (
-                f"cartoon style, storybook illustration, matte shading, soft outlines, {prompt}, "
-                f"high quality, digital art, vibrant colors, clean lines"
-            )
+            enhanced_prompt = prompt
             # Strengthen anti-anime bias for Indian style intent
             negative_prompt = (
                 "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
