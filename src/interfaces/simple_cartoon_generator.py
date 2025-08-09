@@ -113,9 +113,9 @@ Examples:
     
     parser.add_argument(
         "--style", "-s",
-        choices=["cartoon", "anime"],
+        choices=["cartoon", "anime", "indian", "indian_cartoon", "desi", "bollywood"],
         default="cartoon",
-        help="Visual style for the cartoon (default: cartoon)"
+        help="Visual style (cartoon, anime, indian). Use 'indian' for Indian children's-book style"
     )
     
     parser.add_argument(
