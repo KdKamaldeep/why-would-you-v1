@@ -1,85 +1,85 @@
 {
-  "title": "The Rainbow Bridge Adventure",
-  "description": "Three friends follow a magical rainbow bridge to rescue a lost baby elephant and return it home.",
+  "title": "The Rainbow Fruit Quest",
+  "description": "Three friends set out to find the magical Rainbow Fruit hidden deep in the Whispering Forest to save their village from endless rain.",
   "total_duration": 64,
   "cast": [
-    {"name": "Aarav", "role": "brave leader"},
-    {"name": "Lila", "role": "clever thinker"},
-    {"name": "Rohan", "role": "funny helper"}
+    {"name": "Tara", "role": "leader"},
+    {"name": "Aarav", "role": "brave helper"},
+    {"name": "Chintu", "role": "funny one"}
   ],
   "scenes": [
     {
       "duration": 8,
-      "description": "Wide shot of lush green jungle with a shimmering rainbow bridge stretching into the sky, Aarav in foreground looking amazed.",
-      "visual_prompt": "(lush green jungle:1.3), (rainbow bridge:1.4) stretching into sky, boy (Aarav:1.2) looking amazed, (storybook cartoon style:1.4), wide shot, bright colors",
-      "narration": "घने जंगल में, एक चमकता इंद्रधनुषी पुल आसमान की ओर बढ़ रहा था। आरव ने आश्चर्य से ऊपर देखा।",
-      "subtitle": "The Rainbow Bridge",
-      "characters": ["Aarav"]
+      "description": "Wide shot of lush green forest edge after rain, mist curling between tall trees, Tara standing at front holding a basket.",
+      "visual_prompt": "(lush green forest edge:1.3) with mist, tall wet trees, (girl Tara:1.2) holding woven basket, (storybook cartoon style:1.4), bright fresh colors, wide shot",
+      "narration": "बारिश से भीगे जंगल के किनारे, तारा अपने दोस्तों के साथ तैयार खड़ी थी, गाँव के लिए जादुई फल खोजने।",
+      "subtitle": "At the Forest Edge",
+      "characters": ["Tara"]
     },
     {
       "duration": 8,
-      "description": "Medium shot of Lila pointing at tiny baby elephant on the other side of the rainbow bridge.",
-      "visual_prompt": "(girl Lila:1.3) pointing, (baby elephant:1.4) standing far on rainbow bridge, (storybook whimsical style:1.4), medium shot, clear bright sky",
-      "narration": "लीला ने पुल के उस पार एक छोटे हाथी के बच्चे को देखा।",
-      "subtitle": "The Lost Elephant",
-      "characters": ["Lila"]
+      "description": "Medium shot of Tara talking to Aarav and Chintu, pointing toward a glowing path inside the forest.",
+      "visual_prompt": "(three kids:1.3) standing together, (girl Tara:1.2) pointing toward glowing path in forest, (storybook cartoon style:1.4), warm diffused light, medium shot",
+      "narration": "तारा ने आरव और चिंटू को जंगल के अंदर चमकते रास्ते की ओर इशारा किया।",
+      "subtitle": "The Glowing Path",
+      "characters": ["Tara", "Aarav", "Chintu"]
     },
     {
       "duration": 8,
-      "description": "Side shot of three kids stepping onto the rainbow bridge, golden sunlight glowing through the colors.",
-      "visual_prompt": "(three kids:1.3) walking on (rainbow bridge:1.4), golden sunlight passing through colors, (storybook children's illustration:1.4), side view",
-      "narration": "तीनों दोस्त पुल पर कदम रखते ही, रंगों के बीच से सुनहरी धूप चमकने लगी।",
-      "subtitle": "Step Onto Magic",
-      "characters": ["Aarav", "Lila", "Rohan"]
+      "description": "Side shot of friends stepping over mossy stones along a small stream, sunlight breaking through leaves.",
+      "visual_prompt": "(three kids:1.3) stepping carefully over mossy stones beside small stream, sunlight through green leaves, (storybook cartoon style:1.4), side shot",
+      "narration": "वे काई लगे पत्थरों पर कदम रखते हुए एक छोटी धारा के किनारे आगे बढ़े।",
+      "subtitle": "Stream Crossing",
+      "characters": ["Tara", "Aarav", "Chintu"]
     },
     {
       "duration": 8,
-      "description": "Overhead view of a playful flock of parrots flying alongside the kids on the rainbow bridge.",
-      "visual_prompt": "(colorful parrots:1.3) flying beside (three kids:1.2) on rainbow bridge, (storybook cartoon style:1.4), overhead view, vivid colors",
-      "narration": "तोते का झुंड उनके साथ-साथ उड़ने लगा, जैसे उनका हौसला बढ़ा रहा हो।",
-      "subtitle": "Flying Companions",
-      "characters": ["Aarav", "Lila", "Rohan"]
+      "description": "Overhead view of a giant friendly turtle with colorful shell patterns carrying the kids across a pond.",
+      "visual_prompt": "(giant cartoon turtle:1.3) with colorful patterned shell, carrying (three kids:1.2) on its back across calm pond, sparkles on water, (storybook whimsical style:1.4), overhead view",
+      "narration": "एक विशाल कछुए ने उन्हें अपनी पीठ पर बैठाकर तालाब पार कराया।",
+      "subtitle": "The Turtle Ride",
+      "characters": ["Tara", "Aarav", "Chintu"]
     },
     {
       "duration": 8,
-      "description": "Close-up of the baby elephant looking worried, standing near the end of the bridge.",
-      "visual_prompt": "(baby elephant:1.4) with big eyes looking worried, standing on rainbow bridge, (storybook whimsical style:1.4), close-up, soft lighting",
-      "narration": "हाथी का बच्चा डरा हुआ लग रहा था, लेकिन उसकी आँखों में उम्मीद थी।",
-      "subtitle": "The Gentle Giant",
-      "characters": ["Aarav", "Lila", "Rohan"]
+      "description": "Close-up of a talking squirrel holding a tiny umbrella, pointing toward a rainbow arch deep in the forest.",
+      "visual_prompt": "(cartoon squirrel:1.3) holding small umbrella, pointing with paw toward rainbow arch in forest, big expressive eyes, (storybook whimsical style:1.4), close-up",
+      "narration": "एक बोलती गिलहरी ने उन्हें जंगल के भीतर बने इंद्रधनुषी मेहराब की ओर इशारा किया।",
+      "subtitle": "The Helpful Squirrel",
+      "characters": ["Tara", "Aarav", "Chintu"]
     },
     {
       "duration": 8,
-      "description": "Medium shot of kids feeding the baby elephant sweet mangoes from a basket.",
-      "visual_prompt": "(three kids:1.3) feeding (baby elephant:1.4) ripe mangoes from basket, (storybook cartoon style:1.4), medium shot, happy expressions",
-      "narration": "उन्होंने टोकरी से मीठे आम निकालकर हाथी को खिलाए।",
-      "subtitle": "Sweet Friendship",
-      "characters": ["Aarav", "Lila", "Rohan"]
+      "description": "Wide shot of a magical tree with golden leaves and a single glowing rainbow fruit hanging from a branch.",
+      "visual_prompt": "(large magical tree:1.4) with golden leaves, one glowing rainbow fruit on branch, soft magical light all around, (storybook cartoon style:1.4), wide shot",
+      "narration": "आख़िरकार, उन्होंने सुनहरे पत्तों वाले पेड़ को देखा, जिस पर एक चमकता इंद्रधनुषी फल लटक रहा था।",
+      "subtitle": "The Rainbow Fruit Tree",
+      "characters": ["Tara", "Aarav", "Chintu"]
     },
     {
       "duration": 8,
-      "description": "Wide shot of kids and elephant walking down from the rainbow bridge into a sunny jungle clearing.",
-      "visual_prompt": "(three kids:1.3) and (baby elephant:1.4) walking down rainbow bridge into sunny jungle clearing, (storybook cartoon style:1.4), wide shot",
-      "narration": "वे पुल से उतरकर सूरज की रोशनी से भरे जंगल के खुले मैदान में पहुँचे।",
-      "subtitle": "The Journey Home",
-      "characters": ["Aarav", "Lila", "Rohan"]
+      "description": "Medium shot of Tara plucking the fruit carefully while Aarav and Chintu hold the basket ready.",
+      "visual_prompt": "(girl Tara:1.2) gently plucking glowing rainbow fruit, (Aarav and Chintu:1.2) holding woven basket, warm magical light on faces, (storybook cartoon style:1.4), medium shot",
+      "narration": "तारा ने सावधानी से फल तोड़ा, और आरव-चिंटू ने टोकरा आगे किया।",
+      "subtitle": "Picking the Fruit",
+      "characters": ["Tara", "Aarav", "Chintu"]
     },
     {
       "duration": 8,
-      "description": "Pull-back shot of happy mother elephant greeting the baby while kids wave goodbye.",
-      "visual_prompt": "(mother elephant:1.3) greeting (baby elephant:1.4), (three kids:1.2) waving goodbye, (storybook cartoon style:1.4), pull-back wide shot, warm lighting",
-      "narration": "माँ हाथी ने अपने बच्चे को गले लगाया, और बच्चों ने मुस्कुराते हुए अलविदा कहा।",
-      "subtitle": "Home at Last",
-      "characters": ["Aarav", "Lila", "Rohan"]
+      "description": "Pull-back shot of kids returning to their sunny village, villagers cheering as rainbow light spreads.",
+      "visual_prompt": "(three kids:1.3) walking toward happy village, rainbow light spreading in sky, smiling villagers, (storybook cartoon style:1.4), pull-back wide shot",
+      "narration": "जब वे गाँव लौटे, तो इंद्रधनुषी रौशनी फैल गई और सबने खुशी मनाई।",
+      "subtitle": "Home in the Light",
+      "characters": ["Tara", "Aarav", "Chintu"]
     }
   ],
   "tags": [
     "kids",
+    "adventure",
     "rainbow",
-    "elephant",
     "friendship",
+    "magical journey",
     "storybook",
-    "magical",
     "whimsical"
   ]
 }
