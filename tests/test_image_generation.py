@@ -41,7 +41,7 @@ def test_image_generation():
     
     # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-        'sleeping green dragon with pink blanket, treasure chest nearby, kids hiding'
+        'sleeping green dragon'
     ]
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
