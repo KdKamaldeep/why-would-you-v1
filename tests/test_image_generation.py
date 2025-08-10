@@ -41,7 +41,7 @@ def test_image_generation():
     
     # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-        'sleeping green dragon'
+        'a large friendly dragon with shimmering green scales, bright emerald body, big round eyes, wearing a pink blanket, sitting in a magical forest clearing, treasure chest beside it, soft colorful lighting, whimsical children's storybook illustration, cartoon style, vibrant colors, (green dragon:1.4), (shimmering emerald scales:1.3)'
     ]
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
