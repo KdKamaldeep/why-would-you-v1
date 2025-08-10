@@ -41,16 +41,17 @@ def test_image_generation():
     
     # Test prompts
     test_prompts =[
-  "Wide shot – Golden hour view of an Indian village, dusty lane stretching into the distance, mud houses with thatched roofs, neem trees swaying gently in warm sunlight.",
-  "Tracking shot – A person in a red-yellow lehenga walks along the lane, silver anklet glinting on their foot, dupatta flowing behind, long shadows stretching on the dusty ground.",
-  "Low angle close-up – The silver anklet slips off the foot and falls softly onto the dusty lane, a small cloud of dust rising around it.",
-  "Tracking close-up – The anklet rolls slowly along the dusty lane toward the colorful market stalls bustling with people.",
-  "Medium shot – A curious child in an off-white cotton kurta crouches near the anklet, watching it glint on the ground.",
-  "Close-up – The child’s small hands carefully pick up the silver anklet, sunlight sparkling on its detailed design.",
-  "Medium shot – Later on the village lane, two people meet; one hands the anklet over, and the other receives it gratefully.",
-  "Close-up – Two pairs of hands exchanging spiral-shaped golden sweets wrapped in brown paper, glowing softly in the sunset light.",
-  "Wide shot – Peaceful sunset view of the village lane bathed in orange and pink hues as the two figures walk away together."
+  "Wide shot – Bright, colorful cartoon-style Indian village at golden hour, dusty lane stretching into the distance, cheerful mud houses with thatched roofs, neem trees swaying gently under a glowing orange sky.",
+  "Tracking shot – A smiling character in a vibrant red-yellow lehenga walks along the lane, shiny silver anklet sparkling on their foot, flowing dupatta fluttering like a ribbon, long playful shadows on the ground.",
+  "Low angle close-up – The silver anklet slips off the foot in a cute bounce, landing softly on the dusty lane with a tiny puff of dust shaped like a cloud.",
+  "Tracking close-up – The anklet rolls slowly and wobbles along the lane toward a lively cartoon street market with colorful stalls, big signs, and bustling friendly characters.",
+  "Medium shot – A curious child in an off-white cotton kurta crouches near the anklet, wide-eyed with surprise as it twinkles in the sunlight.",
+  "Close-up – The child’s small hands carefully pick up the shiny anklet, its silver pattern sparkling with magical glints, a playful smile spreading on their face.",
+  "Medium shot – Later on the lane, two cheerful characters meet; one offers the anklet with a happy gesture, and the other receives it with a big relieved grin.",
+  "Close-up – Two pairs of cartoon hands exchanging spiral-shaped golden sweets wrapped in crinkly brown paper, glowing warmly in the soft sunset light.",
+  "Wide shot – Peaceful sunset scene of the village lane painted in bright oranges and pinks, the two characters walking away side-by-side as the camera slowly zooms out."
 ]
+
 
 
 
