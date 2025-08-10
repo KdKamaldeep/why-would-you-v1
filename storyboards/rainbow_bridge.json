@@ -10,7 +10,7 @@
   "scenes": [
     {
       "duration": 8,
-      "description": "Wide-angle tracking shot of a cozy Indian village under soft cloudy skies and girl on green ground",
+      "description": "Wide-angle tracking shot of a cozy Indian village under soft cloudy skies",
       "visual_prompt": "(colorful Indian village:1.3) wide open view, sunrise light casting long shadows, lush green fields behind, (girl Lila:1.2) holding woven basket, (storybook cartoon style:1.4), warm colors, wide shot",
       "narration": "सुबह की पहली किरणों में, लीला ने गाँव को देखा और ठान लिया कि वह इंद्रधनुष फल ढूँढ निकालेगी।",
       "subtitle": "The Decision",
