@@ -41,15 +41,7 @@ def test_image_generation():
     
     # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-        "Wide shot – Bright, colorful cartoon-style Indian village at golden hour, dusty lane stretching into the distance, cheerful mud houses with thatched roofs, neem trees swaying gently under a glowing orange sky, cartoon illustration, 2D animation style, flat colors, simple shapes",
-        "Tracking shot – A smiling cartoon character in a vibrant red-yellow lehenga walks along the lane, shiny silver anklet sparkling on their foot, flowing dupatta fluttering like a ribbon, long playful shadows on the ground, cartoon illustration, 2D animation style, flat colors, simple shapes",
-        "Low angle close-up – The silver anklet slips off the foot in a cute bounce, landing softly on the dusty lane with a tiny puff of dust shaped like a cloud, cartoon illustration, 2D animation style, flat colors, simple shapes",
-        "Tracking close-up – The anklet rolls slowly and wobbles along the lane toward a lively cartoon street market with colorful stalls, big signs, and bustling friendly characters, cartoon illustration, 2D animation style, flat colors, simple shapes",
-        "Medium shot – A curious cartoon child in an off-white cotton kurta crouches near the anklet, wide-eyed with surprise as it twinkles in the sunlight, cartoon illustration, 2D animation style, flat colors, simple shapes",
-        "Close-up – The child's small cartoon hands carefully pick up the shiny anklet, its silver pattern sparkling with magical glints, a playful smile spreading on their face, cartoon illustration, 2D animation style, flat colors, simple shapes",
-        "Medium shot – Later on the lane, two cheerful cartoon characters meet; one offers the anklet with a happy gesture, and the other receives it with a big relieved grin, cartoon illustration, 2D animation style, flat colors, simple shapes",
-        "Close-up – Two pairs of cartoon hands exchanging spiral-shaped golden sweets wrapped in crinkly brown paper, glowing warmly in the soft sunset light, cartoon illustration, 2D animation style, flat colors, simple shapes",
-        "Wide shot – Peaceful sunset scene of the village lane painted in bright oranges and pinks, the two cartoon characters walking away side-by-side as the camera slowly zooms out, cartoon illustration, 2D animation style, flat colors, simple shapes"
+        'sleeping green dragon with pink blanket, treasure chest nearby, kids hiding'
     ]
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
