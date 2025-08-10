@@ -12,71 +12,71 @@
     {
       "duration": 8,
       "description": "Wide angle of a magical forest with golden sunlight filtering through tall trees, mist on the ground, and a sparkling river flowing nearby",
-      "visual_prompt": "wide cartoon-style shot of magical forest, golden sunlight beams through towering candy-colored trees, sparkling blue river, soft white mist swirling at ground level, birds with funny hats flying past camera",
+      "visual_prompt": "wide shot magical forest, golden sunlight, tall trees, mist, sparkling river",
       "narration": "कहानी शुरू होती है एक विशाल जादुई जंगल से, जहाँ सुनहरी धूप पेड़ों की ऊँची शाखाओं से छनकर आ रही है। पत्तियाँ रत्नों-सी चमक रही हैं, और हल्की धुंध चारों ओर फैली है। पास ही एक नदी बह रही है, जैसे कोई पुराना राज़ फुसफुसा रही हो।",
       "subtitle": "The Magical Forest",
       "characters": []
     },
     {
       "duration": 8,
-      "description": "Alex finds a glowing treasure map inside a bottle by the sunny riverbank",
-      "visual_prompt": "medium shot cartoon boy with messy hair and oversized red backpack kneeling on sparkling sand, pulling glowing map from a green glass bottle, sunlight sparkles and tiny fish jump in river behind him",
+      "description": "A curious 10-year-old boy named Alex with messy brown hair and a red backpack finds a glowing treasure map inside a bottle by the sunny riverbank, magical forest in the background",
+      "visual_prompt": "boy with messy brown hair, red backpack, holding glowing map from a bottle, riverbank, magical forest",
       "narration": "नदी के किनारे अलेक्स अपने लाल बैग के साथ बैठा है। उसे पानी में तैरती एक पुरानी बोतल मिलती है। बोतल खोलते ही उसमें से एक चमकता हुआ खज़ाने का नक्शा निकलता है, जो रहस्यमयी रोशनी फैला रहा है।",
       "subtitle": "The Discovery",
       "characters": ["Alex"]
     },
     {
       "duration": 8,
-      "description": "Alex shows the map to the other kids",
-      "visual_prompt": "low angle shot cartoon kids gathered in forest clearing, glowing map lighting up their excited faces, butterflies with rainbow wings flying around them",
+      "description": "Alex shows the map to Mia, a smart 9-year-old girl with curly black hair and round glasses, Ethan, a tall 11-year-old with freckles, and Lily, a cheerful 8-year-old with blonde pigtails, all wearing adventure gear",
+      "visual_prompt": "four kids in adventure gear in forest clearing, looking at glowing map",
       "narration": "अलेक्स जल्दी से मिया, ईथन और लिली को बुलाता है। चारों दोस्त अपने बैग, टॉर्च और नाश्ते के साथ तैयार हो जाते हैं। उनके चेहरों पर रोमांच और जिज्ञासा साफ़ झलक रही है।",
       "subtitle": "Gathering the Team",
       "characters": ["Alex", "Mia", "Ethan", "Lily"]
     },
     {
       "duration": 8,
-      "description": "The kids step into the magical forest",
-      "visual_prompt": "tracking shot behind four cartoon kids holding hands, entering glowing jungle path, giant mushrooms with smiley faces, floating lanterns lighting the way",
+      "description": "The four kids stepping into a magical forest with towering trees, glowing plants, and misty paths, holding hands and looking amazed",
+      "visual_prompt": "four adventurous kids entering magical forest with glowing plants and misty paths",
       "narration": "हाथों में हाथ डाले, चारों दोस्त जंगल की ऊँची-ऊँची पेड़ों के बीच कदम रखते हैं। चारों ओर जुगनुओं जैसी टिमटिमाती रोशनी उन्हें और गहरे जंगल में ले जा रही है।",
       "subtitle": "Into the Woods",
       "characters": ["Alex", "Mia", "Ethan", "Lily"]
     },
     {
       "duration": 8,
-      "description": "The Puzzle Tree",
-      "visual_prompt": "wide shot massive ancient cartoon tree with glowing golden carvings shaped like smiling animals, floating letters forming riddle above kids' heads",
+      "description": "A massive ancient tree with glowing carvings and a riddle written in golden letters, the kids looking up with determination",
+      "visual_prompt": "four kids looking up at huge ancient tree with glowing runes and golden riddle",
       "narration": "चलते-चलते वे एक प्राचीन पेड़ के पास पहुँचते हैं, जिसकी छाल पर सुनहरी अक्षरों में एक पहेली लिखी है। पेड़ जैसे उन्हें चुनौती दे रहा हो—'सिर्फ़ मिलकर ही इसका जवाब पा सकोगे।'",
       "subtitle": "The Puzzle Tree",
       "characters": ["Alex", "Mia", "Ethan", "Lily"]
     },
     {
       "duration": 8,
-      "description": "Crossing the Rainbow River",
-      "visual_prompt": "slow motion side view cartoon kids jumping across floating rainbow-colored stones, sparkles and bubbles rising, river full of laughing fish",
+      "description": "The kids laughing as they hop across rainbow-colored floating stones over a magical river, mist rising from the water",
+      "visual_prompt": "kids hopping across rainbow stones over magical river, mist",
       "narration": "वे हँसते हुए, इंद्रधनुषी रंग के पत्थरों पर कूदते-फाँदते जादुई नदी पार करते हैं। पानी की बूँदें मोतियों की तरह हवा में चमक रही हैं।",
       "subtitle": "Crossing the Rainbow River",
       "characters": ["Alex", "Mia", "Ethan", "Lily"]
     },
     {
       "duration": 8,
-      "description": "The Sleeping Dragon",
-      "visual_prompt": "cartoon green dragon with shimmering scales curled under pink polka-dot blanket, gentle snores shown as floating zzz’s, treasure chest beside him",
+      "description": "In a cozy forest clearing, a huge sleeping dragon with shimmering green scales and a pink blanket, a treasure chest beside it",
+      "visual_prompt": "sleeping green dragon with pink blanket, treasure chest nearby, kids hiding",
       "narration": "जंगल के एक शांत कोने में, वे एक विशाल हरे रंग का ड्रैगन देखते हैं, जो गुलाबी रज़ाई ओढ़कर गहरी नींद में सो रहा है। पास ही एक खज़ाने का संदूक रखा है।",
       "subtitle": "The Sleeping Dragon",
       "characters": ["Alex", "Mia", "Ethan", "Lily"]
     },
     {
       "duration": 8,
-      "description": "The dragon shares the treasure",
-      "visual_prompt": "close-up friendly cartoon dragon opening treasure chest full of glowing crystals and magical scrolls, kids’ eyes sparkling with joy",
+      "description": "The dragon awake and smiling, showing the kids glowing crystals and a magical scroll from the chest",
+      "visual_prompt": "friendly green dragon showing kids glowing crystals and magical scroll",
       "narration": "ड्रैगन आँखें खोलता है और मुस्कुराकर उनका स्वागत करता है। वह संदूक खोलकर चमकते क्रिस्टल और एक जादुई स्क्रॉल उन्हें देता है, जिसमें हमेशा की दोस्ती का वादा लिखा है।",
       "subtitle": "The True Treasure",
       "characters": ["Alex", "Mia", "Ethan", "Lily"]
     },
     {
       "duration": 8,
-      "description": "The kids walk home at sunset",
-      "visual_prompt": "wide sunset shot cartoon kids walking home with glowing crystals, silhouettes of candy-colored trees, fireflies dancing around them",
+      "description": "The kids walking home at sunset with glowing crystals in their hands, smiling and chatting",
+      "visual_prompt": "kids walking through forest at sunset holding glowing crystals",
       "narration": "दिल में खुशी और हाथों में चमकते क्रिस्टल लिए, चारों दोस्त घर की ओर लौटते हैं। ढलते सूरज की रोशनी में उनकी हँसी और बातें जंगल में गूँज रही हैं।",
       "subtitle": "Home Again",
       "characters": ["Alex", "Mia", "Ethan", "Lily"]
