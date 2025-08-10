@@ -197,21 +197,24 @@ class ImageGenerator:
         try:
             # Enhanced prompt for better cartoon results
             enhanced_prompt = prompt
-            # Strengthen anti-anime bias for Indian style intent
+            # Strong cartoon-specific negative prompts to avoid realistic images
             negative_prompt = (
                 "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
-                "blurry, low quality, dark, scary, violent, adult content, nsfw"
+                "blurry, low quality, dark, scary, violent, adult content, nsfw, "
+                "hyperrealistic, detailed textures, photographic, film grain, "
+                "realistic lighting, realistic shadows, realistic proportions, "
+                "detailed skin, detailed hair, detailed clothing textures"
             )
             
             logger.info(f"🎯 Enhanced prompt: {enhanced_prompt}")
             
-            # Generate image with optimized settings
+            # Generate image with cartoon-optimized settings
             with torch.autocast(self.device):
                 result = self.pipe(
                     prompt=enhanced_prompt,
                     negative_prompt=negative_prompt,
-                    num_inference_steps=25,  # More steps for better quality
-                    guidance_scale=8.0,      # Slightly higher for better adherence
+                    num_inference_steps=30,  # More steps for better cartoon quality
+                    guidance_scale=7.5,      # Balanced for cartoon style
                     width=768,
                     height=1024,
                     num_images_per_prompt=1,
