@@ -41,15 +41,15 @@ def test_image_generation():
     
     # Test prompts
     test_prompts =[
-  "Golden hour wide shot of an Indian village, dusty lane stretching into the distance, mud houses with thatched roofs, neem trees swaying gently in warm sunlight.",
-  "A person in a red-yellow lehenga walks along the lane, silver anklet glinting on their foot, dupatta flowing behind, long shadows stretching on the dusty ground.",
-  "Close-up of the silver anklet slipping off the foot and falling softly onto the dusty lane, a small cloud of dust rising around it.",
-  "The anklet rolls slowly along the dusty lane toward the colorful market stalls bustling with people.",
-  "A curious child in an off-white cotton kurta crouches near the anklet, watching it glint on the ground.",
-  "The child’s small hands carefully pick up the silver anklet, sunlight sparkling on its detailed design.",
-  "Later on the village lane, two people meet; one hands the anklet over, and the other receives it gratefully.",
-  "Close-up of hands exchanging warm, golden jalebis wrapped in brown paper, glowing softly in the sunset light.",
-  "A peaceful sunset wide shot shows the village lane bathed in orange and pink hues as the two figures walk away together."
+  "Wide shot – Golden hour view of an Indian village, dusty lane stretching into the distance, mud houses with thatched roofs, neem trees swaying gently in warm sunlight.",
+  "Tracking shot – A person in a red-yellow lehenga walks along the lane, silver anklet glinting on their foot, dupatta flowing behind, long shadows stretching on the dusty ground.",
+  "Low angle close-up – The silver anklet slips off the foot and falls softly onto the dusty lane, a small cloud of dust rising around it.",
+  "Tracking close-up – The anklet rolls slowly along the dusty lane toward the colorful market stalls bustling with people.",
+  "Medium shot – A curious child in an off-white cotton kurta crouches near the anklet, watching it glint on the ground.",
+  "Close-up – The child’s small hands carefully pick up the silver anklet, sunlight sparkling on its detailed design.",
+  "Medium shot – Later on the village lane, two people meet; one hands the anklet over, and the other receives it gratefully.",
+  "Close-up – Two pairs of hands exchanging spiral-shaped golden sweets wrapped in brown paper, glowing softly in the sunset light.",
+  "Wide shot – Peaceful sunset view of the village lane bathed in orange and pink hues as the two figures walk away together."
 ]
 
 
