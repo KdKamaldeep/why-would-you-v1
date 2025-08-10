@@ -1,85 +1,71 @@
 {
   "title": "The Rainbow Fruit Quest",
-  "description": "Three friends set out to find the magical Rainbow Fruit hidden deep in the Whispering Forest to save their village from endless rain.",
+  "description": "Three brave friends set out to find the magical Rainbow Fruit that can save their village’s harvest.",
   "total_duration": 64,
   "cast": [
-    {"name": "Tara", "role": "leader"},
-    {"name": "Aarav", "role": "brave helper"},
-    {"name": "Chintu", "role": "funny one"}
+    {"name": "Lila", "role": "leader"},
+    {"name": "Arjun", "role": "inventor"},
+    {"name": "Tara", "role": "explorer"}
   ],
   "scenes": [
     {
       "duration": 8,
-      "description": "Wide shot of lush green forest edge after rain, mist curling between tall trees, Tara standing at front holding a basket.",
-      "visual_prompt": "(lush green forest edge:1.3) with mist, tall wet trees, (girl Tara:1.2) holding woven basket, (storybook cartoon style:1.4), bright fresh colors, wide shot",
-      "narration": "बारिश से भीगे जंगल के किनारे, तारा अपने दोस्तों के साथ तैयार खड़ी थी, गाँव के लिए जादुई फल खोजने।",
-      "subtitle": "At the Forest Edge",
-      "characters": ["Tara"]
+      "description": "Wide-angle shot of a colorful Indian village at sunrise, lush green fields in background, Lila standing in foreground holding a woven basket.",
+      "visual_prompt": "(colorful Indian village:1.3) wide open view, sunrise light casting long shadows, lush green fields behind, (girl Lila:1.2) holding woven basket, (storybook cartoon style:1.4), warm colors, wide shot",
+      "narration": "सुबह की पहली किरणों में, लीला ने गाँव को देखा और ठान लिया कि वह इंद्रधनुष फल ढूँढ निकालेगी।",
+      "subtitle": "The Decision",
+      "characters": ["Lila"]
     },
     {
       "duration": 8,
-      "description": "Medium shot of Tara talking to Aarav and Chintu, pointing toward a glowing path inside the forest.",
-      "visual_prompt": "(three kids:1.3) standing together, (girl Tara:1.2) pointing toward glowing path in forest, (storybook cartoon style:1.4), warm diffused light, medium shot",
-      "narration": "तारा ने आरव और चिंटू को जंगल के अंदर चमकते रास्ते की ओर इशारा किया।",
-      "subtitle": "The Glowing Path",
-      "characters": ["Tara", "Aarav", "Chintu"]
+      "description": "Wide shot of Lila calling Arjun and Tara near the banyan tree, all three gathered with a hand-drawn map on the ground.",
+      "visual_prompt": "(three kids:1.3) standing under large banyan tree, hand-drawn treasure map spread on ground, all looking at it with excitement, (storybook cartoon style:1.4), morning light, wide shot",
+      "narration": "लीला ने अर्जुन और तारा को बुलाया, और उन्हें इंद्रधनुष फल का नक्शा दिखाया।",
+      "subtitle": "The Plan",
+      "characters": ["Lila", "Arjun", "Tara"]
     },
     {
       "duration": 8,
-      "description": "Side shot of friends stepping over mossy stones along a small stream, sunlight breaking through leaves.",
-      "visual_prompt": "(three kids:1.3) stepping carefully over mossy stones beside small stream, sunlight through green leaves, (storybook cartoon style:1.4), side shot",
-      "narration": "वे काई लगे पत्थरों पर कदम रखते हुए एक छोटी धारा के किनारे आगे बढ़े।",
-      "subtitle": "Stream Crossing",
-      "characters": ["Tara", "Aarav", "Chintu"]
+      "description": "Wide landscape shot of kids walking along a riverbank with glittering water, tall reeds swaying, distant hills ahead.",
+      "visual_prompt": "(three kids:1.3) walking along sparkling riverbank, tall green reeds swaying, distant blue hills in background, (storybook cartoon style:1.4), bright daylight, wide shot",
+      "narration": "वे चमकती नदी के किनारे चल पड़े, दूर पहाड़ों की ओर।",
+      "subtitle": "By the River",
+      "characters": ["Lila", "Arjun", "Tara"]
     },
     {
       "duration": 8,
-      "description": "Overhead view of a giant friendly turtle with colorful shell patterns carrying the kids across a pond.",
-      "visual_prompt": "(giant cartoon turtle:1.3) with colorful patterned shell, carrying (three kids:1.2) on its back across calm pond, sparkles on water, (storybook whimsical style:1.4), overhead view",
-      "narration": "एक विशाल कछुए ने उन्हें अपनी पीठ पर बैठाकर तालाब पार कराया।",
-      "subtitle": "The Turtle Ride",
-      "characters": ["Tara", "Aarav", "Chintu"]
+      "description": "Wide magical forest shot with tall glowing mushrooms, colorful fireflies floating, kids stepping carefully along the path.",
+      "visual_prompt": "(three kids:1.3) walking in magical forest, tall glowing mushrooms, floating colorful fireflies, dappled light from treetops, (storybook fantasy cartoon:1.4), wide shot",
+      "narration": "जादुई जंगल में, रोशनी से चमकते मशरूम और उड़ते जुगनू रास्ता दिखा रहे थे।",
+      "subtitle": "The Magical Forest",
+      "characters": ["Lila", "Arjun", "Tara"]
     },
     {
       "duration": 8,
-      "description": "Close-up of a talking squirrel holding a tiny umbrella, pointing toward a rainbow arch deep in the forest.",
-      "visual_prompt": "(cartoon squirrel:1.3) holding small umbrella, pointing with paw toward rainbow arch in forest, big expressive eyes, (storybook whimsical style:1.4), close-up",
-      "narration": "एक बोलती गिलहरी ने उन्हें जंगल के भीतर बने इंद्रधनुषी मेहराब की ओर इशारा किया।",
-      "subtitle": "The Helpful Squirrel",
-      "characters": ["Tara", "Aarav", "Chintu"]
+      "description": "Wide shot of kids standing before a talking monkey wearing a little blue cap, perched on a large rock with vines.",
+      "visual_prompt": "(cartoon monkey:1.3) wearing small blue cap, perched on large mossy rock with vines, (three kids:1.2) standing in front looking curious, (storybook whimsical style:1.4), wide shot",
+      "narration": "एक नटखट बंदर, नीली टोपी पहने, उन्हें रास्ता बताने आया।",
+      "subtitle": "The Talking Monkey",
+      "characters": ["Lila", "Arjun", "Tara"]
     },
     {
       "duration": 8,
-      "description": "Wide shot of a magical tree with golden leaves and a single glowing rainbow fruit hanging from a branch.",
-      "visual_prompt": "(large magical tree:1.4) with golden leaves, one glowing rainbow fruit on branch, soft magical light all around, (storybook cartoon style:1.4), wide shot",
-      "narration": "आख़िरकार, उन्होंने सुनहरे पत्तों वाले पेड़ को देखा, जिस पर एक चमकता इंद्रधनुषी फल लटक रहा था।",
-      "subtitle": "The Rainbow Fruit Tree",
-      "characters": ["Tara", "Aarav", "Chintu"]
+      "description": "Wide mountain cliff shot with kids looking at a glowing rainbow tree growing on a floating island above clouds.",
+      "visual_prompt": "(rainbow tree:1.4) glowing brightly on floating island above fluffy clouds, (three kids:1.2) on cliff edge gazing up in awe, bright magical light, (storybook cartoon style:1.4), wide shot",
+      "narration": "ऊपर बादलों में एक तैरते टापू पर, इंद्रधनुष पेड़ चमक रहा था।",
+      "subtitle": "The Rainbow Tree",
+      "characters": ["Lila", "Arjun", "Tara"]
     },
     {
       "duration": 8,
-      "description": "Medium shot of Tara plucking the fruit carefully while Aarav and Chintu hold the basket ready.",
-      "visual_prompt": "(girl Tara:1.2) gently plucking glowing rainbow fruit, (Aarav and Chintu:1.2) holding woven basket, warm magical light on faces, (storybook cartoon style:1.4), medium shot",
-      "narration": "तारा ने सावधानी से फल तोड़ा, और आरव-चिंटू ने टोकरा आगे किया।",
-      "subtitle": "Picking the Fruit",
-      "characters": ["Tara", "Aarav", "Chintu"]
+      "description": "Wide shot of kids picking the rainbow fruit together, colors reflecting on their happy faces.",
+      "visual_prompt": "(three kids:1.3) reaching up to pick glowing rainbow fruit, bright colorful light reflecting on faces, (storybook whimsical style:1.4), wide shot",
+      "narration": "तीनों ने मिलकर इंद्रधनुष फल तोड़ा, उसकी रौशनी में उनके चेहरे चमक रहे थे।",
+      "subtitle": "The Treasure",
+      "characters": ["Lila", "Arjun", "Tara"]
     },
     {
       "duration": 8,
-      "description": "Pull-back shot of kids returning to their sunny village, villagers cheering as rainbow light spreads.",
-      "visual_prompt": "(three kids:1.3) walking toward happy village, rainbow light spreading in sky, smiling villagers, (storybook cartoon style:1.4), pull-back wide shot",
-      "narration": "जब वे गाँव लौटे, तो इंद्रधनुषी रौशनी फैल गई और सबने खुशी मनाई।",
-      "subtitle": "Home in the Light",
-      "characters": ["Tara", "Aarav", "Chintu"]
-    }
-  ],
-  "tags": [
-    "kids",
-    "adventure",
-    "rainbow",
-    "friendship",
-    "magical journey",
-    "storybook",
-    "whimsical"
-  ]
-}
+      "description": "Wide village shot of kids returning with the rainbow fruit, villagers cheering, colorful flags fluttering.",
+      "visual_prompt": "(colorful Indian village:1.3) with cheering villagers, colorful flags fluttering, (three kids:1.2) holding rainbow fruit basket, (storybook cartoon style:1.4), golden evening light, wide shot",
+      "narration": "गाँव लौटते ही सबने खुशी से उनका स्वागत किया, और फ
