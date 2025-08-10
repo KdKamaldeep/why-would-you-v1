@@ -41,7 +41,7 @@ def test_image_generation():
     
     # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-        "Wide-angle tracking shot of a cozy Indian village under soft cloudy skies and girl on green ground"
+        "Wide-angle tracking shot of a cozy Indian village under soft cloudy skies"
     ]
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
