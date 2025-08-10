@@ -12,7 +12,7 @@
     {
       "duration": 8,
       "description": "Wide-angle tracking shot of a cozy Indian village under soft cloudy skies, dim lanterns swaying gently, Ravi in foreground looking up with determination.",
-      "visual_prompt": "(small Indian village:1.3) under cloudy sky, dim lanterns hanging, boy (Ravi:1.2) looking up determined, (storybook cartoon style:1.4), warm colors, wide shot",
+      "visual_prompt": "(small Indian village:1.3) with narrow paths, clay houses with thatched roofs, dim lanterns hanging from wooden poles, (boy Ravi:1.2) in foreground looking up determined, (storybook cartoon style:1.4), warm golden colors, wide shot",
       "narration": "एक छोटे से गाँव में, जहाँ लालटेन की रौशनी धीमी पड़ गई थी, रवि ने आसमान की ओर देखा और ठान लिया कि वह इसे फिर से जगमगाएगा।",
       "subtitle": "The Promise",
       "characters": ["Ravi"]
@@ -20,7 +20,7 @@
     {
       "duration": 8,
       "description": "Medium shot of Ravi in the village square calling to Anya, Kabir, and Meera, pointing at a map spread on a wooden crate.",
-      "visual_prompt": "(four kids:1.3) standing in village square, looking at treasure map on wooden crate, (cartoon whimsical style:1.4), soft sunset light",
+      "visual_prompt": "(four kids:1.3) gathered in open village square, treasure map spread on wooden crate, Ravi pointing at the map, (storybook cartoon style:1.4), warm sunset light, medium shot",
       "narration": "रवि ने गाँव के चौक में अन्या, कबीर और मीरा को बुलाया और उन्हें फ़्लोटिंग हिल का नक्शा दिखाया।",
       "subtitle": "Gathering the Team",
       "characters": ["Ravi", "Anya", "Kabir", "Meera"]
@@ -28,7 +28,7 @@
     {
       "duration": 8,
       "description": "Side shot of friends walking through tall golden wheat swaying in the breeze, bright morning sky above.",
-      "visual_prompt": "(four kids:1.3) walking through golden wheat fields, blue morning sky, (storybook children's illustration:1.4), light wind in hair",
+      "visual_prompt": "(four kids:1.3) walking single file through tall golden wheat fields, wheat swaying in wind, bright blue morning sky, (storybook children's illustration:1.4), side view shot",
       "narration": "सुबह की सुनहरी धूप में, चारों दोस्त गेहूँ के खेतों से गुज़रते हुए अपनी यात्रा पर निकल पड़े।",
       "subtitle": "Through the Fields",
       "characters": ["Ravi", "Anya", "Kabir", "Meera"]
@@ -36,7 +36,7 @@
     {
       "duration": 8,
       "description": "Dynamic overhead shot of friends leaping across giant glowing lily pads on a magical river.",
-      "visual_prompt": "(kids jumping:1.3) across glowing lily pads on magical river, (fantasy cartoon style:1.4), ripples of golden light on water, overhead view",
+      "visual_prompt": "(four kids:1.3) jumping from one large glowing lily pad to another, on wide magical river with sparkles, ripples of golden light in water, (storybook fantasy cartoon:1.4), overhead dynamic view",
       "narration": "वे एक चमकती नदी के किनारे पहुँचे, जहाँ बड़े-बड़े कमल के पत्ते तैर रहे थे। उन्हें पार करने के लिए कूदना पड़ा।",
       "subtitle": "The Lily Pad Crossing",
       "characters": ["Ravi", "Anya", "Kabir", "Meera"]
@@ -44,7 +44,7 @@
     {
       "duration": 8,
       "description": "Close-up of a talking parrot in a bright red vest, holding a golden key in its beak, perched on a branch.",
-      "visual_prompt": "(cartoon parrot:1.3) wearing bright red vest, holding golden key in beak, perched on branch, (storybook whimsical style:1.4), close-up",
+      "visual_prompt": "(cartoon parrot:1.3) wearing bright red vest, holding shiny golden key in beak, perched on thick tree branch, big expressive eyes, (storybook whimsical style:1.4), close-up",
       "narration": "एक बोलने वाला तोता, लाल जैकेट पहने, उनके पास आया और उन्हें एक सुनहरी चाबी दी।",
       "subtitle": "The Helpful Parrot",
       "characters": ["Ravi", "Anya", "Kabir", "Meera"]
@@ -52,7 +52,7 @@
     {
       "duration": 8,
       "description": "Wide shot of the Floating Hill suspended in clouds, glowing giant lantern at the top, kids gazing in awe.",
-      "visual_prompt": "(floating hill:1.3) in the clouds, giant glowing lantern on top, (four kids:1.2) looking amazed, (storybook cartoon style:1.4), wide shot",
+      "visual_prompt": "(large grassy hill:1.4) floating high above fluffy white clouds, clear visible gap from ground, giant glowing lantern on hilltop, (four kids:1.2) standing on nearby cliff looking amazed, bright magical light, (storybook cartoon style:1.4), wide shot",
       "narration": "आख़िरकार, वे बादलों में तैरते हुए पहाड़ तक पहुँचे, जिसकी चोटी पर एक विशाल लालटेन चमक रही थी।",
       "subtitle": "The Floating Hill",
       "characters": ["Ravi", "Anya", "Kabir", "Meera"]
@@ -60,7 +60,7 @@
     {
       "duration": 8,
       "description": "Medium shot of kids unlocking and lighting the giant lantern together, golden glow illuminating their faces.",
-      "visual_prompt": "(kids lighting giant lantern:1.3), warm golden glow on faces, (storybook whimsical style:1.4), medium shot",
+      "visual_prompt": "(four kids:1.3) together turning golden key and lighting giant glowing lantern, warm golden light on faces, night sky in background, (storybook whimsical style:1.4), medium shot",
       "narration": "चारों ने मिलकर लालटेन खोली और उसे जलाया, जिसकी रौशनी पूरे आसमान में फैल गई।",
       "subtitle": "Lighting the Lantern",
       "characters": ["Ravi", "Anya", "Kabir", "Meera"]
@@ -68,7 +68,7 @@
     {
       "duration": 8,
       "description": "Pull-back night shot of kids walking back into a brightly lit village, warm lights glowing in windows.",
-      "visual_prompt": "(four kids:1.3) walking toward glowing village at night, warm window lights, (storybook cartoon style:1.4), pull-back wide shot",
+      "visual_prompt": "(four kids:1.3) walking down path toward brightly lit village, warm yellow window lights, starry night sky, (storybook cartoon style:1.4), pull-back wide shot",
       "narration": "वह वापस लौटे, और उनका गाँव फिर से रौशनी से भर गया। सबने खुश होकर उनका स्वागत किया।",
       "subtitle": "Home Again",
       "characters": ["Ravi", "Anya", "Kabir", "Meera"]
