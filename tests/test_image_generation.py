@@ -41,7 +41,7 @@ def test_image_generation():
     
     # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-  "(medium shot:1.3) two children looking at old map, warm lantern light, cozy Indian village, storybook style"
+  "medium shot of two children looking at an old map by warm lantern light in a cozy Indian village, storybook illustration style, soft warm glow"
 ]
 
 
