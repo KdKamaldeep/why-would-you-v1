@@ -1,0 +1,5 @@
+python command for stories
+python3 -m src.interfaces.simple_cartoon_generator --prompt "Animal friends adventure" --storyboard storyboards/lost.json 
+    --no-reuse --style indian --language hi
+	
+	python -m pip install --no-cache-dir --force-reinstall "TTS==0.22.0" "transformers==4.35.2" "huggingface_hub==0.20.3"

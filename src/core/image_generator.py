@@ -14,10 +14,15 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 class ImageGenerator:
-    """Handles cartoon image generation using Stable Diffusion."""
+    """Handles cartoon image generation using Stable Diffusion.
+
+    Supports optional LoRA for style adaptation.
+    """
     
-    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors"):
+    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8):
         self.model_path = model_path
+        self.lora_path = lora_path
+        self.lora_scale = lora_scale
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.pipe = None
         self.sd_available = False
@@ -52,12 +57,65 @@ class ImageGenerator:
             logger.info(f"💻 Device: {self.device}")
             logger.info(f"📁 Model path: {self.model_path}")
 
-            # Check if model file exists
+            # Check if model file exists; if not, try loading from Hugging Face repo id
             if not Path(self.model_path).exists():
                 logger.warning(f"⚠️ Model file not found: {self.model_path}")
-                logger.info("💡 Will use placeholder images instead")
-                logger.info("📥 Run: bash download_models.sh to download models")
-                return
+                repo_id = os.getenv("SD_REPO_ID")
+                if not repo_id:
+                    # Default to SD 1.5 base to ensure images can still be generated
+                    repo_id = "runwayml/stable-diffusion-v1-5"
+                    logger.info(f"💡 Falling back to pretrained model: {repo_id}")
+                else:
+                    logger.info(f"💡 Loading pretrained model from repo id: {repo_id}")
+                try:
+                    from diffusers import StableDiffusionPipeline
+                    self.pipe = StableDiffusionPipeline.from_pretrained(
+                        repo_id,
+                        torch_dtype=torch.float16 if self.device == 'cuda' else torch.float32,
+                        safety_checker=None,
+                        requires_safety_checker=False
+                    )
+                    if self.device == 'cuda':
+                        self.pipe = self.pipe.to(self.device)
+                        if hasattr(self.pipe, 'enable_memory_efficient_attention'):
+                            try:
+                                self.pipe.enable_memory_efficient_attention()
+                            except Exception:
+                                pass
+                        if hasattr(self.pipe, 'enable_xformers_memory_efficient_attention'):
+                            try:
+                                self.pipe.enable_xformers_memory_efficient_attention()
+                            except Exception:
+                                logger.info("ℹ️ xFormers not available; continuing without it")
+                    # Optionally load LoRA after from_pretrained as well
+                    if self.lora_path and Path(self.lora_path).exists():
+                        try:
+                            logger.info(f"🎭 Loading LoRA: {self.lora_path}")
+                            load_ok = False
+                            if hasattr(self.pipe, 'load_lora_weights'):
+                                self.pipe.load_lora_weights(self.lora_path)
+                                load_ok = True
+                                if hasattr(self.pipe, 'fuse_lora'):
+                                    try:
+                                        self.pipe.fuse_lora(lora_scale=self.lora_scale)
+                                    except Exception:
+                                        pass
+                                elif hasattr(self.pipe, 'set_adapters'):
+                                    try:
+                                        self.pipe.set_adapters(["default"], adapter_weights=[self.lora_scale])
+                                    except Exception:
+                                        pass
+                            if load_ok:
+                                logger.info(f"✅ LoRA loaded with scale ~ {self.lora_scale}")
+                        except Exception as le:
+                            logger.warning(f"⚠️ Failed to load LoRA '{self.lora_path}': {le}")
+                    self.sd_available = True
+                    logger.info("✅ Stable Diffusion pipeline initialized from pretrained repo!")
+                    return
+                except Exception as e:
+                    logger.warning(f"❌ Failed to load pretrained pipeline '{repo_id}': {e}")
+                    logger.info("💡 Will use placeholder images instead. To enable SD, set SD_REPO_ID or place a .safetensors model.")
+                    return
 
             # Load the pipeline with the custom model
             logger.info("📦 Loading Stable Diffusion model...")
@@ -82,6 +140,31 @@ class ImageGenerator:
                         self.pipe.enable_xformers_memory_efficient_attention()
                     except Exception:
                         logger.info("ℹ️ xFormers not available; continuing without it")
+
+            # Optionally load a LoRA for style adaptation
+            if self.lora_path and Path(self.lora_path).exists():
+                try:
+                    logger.info(f"🎭 Loading LoRA: {self.lora_path}")
+                    load_ok = False
+                    # Newer diffusers API
+                    if hasattr(self.pipe, 'load_lora_weights'):
+                        self.pipe.load_lora_weights(self.lora_path)
+                        load_ok = True
+                        # Try to fuse or set scale depending on API
+                        if hasattr(self.pipe, 'fuse_lora'):
+                            try:
+                                self.pipe.fuse_lora(lora_scale=self.lora_scale)
+                            except Exception:
+                                pass
+                        elif hasattr(self.pipe, 'set_adapters'):
+                            try:
+                                self.pipe.set_adapters(["default"], adapter_weights=[self.lora_scale])
+                            except Exception:
+                                pass
+                    if load_ok:
+                        logger.info(f"✅ LoRA loaded with scale ~ {self.lora_scale}")
+                except Exception as le:
+                    logger.warning(f"⚠️ Failed to load LoRA '{self.lora_path}': {le}")
 
             self.sd_available = True
             logger.info("✅ Stable Diffusion pipeline initialized successfully!")
@@ -113,18 +196,25 @@ class ImageGenerator:
         """Generate image using Stable Diffusion."""
         try:
             # Enhanced prompt for better cartoon results
-            enhanced_prompt = f"cartoon style, animated, colorful, cute, {prompt}, high quality, digital art, illustration, vibrant colors, clean lines"
-            negative_prompt = "photorealistic, realistic, photo, blurry, low quality, dark, scary, violent, adult content, nsfw"
+            enhanced_prompt = prompt
+            # Strong cartoon-specific negative prompts to avoid realistic images
+            negative_prompt = (
+                "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
+                "blurry, low quality, dark, scary, violent, adult content, nsfw, "
+                "hyperrealistic, detailed textures, photographic, film grain, "
+                "realistic lighting, realistic shadows, realistic proportions, "
+                "detailed skin, detailed hair, detailed clothing textures"
+            )
             
             logger.info(f"🎯 Enhanced prompt: {enhanced_prompt}")
             
-            # Generate image with optimized settings
+            # Generate image with cartoon-optimized settings
             with torch.autocast(self.device):
                 result = self.pipe(
                     prompt=enhanced_prompt,
                     negative_prompt=negative_prompt,
-                    num_inference_steps=25,  # More steps for better quality
-                    guidance_scale=8.0,      # Slightly higher for better adherence
+                    num_inference_steps=30,  # More steps for better cartoon quality
+                    guidance_scale=7.5,      # Balanced for cartoon style
                     width=768,
                     height=1024,
                     num_images_per_prompt=1,

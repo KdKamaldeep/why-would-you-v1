@@ -23,19 +23,17 @@ def check_requirements():
     
     # Check API keys
     openai_key = os.getenv('OPENAI_API_KEY')
-    elevenlabs_key = os.getenv('ELEVENLABS_API_KEY')
+    # Coqui TTS does not require an API key when using local models
     
     if not openai_key or openai_key == 'your_openai_api_key_here':
         print("❌ OpenAI API key not configured in .env file")
         return False
         
-    if not elevenlabs_key or elevenlabs_key == 'your_elevenlabs_api_key_here':
-        print("❌ ElevenLabs API key not configured in .env file")
-        return False
+    # No ElevenLabs key needed; ensure TTS model directory exists if using local models
     
     # Check if models directory exists
     if not Path("models").exists():
-        print("❌ Models directory not found. Please run download_models.bat first.")
+        print("❌ Models directory not found. Please run the model download script first.")
         return False
     
     # Check for at least one supported model (others optional)
@@ -49,7 +47,7 @@ def check_requirements():
     print("✅ All requirements satisfied!")
     return True
 
-def generate_cartoon(prompt, style="cartoon", duration=30):
+def generate_cartoon(prompt, style="cartoon", duration=30, language="en"):
     """Generate a cartoon video with the given prompt."""
     try:
         # Import the main generator
@@ -59,6 +57,7 @@ def generate_cartoon(prompt, style="cartoon", duration=30):
         print(f"📝 Prompt: {prompt}")
         print(f"🎨 Style: {style}")
         print(f"⏱️ Duration: {duration} seconds")
+        print(f"🗣️ Language: {language}")
         print("-" * 50)
         
         # Create video configuration
@@ -66,7 +65,9 @@ def generate_cartoon(prompt, style="cartoon", duration=30):
             prompt=prompt,
             duration=duration,
             style=style,
-            output_path="output"
+            output_path="output",
+            add_subtitles=False,
+            language=language
         )
         
         # Initialize generator
@@ -112,9 +113,9 @@ Examples:
     
     parser.add_argument(
         "--style", "-s",
-        choices=["cartoon", "anime"],
+        choices=["cartoon", "anime", "indian", "indian_cartoon", "desi", "bollywood"],
         default="cartoon",
-        help="Visual style for the cartoon (default: cartoon)"
+        help="Visual style (cartoon, anime, indian). Use 'indian' for Indian children's-book style"
     )
     
     parser.add_argument(
@@ -122,6 +123,12 @@ Examples:
         type=int,
         default=30,
         help="Video duration in seconds (default: 30)"
+    )
+
+    parser.add_argument(
+        "--language", "-l",
+        default="en",
+        help="Narration language (e.g., en, hi, es). For Hindi use 'hi'"
     )
 
     parser.add_argument(
@@ -203,7 +210,9 @@ Examples:
                 description=description,
                 custom_scenes=normalized_scenes,
                 scene_duration=scene_duration,
-                reuse_existing=(not args.no_reuse)
+                reuse_existing=(not args.no_reuse),
+                add_subtitles=False,
+                language=args.language
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
@@ -211,7 +220,7 @@ Examples:
             print(f"❌ Failed to use storyboard: {e}")
             output_path = None
     else:
-        output_path = generate_cartoon(args.prompt, args.style, args.duration)
+        output_path = generate_cartoon(args.prompt, args.style, args.duration, args.language)
     
     if output_path:
         print(f"\n🎊 Success! Your cartoon is ready at: {output_path}")

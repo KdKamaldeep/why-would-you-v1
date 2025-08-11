@@ -1,19 +1,8 @@
-# Core system modules for cartoon generation
+"""Core package for cartoon generation.
 
-from .generate_cartoon_short import CartoonShortsGenerator, VideoConfig
-from .image_generator import ImageGenerator
-from .animation_generator import AnimationGenerator
-from .script_generator import ScriptGenerator
-from .voice_generator import VoiceGenerator
-from .video_processor import VideoProcessor, VideoConfig as VPConfig
+Avoid heavy imports at package import time to prevent circular or environment
+issues during testing. Import submodules directly where needed, e.g.:
+    from core.coqui_voice_synthesizer import CoquiVoiceSynthesizer
+"""
 
-__all__ = [
-    'CartoonShortsGenerator',
-    'VideoConfig', 
-    'ImageGenerator',
-    'AnimationGenerator',
-    'ScriptGenerator',
-    'VoiceGenerator',
-    'VideoProcessor',
-    'VPConfig'
-]
+__all__ = []

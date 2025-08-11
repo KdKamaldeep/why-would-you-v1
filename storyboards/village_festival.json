@@ -1,0 +1,69 @@
+{
+  "title": "The Festival of Colors in Greenleaf Village",
+  "description": "In the lush, green countryside of Greenleaf Village, children and families come together to celebrate the annual spring festival with music, games, and dazzling lights.",
+  "total_duration": 60,
+  "cast": [
+    {"name": "Ravi", "role": "leader"},
+    {"name": "Anya", "role": "artist"},
+    {"name": "Kiran", "role": "musician"},
+    {"name": "Meera", "role": "dancer"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "Ravi, a cheerful 10-year-old boy with short black hair and a bright yellow kurta, runs through green fields at sunrise with a basket of marigold flowers, birds flying overhead",
+      "visual_prompt": "A boy in a yellow kurta running through lush green fields at sunrise, holding a basket of marigold flowers, birds in the sky, storybook style",
+      "narration": "The festival morning begins with Ravi gathering fresh marigold flowers as the sun paints the fields golden.",
+      "subtitle": "Morning Glow",
+      "characters": ["Ravi"]
+    },
+    {
+      "duration": 10,
+      "description": "Ravi joins Anya, Kiran, and Meera in the village square, where villagers hang colorful flags and lanterns between wooden houses",
+      "visual_prompt": "Four children helping villagers decorate a square with colorful flags and lanterns, surrounded by green hills, cartoon style",
+      "narration": "In the square, Ravi meets his friends as they help hang lanterns and flags for the big celebration.",
+      "subtitle": "Decorating the Village",
+      "characters": ["Ravi", "Anya", "Kiran", "Meera"]
+    },
+    {
+      "duration": 12,
+      "description": "A lively parade with drummers, dancers in colorful clothes, children carrying flower garlands, and oxen decorated with flower crowns marching through the green village lanes",
+      "visual_prompt": "Parade with drummers, dancers, children carrying flowers, oxen with crowns, lush green village background",
+      "narration": "The parade begins! Drums beat, dancers twirl, and flowers fill the air with their sweet scent.",
+      "subtitle": "The Parade Begins",
+      "characters": ["Ravi", "Anya", "Kiran", "Meera"]
+    },
+    {
+      "duration": 12,
+      "description": "Children playing a sack race and throwing colored powders, laughing, while stalls offer sweets and sugarcane juice",
+      "visual_prompt": "Kids in colorful clothes playing sack race, throwing colors, with sweet stalls in the background, bright festival atmosphere",
+      "narration": "Games, colors, and treats make the festival sparkle with laughter and joy.",
+      "subtitle": "Games and Colors",
+      "characters": ["Ravi", "Anya", "Kiran", "Meera"]
+    },
+    {
+      "duration": 8,
+      "description": "The sun setting behind the green hills as villagers dance in a circle around a bonfire, lanterns glowing in the trees",
+      "visual_prompt": "Sunset over green hills, villagers dancing around bonfire, glowing lanterns hanging from trees",
+      "narration": "As the day fades, music and dancing light up the village square.",
+      "subtitle": "Evening Dance",
+      "characters": ["Ravi", "Anya", "Kiran", "Meera"]
+    },
+    {
+      "duration": 10,
+      "description": "Children releasing glowing paper lanterns into the night sky, reflections in the pond, fireflies glowing among the trees",
+      "visual_prompt": "Children releasing glowing paper lanterns, starry night, reflections in pond, fireflies in trees",
+      "narration": "Under the stars, they send lanterns into the sky, carrying their wishes for joy and togetherness.",
+      "subtitle": "Wishes in the Sky",
+      "characters": ["Ravi", "Anya", "Kiran", "Meera"]
+    }
+  ],
+  "tags": [
+    "kids",
+    "festival",
+    "village",
+    "nature",
+    "friendship",
+    "colors"
+  ]
+}

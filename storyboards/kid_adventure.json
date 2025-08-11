@@ -1,0 +1,69 @@
+{
+  "title": "Animal Friends' Magical Adventure",
+  "description": "Join four animal friends as they embark on a fun and magical adventure through a whimsical forest, solving puzzles and finding surprises along the way.",
+  "total_duration": 64,
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "A cute red fox on a sunny riverbank finds a glowing old treasure map inside a bottle, magical forest background, children's storybook style",
+      "visual_prompt": "A cute red fox on a sunny riverbank finds a glowing old treasure map inside a bottle, magical forest background, children's storybook style",
+      "narration": "On a sunny riverbank, a curious little fox finds a glowing map tucked inside a floating glass bottle.",
+      "subtitle": "The Discovery"
+    },
+    {
+      "duration": 8,
+      "description": "A red fox talking to a brown bear, a small squirrel, and a wise owl on a tree, all animals look friendly and wear small adventure gear, cartoon forest scene",
+      "visual_prompt": "A red fox talking to a brown bear, a small squirrel, and a wise owl on a tree, all animals look friendly and wear small adventure gear, cartoon forest scene",
+      "narration": "Excited, the fox gathers a friendly bear, a quick squirrel, and a wise old owl to join the quest.",
+      "subtitle": "Gathering the Team"
+    },
+    {
+      "duration": 8,
+      "description": "Four animal friends entering a mysterious, magical forest with tall trees, glowing plants, and foggy paths, fantasy children's illustration",
+      "visual_prompt": "Four animal friends entering a mysterious, magical forest with tall trees, glowing plants, and foggy paths, fantasy children's illustration",
+      "narration": "Together they step beneath towering trees, following twinkling lights that lead deeper into the magical forest.",
+      "subtitle": "Into the Woods"
+    },
+    {
+      "duration": 8,
+      "description": "A massive ancient tree with glowing carvings and a riddle on its trunk, surrounded by four curious animals looking up, storybook fantasy art",
+      "visual_prompt": "A massive ancient tree with glowing carvings and a riddle on its trunk, surrounded by four curious animals looking up, storybook fantasy art",
+      "narration": "They discover an ancient tree carved with glowing runes and a riddle only teamwork and kindness can solve.",
+      "subtitle": "The Puzzle Tree"
+    },
+    {
+      "duration": 8,
+      "description": "A colorful magical river with glowing floating stones, animals hopping across one by one, whimsical forest in background, children's book style",
+      "visual_prompt": "A colorful magical river with glowing floating stones, animals hopping across one by one, whimsical forest in background, children's book style",
+      "narration": "Laughing, the friends hop across rainbow stones that rise and shimmer, guiding them safely over the rushing river.",
+      "subtitle": "Crossing the Rainbow River"
+    },
+    {
+      "duration": 8,
+      "description": "A cute, large, sleeping dragon with a pink blanket and a treasure chest nearby, in a cozy forest clearing, storybook style",
+      "visual_prompt": "A cute, large, sleeping dragon with a pink blanket and a treasure chest nearby, in a cozy forest clearing, storybook style",
+      "narration": "In a cozy clearing, they find a gentle dragon fast asleep beside a treasure chest wrapped in a pink blanket.",
+      "subtitle": "The Sleeping Dragon"
+    },
+    {
+      "duration": 8,
+      "description": "Animals looking at glowing crystals and a scroll inside an open chest, with a smiling dragon nearby, magical forest atmosphere",
+      "visual_prompt": "Animals looking at glowing crystals and a scroll inside an open chest, with a smiling dragon nearby, magical forest atmosphere",
+      "narration": "When the dragon wakes, it smiles and shares the chest: glowing crystals and a scroll that promises friendship.",
+      "subtitle": "The True Treasure"
+    },
+    {
+      "duration": 8,
+      "description": "Four happy animal friends walking home through the forest with glowing crystals, smiling and laughing, sunset lighting, cartoon style",
+      "visual_prompt": "Four happy animal friends walking home through the forest with glowing crystals, smiling and laughing, sunset lighting, cartoon style",
+      "narration": "As the sun sets, the four friends head home, hearts shining brighter than the crystals, thankful for their adventure.",
+      "subtitle": "Home Again"
+    }
+  ],
+  "tags": [
+    "kids",
+    "adventure",
+    "animal friends",
+    "magical forest"
+  ]
+}

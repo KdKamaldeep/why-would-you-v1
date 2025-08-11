@@ -6,7 +6,7 @@ This script follows a specific flow:
 1. Generate 3-scene story with OpenAI GPT-4
 2. Create cartoon images with Stable Diffusion (ToonYou/MeinaMix)
 3. Animate images with AnimateDiff + cartoon LoRA
-4. Generate narration with ElevenLabs
+4. Generate narration with Coqui TTS (XTTS v2)
 5. Add audio to video clips
 6. Add subtitles and background music
 7. Compile final vertical video
@@ -32,7 +32,7 @@ from dotenv import load_dotenv
 # Import modular classes
 from .script_generator import ScriptGenerator
 from .image_generator import ImageGenerator
-from .voice_generator import VoiceGenerator
+from .coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 from .animation_generator import AnimationGenerator
 from .video_processor import VideoProcessor, VideoConfig as VPConfig
 
@@ -61,7 +61,7 @@ class VideoConfig:
     height: int = 1024  # Vertical format for Shorts
     output_path: str = "output"
     style: str = "cartoon"
-    voice_id: str = "pNInz6obpgDQGcFmaJgB"  # ElevenLabs voice ID
+    voice_id: str = ""  # Optional path to reference speaker WAV for Coqui XTTS
     language: str = "en"
     num_scenes: int = 3
     # Optional storyboard support
@@ -71,6 +71,8 @@ class VideoConfig:
     scene_duration: int = 8  # Used when custom_scenes is provided and per-scene duration not specified
     # Reuse assets to speed up repeated runs
     reuse_existing: bool = True
+    # Control subtitle rendering
+    add_subtitles: bool = True
 
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
@@ -82,9 +84,21 @@ class CartoonShortsGenerator:
         
         # Initialize components using modular classes
         self.script_generator = ScriptGenerator(os.getenv('OPENAI_API_KEY', ''))
-        self.image_generator = ImageGenerator()
+        # Choose a more neutral/non-anime base when Indian style is requested
+        default_model = "models/toonyou_beta6.safetensors"
+        indian_pref_model = os.getenv("INDIAN_STYLE_MODEL", default_model)
+        model_path = indian_pref_model if (config.style or "").lower() in {"indian", "indian_cartoon", "desi", "bollywood"} else default_model
+        lora_path = os.getenv("INDIAN_STYLE_LORA", "") or None
+        try:
+            self.image_generator = ImageGenerator(model_path=model_path, lora_path=lora_path, lora_scale=0.85)
+        except TypeError:
+            # Fallback for older ImageGenerator signature
+            self.image_generator = ImageGenerator(model_path=model_path)
         self.animation_generator = AnimationGenerator()
-        self.voice_generator = VoiceGenerator(os.getenv('ELEVENLABS_API_KEY', ''))
+        # Initialize Coqui TTS voice synthesizer
+        self.voice_synthesizer = CoquiVoiceSynthesizer(
+            CoquiVoiceConfig(language=config.language)
+        )
 
         
         # Create video config for processor
@@ -134,7 +148,7 @@ class CartoonShortsGenerator:
                     json.dump(script, f, indent=2)
             else:
                 logger.info("Step 1: Generating 3-scene story...")
-                script = self.script_generator.generate_script(self.config.prompt, self.config.duration)
+                script = self.script_generator.generate_script(self.config.prompt, self.config.duration, language=self.config.language)
                 with open(script_path, 'w', encoding='utf-8') as f:
                     json.dump(script, f, indent=2)
             
@@ -209,16 +223,23 @@ class CartoonShortsGenerator:
                 video_path = self.video_processor.frames_to_video(frames_dir, str(clip_path), fps=self.config.fps)
                 video_clips.append(video_path)
             
-            # Step 5: Generate narration with ElevenLabs
+            # Step 5: Generate narration with Coqui TTS
             logger.info("Step 5: Generating narration...")
-            narration_path = self.output_dir / "narration.mp3"
+            narration_path = self.output_dir / "narration.wav"
             scene_audio_paths = []
             try:
                 # Generate per-scene audio to match durations more tightly
                 for i, scene in enumerate(script['scenes']):
-                    scene_audio = self.output_dir / f"audio_scene_{i+1}.mp3"
+                    scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
                     if not (self.config.reuse_existing and scene_audio.exists()):
-                        self.voice_generator.generate_narration(scene.get('narration', ''), self.config.voice_id, str(scene_audio))
+                        generated_audio = self.voice_synthesizer.synthesize_voice(
+                            [scene.get('narration', '')],
+                            str(scene_audio),
+                            speaker=None,
+                            voice_clone_audio=self.config.voice_id or None,
+                        )
+                        # Use actual generated path (may switch extension on fallback)
+                        scene_audio = Path(generated_audio)
                     # Fit each scene audio to scene duration
                     fitted_audio = self.output_dir / f"audio_scene_{i+1}_fit.m4a"
                     self.video_processor.adjust_audio_to_duration(str(scene_audio), float(scene.get('duration', 8)), str(fitted_audio))
@@ -230,23 +251,29 @@ class CartoonShortsGenerator:
             except Exception as e:
                 logger.warning(f"Per-scene audio fitting failed; falling back to single track: {e}")
                 if not (self.config.reuse_existing and narration_path.exists()):
-                    self.voice_generator.generate_narration_from_script(
-                        script,
-                        self.config.voice_id,
-                        str(narration_path)
+                    narration_lines = [scene.get('narration', '') for scene in script.get('scenes', [])]
+                    generated_audio = self.voice_synthesizer.synthesize_voice(
+                        narration_lines,
+                        str(narration_path),
+                        speaker=None,
+                        voice_clone_audio=self.config.voice_id or None,
                     )
+                    narration_path = Path(generated_audio)
             
             # Step 6: Use video clips directly (no lip-sync)
             logger.info("Step 6: Preparing video clips...")
             final_clips = video_clips
             
-            # Step 7: Create subtitles
-            logger.info("Step 7: Creating subtitles...")
+            # Step 7: Create subtitles (optional)
             subtitles_path = self.output_dir / "subtitles.srt"
-            if self.config.reuse_existing and subtitles_path.exists():
-                logger.info(f"Skipping subtitles (exists): {subtitles_path}")
+            if self.config.add_subtitles:
+                logger.info("Step 7: Creating subtitles...")
+                if self.config.reuse_existing and subtitles_path.exists():
+                    logger.info(f"Skipping subtitles (exists): {subtitles_path}")
+                else:
+                    self.video_processor.create_subtitles_srt(script, str(subtitles_path))
             else:
-                self.video_processor.create_subtitles_srt(script, str(subtitles_path))
+                logger.info("Step 7: Subtitles disabled; skipping SRT generation and overlay")
             
             # Step 8: Select background music
             logger.info("Step 8: Adding background music...")
@@ -258,7 +285,7 @@ class CartoonShortsGenerator:
                 final_clips,
                 str(narration_path) if isinstance(narration_path, (str, Path)) else narration_path,
                 background_music,
-                str(subtitles_path),
+                str(subtitles_path) if self.config.add_subtitles else None,
                 str(final_output)
             )
             
@@ -306,6 +333,21 @@ class CartoonShortsGenerator:
         """Compose an image prompt that bakes in exactly two character specs if available."""
         base = scene.get('visual_prompt', scene.get('description', ''))
         characters = scene.get('characters', [])
+        # Style preset additions
+        style_suffix = ""
+        style_key = (self.config.style or "").lower()
+        if style_key in {"indian", "indian_cartoon", "desi", "bollywood"}:
+            style_suffix = (
+                " Indian cartoon style, inspired by Indian children's book illustrations and Amar Chitra Katha; "
+                "vibrant festive palette (marigold, vermilion, indigo), matte shading, soft outlines; "
+                "traditional Indian clothing and accessories where natural (kurta, sari, bangles); "
+                "background motifs like bazaars, auto-rickshaws, kites, forts or temples when relevant; "
+                "warm sunlight, friendly expression, family-friendly, avoid anime/manga aesthetics."
+            )
+        else:
+            style_suffix = (
+                " Vertical 768x1024 cartoon, clean lines, vibrant colors, family-friendly, both characters clearly visible, consistent traits across scenes."
+            )
         if characters:
             char_bits = []
             for idx, ch in enumerate(characters[:2], start=1):
@@ -320,8 +362,7 @@ class CartoonShortsGenerator:
             char_text = " Include two characters: " + " | ".join(char_bits) + "."
         else:
             char_text = ""
-        suffix = " Vertical 768x1024 cartoon, clean lines, vibrant colors, family-friendly, both characters clearly visible, consistent traits across scenes."
-        return (base or "Cartoon scene") + char_text + suffix
+        return (base or "Cartoon scene") + char_text + style_suffix
 
 def main():
     """Main CLI entry point."""
@@ -330,13 +371,13 @@ def main():
     parser.add_argument("--duration", type=int, default=30, help="Video duration in seconds")
     parser.add_argument("--output", default="output", help="Output directory")
     parser.add_argument("--style", default="cartoon", help="Visual style")
-    parser.add_argument("--voice", default="pNInz6obpgDQGcFmaJgB", help="ElevenLabs voice ID")
+    parser.add_argument("--voice", default="", help="Reference speaker WAV path for Coqui XTTS (optional)")
     parser.add_argument("--language", default="en", help="Language for narration")
     
     args = parser.parse_args()
     
     # Validate environment variables
-    required_env_vars = ['OPENAI_API_KEY', 'ELEVENLABS_API_KEY']
+    required_env_vars = ['OPENAI_API_KEY']
     missing_vars = [var for var in required_env_vars if not os.getenv(var)]
     
     if missing_vars:

@@ -1,0 +1,62 @@
+{
+  "title": "The Great Kite Chase in Sunflower Town",
+  "description": "In the cheerful town of Sunflower, four best friends set out on a fun-filled adventure to catch a magical kite that leads them through fields, rivers, and into the sky!",
+  "total_duration": 60,
+  "cast": [
+    {"name": "Arjun", "role": "leader"},
+    {"name": "Sia", "role": "inventor"},
+    {"name": "Kabir", "role": "musician"},
+    {"name": "Lila", "role": "storyteller"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "Arjun, a lively boy in a blue shirt, spots a shimmering golden kite soaring high above the sunflower fields under a bright morning sky.",
+      "visual_prompt": "A boy in a blue shirt pointing excitedly at a golden kite flying over endless sunflower fields, cheerful storybook style",
+      "narration": "One sunny morning, Arjun spots a golden kite dancing in the breeze over the sunflower fields.",
+      "subtitle": "The Golden Kite",
+      "characters": ["Arjun"]
+    },
+    {
+      "duration": 10,
+      "description": "Arjun calls Sia, Kabir, and Lila, and together they race through the colorful fields, trying to follow the kite's trail.",
+      "visual_prompt": "Four children running through bright yellow sunflower fields, chasing a sparkling golden kite in the sky",
+      "narration": "He calls his friends, and soon the four are running together, laughing and chasing the magical kite.",
+      "subtitle": "Chasing the Wind",
+      "characters": ["Arjun", "Sia", "Kabir", "Lila"]
+    },
+    {
+      "duration": 12,
+      "description": "The kite glides over a river where the friends hop onto a wooden raft, paddling fast as the wind carries the kite across.",
+      "visual_prompt": "Four kids on a wooden raft paddling down a sparkling blue river, the golden kite ahead in the sky",
+      "narration": "The kite floats over the river, and the friends paddle their raft as fast as they can to keep up.",
+      "subtitle": "Across the River",
+      "characters": ["Arjun", "Sia", "Kabir", "Lila"]
+    },
+    {
+      "duration": 12,
+      "description": "The friends reach a small hill where the kite swirls in circles, as if waiting for them, before shooting up into the clouds.",
+      "visual_prompt": "Children standing on a grassy hill, looking up at the golden kite swirling above them before flying higher into the clouds",
+      "narration": "They climb the hill, hearts racing, just as the golden kite swirls playfully and then soars into the clouds.",
+      "subtitle": "The Waiting Kite",
+      "characters": ["Arjun", "Sia", "Kabir", "Lila"]
+    },
+    {
+      "duration": 8,
+      "description": "The kite magically pulls them upward, and suddenly they are floating among fluffy clouds, surrounded by rainbow-colored birds.",
+      "visual_prompt": "Children floating among fluffy white clouds with rainbow-colored birds, holding onto a golden kite string",
+      "narration": "Holding the string tight, they rise into the sky, flying with rainbow birds and touching the clouds.",
+      "subtitle": "Flying High",
+      "characters": ["Arjun", "Sia", "Kabir", "Lila"]
+    },
+    {
+      "duration": 10,
+      "description": "The kite gently brings them back to the sunflower fields, where it lands softly in Arjun’s hands, glowing warmly.",
+      "visual_prompt": "A golden kite landing in a boy's hands in a field of sunflowers, glowing in the evening sunlight",
+      "narration": "The golden kite leads them back home, where it lands softly in Arjun’s hands, shining like a treasure.",
+      "subtitle": "The Treasure Returns",
+      "characters": ["Arjun", "Sia", "Kabir", "Lila"]
+    }
+  ],
+  "tags": ["kids", "adventure", "magic", "friendship", "nature", "fun"]
+}

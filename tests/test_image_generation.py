@@ -39,14 +39,11 @@ def test_image_generation():
         print("⚠️ Stable Diffusion not available - will use placeholder images")
         print("💡 To enable SD, run: bash download_models.sh")
     
-    # Test prompts
+    # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-        "A cute cartoon dragon learning to bake cookies",
-        "Space pirates discovering treasure on a colorful planet",
-        "A magical cat teaching other animals to dance",
-        "A robot and a fairy becoming best friends"
+        "Wide-angle tracking shot of a cozy Indian village under soft cloudy skies"
     ]
-    
+
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
     
     # Generate images
