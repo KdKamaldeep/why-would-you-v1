@@ -11,80 +11,80 @@
     {
       "duration": 5,
       "description": "warm village evening, children gathered around Nanu listening to stories",
-      "visual_prompt": "(wide shot:1.3) Indian village evening, children gathered around elderly man, warm lantern light, (storybook cozy:1.4)",
-      "narration": "सुनदरवन के जंगल में छुपा है एक राज़ी खजाना।",
+      "visual_prompt": "(wide shot:1.3) Indian village evening, children gathered around elderly man sitting near a warm glowing lantern, cozy traditional village setting, storybook cozy:1.4, soft warm light, gentle shadows",
+      "narration": "नानू ने सुनदरवन के जंगल में छुपे खजाने की कहानी सुनाई।",
       "subtitle": "The Secret",
       "characters": ["Nanu", "Children"]
     },
     {
       "duration": 5,
       "description": "close-up of old weathered map in Aarav’s hands",
-      "visual_prompt": "close-up old map with faded markings, hands holding it carefully",
-      "narration": "आरव को मिला एक पुराना नक्शा, जो खजाने तक ले जाता है।",
+      "visual_prompt": "close-up detailed shot of hands holding an ancient weathered map with faded markings, rustic paper texture, soft natural light, storybook antique style",
+      "narration": "आरव को एक पुराना नक्शा मिला, जो खजाने तक ले जाता था।",
       "subtitle": "The Map",
       "characters": ["Aarav"]
     },
     {
       "duration": 5,
       "description": "Meera and Aarav studying map excitedly under lantern light",
-      "visual_prompt": "medium shot of two children looking at an old map by warm lantern light in a cozy Indian village, storybook illustration style, soft warm glow",
-      "narration": "मीरा ने कहा, ‘चलो, खोजते हैं उसे!’",
+      "visual_prompt": "medium shot of two Indian children studying an old map by the soft golden glow of a lantern inside a cozy wooden village hut, warm tones, storybook illustration style, expressive faces, gentle shadows, magical atmosphere",
+      "narration": "मीरा ने उत्साह से कहा, ‘चलो, हम इसे खोजते हैं!’",
       "subtitle": "The Plan",
       "characters": ["Aarav", "Meera"]
     },
     {
       "duration": 5,
       "description": "children running through village towards forest at sunset",
-      "visual_prompt": "(wide shot:1.3) children running through village streets, sunset sky, (storybook bright:1.4)",
-      "narration": "सूरज ढल रहा था, और वे जंगल की ओर भागे।",
+      "visual_prompt": "(wide shot:1.3) two children running joyfully through dusty Indian village streets at sunset, warm orange sky, soft lens flare, storybook bright:1.4",
+      "narration": "सूरज ढल रहा था, और वे जंगल की ओर दौड़े।",
       "subtitle": "Setting Out",
       "characters": ["Aarav", "Meera"]
     },
     {
       "duration": 5,
       "description": "entrance to dense forest with soft glowing lights and shadows",
-      "visual_prompt": "(wide shot:1.3) forest entrance, soft glowing lights and shadows, gentle evening, (storybook magical:1.4)",
-      "narration": "जंगल का रास्ता धीरे-धीरे उनके सामने खुल गया।",
+      "visual_prompt": "(wide shot:1.3) mysterious forest entrance with dense trees, soft glowing light filtering through leaves, gentle evening shadows, storybook magical:1.4",
+      "narration": "जंगल के रास्ते में हर कदम उनके लिए नया रहस्य लेकर आया।",
       "subtitle": "The Forest Path",
       "characters": ["Aarav", "Meera"]
     },
     {
       "duration": 5,
       "description": "children walking carefully on narrow forest trail holding lanterns",
-      "visual_prompt": "(medium shot) children with lanterns walking on narrow forest trail, soft ambient light, (storybook magical:1.3)",
-      "narration": "लालटेन की रौशनी से उन्होंने आगे बढ़ना जारी रखा।",
+      "visual_prompt": "(medium shot) two children walking carefully on narrow forest trail, holding lanterns emitting soft warm light, surrounded by glowing plants and gentle shadows, storybook magical:1.3",
+      "narration": "लालटेन की रौशनी में वे आगे बढ़ते रहे।",
       "subtitle": "Guided by Light",
       "characters": ["Aarav", "Meera"]
     },
     {
       "duration": 5,
       "description": "hidden clearing with ancient stone chest covered in moss",
-      "visual_prompt": "(wide shot:1.3) hidden forest clearing, moss-covered stone chest, dappled moonlight, (storybook mysterious:1.4)",
-      "narration": "अंत में, उन्हें छुपा हुआ खजाना मिला।",
+      "visual_prompt": "(wide shot:1.3) secret forest clearing bathed in soft moonlight, moss-covered ancient stone chest at center, surrounded by lush greenery, storybook mysterious:1.4",
+      "narration": "अंत में, उन्होंने छुपा हुआ खजाना देखा।",
       "subtitle": "Treasure Found",
       "characters": ["Aarav", "Meera"]
     },
     {
       "duration": 5,
       "description": "close-up of children opening chest, glowing light spilling out",
-      "visual_prompt": "(close-up) children opening glowing treasure chest, golden light spilling out, (storybook magical:1.4)",
-      "narration": "खजाने की रोशनी ने उनकी आँखें चमका दीं।",
+      "visual_prompt": "close-up of two children opening an ancient treasure chest emitting golden glowing light, faces illuminated with wonder, storybook magical:1.4",
+      "narration": "खजाने की चमक ने उनके दिलों को रोशन कर दिया।",
       "subtitle": "The Glow",
       "characters": ["Aarav", "Meera"]
     },
     {
       "duration": 5,
       "description": "children carrying treasure chest back towards village with joyful faces",
-      "visual_prompt": "(medium shot) children carrying treasure chest through forest, smiling faces, soft dawn light, (storybook bright:1.3)",
-      "narration": "खजाना लेकर वे खुशी से लौटे।",
+      "visual_prompt": "(medium shot) two happy children carrying treasure chest through forest path, soft dawn light breaking through trees, storybook bright:1.3",
+      "narration": "खजाना लेकर वे खुशी-खुशी गाँव लौटे।",
       "subtitle": "Return Home",
       "characters": ["Aarav", "Meera"]
     },
     {
       "duration": 5,
       "description": "village morning celebration with villagers smiling, treasure chest in center",
-      "visual_prompt": "(wide shot:1.3) bright village morning, villagers celebrating, treasure chest displayed, (storybook joyful:1.4)",
-      "narration": "पूरा गाँव इस खुशहाली में झूम उठा।",
+      "visual_prompt": "(wide shot:1.3) bright morning in Indian village, villagers celebrating around treasure chest, colorful decorations, joyful expressions, storybook joyful:1.4",
+      "narration": "पूरा गाँव उनकी सफलता पर खुश था।",
       "subtitle": "Celebration",
       "characters": ["Aarav", "Meera", "Nanu"]
     }
