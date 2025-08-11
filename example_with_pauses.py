@@ -104,7 +104,7 @@ def main():
     print("📖 A story about Aarav and Meera's treasure hunt adventure")
     print(f"📊 {len(custom_scenes)} scenes, each {custom_scenes[0]['duration']} seconds")
     
-    # Configuration with pauses
+    # Configuration with pauses and image validation
     config = VideoConfig(
         prompt="The Secret Treasure of Sundarvan",
         duration=50,
@@ -113,6 +113,7 @@ def main():
         scene_duration=5,
         scene_pause_duration=1.0,  # 1 second pause between scenes
         enable_prompt_enhancement=True,
+        enable_image_validation=True,  # Enable automatic image validation and prompt adjustment
         language="hi",  # Hindi language
         reuse_existing=True  # Reuse existing assets if available
     )
@@ -134,6 +135,7 @@ def main():
     print(f"   🎨 Style: {config.style}")
     print(f"   🌍 Language: {config.language}")
     print(f"   🎯 Prompt enhancement: {'Enabled' if config.enable_prompt_enhancement else 'Disabled'}")
+    print(f"   🔍 Image validation: {'Enabled' if config.enable_image_validation else 'Disabled'}")
     
     # Generate the video
     try:

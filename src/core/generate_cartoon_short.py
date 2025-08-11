@@ -77,6 +77,8 @@ class VideoConfig:
     enable_prompt_enhancement: bool = True
     # Control pause between scenes (in seconds)
     scene_pause_duration: float = 0.5  # Default 0.5 second pause between scenes
+    # Control image validation and automatic prompt adjustment
+    enable_image_validation: bool = True  # Enable automatic blank image detection and prompt adjustment
 
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
@@ -227,7 +229,12 @@ class CartoonShortsGenerator:
                     prompt = self._compose_image_prompt(scene)
                     logger.info(f"🖼️ Scene {i+1}: Generating image with prompt ({len(prompt)} characters)")
                     logger.info(f"🖼️ Scene {i+1}: Prompt preview: {prompt[:100]}...")
-                    self.image_generator.generate_cartoon_image(prompt, str(image_path))
+                    
+                    # Use validation method if enabled, otherwise use standard generation
+                    if self.config.enable_image_validation:
+                        self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3)
+                    else:
+                        self.image_generator.generate_cartoon_image(prompt, str(image_path))
                     logger.info(f"🖼️ Scene {i+1}: Image generation completed: {image_path}")
                 
                 image_paths.append(str(image_path))
@@ -589,6 +596,7 @@ def main():
     parser.add_argument("--language", default="en", help="Language for narration")
     parser.add_argument("--no-prompt-enhancement", action="store_true", help="Disable GPT-2 prompt enhancement")
     parser.add_argument("--scene-pause", type=float, default=0.5, help="Pause duration between scenes in seconds (default: 0.5)")
+    parser.add_argument("--no-image-validation", action="store_true", help="Disable automatic image validation and prompt adjustment")
     
     args = parser.parse_args()
     
@@ -612,7 +620,8 @@ def main():
         voice_id=args.voice,
         language=args.language,
         enable_prompt_enhancement=not args.no_prompt_enhancement,
-        scene_pause_duration=args.scene_pause
+        scene_pause_duration=args.scene_pause,
+        enable_image_validation=not args.no_image_validation
     )
     
     # Generate video
