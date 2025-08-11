@@ -10,6 +10,7 @@ import torch
 from PIL import Image, ImageDraw, ImageFont
 from typing import List, Optional
 from pathlib import Path
+from .prompt_enhancer import PromptEnhancer
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +20,20 @@ class ImageGenerator:
     Supports optional LoRA for style adaptation.
     """
     
-    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8):
+    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8, enable_prompt_enhancement: bool = True):
         self.model_path = model_path
         self.lora_path = lora_path
         self.lora_scale = lora_scale
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.pipe = None
         self.sd_available = False
+        self.enable_prompt_enhancement = enable_prompt_enhancement
+        self.prompt_enhancer = None
+        
+        # Initialize prompt enhancer if enabled
+        if self.enable_prompt_enhancement:
+            self.prompt_enhancer = PromptEnhancer()
+        
         self._initialize_pipeline()
         
     def _initialize_pipeline(self):
@@ -195,7 +203,10 @@ class ImageGenerator:
     def _generate_sd_image(self, prompt: str, output_path: str) -> str:
         """Generate image using Stable Diffusion."""
         try:
-            # Use original prompt without enhancement
+            # Use the prompt as-is (enhancement is now handled in _compose_image_prompt)
+            final_prompt = prompt
+            logger.info(f"🎯 Using prompt (enhancement handled upstream): {prompt}")
+            
             # Strong cartoon-specific negative prompts to avoid realistic images
             negative_prompt = (
                 "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
@@ -205,12 +216,10 @@ class ImageGenerator:
                 "detailed skin, detailed hair, detailed clothing textures"
             )
             
-            logger.info(f"🎯 Using original prompt: {prompt}")
-            
             # Generate image with cartoon-optimized settings
             with torch.autocast(self.device):
                 result = self.pipe(
-                    prompt=prompt,
+                    prompt=final_prompt,
                     negative_prompt=negative_prompt,
                     num_inference_steps=30,  # More steps for better cartoon quality
                     guidance_scale=7.5,      # Balanced for cartoon style
@@ -356,3 +365,160 @@ class ImageGenerator:
     def is_sd_available(self) -> bool:
         """Check if Stable Diffusion is available."""
         return self.sd_available and self.pipe is not None
+
+    def _is_image_blank_or_poor_quality(self, image_path: str) -> bool:
+        """
+        Check if an image is blank, mostly empty, or of poor quality.
+        Returns True if the image should be regenerated with an adjusted prompt.
+        """
+        try:
+            from PIL import Image, ImageStat
+            import numpy as np
+            
+            # Load the image
+            image = Image.open(image_path)
+            
+            # Convert to RGB if necessary
+            if image.mode != 'RGB':
+                image = image.convert('RGB')
+            
+            # Convert to numpy array for analysis
+            img_array = np.array(image)
+            
+            # Check 1: Variance analysis (blank images have low variance)
+            stat = ImageStat.Stat(image)
+            variance = np.var(img_array)
+            
+            # Check 2: Check if image is mostly one color (blank/empty)
+            unique_colors = len(np.unique(img_array.reshape(-1, img_array.shape[-1]), axis=0))
+            
+            # Check 3: Check brightness distribution
+            gray = image.convert('L')
+            gray_array = np.array(gray)
+            brightness_variance = np.var(gray_array)
+            
+            # Check 4: Check for extreme brightness (all white or all black)
+            mean_brightness = np.mean(gray_array)
+            
+            # Define thresholds
+            is_blank = (
+                variance < 1000 or  # Very low variance indicates blank image
+                unique_colors < 100 or  # Very few unique colors
+                brightness_variance < 500 or  # Low brightness variance
+                mean_brightness < 10 or  # Too dark
+                mean_brightness > 245  # Too bright
+            )
+            
+            if is_blank:
+                logger.warning(f"⚠️ Image detected as blank/poor quality: {image_path}")
+                logger.info(f"   Variance: {variance:.1f}, Unique colors: {unique_colors}, Brightness: {mean_brightness:.1f}")
+                return True
+            
+            return False
+            
+        except Exception as e:
+            logger.error(f"Error analyzing image quality: {e}")
+            # If we can't analyze, assume it's fine
+            return False
+
+    def _adjust_visual_prompt_for_blank_image(self, original_prompt: str, attempt: int = 1) -> str:
+        """
+        Adjust the visual prompt using GPT-2 to fix blank image issues.
+        Returns an enhanced prompt that should produce better results.
+        """
+        try:
+            if not self.prompt_enhancer or not self.prompt_enhancer.is_available():
+                logger.warning("⚠️ Prompt enhancer not available, using fallback adjustments")
+                return self._fallback_prompt_adjustment(original_prompt, attempt)
+            
+            # Create specific adjustment prompts based on attempt number
+            if attempt == 1:
+                adjustment_prompt = f"Enhance this visual prompt to create a vibrant, detailed cartoon scene with clear subjects and rich colors: {original_prompt}"
+            elif attempt == 2:
+                adjustment_prompt = f"Transform this prompt into a highly detailed, colorful cartoon scene with strong visual elements and clear composition: {original_prompt}"
+            else:
+                adjustment_prompt = f"Create an extremely detailed, vibrant cartoon scene with multiple visual elements, rich colors, and clear subjects: {original_prompt}"
+            
+            logger.info(f"🎯 Adjusting prompt (attempt {attempt}): {original_prompt}")
+            
+            # Use GPT-2 to enhance the prompt
+            enhanced_prompt = self.prompt_enhancer.enhance_prompt(
+                adjustment_prompt,
+                enhancement_type="cartoon_detailed",
+                max_tokens=77  # Keep within diffusion model limits
+            )
+            
+            # Add specific cartoon enhancement keywords if not present
+            enhancement_keywords = [
+                "vibrant colors", "detailed cartoon", "clear composition", 
+                "rich textures", "bright lighting", "distinct subjects"
+            ]
+            
+            # Check if any enhancement keywords are missing
+            missing_keywords = [kw for kw in enhancement_keywords if kw.lower() not in enhanced_prompt.lower()]
+            
+            if missing_keywords and attempt <= 2:
+                # Add missing keywords
+                additional_enhancement = ", ".join(missing_keywords[:3])  # Limit to 3 keywords
+                enhanced_prompt = f"{enhanced_prompt}, {additional_enhancement}"
+                
+                # Ensure we stay within token limits
+                enhanced_prompt = self.prompt_enhancer._limit_tokens(enhanced_prompt, 77)
+            
+            logger.info(f"🎯 Enhanced prompt: {enhanced_prompt}")
+            return enhanced_prompt
+            
+        except Exception as e:
+            logger.error(f"Error adjusting prompt with GPT-2: {e}")
+            return self._fallback_prompt_adjustment(original_prompt, attempt)
+
+    def _fallback_prompt_adjustment(self, original_prompt: str, attempt: int) -> str:
+        """
+        Fallback prompt adjustment when GPT-2 is not available.
+        """
+        base_enhancements = [
+            "vibrant cartoon style, detailed, colorful",
+            "bright cartoon scene, rich details, clear subjects",
+            "highly detailed cartoon, vibrant colors, strong composition"
+        ]
+        
+        enhancement = base_enhancements[min(attempt - 1, len(base_enhancements) - 1)]
+        adjusted_prompt = f"{original_prompt}, {enhancement}"
+        
+        logger.info(f"🎯 Fallback adjusted prompt: {adjusted_prompt}")
+        return adjusted_prompt
+
+    def generate_cartoon_image_with_validation(self, prompt: str, output_path: str, max_attempts: int = 3) -> str:
+        """
+        Generate a cartoon image with validation and automatic prompt adjustment.
+        Retries with adjusted prompts if the generated image is blank or poor quality.
+        """
+        original_prompt = prompt
+        
+        for attempt in range(1, max_attempts + 1):
+            logger.info(f"🎨 Generating image (attempt {attempt}/{max_attempts})")
+            
+            # Generate the image
+            result_path = self.generate_cartoon_image(prompt, output_path)
+            
+            # Validate the generated image
+            if not self._is_image_blank_or_poor_quality(result_path):
+                logger.info(f"✅ Image validation passed on attempt {attempt}")
+                return result_path
+            
+            logger.warning(f"⚠️ Image validation failed on attempt {attempt}")
+            
+            # If this is not the last attempt, adjust the prompt and try again
+            if attempt < max_attempts:
+                logger.info(f"🔄 Adjusting prompt for attempt {attempt + 1}")
+                prompt = self._adjust_visual_prompt_for_blank_image(original_prompt, attempt)
+                
+                # Create a new output path for this attempt
+                base_path = Path(output_path)
+                new_output_path = base_path.parent / f"{base_path.stem}_attempt_{attempt + 1}{base_path.suffix}"
+                output_path = str(new_output_path)
+            else:
+                logger.warning(f"⚠️ All {max_attempts} attempts failed. Using best available image.")
+                return result_path
+        
+        return output_path

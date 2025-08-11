@@ -333,6 +333,49 @@ class VideoProcessor:
             logger.error(f"Error adding subtitles to video: {e}")
             return video_path
     
+    def create_pause_video(self, duration: float, output_path: str, color: str = "black") -> str:
+        """Create a pause video of specified duration."""
+        try:
+            cmd = [
+                'ffmpeg', '-y',
+                '-f', 'lavfi',
+                '-i', f'color=c={color}:size={self.config.width}x{self.config.height}:duration={duration}',
+                '-c:v', self.config.codec,
+                '-preset', self.config.preset,
+                '-crf', str(self.config.crf),
+                '-tune', self.config.tune,
+                '-pix_fmt', 'yuv420p',
+                output_path
+            ]
+            
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"Created pause video: {output_path} ({duration:.2f}s)")
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Error creating pause video: {e}")
+            return ""
+
+    def create_silent_audio(self, duration: float, output_path: str) -> str:
+        """Create silent audio of specified duration."""
+        try:
+            cmd = [
+                'ffmpeg', '-y',
+                '-f', 'lavfi',
+                '-i', f'anullsrc=channel_layout=stereo:sample_rate=44100:duration={duration}',
+                '-c:a', 'aac',
+                '-b:a', self.config.audio_bitrate,
+                output_path
+            ]
+            
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"Created silent audio: {output_path} ({duration:.2f}s)")
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Error creating silent audio: {e}")
+            return ""
+
     def compile_final_video(self, clips: List[str], narration_audio: Union[str, List[str]], background_music: str = None, subtitles_path: str = None, output_path: str = "output/final_short.mp4") -> str:
         """Compile final video with all components."""
         try:
