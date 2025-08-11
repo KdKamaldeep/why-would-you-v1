@@ -151,7 +151,7 @@ def main():
         success &= install_ffmpeg()
     
     # Install Python dependencies
-    success &= install_python_dependencies()
+    #success &= install_python_dependencies()
     
     # Install CMake (optional, for dlib)
     print("\n📋 CMake Installation (Optional)")
