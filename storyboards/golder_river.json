@@ -34,7 +34,7 @@
     {
       "duration": 8,
       "description": "wide shot of golden glowing river between rocky cliffs, bright golden reflections on children's faces, storybook magical style",
-      "visual_prompt": "(wide shot:1.3) (golden glowing river:1.4) between rocky cliffs, (two children:1.3) in awe, bright golden reflections on faces, (storybook magical:1.4)",
+      "visual_prompt": "(wide shot:1.5), (full scene view:1.3), (golden glowing river:1.4) flowing between tall rocky cliffs, (two children:1.3) standing in awe, bright golden reflections on faces, magical light in background, (storybook magical:1.4), (wide shot:1.3)",
       "narration": "और फिर, सामने थी सुनहरी नदी, जिसकी लहरें सूरज की तरह चमक रही थीं।",
       "subtitle": "The Golden River",
       "characters": ["Anaya", "Rohan"]
@@ -42,7 +42,7 @@
     {
       "duration": 8,
       "description": "wide shot of happy Indian village festival, villagers cheering, two children opening glowing chest, colorful butterflies and sparkles filling sky, storybook magical style",
-      "visual_prompt": "(wide shot:1.3) (happy Indian village festival:1.4) with cheering villagers, (two children:1.3) opening glowing chest, colorful butterflies and sparkles filling sky, (storybook magical:1.4)",
+      "visual_prompt": "(wide shot:1.5), (full scene view:1.3), (happy Indian village festival:1.4), cheering villagers, (two children:1.3) opening glowing chest, colorful butterflies and sparkles in sky, bright daylight, (storybook magical:1.4), (wide shot:1.3)",
       "narration": "गाँव में उन्होंने सन्दूक खोला, और आसमान रंग-बिरंगी तितलियों से भर गया।",
       "subtitle": "The Celebration",
       "characters": ["Anaya", "Rohan"]
