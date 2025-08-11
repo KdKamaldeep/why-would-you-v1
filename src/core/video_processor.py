@@ -59,6 +59,160 @@ class VideoProcessor:
             logger.error(f"Error creating video from frames: {e}")
             return self._create_simple_clip(f"{frames_dir}/frame_0000.png", 10, output_path)
 
+    def get_video_duration(self, video_file: str) -> float:
+        """Get the duration of a video file in seconds using FFmpeg."""
+        try:
+            cmd = [
+                'ffprobe', '-v', 'quiet', '-show_entries', 'format=duration',
+                '-of', 'csv=p=0', video_file
+            ]
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            duration = float(result.stdout.strip())
+            logger.info(f"Video duration for {video_file}: {duration:.2f}s")
+            return duration
+        except Exception as e:
+            logger.error(f"Error getting video duration for {video_file}: {e}")
+            # Return a default duration if we can't determine it
+            return 8.0
+
+    def extend_video_duration(self, input_video: str, target_duration_sec: float, output_video: str) -> str:
+        """Extend video duration by looping or slowing down to match target duration."""
+        try:
+            # Get current video duration
+            current_duration = self.get_video_duration(input_video)
+            
+            if current_duration >= target_duration_sec:
+                # Video is already long enough, just copy
+                import shutil
+                shutil.copy2(input_video, output_video)
+                return output_video
+            
+            # Calculate how many times we need to loop
+            loop_count = int(target_duration_sec / current_duration) + 1
+            
+            if loop_count <= 2:
+                # Just slow down the video to match duration
+                speed_factor = current_duration / target_duration_sec
+                cmd = [
+                    'ffmpeg', '-y',
+                    '-i', input_video,
+                    '-filter:v', f'setpts={speed_factor}*PTS',
+                    '-filter:a', f'atempo={1/speed_factor}' if speed_factor < 0.5 else 'atempo=0.5,atempo=0.5' if speed_factor < 0.25 else 'atempo=0.5,atempo=0.5,atempo=0.5',
+                    '-c:v', 'libx264',
+                    '-c:a', 'aac',
+                    '-shortest',
+                    output_video
+                ]
+                subprocess.run(cmd, check=True, capture_output=True)
+                logger.info(f"Extended video by slowing down: {current_duration:.1f}s → {target_duration_sec:.1f}s")
+            else:
+                # Loop the video multiple times
+                # Create a concat file
+                concat_file = output_video.replace('.mp4', '_concat.txt')
+                with open(concat_file, 'w') as f:
+                    for _ in range(loop_count):
+                        f.write(f"file '{input_video}'\n")
+                
+                # Concatenate videos
+                cmd = [
+                    'ffmpeg', '-y',
+                    '-f', 'concat',
+                    '-safe', '0',
+                    '-i', concat_file,
+                    '-c', 'copy',
+                    output_video
+                ]
+                subprocess.run(cmd, check=True, capture_output=True)
+                
+                # Trim to exact duration
+                temp_output = output_video.replace('.mp4', '_temp.mp4')
+                import shutil
+                shutil.move(output_video, temp_output)
+                
+                cmd = [
+                    'ffmpeg', '-y',
+                    '-i', temp_output,
+                    '-t', str(target_duration_sec),
+                    '-c', 'copy',
+                    output_video
+                ]
+                subprocess.run(cmd, check=True, capture_output=True)
+                
+                # Clean up
+                os.remove(concat_file)
+                os.remove(temp_output)
+                
+                logger.info(f"Extended video by looping {loop_count}x: {current_duration:.1f}s → {target_duration_sec:.1f}s")
+            
+            return output_video
+            
+        except Exception as e:
+            logger.error(f"Error extending video duration: {e}")
+            # Fallback: just copy the original
+            import shutil
+            shutil.copy2(input_video, output_video)
+            return output_video
+
+    def adjust_video_duration(self, input_video: str, target_duration_sec: float, output_video: str) -> str:
+        """Adjust video duration by speeding up or slowing down to match target duration."""
+        try:
+            # Get current video duration
+            current_duration = self.get_video_duration(input_video)
+            
+            if abs(current_duration - target_duration_sec) < 0.1:
+                # Duration is close enough, just copy
+                import shutil
+                shutil.copy2(input_video, output_video)
+                return output_video
+            
+            # Calculate speed factor
+            speed_factor = current_duration / target_duration_sec
+            
+            cmd = [
+                'ffmpeg', '-y',
+                '-i', input_video,
+                '-filter:v', f'setpts={1/speed_factor:.6f}*PTS',
+                '-filter:a', f'atempo={speed_factor:.6f}',
+                '-c:v', self.config.codec,
+                '-preset', self.config.preset,
+                '-crf', str(self.config.crf),
+                '-tune', self.config.tune,
+                '-c:a', 'aac',
+                '-b:a', self.config.audio_bitrate,
+                output_video
+            ]
+            
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"Adjusted video duration: {current_duration:.2f}s → {target_duration_sec:.2f}s (speed: {speed_factor:.2f}x)")
+            return output_video
+            
+        except Exception as e:
+            logger.error(f"Error adjusting video duration: {e}")
+            return input_video
+
+    def estimate_narration_duration(self, text: str, words_per_minute: int = 150) -> float:
+        """Estimate narration duration based on word count."""
+        words = len(text.split())
+        duration_minutes = words / words_per_minute
+        return duration_minutes * 60  # Convert to seconds
+
+    def get_audio_duration(self, audio_file: str) -> float:
+        """Get the duration of an audio file in seconds using FFmpeg."""
+        logger.info(f"Getting audio duration for {audio_file}")
+        try:
+            cmd = [
+                'ffprobe', '-v', 'quiet', '-show_entries', 'format=duration',
+                '-of', 'csv=p=0', audio_file
+            ]
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            duration = float(result.stdout.strip())
+            logger.info(f"Audio duration for {audio_file}: {duration:.2f}s")
+            return duration
+        except Exception as e:
+            logger.error(f"Error getting audio duration for {audio_file}: {e}")
+            # Return a default duration if we can't determine it
+            return 8.0
+
     def adjust_audio_to_duration(self, input_audio: str, target_duration_sec: float, output_audio: str) -> str:
         """Pad with silence or trim audio to exactly target duration."""
         try:
@@ -179,6 +333,49 @@ class VideoProcessor:
             logger.error(f"Error adding subtitles to video: {e}")
             return video_path
     
+    def create_pause_video(self, duration: float, output_path: str, color: str = "black") -> str:
+        """Create a pause video of specified duration."""
+        try:
+            cmd = [
+                'ffmpeg', '-y',
+                '-f', 'lavfi',
+                '-i', f'color=c={color}:size={self.config.width}x{self.config.height}:duration={duration}',
+                '-c:v', self.config.codec,
+                '-preset', self.config.preset,
+                '-crf', str(self.config.crf),
+                '-tune', self.config.tune,
+                '-pix_fmt', 'yuv420p',
+                output_path
+            ]
+            
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"Created pause video: {output_path} ({duration:.2f}s)")
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Error creating pause video: {e}")
+            return ""
+
+    def create_silent_audio(self, duration: float, output_path: str) -> str:
+        """Create silent audio of specified duration."""
+        try:
+            cmd = [
+                'ffmpeg', '-y',
+                '-f', 'lavfi',
+                '-i', f'anullsrc=channel_layout=stereo:sample_rate=44100:duration={duration}',
+                '-c:a', 'aac',
+                '-b:a', self.config.audio_bitrate,
+                output_path
+            ]
+            
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"Created silent audio: {output_path} ({duration:.2f}s)")
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Error creating silent audio: {e}")
+            return ""
+
     def compile_final_video(self, clips: List[str], narration_audio: Union[str, List[str]], background_music: str = None, subtitles_path: str = None, output_path: str = "output/final_short.mp4") -> str:
         """Compile final video with all components."""
         try:

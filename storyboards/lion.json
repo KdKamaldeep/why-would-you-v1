@@ -1,0 +1,101 @@
+{
+  "title": "Raja, The Brave Jungle Lion",
+  "description": "Raja, the young lion prince, embarks on a courageous journey to protect his jungle home and prove himself as a true leader.",
+  "total_duration": 50,
+  "cast": [
+    {"name": "Raja", "role": "young brave lion prince"},
+    {"name": "Maya", "role": "wise elephant friend"},
+    {"name": "Chirpy", "role": "playful parrot messenger"}
+  ],
+  "scenes": [
+    {
+      "duration": 5,
+      "description": "wide shot of lush jungle with morning sun filtering through tall trees, animals gathering",
+      "visual_prompt": "(wide shot:1.3) lush green jungle morning, tall trees with sun rays, animals gathering peacefully, storybook natural style:1.4",
+      "narration": "सुबह की पहली किरणें जंगल को जगाती हैं, और राजा, शेर का शेर राजा, अपने घर में तैयार होता है।",
+      "subtitle": "Morning in the Jungle",
+      "characters": ["Raja", "Animals"]
+    },
+    {
+      "duration": 5,
+      "description": "close-up of Raja stretching and roaring on a rock",
+      "visual_prompt": "close-up of young lion roaring on a large rock, golden fur shining in sunlight, storybook majestic style",
+      "narration": "राजा अपनी ताकत दिखाता है और जंगल के सभी जीवों को سلام करता है।",
+      "subtitle": "Raja's Roar",
+      "characters": ["Raja"]
+    },
+    {
+      "duration": 5,
+      "description": "medium shot of Raja meeting Maya the elephant near a river",
+      "visual_prompt": "medium shot of young lion meeting wise elephant by the river, lush jungle background, warm light, storybook friendship style",
+      "narration": "माया, बुद्धिमान हाथी, राजा को जंगल की सुरक्षा की ज़िम्मेदारी देती है।",
+      "subtitle": "Wise Advice",
+      "characters": ["Raja", "Maya"]
+    },
+    {
+      "duration": 5,
+      "description": "wide shot of jungle animals listening attentively as Raja speaks",
+      "visual_prompt": "(wide shot:1.3) jungle clearing with animals gathered, young lion speaking confidently, dappled sunlight, storybook leadership style:1.4",
+      "narration": "राजा जंगल के सभी जीवों को एक साथ लाता है, और उन्हें एकजुट होने को कहता है।",
+      "subtitle": "Uniting the Jungle",
+      "characters": ["Raja", "Animals"]
+    },
+    {
+      "duration": 5,
+      "description": "medium shot of Chirpy the parrot flying to deliver a message",
+      "visual_prompt": "medium shot of colorful parrot flying with a leaf message in its beak, bright jungle background, storybook playful style",
+      "narration": "चिरपी, रंगीन तोता, खबर लाता है कि खतरा पास है।",
+      "subtitle": "The Warning",
+      "characters": ["Chirpy"]
+    },
+    {
+      "duration": 5,
+      "description": "wide shot of Raja and friends preparing defenses around jungle",
+      "visual_prompt": "(wide shot:1.3) young lion and jungle animals building barriers, alert and focused, golden hour light, storybook adventure style:1.4",
+      "narration": "राजा और उसके दोस्त जंगल की रक्षा के लिए तैयार हो जाते हैं।",
+      "subtitle": "Preparing Defenses",
+      "characters": ["Raja", "Animals"]
+    },
+    {
+      "duration": 5,
+      "description": "medium shot of Raja confronting shadowy threat at jungle edge",
+      "visual_prompt": "medium shot of brave lion facing shadowy figure at jungle edge, tense atmosphere, dramatic lighting, storybook suspense style",
+      "narration": "खतरा आया, लेकिन राजा डरा नहीं। वह बहादुरी से सामना करता है।",
+      "subtitle": "The Confrontation",
+      "characters": ["Raja"]
+    },
+    {
+      "duration": 5,
+      "description": "wide shot of jungle animals celebrating together under moonlight",
+      "visual_prompt": "(wide shot:1.3) jungle animals celebrating under full moon, joyful expressions, glowing fireflies, storybook magical style:1.4",
+      "narration": "जंगल सुरक्षित है, और सभी जीव खुशी से जश्न मनाते हैं।",
+      "subtitle": "Victory Celebration",
+      "characters": ["Raja", "Animals"]
+    },
+    {
+      "duration": 5,
+      "description": "close-up of Raja resting peacefully under a tree with moonlight shining",
+      "visual_prompt": "close-up of peaceful young lion resting under tree, soft moonlight, calm jungle night, storybook serene style",
+      "narration": "राजा ने अपनी बहादुरी से साबित किया कि वह जंगल का सच्चा राजा है।",
+      "subtitle": "The True King",
+      "characters": ["Raja"]
+    },
+    {
+      "duration": 5,
+      "description": "wide shot of jungle panorama at dawn with birds flying",
+      "visual_prompt": "(wide shot:1.3) jungle panorama at dawn, birds flying across colorful sky, storybook hopeful style:1.4",
+      "narration": "नया दिन शुरू होता है, और जंगल में फिर से शांति छा जाती है।",
+      "subtitle": "A New Dawn",
+      "characters": ["Jungle"]
+    }
+  ],
+  "tags": [
+    "jungle",
+    "lion",
+    "adventure",
+    "friendship",
+    "storybook",
+    "nature",
+    "courage"
+  ]
+}

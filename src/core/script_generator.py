@@ -27,6 +27,11 @@ class ScriptGenerator:
         If language != 'en', request narration and subtitles in the target language.
         """
         scene_duration = max(8, duration // 3)  # Minimum 8 seconds per scene
+        
+        # Calculate target words per scene for proper timing
+        # Assuming 150 words per minute = 2.5 words per second
+        words_per_second = 2.5
+        target_words_per_scene = int((scene_duration - 1) * words_per_second)  # Leave 1 second buffer
         # Language guidance for GPT output
         lang_note = ""
         if (language or "en").lower() != "en":
@@ -45,10 +50,11 @@ class ScriptGenerator:
         - Include VERY detailed visual descriptions for accurate cartoon-style image generation
         - Add humor, emotion, and personality
         - Optimized for vertical video format (768x1024)
-        - Include clear, engaging narration text for each scene
+        - Include clear, engaging narration text for each scene (aim for 15-25 words per scene for proper timing)
         - Make sure the visual descriptions match the story content EXACTLY
         - Include specific details about characters, expressions, actions, and settings
         - IMPORTANT: Each scene must feature exactly TWO characters and describe them clearly
+        - NARRATION TIMING: Keep narration concise but complete - each scene's narration should be 2-3 sentences with approximately {target_words_per_scene} words for proper timing
         
         {lang_note}
 
