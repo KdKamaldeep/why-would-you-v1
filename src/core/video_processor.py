@@ -59,6 +59,57 @@ class VideoProcessor:
             logger.error(f"Error creating video from frames: {e}")
             return self._create_simple_clip(f"{frames_dir}/frame_0000.png", 10, output_path)
 
+    def adjust_video_duration(self, input_video: str, target_duration_sec: float, output_video: str) -> str:
+        """Adjust video duration by speeding up or slowing down to match target duration."""
+        try:
+            # Get current video duration
+            current_duration = self.get_video_duration(input_video)
+            
+            if abs(current_duration - target_duration_sec) < 0.1:
+                # Duration is close enough, just copy
+                import shutil
+                shutil.copy2(input_video, output_video)
+                return output_video
+            
+            # Calculate speed factor
+            speed_factor = current_duration / target_duration_sec
+            
+            cmd = [
+                'ffmpeg', '-y',
+                '-i', input_video,
+                '-filter:v', f'setpts={1/speed_factor:.6f}*PTS',
+                '-filter:a', f'atempo={speed_factor:.6f}',
+                '-c:v', self.config.codec,
+                '-preset', self.config.preset,
+                '-crf', str(self.config.crf),
+                '-tune', self.config.tune,
+                '-c:a', 'aac',
+                '-b:a', self.config.audio_bitrate,
+                output_video
+            ]
+            
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"Adjusted video duration: {current_duration:.2f}s → {target_duration_sec:.2f}s (speed: {speed_factor:.2f}x)")
+            return output_video
+            
+        except Exception as e:
+            logger.error(f"Error adjusting video duration: {e}")
+            return input_video
+
+    def get_video_duration(self, video_file: str) -> float:
+        """Get the duration of a video file in seconds using FFmpeg."""
+        try:
+            cmd = [
+                'ffprobe', '-v', 'quiet', '-show_entries', 'format=duration',
+                '-of', 'csv=p=0', video_file
+            ]
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            duration = float(result.stdout.strip())
+            return duration
+        except Exception as e:
+            logger.error(f"Error getting video duration for {video_file}: {e}")
+            return 8.0
+
     def estimate_narration_duration(self, text: str, words_per_minute: int = 150) -> float:
         """Estimate narration duration based on word count."""
         words = len(text.split())
@@ -67,6 +118,7 @@ class VideoProcessor:
 
     def get_audio_duration(self, audio_file: str) -> float:
         """Get the duration of an audio file in seconds using FFmpeg."""
+        logger.info(f"Getting audio duration for {audio_file}")
         try:
             cmd = [
                 'ffprobe', '-v', 'quiet', '-show_entries', 'format=duration',

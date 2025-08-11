@@ -247,6 +247,10 @@ class CartoonShortsGenerator:
                     actual_duration = self.video_processor.get_audio_duration(str(scene_audio))
                     actual_scene_durations.append(actual_duration)
                     
+                    # Store original duration for comparison
+                    original_duration = script['scenes'][i].get('duration', 8)
+                    script['scenes'][i]['original_duration'] = original_duration
+                    
                     # Update scene duration to match actual audio length
                     script['scenes'][i]['duration'] = actual_duration
                     
@@ -286,12 +290,50 @@ class CartoonShortsGenerator:
                 actual_duration = self.video_processor.get_audio_duration(str(narration_path))
                 self.config.duration = max(self.config.duration, actual_duration)
                 script['total_duration'] = actual_duration
+                
+                # For single track, distribute duration evenly across scenes
+                scene_count = len(script['scenes'])
+                if scene_count > 0:
+                    per_scene_duration = actual_duration / scene_count
+                    for i, scene in enumerate(script['scenes']):
+                        original_duration = scene.get('duration', 8)
+                        scene['original_duration'] = original_duration
+                        scene['duration'] = per_scene_duration
+                
                 logger.info(f"Single track duration: {actual_duration:.1f}s")
                 logger.info("✅ Narration timing optimized - video will match actual audio length")
             
-            # Step 6: Use video clips directly (no lip-sync)
-            logger.info("Step 6: Preparing video clips...")
-            final_clips = video_clips
+            # Step 6: Regenerate video clips with corrected durations
+            logger.info("Step 6: Regenerating video clips with corrected durations...")
+            
+            # Check if we need to regenerate clips due to duration changes
+            need_regeneration = False
+            for i, scene in enumerate(script['scenes']):
+                original_duration = scene.get('original_duration', scene.get('duration', 8))
+                current_duration = scene.get('duration', 8)
+                if abs(current_duration - original_duration) > 0.5:  # More than 0.5s difference
+                    need_regeneration = True
+                    logger.info(f"Scene {i+1} duration changed: {original_duration:.1f}s → {current_duration:.1f}s")
+            
+            if need_regeneration:
+                logger.info("🔄 Adjusting video clips to match narration timing...")
+                # Adjust existing video clips to match new durations
+                updated_video_clips = []
+                for i, clip_path in enumerate(video_clips):
+                    target_duration = script['scenes'][i]['duration']
+                    adjusted_clip_path = self.output_dir / f"scene_{i+1}_adjusted.mp4"
+                    
+                    # Adjust video duration to match narration
+                    adjusted_path = self.video_processor.adjust_video_duration(
+                        clip_path, target_duration, str(adjusted_clip_path)
+                    )
+                    updated_video_clips.append(adjusted_path)
+                
+                final_clips = updated_video_clips
+                logger.info("✅ Video clips adjusted to match narration timing")
+            else:
+                logger.info("✅ Video clips timing already matches narration")
+                final_clips = video_clips
             
             # Step 7: Create subtitles (optional)
             subtitles_path = self.output_dir / "subtitles.srt"
