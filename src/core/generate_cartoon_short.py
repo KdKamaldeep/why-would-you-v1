@@ -75,6 +75,8 @@ class VideoConfig:
     add_subtitles: bool = True
     # Control prompt enhancement
     enable_prompt_enhancement: bool = True
+    # Control pause between scenes (in seconds)
+    scene_pause_duration: float = 0.5  # Default 0.5 second pause between scenes
 
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
@@ -310,12 +312,48 @@ class CartoonShortsGenerator:
             logger.info(f"📊 Total video duration created: {total_video_duration:.1f}s")
             logger.info(f"📊 Video clips ready: {len(video_clips)}")
             
-            # Videos are already created with correct duration matching audio clips
-            final_clips = video_clips
-            logger.info("✅ Videos already created with correct duration matching audio clips")
-            logger.info(f"📊 Final clips to compile: {len(final_clips)}")
+            # Step 6: Add pauses between scenes if configured
+            logger.info("Step 6: Adding pauses between scenes...")
+            final_clips = []
+            final_audio_paths = []
             
-            # Step 7: Create subtitles (optional)
+            if self.config.scene_pause_duration > 0:
+                logger.info(f"⏸️ Adding {self.config.scene_pause_duration:.2f}s pauses between scenes")
+                
+                for i, (video_clip, audio_clip) in enumerate(zip(video_clips, scene_audio_paths)):
+                    # Add scene video and audio
+                    final_clips.append(video_clip)
+                    final_audio_paths.append(audio_clip)
+                    
+                    # Add pause between scenes (except after the last scene)
+                    if i < len(video_clips) - 1:
+                        pause_video = self.output_dir / f"pause_{i+1}.mp4"
+                        pause_audio = self.output_dir / f"pause_audio_{i+1}.aac"
+                        
+                        if not (self.config.reuse_existing and pause_video.exists()):
+                            logger.info(f"⏸️ Creating pause {i+1}: {self.config.scene_pause_duration:.2f}s")
+                            self.video_processor.create_pause_video(
+                                self.config.scene_pause_duration, 
+                                str(pause_video)
+                            )
+                            self.video_processor.create_silent_audio(
+                                self.config.scene_pause_duration, 
+                                str(pause_audio)
+                            )
+                        else:
+                            logger.info(f"⏸️ Reusing existing pause {i+1}")
+                        
+                        final_clips.append(str(pause_video))
+                        final_audio_paths.append(str(pause_audio))
+            else:
+                logger.info("⏸️ No pauses configured - scenes will transition directly")
+                final_clips = video_clips
+                final_audio_paths = scene_audio_paths
+            
+            logger.info(f"📊 Final clips to compile: {len(final_clips)} (including pauses)")
+            logger.info(f"📊 Final audio clips: {len(final_audio_paths)} (including silence)")
+            
+            # Step 7: Create subtitles (optional) - accounting for pauses
             logger.info("Step 7: Creating subtitles...")
             subtitles_path = self.output_dir / "subtitles.srt"
             if self.config.add_subtitles:
@@ -323,8 +361,8 @@ class CartoonShortsGenerator:
                 if self.config.reuse_existing and subtitles_path.exists():
                     logger.info(f"Skipping subtitles (exists): {subtitles_path}")
                 else:
-                    logger.info(f"📝 Generating subtitles for {len(script['scenes'])} scenes...")
-                    self.video_processor.create_subtitles_srt(script, str(subtitles_path))
+                    logger.info(f"📝 Generating subtitles for {len(script['scenes'])} scenes (with pauses)...")
+                    self._create_subtitles_with_pauses(script, str(subtitles_path))
                     logger.info(f"📝 Subtitles created: {subtitles_path}")
             else:
                 logger.info("Step 7: Subtitles disabled; skipping SRT generation and overlay")
@@ -340,14 +378,14 @@ class CartoonShortsGenerator:
             # Step 9: Compile final video
             logger.info("Step 9: Compiling final video...")
             logger.info(f"🎬 Compiling {len(final_clips)} video clips...")
-            logger.info(f"🎵 Using {len(scene_audio_paths)} audio clips...")
+            logger.info(f"🎵 Using {len(final_audio_paths)} audio clips...")
             logger.info(f"📝 Subtitles: {'Enabled' if self.config.add_subtitles else 'Disabled'}")
             logger.info(f"🎵 Background music: {'Yes' if background_music else 'No'}")
             logger.info(f"📁 Final output: {final_output}")
             
             self.video_processor.compile_final_video(
                 final_clips,
-                scene_audio_paths,  # Pass audio paths directly - compile_final_video will handle concatenation
+                final_audio_paths,  # Pass audio paths with pauses included
                 background_music,
                 str(subtitles_path) if self.config.add_subtitles else None,
                 str(final_output)
@@ -485,17 +523,53 @@ class CartoonShortsGenerator:
         
         logger.info(f"Generated metadata: {metadata_path}")
 
+    def _create_subtitles_with_pauses(self, script: Dict, output_path: str) -> str:
+        """Create SRT subtitle file from script, accounting for pauses between scenes."""
+        try:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                start_time = 0
+                for i, scene in enumerate(script['scenes']):
+                    # Calculate end time including scene duration
+                    scene_duration = scene.get('duration', 8)
+                    end_time = start_time + scene_duration
+                    
+                    # Convert seconds to SRT time format
+                    start_str = self._seconds_to_srt_time(start_time)
+                    end_str = self._seconds_to_srt_time(end_time)
+                    
+                    f.write(f"{i+1}\n")
+                    f.write(f"{start_str} --> {end_str}\n")
+                    f.write(f"{scene['subtitle']}\n\n")
+                    
+                    # Add pause duration to start time for next scene
+                    start_time = end_time + self.config.scene_pause_duration
+            
+            logger.info(f"Created subtitles with pauses: {output_path}")
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Error creating subtitles with pauses: {e}")
+            return ""
+
+    def _seconds_to_srt_time(self, seconds: float) -> str:
+        """Convert seconds to SRT time format (HH:MM:SS,mmm)."""
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        secs = int(seconds % 60)
+        millisecs = int((seconds % 1) * 1000)
+        return f"{hours:02d}:{minutes:02d}:{secs:02d},{millisecs:03d}"
+
     def _compose_image_prompt(self, scene: Dict) -> str:
         """Compose an image prompt using the visual_prompt from script with optional GPT-2 enhancement."""
         # Get the visual_prompt from the script (this is the key requirement)
         visual_prompt = scene.get('visual_prompt', scene.get('description', ''))
         base_prompt = visual_prompt or "Cartoon scene"
-        
+
         # If prompt enhancement is enabled, enhance the visual_prompt specifically
         if self.config.enable_prompt_enhancement and hasattr(self, 'image_generator') and self.image_generator.prompt_enhancer:
             logger.info(f"🎯 Enhancing visual_prompt from script: {base_prompt}")
             enhanced_prompt = self.image_generator.prompt_enhancer.enhance_prompt(
-                base_prompt, 
+                base_prompt,
                 enhancement_type="cartoon",
                 max_tokens=77  # Diffusion model token limit
             )
@@ -514,6 +588,7 @@ def main():
     parser.add_argument("--voice", default="", help="Reference speaker WAV path for Coqui XTTS (optional)")
     parser.add_argument("--language", default="en", help="Language for narration")
     parser.add_argument("--no-prompt-enhancement", action="store_true", help="Disable GPT-2 prompt enhancement")
+    parser.add_argument("--scene-pause", type=float, default=0.5, help="Pause duration between scenes in seconds (default: 0.5)")
     
     args = parser.parse_args()
     
@@ -536,7 +611,8 @@ def main():
         style=args.style,
         voice_id=args.voice,
         language=args.language,
-        enable_prompt_enhancement=not args.no_prompt_enhancement
+        enable_prompt_enhancement=not args.no_prompt_enhancement,
+        scene_pause_duration=args.scene_pause
     )
     
     # Generate video
