@@ -59,6 +59,28 @@ class VideoProcessor:
             logger.error(f"Error creating video from frames: {e}")
             return self._create_simple_clip(f"{frames_dir}/frame_0000.png", 10, output_path)
 
+    def estimate_narration_duration(self, text: str, words_per_minute: int = 150) -> float:
+        """Estimate narration duration based on word count."""
+        words = len(text.split())
+        duration_minutes = words / words_per_minute
+        return duration_minutes * 60  # Convert to seconds
+
+    def get_audio_duration(self, audio_file: str) -> float:
+        """Get the duration of an audio file in seconds using FFmpeg."""
+        try:
+            cmd = [
+                'ffprobe', '-v', 'quiet', '-show_entries', 'format=duration',
+                '-of', 'csv=p=0', audio_file
+            ]
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            duration = float(result.stdout.strip())
+            logger.info(f"Audio duration for {audio_file}: {duration:.2f}s")
+            return duration
+        except Exception as e:
+            logger.error(f"Error getting audio duration for {audio_file}: {e}")
+            # Return a default duration if we can't determine it
+            return 8.0
+
     def adjust_audio_to_duration(self, input_audio: str, target_duration_sec: float, output_audio: str) -> str:
         """Pad with silence or trim audio to exactly target duration."""
         try:

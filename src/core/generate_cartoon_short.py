@@ -227,8 +227,10 @@ class CartoonShortsGenerator:
             logger.info("Step 5: Generating narration...")
             narration_path = self.output_dir / "narration.wav"
             scene_audio_paths = []
+            actual_scene_durations = []  # Track actual audio durations
+            
             try:
-                # Generate per-scene audio to match durations more tightly
+                # Generate per-scene audio and calculate actual durations
                 for i, scene in enumerate(script['scenes']):
                     scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
                     if not (self.config.reuse_existing and scene_audio.exists()):
@@ -240,14 +242,34 @@ class CartoonShortsGenerator:
                         )
                         # Use actual generated path (may switch extension on fallback)
                         scene_audio = Path(generated_audio)
-                    # Fit each scene audio to scene duration
+                    
+                    # Calculate actual audio duration
+                    actual_duration = self.video_processor.get_audio_duration(str(scene_audio))
+                    actual_scene_durations.append(actual_duration)
+                    
+                    # Update scene duration to match actual audio length
+                    script['scenes'][i]['duration'] = actual_duration
+                    
+                    logger.info(f"Scene {i+1}: Script duration {scene.get('duration', 8):.1f}s, Actual audio: {actual_duration:.1f}s")
+                    
+                    # Fit each scene audio to scene duration (now using actual duration)
                     fitted_audio = self.output_dir / f"audio_scene_{i+1}_fit.m4a"
-                    self.video_processor.adjust_audio_to_duration(str(scene_audio), float(scene.get('duration', 8)), str(fitted_audio))
+                    self.video_processor.adjust_audio_to_duration(str(scene_audio), actual_duration, str(fitted_audio))
                     scene_audio_paths.append(str(fitted_audio))
+                
                 # Combine per-scene into one track
                 merged_audio = self.output_dir / "narration_fitted.m4a"
                 self.video_processor.concat_audios(scene_audio_paths, str(merged_audio))
                 narration_path = merged_audio
+                
+                # Update total duration based on actual audio lengths
+                total_actual_duration = sum(actual_scene_durations)
+                self.config.duration = max(self.config.duration, total_actual_duration)
+                script['total_duration'] = total_actual_duration
+                
+                logger.info(f"Updated total duration: {total_actual_duration:.1f}s (was {self.config.duration}s)")
+                logger.info("✅ Narration timing optimized - video will match actual audio length")
+                
             except Exception as e:
                 logger.warning(f"Per-scene audio fitting failed; falling back to single track: {e}")
                 if not (self.config.reuse_existing and narration_path.exists()):
@@ -259,6 +281,13 @@ class CartoonShortsGenerator:
                         voice_clone_audio=self.config.voice_id or None,
                     )
                     narration_path = Path(generated_audio)
+                
+                # Calculate actual duration of the single track
+                actual_duration = self.video_processor.get_audio_duration(str(narration_path))
+                self.config.duration = max(self.config.duration, actual_duration)
+                script['total_duration'] = actual_duration
+                logger.info(f"Single track duration: {actual_duration:.1f}s")
+                logger.info("✅ Narration timing optimized - video will match actual audio length")
             
             # Step 6: Use video clips directly (no lip-sync)
             logger.info("Step 6: Preparing video clips...")
