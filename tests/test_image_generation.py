@@ -41,11 +41,7 @@ def test_image_generation():
     
     # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-  "(wide shot:1.3) (full scene view:1.2) (Indian village:1.3) at sunrise, dusty path in foreground leading to distant blue hills, (two children:1.3) midground, girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, holding small cloth bags, (storybook mystery:1.4)",
-  "(wide shot:1.3) (full scene view:1.2) small wooden bridge in midground over sparkling stream, (two children:1.3) midground crossing bridge, girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, surrounded by green trees and bright flowers in background, (storybook colorful:1.4)",
-  "(wide shot:1.3) (full scene view:1.2) glowing golden fireflies lighting jungle path, tall green plants in foreground, (two children:1.3) midground walking cautiously, girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, background fades into dense jungle, (storybook magical:1.4)",
-  "(wide shot:1.3) (full scene view:1.2) (golden glowing river:1.4) flowing between rocky cliffs, rocky foreground, (two children:1.3) midground standing in awe, girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, bright golden reflections on faces, background cliffs glowing, (storybook magical:1.4)",
-  "(wide shot:1.3) (full scene view:1.2) (happy Indian village festival:1.4) with cheering villagers in background, (two children:1.3) foreground opening glowing chest, colorful butterflies and sparkles filling sky, girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, (storybook magical:1.4)"
+  "(medium shot:1.3) two children looking at old map, warm lantern light, cozy Indian village, storybook style"
 ]
 
 
