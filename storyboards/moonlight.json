@@ -35,7 +35,7 @@
     {
       "duration": 10,
       "description": "wide shot of giant banyan tree glowing with silver moonlight, roots like flowing rivers, children in awe, storybook magical style",
-      "visual_prompt": "(wide shot:1.3) giant banyan tree glowing in silver moonlight, roots flowing like rivers, children standing in awe nearby, (storybook magical:1.4)",
+      "visual_prompt": "(wide shot:1.3) giant banyan tree glowing in silver moonlight, roots flowing like rivers",
       "narration": "अंत में, चाँदनी से नहाया विशाल बरगद सामने आया, जिसकी जड़ें मानो नदी की धाराओं की तरह फैल रही थीं।",
       "subtitle": "The Moonlight Banyan",
       "characters": ["Aarav", "Meera"]
