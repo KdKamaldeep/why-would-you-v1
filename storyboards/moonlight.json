@@ -44,4 +44,18 @@
       "duration": 10,
       "description": "wide shot of happy Indian village morning, children returning with flower garlands, villagers smiling, banyan tree faintly visible in distance, storybook bright style",
       "visual_prompt": "(wide shot:1.3) cheerful Indian village morning, children carrying flower garlands, smiling villagers, banyan tree visible faintly in background, (storybook bright:1.4)",
-      "nar
+      "narration": "मनोकामना के साथ बच्चे लौटे, और सुबह होते ही पूरा गाँव खुशी और उम्मीद से भर गया।",
+      "subtitle": "The Wish",
+      "characters": ["Aarav", "Meera", "Nanu"]
+    }
+  ],
+  "tags": [
+    "kids",
+    "adventure",
+    "moonlight banyan",
+    "friendship",
+    "mystery",
+    "storybook",
+    "magical"
+  ]
+}
