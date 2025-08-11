@@ -251,6 +251,41 @@ class CartoonShortsGenerator:
                 video_clips.append(video_path)
                 logger.info(f"Scene {i+1}: Created MP4 with {actual_scene_durations[i]:.1f}s duration")
             
+            # Videos are already created with correct duration matching audio clips
+            final_clips = video_clips
+            logger.info("✅ Videos already created with correct duration matching audio clips")
+            
+            # Step 7: Create subtitles (optional)
+            subtitles_path = self.output_dir / "subtitles.srt"
+            if self.config.add_subtitles:
+                logger.info("Step 7: Creating subtitles...")
+                if self.config.reuse_existing and subtitles_path.exists():
+                    logger.info(f"Skipping subtitles (exists): {subtitles_path}")
+                else:
+                    self.video_processor.create_subtitles_srt(script, str(subtitles_path))
+            else:
+                logger.info("Step 7: Subtitles disabled; skipping SRT generation and overlay")
+            
+            # Step 8: Select background music
+            logger.info("Step 8: Adding background music...")
+            background_music = self._get_background_music()
+            
+            # Step 9: Compile final video
+            logger.info("Step 9: Compiling final video...")
+            self.video_processor.compile_final_video(
+                final_clips,
+                scene_audio_paths,  # Pass audio paths directly - compile_final_video will handle concatenation
+                background_music,
+                str(subtitles_path) if self.config.add_subtitles else None,
+                str(final_output)
+            )
+            
+            # Step 10: Generate metadata
+            self._generate_metadata(script, str(final_output))
+            
+            logger.info(f"Video generation completed: {final_output}")
+            return str(final_output)
+            
         except Exception as e:
             logger.warning(f"Per-scene audio detection failed; falling back to single track: {e}")
             # Fallback: Generate single narration track
