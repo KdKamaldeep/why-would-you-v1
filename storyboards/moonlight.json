@@ -27,7 +27,7 @@
     {
       "duration": 5,
       "description": "Meera and Aarav studying map excitedly under lantern light",
-      "visual_prompt": "(medium shot) two children studying old map, warm lantern glow, (storybook cozy:1.3)",
+      "visual_prompt": "(medium shot:1.3) two children looking at old map, warm lantern light, cozy Indian village, storybook style",
       "narration": "मीरा ने कहा, ‘चलो, खोजते हैं उसे!’",
       "subtitle": "The Plan",
       "characters": ["Aarav", "Meera"]
