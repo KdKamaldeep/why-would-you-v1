@@ -76,7 +76,7 @@ class VideoConfig:
     # Control prompt enhancement
     enable_prompt_enhancement: bool = True
     # Control pause between scenes (in seconds)
-    scene_pause_duration: float = 0.5  # Default 0.5 second pause between scenes
+    scene_pause_duration: float = 0.0  # Default 0.0 second pause between scenes (no black screens)
     # Control image validation and automatic prompt adjustment
     enable_image_validation: bool = True  # Enable automatic blank image detection and prompt adjustment
 
@@ -596,7 +596,7 @@ def main():
     parser.add_argument("--voice", default="", help="Reference speaker WAV path for Coqui XTTS (optional)")
     parser.add_argument("--language", default="en", help="Language for narration")
     parser.add_argument("--no-prompt-enhancement", action="store_true", help="Disable GPT-2 prompt enhancement")
-    parser.add_argument("--scene-pause", type=float, default=0.5, help="Pause duration between scenes in seconds (default: 0.5)")
+    parser.add_argument("--scene-pause", type=float, default=0.0, help="Pause duration between scenes in seconds (default: 0.0, no black screens)")
     parser.add_argument("--no-image-validation", action="store_true", help="Disable automatic image validation and prompt adjustment")
     
     args = parser.parse_args()
