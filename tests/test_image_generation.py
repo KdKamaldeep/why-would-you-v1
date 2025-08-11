@@ -41,7 +41,13 @@ def test_image_generation():
     
     # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-        "Wide-angle tracking shot of a cozy Indian village under soft cloudy skies"
+
+  "(Indian village:1.3) at warm sunrise, dusty road leading to blue hills, (two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, (storybook adventure style:1.4), bright soft light, wide shot",
+  "(two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, crossing small wooden bridge over sparkling stream, green trees and bright flowers around, (storybook colorful style:1.4), morning light, wide shot",
+  "(two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, walking through jungle with glowing golden fireflies lighting path, tall green plants around, (storybook fantasy style:1.4), magical light, wide shot",
+  "(golden glowing river:1.4) flowing between rocky cliffs, (two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, standing in awe, bright golden reflections, (storybook magical style:1.4), wide shot",
+  "(happy Indian village:1.3) with smiling villagers, (two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, carrying small jar glowing with golden light, (storybook colorful style:1.4), golden evening light, wide shot"
+
     ]
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
