@@ -161,74 +161,12 @@ class CartoonShortsGenerator:
             except Exception as e:
                 logger.warning(f"Failed to save storyboard: {e}")
 
-            # Step 2: Generate cartoon images with Stable Diffusion
-            logger.info("Step 2: Generating cartoon images...")
-            image_paths = []
-            for i, scene in enumerate(script['scenes']):
-                image_path = self.output_dir / f"scene_{i+1}.png"
-                if self.config.reuse_existing and image_path.exists():
-                    logger.info(f"Skipping image generation (exists): {image_path}")
-                else:
-                    prompt = self._compose_image_prompt(scene)
-                    self.image_generator.generate_cartoon_image(prompt, str(image_path))
-                image_paths.append(str(image_path))
-            
-            # Step 3: Animate images with AnimateDiff
-            logger.info("Step 3: Creating professional quality animations...")
-            # Calculate frames needed for each scene based on duration
-            scene_prompts = [scene['visual_prompt'] for scene in script['scenes']]
-            scene_durations = [scene['duration'] for scene in script['scenes']]
-            
-            # Calculate frames per scene: duration * fps
-            # Note: Enhanced animation system supports unlimited length!
-            frames_per_scene = []
-            for duration in scene_durations:
-                # Professional quality animation with proper timing
-                total_frames = max(30, int(duration * self.config.fps))  # Minimum 2 seconds per scene
-                frames_per_scene.append(total_frames)
-            
-            logger.info(f"Scene durations: {scene_durations} seconds")
-            logger.info(f"Frames per scene: {frames_per_scene}")
-            logger.info("🎬 Using enhanced animation system (unlimited length capability)")
-            
-            frame_dirs: List[str] = []
-            for i, image_path in enumerate(image_paths):
-                frames_dir = self.output_dir / f"scene_{i+1}_frames"
-                expected_frames = frames_per_scene[i]
-                if self.config.reuse_existing and frames_dir.exists():
-                    # Count frames
-                    existing = list(frames_dir.glob("frame_*.png"))
-                    if len(existing) >= expected_frames:
-                        logger.info(f"Skipping animation (frames ready): {frames_dir} ({len(existing)} frames)")
-                        frame_dirs.append(str(frames_dir))
-                        continue
-                # Generate frames
-                dir_path = self.animation_generator.animate_image(
-                    image_path,
-                    str(frames_dir),
-                    num_frames=expected_frames,
-                    prompt=scene_prompts[i] if i < len(scene_prompts) else ""
-                )
-                frame_dirs.append(dir_path)
-            
-            # Step 4: Convert frames to MP4 videos
-            logger.info("Step 4: Converting frames to videos...")
-            video_clips: List[str] = []
-            for i, frames_dir in enumerate(frame_dirs):
-                clip_path = self.output_dir / f"scene_{i+1}.mp4"
-                if self.config.reuse_existing and clip_path.exists():
-                    logger.info(f"Skipping frames->video (exists): {clip_path}")
-                    video_clips.append(str(clip_path))
-                    continue
-                video_path = self.video_processor.frames_to_video(frames_dir, str(clip_path), fps=self.config.fps)
-                video_clips.append(video_path)
-            
-            # Step 5: Generate audio clips from each scene's narration
-            logger.info("Step 5: Generating audio clips from each scene's narration...")
+            # Step 2: Create audio clips at the beginning
+            logger.info("Step 2: Creating audio clips from each scene's narration...")
             scene_audio_paths = []
             actual_scene_durations = []  # Track actual audio durations
             
-            # Step 1: Generate audio clips from each scene's narration
+            # Generate audio clips from each scene's narration
             for i, scene in enumerate(script['scenes']):
                 scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
                 if not (self.config.reuse_existing and scene_audio.exists()):
@@ -244,8 +182,8 @@ class CartoonShortsGenerator:
                 scene_audio_paths.append(str(scene_audio))
                 logger.info(f"Scene {i+1}: Generated audio clip: {scene_audio}")
             
-            # Step 2: Detect length of each audio clip
-            logger.info("Step 2: Detecting length of each audio clip...")
+            # Detect length of each audio clip
+            logger.info("Detecting length of each audio clip...")
             for i, scene_audio in enumerate(scene_audio_paths):
                 actual_duration = self.video_processor.get_audio_duration(scene_audio)
                 actual_scene_durations.append(actual_duration)
@@ -255,6 +193,66 @@ class CartoonShortsGenerator:
             narration_path = self.output_dir / "narration_combined.m4a"
             self.video_processor.concat_audios(scene_audio_paths, str(narration_path))
             logger.info(f"✅ Combined all audio clips into: {narration_path}")
+            
+            # Step 3: Generate cartoon images for scenes
+            logger.info("Step 3: Generating cartoon images...")
+            image_paths = []
+            for i, scene in enumerate(script['scenes']):
+                image_path = self.output_dir / f"scene_{i+1}.png"
+                if self.config.reuse_existing and image_path.exists():
+                    logger.info(f"Skipping image generation (exists): {image_path}")
+                else:
+                    prompt = self._compose_image_prompt(scene)
+                    self.image_generator.generate_cartoon_image(prompt, str(image_path))
+                image_paths.append(str(image_path))
+            
+            # Step 4: Animate images with AnimateDiff (using audio clip lengths)
+            logger.info("Step 4: Creating animations with audio clip timing...")
+            scene_prompts = [scene['visual_prompt'] for scene in script['scenes']]
+            
+            # Calculate frames per scene based on actual audio clip lengths
+            frames_per_scene = []
+            for audio_duration in actual_scene_durations:
+                # Use actual audio duration to determine frame count
+                total_frames = max(30, int(audio_duration * self.config.fps))
+                frames_per_scene.append(total_frames)
+            
+            logger.info(f"Audio clip lengths: {actual_scene_durations} seconds")
+            logger.info(f"Frames per scene: {frames_per_scene}")
+            logger.info("🎬 Using audio clip timing for animation frames")
+            
+            frame_dirs: List[str] = []
+            for i, image_path in enumerate(image_paths):
+                frames_dir = self.output_dir / f"scene_{i+1}_frames"
+                expected_frames = frames_per_scene[i]
+                if self.config.reuse_existing and frames_dir.exists():
+                    # Count frames
+                    existing = list(frames_dir.glob("frame_*.png"))
+                    if len(existing) >= expected_frames:
+                        logger.info(f"Skipping animation (frames ready): {frames_dir} ({len(existing)} frames)")
+                        frame_dirs.append(str(frames_dir))
+                        continue
+                # Generate frames based on audio clip length
+                dir_path = self.animation_generator.animate_image(
+                    image_path,
+                    str(frames_dir),
+                    num_frames=expected_frames,
+                    prompt=scene_prompts[i] if i < len(scene_prompts) else ""
+                )
+                frame_dirs.append(dir_path)
+            
+            # Step 5: Convert frames to MP4 videos (already expanded to match audio)
+            logger.info("Step 5: Converting frames to MP4 videos (expanded to match audio)...")
+            video_clips: List[str] = []
+            for i, frames_dir in enumerate(frame_dirs):
+                clip_path = self.output_dir / f"scene_{i+1}.mp4"
+                if self.config.reuse_existing and clip_path.exists():
+                    logger.info(f"Skipping frames->video (exists): {clip_path}")
+                    video_clips.append(str(clip_path))
+                    continue
+                video_path = self.video_processor.frames_to_video(frames_dir, str(clip_path), fps=self.config.fps)
+                video_clips.append(video_path)
+                logger.info(f"Scene {i+1}: Created MP4 with {actual_scene_durations[i]:.1f}s duration")
             
         except Exception as e:
             logger.warning(f"Per-scene audio detection failed; falling back to single track: {e}")
@@ -290,31 +288,9 @@ class CartoonShortsGenerator:
                     scene['duration'] = per_scene_duration
                     logger.info(f"  Scene {i+1}: {original_duration:.1f}s → {per_scene_duration:.1f}s")
             
-            # Step 3: Extend video clips as per audio clip length
-            logger.info("Step 3: Extending video clips as per audio clip length...")
-            
-            adjusted_video_clips = []
-            for i, clip_path in enumerate(video_clips):
-                audio_clip_length = actual_scene_durations[i]  # Length of the audio clip we detected
-                video_duration = self.video_processor.get_video_duration(clip_path)  # Current video length
-                
-                logger.info(f"Scene {i+1}: Video={video_duration:.1f}s, Audio Clip={audio_clip_length:.1f}s")
-                
-                if audio_clip_length > video_duration:
-                    # Audio clip is longer - extend video to match audio clip length
-                    logger.info(f"Scene {i+1}: ⚡ Extending video {video_duration:.1f}s → {audio_clip_length:.1f}s")
-                    extended_clip_path = self.output_dir / f"scene_{i+1}_extended.mp4"
-                    extended_path = self.video_processor.extend_video_duration(
-                        clip_path, audio_clip_length, str(extended_clip_path)
-                    )
-                    adjusted_video_clips.append(extended_path)
-                else:
-                    # Video is long enough - use as is
-                    logger.info(f"Scene {i+1}: ✅ Video duration sufficient ({video_duration:.1f}s ≥ {audio_clip_length:.1f}s)")
-                    adjusted_video_clips.append(clip_path)
-            
-            final_clips = adjusted_video_clips
-            logger.info("✅ Video clips adjusted to match narration timing (fast method)")
+            # Videos are already created with correct duration matching audio clips
+            final_clips = video_clips
+            logger.info("✅ Videos already created with correct duration matching audio clips")
             
             # Step 7: Create subtitles (optional)
             subtitles_path = self.output_dir / "subtitles.srt"
