@@ -75,6 +75,84 @@ class VideoProcessor:
             # Return a default duration if we can't determine it
             return 8.0
 
+    def extend_video_duration(self, input_video: str, target_duration_sec: float, output_video: str) -> str:
+        """Extend video duration by looping or slowing down to match target duration."""
+        try:
+            # Get current video duration
+            current_duration = self.get_video_duration(input_video)
+            
+            if current_duration >= target_duration_sec:
+                # Video is already long enough, just copy
+                import shutil
+                shutil.copy2(input_video, output_video)
+                return output_video
+            
+            # Calculate how many times we need to loop
+            loop_count = int(target_duration_sec / current_duration) + 1
+            
+            if loop_count <= 2:
+                # Just slow down the video to match duration
+                speed_factor = current_duration / target_duration_sec
+                cmd = [
+                    'ffmpeg', '-y',
+                    '-i', input_video,
+                    '-filter:v', f'setpts={speed_factor}*PTS',
+                    '-filter:a', f'atempo={1/speed_factor}' if speed_factor < 0.5 else 'atempo=0.5,atempo=0.5' if speed_factor < 0.25 else 'atempo=0.5,atempo=0.5,atempo=0.5',
+                    '-c:v', 'libx264',
+                    '-c:a', 'aac',
+                    '-shortest',
+                    output_video
+                ]
+                subprocess.run(cmd, check=True, capture_output=True)
+                logger.info(f"Extended video by slowing down: {current_duration:.1f}s → {target_duration_sec:.1f}s")
+            else:
+                # Loop the video multiple times
+                # Create a concat file
+                concat_file = output_video.replace('.mp4', '_concat.txt')
+                with open(concat_file, 'w') as f:
+                    for _ in range(loop_count):
+                        f.write(f"file '{input_video}'\n")
+                
+                # Concatenate videos
+                cmd = [
+                    'ffmpeg', '-y',
+                    '-f', 'concat',
+                    '-safe', '0',
+                    '-i', concat_file,
+                    '-c', 'copy',
+                    output_video
+                ]
+                subprocess.run(cmd, check=True, capture_output=True)
+                
+                # Trim to exact duration
+                temp_output = output_video.replace('.mp4', '_temp.mp4')
+                import shutil
+                shutil.move(output_video, temp_output)
+                
+                cmd = [
+                    'ffmpeg', '-y',
+                    '-i', temp_output,
+                    '-t', str(target_duration_sec),
+                    '-c', 'copy',
+                    output_video
+                ]
+                subprocess.run(cmd, check=True, capture_output=True)
+                
+                # Clean up
+                os.remove(concat_file)
+                os.remove(temp_output)
+                
+                logger.info(f"Extended video by looping {loop_count}x: {current_duration:.1f}s → {target_duration_sec:.1f}s")
+            
+            return output_video
+            
+        except Exception as e:
+            logger.error(f"Error extending video duration: {e}")
+            # Fallback: just copy the original
+            import shutil
+            shutil.copy2(input_video, output_video)
+            return output_video
+
     def adjust_video_duration(self, input_video: str, target_duration_sec: float, output_video: str) -> str:
         """Adjust video duration by speeding up or slowing down to match target duration."""
         try:

@@ -223,118 +223,95 @@ class CartoonShortsGenerator:
                 video_path = self.video_processor.frames_to_video(frames_dir, str(clip_path), fps=self.config.fps)
                 video_clips.append(video_path)
             
-            # Step 5: Generate narration and detect actual durations
-            logger.info("Step 5: Generating narration and detecting actual durations...")
-            narration_path = self.output_dir / "narration.wav"
+            # Step 5: Generate audio clips from each scene's narration
+            logger.info("Step 5: Generating audio clips from each scene's narration...")
             scene_audio_paths = []
             actual_scene_durations = []  # Track actual audio durations
             
-            try:
-                # Generate per-scene audio and detect actual durations
-                for i, scene in enumerate(script['scenes']):
-                    scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
-                    if not (self.config.reuse_existing and scene_audio.exists()):
-                        generated_audio = self.voice_synthesizer.synthesize_voice(
-                            [scene.get('narration', '')],
-                            str(scene_audio),
-                            speaker=None,
-                            voice_clone_audio=self.config.voice_id or None,
-                        )
-                        # Use actual generated path (may switch extension on fallback)
-                        scene_audio = Path(generated_audio)
-                    
-                    # Detect actual audio duration
-                    actual_duration = self.video_processor.get_audio_duration(str(scene_audio))
-                    actual_scene_durations.append(actual_duration)
-                    
-                    logger.info(f"Scene {i+1}: Detected actual audio duration: {actual_duration:.1f}s")
-                
-                # Now update script scene durations to match actual audio durations
-                logger.info("🔄 Updating script scene durations to match actual audio...")
-                for i, scene in enumerate(script['scenes']):
-                    original_duration = scene.get('duration', 8)
-                    actual_duration = actual_scene_durations[i]
-                    
-                    # Store original for comparison
-                    scene['original_duration'] = original_duration
-                    
-                    # Rewrite scene duration to match actual audio
-                    scene['duration'] = actual_duration
-                    
-                    logger.info(f"  Scene {i+1}: {original_duration:.1f}s → {actual_duration:.1f}s")
-                
-                # Update total duration
-                total_actual_duration = sum(actual_scene_durations)
-                script['total_duration'] = total_actual_duration
-                self.config.duration = max(self.config.duration, total_actual_duration)
-                
-                logger.info(f"✅ Script updated: Total duration {total_actual_duration:.1f}s")
-                
-                # Process audio files with corrected durations
-                for i, scene in enumerate(script['scenes']):
-                    scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
-                    fitted_audio = self.output_dir / f"audio_scene_{i+1}_fit.m4a"
-                    self.video_processor.adjust_audio_to_duration(str(scene_audio), scene['duration'], str(fitted_audio))
-                    scene_audio_paths.append(str(fitted_audio))
-                
-                # Combine per-scene into one track
-                merged_audio = self.output_dir / "narration_fitted.m4a"
-                self.video_processor.concat_audios(scene_audio_paths, str(merged_audio))
-                narration_path = merged_audio
-                
-            except Exception as e:
-                logger.warning(f"Per-scene audio detection failed; falling back to single track: {e}")
-                if not (self.config.reuse_existing and narration_path.exists()):
-                    narration_lines = [scene.get('narration', '') for scene in script.get('scenes', [])]
+            # Step 1: Generate audio clips from each scene's narration
+            for i, scene in enumerate(script['scenes']):
+                scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
+                if not (self.config.reuse_existing and scene_audio.exists()):
                     generated_audio = self.voice_synthesizer.synthesize_voice(
-                        narration_lines,
-                        str(narration_path),
+                        [scene.get('narration', '')],
+                        str(scene_audio),
                         speaker=None,
                         voice_clone_audio=self.config.voice_id or None,
                     )
-                    narration_path = Path(generated_audio)
+                    # Use actual generated path (may switch extension on fallback)
+                    scene_audio = Path(generated_audio)
                 
-                # Detect actual duration of the single track
-                actual_duration = self.video_processor.get_audio_duration(str(narration_path))
-                script['total_duration'] = actual_duration
-                self.config.duration = max(self.config.duration, actual_duration)
-                
-                # Distribute duration evenly across scenes
-                scene_count = len(script['scenes'])
-                if scene_count > 0:
-                    per_scene_duration = actual_duration / scene_count
-                    logger.info(f"🔄 Distributing single track duration ({actual_duration:.1f}s) across {scene_count} scenes")
-                    for i, scene in enumerate(script['scenes']):
-                        original_duration = scene.get('duration', 8)
-                        scene['original_duration'] = original_duration
-                        scene['duration'] = per_scene_duration
-                        logger.info(f"  Scene {i+1}: {original_duration:.1f}s → {per_scene_duration:.1f}s")
-                
-                logger.info(f"✅ Single track duration detected: {actual_duration:.1f}s")
+                scene_audio_paths.append(str(scene_audio))
+                logger.info(f"Scene {i+1}: Generated audio clip: {scene_audio}")
             
-            # Step 6: Adjust existing video clips to match narration timing (FAST METHOD)
-            logger.info("Step 6: Adjusting video clips to match narration timing...")
+            # Step 2: Detect length of each audio clip
+            logger.info("Step 2: Detecting length of each audio clip...")
+            for i, scene_audio in enumerate(scene_audio_paths):
+                actual_duration = self.video_processor.get_audio_duration(scene_audio)
+                actual_scene_durations.append(actual_duration)
+                logger.info(f"Scene {i+1}: Audio clip length: {actual_duration:.1f}s")
             
-            # Use FFmpeg to speed up/slow down existing clips instead of regenerating
+            # Combine all audio clips into one narration track
+            narration_path = self.output_dir / "narration_combined.m4a"
+            self.video_processor.concat_audios(scene_audio_paths, str(narration_path))
+            logger.info(f"✅ Combined all audio clips into: {narration_path}")
+            
+        except Exception as e:
+            logger.warning(f"Per-scene audio detection failed; falling back to single track: {e}")
+            if not (self.config.reuse_existing and narration_path.exists()):
+                narration_lines = [scene.get('narration', '') for scene in script.get('scenes', [])]
+                generated_audio = self.voice_synthesizer.synthesize_voice(
+                    narration_lines,
+                    str(narration_path),
+                    speaker=None,
+                    voice_clone_audio=self.config.voice_id or None,
+                )
+                narration_path = Path(generated_audio)
+            
+            # Detect actual duration of the single track
+            actual_duration = self.video_processor.get_audio_duration(str(narration_path))
+            script['total_duration'] = actual_duration
+            self.config.duration = max(self.config.duration, actual_duration)
+            
+            # For single track, we need to extend videos to match the actual audio duration
+            logger.info(f"✅ Single track duration detected: {actual_duration:.1f}s")
+            
+            # Store the actual audio duration for video adjustment
+            actual_scene_durations = [actual_duration / len(script['scenes'])] * len(script['scenes'])
+            
+            # Update script durations to match actual audio
+            scene_count = len(script['scenes'])
+            if scene_count > 0:
+                per_scene_duration = actual_duration / scene_count
+                logger.info(f"🔄 Distributing single track duration ({actual_duration:.1f}s) across {scene_count} scenes")
+                for i, scene in enumerate(script['scenes']):
+                    original_duration = scene.get('duration', 8)
+                    scene['original_duration'] = original_duration
+                    scene['duration'] = per_scene_duration
+                    logger.info(f"  Scene {i+1}: {original_duration:.1f}s → {per_scene_duration:.1f}s")
+            
+            # Step 3: Extend video clips as per audio clip length
+            logger.info("Step 3: Extending video clips as per audio clip length...")
+            
             adjusted_video_clips = []
             for i, clip_path in enumerate(video_clips):
-                target_duration = script['scenes'][i]['duration']
-                adjusted_clip_path = self.output_dir / f"scene_{i+1}_adjusted.mp4"
+                audio_clip_length = actual_scene_durations[i]  # Length of the audio clip we detected
+                video_duration = self.video_processor.get_video_duration(clip_path)  # Current video length
                 
-                # Get current video duration
-                current_duration = self.video_processor.get_video_duration(clip_path)
+                logger.info(f"Scene {i+1}: Video={video_duration:.1f}s, Audio Clip={audio_clip_length:.1f}s")
                 
-                if abs(current_duration - target_duration) < 0.1:
-                    # Duration is close enough, just use original
-                    logger.info(f"Scene {i+1}: Duration close enough ({current_duration:.1f}s ≈ {target_duration:.1f}s)")
-                    adjusted_video_clips.append(clip_path)
-                else:
-                    # Adjust video speed to match target duration
-                    logger.info(f"Scene {i+1}: Adjusting {current_duration:.1f}s → {target_duration:.1f}s")
-                    adjusted_path = self.video_processor.adjust_video_duration(
-                        clip_path, target_duration, str(adjusted_clip_path)
+                if audio_clip_length > video_duration:
+                    # Audio clip is longer - extend video to match audio clip length
+                    logger.info(f"Scene {i+1}: ⚡ Extending video {video_duration:.1f}s → {audio_clip_length:.1f}s")
+                    extended_clip_path = self.output_dir / f"scene_{i+1}_extended.mp4"
+                    extended_path = self.video_processor.extend_video_duration(
+                        clip_path, audio_clip_length, str(extended_clip_path)
                     )
-                    adjusted_video_clips.append(adjusted_path)
+                    adjusted_video_clips.append(extended_path)
+                else:
+                    # Video is long enough - use as is
+                    logger.info(f"Scene {i+1}: ✅ Video duration sufficient ({video_duration:.1f}s ≥ {audio_clip_length:.1f}s)")
+                    adjusted_video_clips.append(clip_path)
             
             final_clips = adjusted_video_clips
             logger.info("✅ Video clips adjusted to match narration timing (fast method)")
