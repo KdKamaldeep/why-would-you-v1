@@ -148,7 +148,7 @@ class CartoonShortsGenerator:
                     json.dump(script, f, indent=2)
             else:
                 logger.info("Step 1: Generating 3-scene story...")
-                script = self.script_generator.generate_script(self.config.prompt, self.config.duration)
+                script = self.script_generator.generate_script(self.config.prompt, self.config.duration, language=self.config.language)
                 with open(script_path, 'w', encoding='utf-8') as f:
                     json.dump(script, f, indent=2)
             

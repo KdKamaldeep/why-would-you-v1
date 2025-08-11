@@ -42,7 +42,7 @@ class CoquiVoiceConfig(BaseModel):
     model_name: str = "tts_models/en/ljspeech/tacotron2-DDC"
     gpu: bool = True
     voice_dir: str = "tts_voices/"
-    speaker: str = "random"
+    speaker: str = "default"
     text_temp: float = 0.7
     waveform_temp: float = 0.7
     progress_bar: bool = True
@@ -81,6 +81,8 @@ class CoquiVoiceSynthesizer:
             lang = (self.config.language or "en").lower()
             # For non-English targets, try multilingual XTTS first
             if lang != "en":
+                # Prefer the newer hub-style alias first, then legacy id
+                fallback_models.append("coqui/XTTS-v2")
                 fallback_models.append("tts_models/multilingual/multi-dataset/xtts_v2")
             # Always try the explicitly configured model next
             fallback_models.append(self.config.model_name)
@@ -149,28 +151,45 @@ class CoquiVoiceSynthesizer:
             if "xtts" in model_name_lower:
                 logger.info("Generating audio with XTTS (multilingual)")
                 speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
-                # Do NOT pass placeholder speakers like 'random' to XTTS
-                xtts_speaker = None
-                if speaker_wav_arg is None and speaker and str(speaker).lower() not in ("", "random"):
-                    xtts_speaker = speaker
+                # Auto-discover a language-appropriate speaker WAV if none provided
+                if speaker_wav_arg is None:
+                    auto_wav = self._discover_speaker_wav(self.config.language)
+                    if auto_wav:
+                        logger.info(f"Using discovered speaker_wav for language '{self.config.language}': {auto_wav}")
+                        speaker_wav_arg = auto_wav
+                # Ensure a valid speaker is passed for XTTS if no reference wav
+                requested_speaker = (
+                    speaker if (speaker is not None and str(speaker).strip() != "") else self.config.speaker
+                )
+                xtts_speaker = self._select_xtts_speaker(requested_speaker if speaker_wav_arg is None else None)
+                logger.info(f"XTTS selected speaker: {xtts_speaker if speaker_wav_arg is None else 'speaker_wav provided'}")
+
+                def _xtts_call(speaker_value: Optional[str]) -> None:
+                    # Avoid passing progress_bar to suppress model_kwargs warnings
+                    if speaker_wav_arg is not None:
+                        # Reference voice provided: do not pass speaker token
+                        self.tts.tts_to_file(
+                            text=full_text,
+                            file_path=output_path,
+                            speaker_wav=speaker_wav_arg,
+                            language=self.config.language,
+                        )
+                    else:
+                        # No reference: pass an explicit speaker token
+                        chosen_speaker = speaker_value or self.config.speaker or "default"
+                        self.tts.tts_to_file(
+                            text=full_text,
+                            file_path=output_path,
+                            speaker=chosen_speaker,
+                            language=self.config.language,
+                        )
+
                 try:
-                    self.tts.tts_to_file(
-                        text=full_text,
-                        file_path=output_path,
-                        speaker_wav=speaker_wav_arg,
-                        speaker=xtts_speaker,
-                        language=self.config.language,
-                        progress_bar=self.config.progress_bar,
-                    )
-                except TypeError:
-                    # Older TTS may not accept progress_bar; retry without
-                    self.tts.tts_to_file(
-                        text=full_text,
-                        file_path=output_path,
-                        speaker_wav=speaker_wav_arg,
-                        speaker=xtts_speaker,
-                        language=self.config.language,
-                    )
+                    _xtts_call(xtts_speaker)
+                except Exception as e:
+                    # Retry strategy for XTTS when speaker is not accepted
+                    err_msg = str(e)
+                    logger.warning(f"XTTS initial synthesis failed: {err_msg}")
             else:
                 # Non-XTTS models: use speaker registry in voice_dir
                 current_speaker = speaker or self.config.speaker
@@ -185,21 +204,12 @@ class CoquiVoiceSynthesizer:
                     shutil.copy2(voice_clone_audio, speaker_audio_path)
                     current_speaker = speaker_name
                 logger.info(f"Generating audio with speaker: {current_speaker}")
-                try:
-                    self.tts.tts_to_file(
-                        text=full_text,
-                        file_path=output_path,
-                        voice_dir=self.config.voice_dir,
-                        speaker=current_speaker,
-                        progress_bar=self.config.progress_bar,
-                    )
-                except TypeError:
-                    self.tts.tts_to_file(
-                        text=full_text,
-                        file_path=output_path,
-                        voice_dir=self.config.voice_dir,
-                        speaker=current_speaker,
-                    )
+                # Avoid passing progress_bar to suppress model_kwargs warnings
+                self.tts.tts_to_file(
+                    text=full_text,
+                    file_path=output_path,
+                    voice_dir=self.config.voice_dir
+                )
             
             if os.path.exists(output_path):
                 logger.info(f"✅ Voice synthesized successfully: {output_path}")
@@ -212,6 +222,119 @@ class CoquiVoiceSynthesizer:
             logger.error(f"❌ Failed to synthesize voice with Coqui TTS: {e}")
             logger.info("Creating fallback silent audio")
             return self._create_silent_audio(output_path, len(narration_lines) * 3)
+
+    def _discover_speaker_wav(self, language: str) -> Optional[str]:
+        """Discover a language-appropriate speaker WAV file on disk.
+
+        Heuristics:
+        - Check language-specific env vars (e.g., HINDI_SPEAKER_WAV)
+        - Check common folders like 'tts-speaker', 'tts_speaker', 'tts_voices'
+        - Prefer filenames containing the language or gender hints when possible
+        """
+        try:
+            lang = (language or "").lower()
+            # Environment overrides
+            env_map = {
+                "hi": os.getenv("HINDI_SPEAKER_WAV"),
+            }
+            if lang in env_map and env_map[lang] and os.path.exists(env_map[lang]):
+                return env_map[lang]
+
+            candidates: List[str] = []
+            # Common directories
+            roots = [
+                os.path.join("tts-speaker", "male_hindi_speaker.wav"),
+                os.path.join("tts_speaker", "male_hindi_speaker.wav"),
+                os.path.join("tts_voices", "male_hindi_speaker.wav"),
+            ]
+            for p in roots:
+                if os.path.exists(p):
+                    candidates.append(p)
+
+            # Broader search for any wav under tts-speaker-like dirs
+            for folder in ["tts-speaker", "tts_speaker", "tts_voices"]:
+                if os.path.isdir(folder):
+                    try:
+                        for name in os.listdir(folder):
+                            if name.lower().endswith(".wav"):
+                                full = os.path.join(folder, name)
+                                candidates.append(full)
+                    except Exception:
+                        pass
+
+            # Rank: prefer names with 'hindi' then 'male'
+            def score(path: str) -> int:
+                name = os.path.basename(path).lower()
+                s = 0
+                if "hindi" in name:
+                    s += 2
+                if "male" in name:
+                    s += 1
+                return s
+
+            candidates = sorted(set(candidates), key=lambda p: (-score(p), p))
+            for c in candidates:
+                if os.path.exists(c):
+                    return c
+        except Exception:
+            pass
+        return None
+
+    def _get_builtin_speakers(self) -> List[str]:
+        """Attempt to retrieve a list of available speakers from the loaded TTS model."""
+        try:
+            # Many models expose a simple .speakers list
+            speakers = getattr(self.tts, "speakers", None)
+            if speakers:
+                try:
+                    spk_list = list(speakers)
+                except Exception:
+                    # Some implementations expose a dict-like mapping
+                    spk_list = list(speakers.keys()) if hasattr(speakers, 'keys') else []
+                logger.info(f"XTTS available speakers: {spk_list}")
+                return spk_list
+            # Some expose a speaker_manager with various fields
+            sm = getattr(self.tts, "speaker_manager", None)
+            if sm is not None:
+                for attr in ("speaker_names", "speaker_ids", "speakers"):
+                    val = getattr(sm, attr, None)
+                    if val:
+                        try:
+                            spk_list = list(val)
+                        except Exception:
+                            spk_list = list(val.keys()) if hasattr(val, 'keys') else []
+                        logger.info(f"XTTS available speakers (speaker_manager): {spk_list}")
+                        return spk_list
+        except Exception:
+            pass
+        return []
+
+    def _select_xtts_speaker(self, preferred: Optional[str]) -> Optional[str]:
+        """Select a valid XTTS speaker string.
+
+        - Uses preferred if provided and not 'random'.
+        - Else tries builtin speakers from the model.
+        - Else falls back to a known common XTTS speaker token.
+        """
+        # Honor explicit non-random preference
+        if preferred and str(preferred).strip().lower() not in ("", "random"):
+            return preferred
+
+        # Try to use a builtin speaker from the model
+        builtin = self._get_builtin_speakers()
+        if builtin:
+            try:
+                # Prefer a female English voice if present; else first available
+                for name in builtin:
+                    name_str = str(name)
+                    if "female" in name_str.lower():
+                        return name_str
+                return str(builtin[0])
+            except Exception:
+                pass
+
+        # Fallback: many XTTS builds accept 'default' to pick a bundled voice
+        return "default"
     
     def clone_voice(self, 
                    audio_file_path: str, 
@@ -251,9 +374,7 @@ class CoquiVoiceSynthesizer:
             self.tts.tts_to_file(
                 text=test_text,
                 file_path=test_output_path,
-                voice_dir=self.config.voice_dir,
-                speaker=speaker_name,
-                progress_bar=True
+                voice_dir=self.config.voice_dir                
             )
             
             if os.path.exists(test_output_path):
@@ -338,8 +459,7 @@ def test_coqui_voice():
     try:
         # Initialize synthesizer
         config = CoquiVoiceConfig(
-            gpu=torch.cuda.is_available(),
-            speaker="random"
+            gpu=torch.cuda.is_available()            
         )
         
         synthesizer = CoquiVoiceSynthesizer(config)

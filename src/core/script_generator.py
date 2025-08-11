@@ -21,9 +21,21 @@ class ScriptGenerator:
         self.api_key = api_key
         self.base_url = "https://api.openai.com/v1/chat/completions"
         
-    def generate_script(self, prompt: str, duration: int) -> Dict:
-        """Generate a 3-scene story script for the video with two characters per scene."""
+    def generate_script(self, prompt: str, duration: int, language: str = "en") -> Dict:
+        """Generate a 3-scene story script for the video with two characters per scene.
+
+        If language != 'en', request narration and subtitles in the target language.
+        """
         scene_duration = max(8, duration // 3)  # Minimum 8 seconds per scene
+        # Language guidance for GPT output
+        lang_note = ""
+        if (language or "en").lower() != "en":
+            # Be explicit for Hindi
+            if language.lower() == "hi":
+                lang_note = "All narration and subtitles must be written in Hindi using Devanagari script."
+            else:
+                lang_note = f"All narration and subtitles must be written in the target language: {language}."
+
         gpt_prompt = f"""
         Create a {duration}-second YouTube Shorts story based on this prompt: "{prompt}"
         
@@ -38,6 +50,8 @@ class ScriptGenerator:
         - Include specific details about characters, expressions, actions, and settings
         - IMPORTANT: Each scene must feature exactly TWO characters and describe them clearly
         
+        {lang_note}
+
         Return the response as a JSON object with:
         {{
             "title": "Engaging story title",
