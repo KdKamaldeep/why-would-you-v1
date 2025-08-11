@@ -19,7 +19,7 @@
     {
       "duration": 5,
       "description": "close-up of old weathered map in Aarav’s hands",
-      "visual_prompt": "(close-up) old map with faded markings, hands holding it carefully, (storybook antique:1.3)",
+      "visual_prompt": "close-up old map with faded markings, hands holding it carefully",
       "narration": "आरव को मिला एक पुराना नक्शा, जो खजाने तक ले जाता है।",
       "subtitle": "The Map",
       "characters": ["Aarav"]
