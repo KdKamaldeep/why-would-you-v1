@@ -225,6 +225,7 @@ class CartoonShortsGenerator:
                 
                 if self.config.reuse_existing and image_path.exists():
                     logger.info(f"Skipping image generation (exists): {image_path}")
+                    final_image_path = str(image_path)
                 else:
                     prompt = self._compose_image_prompt(scene)
                     logger.info(f"🖼️ Scene {i+1}: Generating image with prompt ({len(prompt)} characters)")
@@ -232,13 +233,13 @@ class CartoonShortsGenerator:
                     
                     # Use validation method if enabled, otherwise use standard generation
                     if self.config.enable_image_validation:
-                        self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3)
+                        final_image_path = self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3)
                     else:
-                        self.image_generator.generate_cartoon_image(prompt, str(image_path))
-                    logger.info(f"🖼️ Scene {i+1}: Image generation completed: {image_path}")
+                        final_image_path = self.image_generator.generate_cartoon_image(prompt, str(image_path))
+                    logger.info(f"🖼️ Scene {i+1}: Image generation completed: {final_image_path}")
                 
-                image_paths.append(str(image_path))
-                logger.info(f"Scene {i+1}: Image ready: {image_path}")
+                image_paths.append(final_image_path)
+                logger.info(f"Scene {i+1}: Image ready: {final_image_path}")
             
             # Step 4: Animate images with AnimateDiff (using audio clip lengths)
             logger.info("Step 4: Creating animations with audio clip timing...")
