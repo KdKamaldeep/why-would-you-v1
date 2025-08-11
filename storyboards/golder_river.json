@@ -1,7 +1,7 @@
 {
   "title": "The Secret of the Golden River",
   "description": "Anaya and Rohan embark on a magical journey to find the Golden River from their grandmother's tales and bring back a gift for their village.",
-  "total_duration": 40,
+  "total_duration": 50,
   "cast": [
     {"name": "Anaya", "role": "curious and brave girl"},
     {"name": "Rohan", "role": "adventurous and thoughtful boy"},
@@ -9,42 +9,42 @@
   ],
   "scenes": [
     {
-      "duration": 8,
+      "duration": 10,
       "description": "wide shot of small Indian village at sunrise, dusty path in foreground leading to distant blue hills, two children midground holding small cloth bags, warm golden light, storybook style",
       "visual_prompt": "(wide shot:1.3) (Indian village:1.3) at sunrise, dusty path in foreground leading to distant blue hills, (two children:1.3) holding small cloth bags, (storybook mystery:1.4)",
-      "narration": "सुबह की पहली किरणों में, दादी की कहानियों से प्रेरित होकर अनाया और रोहन रहस्यमयी सुनहरी नदी की तलाश में निकल पड़े—जहाँ कहा जाता है कि एक जादुई सन्दूक गाँव के लिए खुशियाँ लाता है।",
+      "narration": "सुबह की पहली सुनहरी किरणें गाँव को छू रही थीं। दादी की पुरानी कहानियों से प्रेरित होकर अनाया और रोहन अपने छोटे से थैले लेकर रहस्यमयी सुनहरी नदी की खोज में निकल पड़े। कहा जाता है, वहाँ एक जादुई संदूक छुपा है जो पूरे गाँव में खुशियाँ भर देता है।",
       "subtitle": "The Beginning",
       "characters": ["Anaya", "Rohan", "Dadi"]
     },
     {
-      "duration": 8,
+      "duration": 10,
       "description": "wide shot of small wooden bridge over sparkling stream, green trees and bright flowers in background, two children crossing with excited expressions, storybook colorful style",
       "visual_prompt": "(wide shot:1.3) small wooden bridge over sparkling stream, (two children:1.3) crossing, surrounded by green trees and bright flowers, (storybook colorful:1.4)",
-      "narration": "चमकती धारा के ऊपर बने लकड़ी के पुल को पार करते हुए, उन्हें लगा जैसे पानी फुसफुसा रहा हो—'आगे बढ़ो, तुम सही राह पर हो।'",
+      "narration": "वे एक छोटी लकड़ी के पुल तक पहुँचे, जिसके नीचे धूप में चमकती हुई धारा बह रही थी। पानी की कलकल में जैसे कोई मीठा संदेश छुपा था, मानो वह कह रहा हो, आगे बढ़ो... तुम सही राह पर हो।",
       "subtitle": "Crossing the Bridge",
       "characters": ["Anaya", "Rohan"]
     },
     {
-      "duration": 8,
+      "duration": 10,
       "description": "wide shot of glowing golden fireflies lighting jungle path, tall green plants in foreground, two children walking cautiously, storybook magical style",
       "visual_prompt": "(wide shot:1.3) glowing golden fireflies lighting jungle path, (two children:1.3) walking cautiously, (storybook magical:1.4)",
-      "narration": "जंगल में सुनहरी जुगनुओं की रोशनी उन्हें आगे का रास्ता दिखा रही थी, जैसे वे भी इस खोज का हिस्सा हों।",
+      "narration": "जंगल के भीतर जैसे ही अंधेरा बढ़ा, अनगिनत सुनहरी जुगनू रास्ते को रोशन करने लगे। उनकी रोशनी न सिर्फ़ आगे का मार्ग दिखा रही थी, बल्कि जैसे इस रोमांचक सफर में उनका साथ भी दे रही थी।",
       "subtitle": "The Firefly Path",
       "characters": ["Anaya", "Rohan"]
     },
     {
-      "duration": 8,
+      "duration": 10,
       "description": "wide shot of golden glowing river between rocky cliffs, bright golden reflections on children's faces, storybook magical style",
       "visual_prompt": "(wide shot:1.3) (golden glowing river:1.4) between rocky cliffs, (two children:1.3) in awe, bright golden reflections on faces, (storybook magical:1.4)",
-      "narration": "और फिर, सामने थी सुनहरी नदी—बिलकुल वैसी ही जैसी दादी ने कहानियों में सुनाई थी। किनारे पर एक चमकता हुआ सन्दूक रखा था, मानो उनका इंतज़ार कर रहा हो।",
+      "narration": "और फिर... सामने थी सुनहरी नदी। लहरों पर सूरज की किरणें ऐसे नाच रही थीं जैसे किसी सपने का दृश्य हो। किनारे पर एक चमकता हुआ संदूक रखा था, मानो सदियों से सिर्फ़ उनका इंतज़ार कर रहा हो।",
       "subtitle": "The Golden River",
       "characters": ["Anaya", "Rohan"]
     },
     {
-      "duration": 8,
+      "duration": 10,
       "description": "wide shot of happy Indian village festival, villagers cheering, two children opening glowing chest, colorful butterflies and sparkles filling sky, storybook magical style",
       "visual_prompt": "(wide shot:1.3) (happy Indian village festival:1.4) with cheering villagers, (two children:1.3) opening glowing chest, colorful butterflies and sparkles filling sky, (storybook magical:1.4)",
-      "narration": "सन्दूक को सावधानी से उठाकर वे गाँव लौटे। जैसे ही उन्होंने उसे खोला, रंग-बिरंगी तितलियाँ और चमकते फूल आसमान में फैल गए—सुनहरी नदी का वादा सच हो गया था।",
+      "narration": "संदूक को सावधानी से उठाकर वे गाँव लौट आए। जैसे ही उन्होंने ढक्कन खोला, उसमें से रंग-बिरंगी तितलियाँ और चमकते फूल आसमान में फैल गए। हर ओर खुशी और रोशनी फैल गई—सुनहरी नदी का वादा आखिरकार सच हो गया था।",
       "subtitle": "The Celebration",
       "characters": ["Anaya", "Rohan", "Dadi"]
     }
