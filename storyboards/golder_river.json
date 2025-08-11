@@ -1,0 +1,60 @@
+{
+  "title": "The Secret of the Golden River",
+  "description": "Anaya and Rohan follow a magical trail through forests and rivers to discover a glowing treasure for their village.",
+  "total_duration": 40,
+  "cast": [
+    {"name": "Anaya", "role": "curious and brave girl"},
+    {"name": "Rohan", "role": "adventurous and thoughtful boy"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "wide shot of small Indian village at sunrise, dusty path in foreground leading to distant blue hills, two children midground holding small cloth bags, warm golden light, storybook style",
+      "visual_prompt": "(wide shot:1.3) (Indian village:1.3) at sunrise, dusty path in foreground leading to distant blue hills, (two children:1.3) holding small cloth bags, (storybook mystery:1.4)",
+      "narration": "सुबह की पहली किरणों में, अनाया और रोहन रहस्यमयी सुनहरी नदी की तलाश में निकल पड़े।",
+      "subtitle": "The Beginning",
+      "characters": ["Anaya", "Rohan"]
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of small wooden bridge over sparkling stream, green trees and bright flowers in background, two children crossing with excited expressions, storybook colorful style",
+      "visual_prompt": "(wide shot:1.3) small wooden bridge over sparkling stream, (two children:1.3) crossing, surrounded by green trees and bright flowers, (storybook colorful:1.4)",
+      "narration": "चमकती धारा के ऊपर बने लकड़ी के पुल को पार करते हुए, उन्हें लगा जैसे पानी फुसफुसा रहा हो।",
+      "subtitle": "Crossing the Bridge",
+      "characters": ["Anaya", "Rohan"]
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of glowing golden fireflies lighting jungle path, tall green plants in foreground, two children walking cautiously, storybook magical style",
+      "visual_prompt": "(wide shot:1.3) glowing golden fireflies lighting jungle path, (two children:1.3) walking cautiously, (storybook magical:1.4)",
+      "narration": "जंगल में सुनहरी जुगनुओं की रोशनी उन्हें आगे का रास्ता दिखा रही थी।",
+      "subtitle": "The Firefly Path",
+      "characters": ["Anaya", "Rohan"]
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of golden glowing river between rocky cliffs, bright golden reflections on children's faces, storybook magical style",
+      "visual_prompt": "(wide shot:1.3) (golden glowing river:1.4) between rocky cliffs, (two children:1.3) in awe, bright golden reflections on faces, (storybook magical:1.4)",
+      "narration": "और फिर, सामने थी सुनहरी नदी, जिसकी लहरें सूरज की तरह चमक रही थीं।",
+      "subtitle": "The Golden River",
+      "characters": ["Anaya", "Rohan"]
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of happy Indian village festival, villagers cheering, two children opening glowing chest, colorful butterflies and sparkles filling sky, storybook magical style",
+      "visual_prompt": "(wide shot:1.3) (happy Indian village festival:1.4) with cheering villagers, (two children:1.3) opening glowing chest, colorful butterflies and sparkles filling sky, (storybook magical:1.4)",
+      "narration": "गाँव में उन्होंने सन्दूक खोला, और आसमान रंग-बिरंगी तितलियों से भर गया।",
+      "subtitle": "The Celebration",
+      "characters": ["Anaya", "Rohan"]
+    }
+  ],
+  "tags": [
+    "kids",
+    "adventure",
+    "golden river",
+    "friendship",
+    "mystery",
+    "storybook",
+    "magical"
+  ]
+}
