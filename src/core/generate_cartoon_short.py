@@ -479,39 +479,9 @@ class CartoonShortsGenerator:
         logger.info(f"Generated metadata: {metadata_path}")
 
     def _compose_image_prompt(self, scene: Dict) -> str:
-        """Compose an image prompt that bakes in exactly two character specs if available."""
+        """Compose an image prompt using the original visual prompt without enhancement."""
         base = scene.get('visual_prompt', scene.get('description', ''))
-        characters = scene.get('characters', [])
-        # Style preset additions
-        style_suffix = ""
-        style_key = (self.config.style or "").lower()
-        if style_key in {"indian", "indian_cartoon", "desi", "bollywood"}:
-            style_suffix = (
-                " Indian cartoon style, inspired by Indian children's book illustrations and Amar Chitra Katha; "
-                "vibrant festive palette (marigold, vermilion, indigo), matte shading, soft outlines; "
-                "traditional Indian clothing and accessories where natural (kurta, sari, bangles); "
-                "background motifs like bazaars, auto-rickshaws, kites, forts or temples when relevant; "
-                "warm sunlight, friendly expression, family-friendly, avoid anime/manga aesthetics."
-            )
-        else:
-            style_suffix = (
-                " Vertical 768x1024 cartoon, clean lines, vibrant colors, family-friendly, both characters clearly visible, consistent traits across scenes."
-            )
-        if characters:
-            char_bits = []
-            for idx, ch in enumerate(characters[:2], start=1):
-                part = (
-                    f"({idx}) {ch.get('name','Character')} - {ch.get('role','role')}; "
-                    f"appearance: {ch.get('appearance','consistent look')}; "
-                    f"clothing: {ch.get('clothing','simple outfit')}; "
-                    f"emotion: {ch.get('emotion','neutral')}; "
-                    f"action: {ch.get('action','standing')}"
-                )
-                char_bits.append(part)
-            char_text = " Include two characters: " + " | ".join(char_bits) + "."
-        else:
-            char_text = ""
-        return (base or "Cartoon scene") + char_text + style_suffix
+        return base or "Cartoon scene"
 
 def main():
     """Main CLI entry point."""

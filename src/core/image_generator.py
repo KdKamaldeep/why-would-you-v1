@@ -195,8 +195,7 @@ class ImageGenerator:
     def _generate_sd_image(self, prompt: str, output_path: str) -> str:
         """Generate image using Stable Diffusion."""
         try:
-            # Enhanced prompt for better cartoon results
-            enhanced_prompt = prompt
+            # Use original prompt without enhancement
             # Strong cartoon-specific negative prompts to avoid realistic images
             negative_prompt = (
                 "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
@@ -206,12 +205,12 @@ class ImageGenerator:
                 "detailed skin, detailed hair, detailed clothing textures"
             )
             
-            logger.info(f"🎯 Enhanced prompt: {enhanced_prompt}")
+            logger.info(f"🎯 Using original prompt: {prompt}")
             
             # Generate image with cartoon-optimized settings
             with torch.autocast(self.device):
                 result = self.pipe(
-                    prompt=enhanced_prompt,
+                    prompt=prompt,
                     negative_prompt=negative_prompt,
                     num_inference_steps=30,  # More steps for better cartoon quality
                     guidance_scale=7.5,      # Balanced for cartoon style
