@@ -41,12 +41,13 @@ def test_image_generation():
     
     # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-  "(Indian village:1.3) at misty dawn, soft fog over green fields, (two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, holding lanterns, looking toward distant hills, (storybook mystery adventure style:1.4), wide shot",
-  "(two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, walking on overgrown muddy path with faint footprints, tall grass on both sides, (storybook mystery style:1.4), soft light, wide shot",
-  "(two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, standing at entrance of rocky cave hidden behind waterfall, golden light glowing inside, (storybook magical mystery style:1.4), wide shot",
-  "(ancient chest:1.4) covered in vines with glowing mysterious symbols, (two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, reaching toward chest, (storybook magical style:1.4), warm glow, wide shot",
-  "(happy Indian village festival:1.4) with cheering villagers, (two children:1.3) small Indian girl, red scarf, short black hair, wearing yellow kurta and green salwar, small Indian boy, messy hair, wearing blue shirt and brown shorts, opening glowing ancient chest, hundreds of colorful glowing butterflies flying into the sky, sparkles everywhere, (storybook magical style:1.4), golden evening light, wide shot"
+  "(Indian village:1.3) misty dawn, soft fog, green fields, (two children:1.3) girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, holding lanterns, looking toward hills, (storybook mystery:1.4), wide shot",
+  "(two children:1.3) girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, walking on muddy path with faint footprints, tall grass, (storybook mystery:1.4), wide shot",
+  "(two children:1.3) girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, at rocky cave behind waterfall, golden glow inside, (storybook magical mystery:1.4), wide shot",
+  "(ancient chest:1.4) vines glowing symbols, (two children:1.3) girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, reaching toward chest, (storybook magical:1.4), wide shot",
+  "(happy Indian village festival:1.4) cheering villagers, (two children:1.3) girl red scarf short black hair yellow kurta green salwar; boy messy hair blue shirt brown shorts, opening glowing chest, colorful butterflies sparkles, (storybook magical:1.4), wide shot"
 ]
+
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
     
