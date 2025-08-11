@@ -1,0 +1,61 @@
+{
+  "title": "The Moonlight Banyan",
+  "description": "Aarav and Meera race against time to find the glowing banyan tree that appears only under a full moon, hoping to make a wish for their village.",
+  "total_duration": 50,
+  "cast": [
+    {"name": "Aarav", "role": "playful and quick-thinking boy"},
+    {"name": "Meera", "role": "clever and kind-hearted girl"},
+    {"name": "Nanu", "role": "gentle storyteller and keeper of village legends"}
+  ],
+  "scenes": [
+    {
+      "duration": 10,
+      "description": "wide shot of peaceful Indian village under twilight, children listening to elderly man tell stories, warm lantern light, storybook cozy style",
+      "visual_prompt": "(wide shot:1.3) peaceful Indian village under twilight, (children listening:1.3) to elderly man telling stories, warm lantern light, (storybook cozy:1.4)",
+      "narration": "साँझ की लालिमा में, नानू ने एक रहस्य सुनाया—एक बरगद का पेड़, जो केवल पूर्णिमा की रात चाँदनी में जगमगाता है, और एक सच्चा मनोकामना पूरी करता है।",
+      "subtitle": "The Legend",
+      "characters": ["Aarav", "Meera", "Nanu"]
+    },
+    {
+      "duration": 10,
+      "description": "wide shot of children running through moonlit fields, tall grass swaying, soft silver light, storybook dreamy style",
+      "visual_prompt": "(wide shot:1.3) children running through moonlit fields, tall grass swaying, soft silver light, (storybook dreamy:1.4)",
+      "narration": "आकाश में गोल चाँद उभरा, और आरव व मीरा खेतों से होते हुए उस रहस्यमयी पेड़ की तलाश में निकल पड़े।",
+      "subtitle": "Moonlit Run",
+      "characters": ["Aarav", "Meera"]
+    },
+    {
+      "duration": 10,
+      "description": "wide shot of dark jungle with fireflies, narrow path leading forward, children holding small lantern, storybook magical style",
+      "visual_prompt": "(wide shot:1.3) dark jungle with glowing fireflies, narrow path, (children:1.3) holding small lantern, (storybook magical:1.4)",
+      "narration": "जंगल की गहराई में, जुगनुओं की चमक उनके कदमों को दिशा दे रही थी, मानो वे भी इस सफर में साथी हों।",
+      "subtitle": "The Firefly Trail",
+      "characters": ["Aarav", "Meera"]
+    },
+    {
+      "duration": 10,
+      "description": "wide shot of giant banyan tree glowing with silver moonlight, roots like flowing rivers, children in awe, storybook magical style",
+      "visual_prompt": "(wide shot:1.3) giant banyan tree glowing with silver moonlight, roots flowing like rivers, (children in awe:1.3), (storybook magical:1.4)",
+      "narration": "और वहाँ था—चाँदनी में नहाया हुआ विशाल बरगद, जिसकी जड़ें नदी की धाराओं सी लहरा रही थीं।",
+      "subtitle": "The Moonlight Banyan",
+      "characters": ["Aarav", "Meera"]
+    },
+    {
+      "duration": 10,
+      "description": "wide shot of happy Indian village morning, children returning with flower garlands, villagers smiling, banyan tree faintly visible in distance, storybook bright style",
+      "visual_prompt": "(wide shot:1.3) happy Indian village morning, children with flower garlands, smiling villagers, banyan tree faint in background, (storybook bright:1.4)",
+      "narration": "उन्होंने मन ही मन गाँव के लिए खुशियों की कामना की। सुबह होते ही, पूरा गाँव उल्लास से भर गया—मनोकामना पूरी हो चुकी थी।",
+      "subtitle": "The Wish",
+      "characters": ["Aarav", "Meera", "Nanu"]
+    }
+  ],
+  "tags": [
+    "kids",
+    "adventure",
+    "moonlight banyan",
+    "friendship",
+    "mystery",
+    "storybook",
+    "magical"
+  ]
+}
