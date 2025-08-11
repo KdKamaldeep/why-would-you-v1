@@ -10,6 +10,7 @@ import torch
 from PIL import Image, ImageDraw, ImageFont
 from typing import List, Optional
 from pathlib import Path
+from .prompt_enhancer import PromptEnhancer
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +20,20 @@ class ImageGenerator:
     Supports optional LoRA for style adaptation.
     """
     
-    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8):
+    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8, enable_prompt_enhancement: bool = True):
         self.model_path = model_path
         self.lora_path = lora_path
         self.lora_scale = lora_scale
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.pipe = None
         self.sd_available = False
+        self.enable_prompt_enhancement = enable_prompt_enhancement
+        self.prompt_enhancer = None
+        
+        # Initialize prompt enhancer if enabled
+        if self.enable_prompt_enhancement:
+            self.prompt_enhancer = PromptEnhancer()
+        
         self._initialize_pipeline()
         
     def _initialize_pipeline(self):
@@ -195,7 +203,10 @@ class ImageGenerator:
     def _generate_sd_image(self, prompt: str, output_path: str) -> str:
         """Generate image using Stable Diffusion."""
         try:
-            # Use original prompt without enhancement
+            # Use the prompt as-is (enhancement is now handled in _compose_image_prompt)
+            final_prompt = prompt
+            logger.info(f"🎯 Using prompt (enhancement handled upstream): {prompt}")
+            
             # Strong cartoon-specific negative prompts to avoid realistic images
             negative_prompt = (
                 "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
@@ -205,12 +216,10 @@ class ImageGenerator:
                 "detailed skin, detailed hair, detailed clothing textures"
             )
             
-            logger.info(f"🎯 Using original prompt: {prompt}")
-            
             # Generate image with cartoon-optimized settings
             with torch.autocast(self.device):
                 result = self.pipe(
-                    prompt=prompt,
+                    prompt=final_prompt,
                     negative_prompt=negative_prompt,
                     num_inference_steps=30,  # More steps for better cartoon quality
                     guidance_scale=7.5,      # Balanced for cartoon style

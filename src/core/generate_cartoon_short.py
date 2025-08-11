@@ -73,6 +73,8 @@ class VideoConfig:
     reuse_existing: bool = True
     # Control subtitle rendering
     add_subtitles: bool = True
+    # Control prompt enhancement
+    enable_prompt_enhancement: bool = True
 
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
@@ -90,7 +92,12 @@ class CartoonShortsGenerator:
         model_path = indian_pref_model if (config.style or "").lower() in {"indian", "indian_cartoon", "desi", "bollywood"} else default_model
         lora_path = os.getenv("INDIAN_STYLE_LORA", "") or None
         try:
-            self.image_generator = ImageGenerator(model_path=model_path, lora_path=lora_path, lora_scale=0.85)
+            self.image_generator = ImageGenerator(
+                model_path=model_path, 
+                lora_path=lora_path, 
+                lora_scale=0.85,
+                enable_prompt_enhancement=config.enable_prompt_enhancement
+            )
         except TypeError:
             # Fallback for older ImageGenerator signature
             self.image_generator = ImageGenerator(model_path=model_path)
@@ -479,9 +486,23 @@ class CartoonShortsGenerator:
         logger.info(f"Generated metadata: {metadata_path}")
 
     def _compose_image_prompt(self, scene: Dict) -> str:
-        """Compose an image prompt using the original visual prompt without enhancement."""
-        base = scene.get('visual_prompt', scene.get('description', ''))
-        return base or "Cartoon scene"
+        """Compose an image prompt using the visual_prompt from script with optional GPT-2 enhancement."""
+        # Get the visual_prompt from the script (this is the key requirement)
+        visual_prompt = scene.get('visual_prompt', scene.get('description', ''))
+        base_prompt = visual_prompt or "Cartoon scene"
+        
+        # If prompt enhancement is enabled, enhance the visual_prompt specifically
+        if self.config.enable_prompt_enhancement and hasattr(self, 'image_generator') and self.image_generator.prompt_enhancer:
+            logger.info(f"🎯 Enhancing visual_prompt from script: {base_prompt}")
+            enhanced_prompt = self.image_generator.prompt_enhancer.enhance_prompt(
+                base_prompt, 
+                enhancement_type="cartoon",
+                max_tokens=77  # Diffusion model token limit
+            )
+            return enhanced_prompt
+        else:
+            logger.info(f"🎯 Using original visual_prompt from script: {base_prompt}")
+            return base_prompt
 
 def main():
     """Main CLI entry point."""
@@ -492,6 +513,7 @@ def main():
     parser.add_argument("--style", default="cartoon", help="Visual style")
     parser.add_argument("--voice", default="", help="Reference speaker WAV path for Coqui XTTS (optional)")
     parser.add_argument("--language", default="en", help="Language for narration")
+    parser.add_argument("--no-prompt-enhancement", action="store_true", help="Disable GPT-2 prompt enhancement")
     
     args = parser.parse_args()
     
@@ -513,7 +535,8 @@ def main():
         output_path=args.output,
         style=args.style,
         voice_id=args.voice,
-        language=args.language
+        language=args.language,
+        enable_prompt_enhancement=not args.no_prompt_enhancement
     )
     
     # Generate video
