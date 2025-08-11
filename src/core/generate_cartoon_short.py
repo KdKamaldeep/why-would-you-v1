@@ -189,10 +189,7 @@ class CartoonShortsGenerator:
                 actual_scene_durations.append(actual_duration)
                 logger.info(f"Scene {i+1}: Audio clip length: {actual_duration:.1f}s")
             
-            # Combine all audio clips into one narration track
-            narration_path = self.output_dir / "narration_combined.m4a"
-            self.video_processor.concat_audios(scene_audio_paths, str(narration_path))
-            logger.info(f"✅ Combined all audio clips into: {narration_path}")
+            logger.info(f"✅ Generated {len(scene_audio_paths)} audio clips for narration")
             
             # Step 3: Generate cartoon images for scenes
             logger.info("Step 3: Generating cartoon images...")
@@ -256,6 +253,8 @@ class CartoonShortsGenerator:
             
         except Exception as e:
             logger.warning(f"Per-scene audio detection failed; falling back to single track: {e}")
+            # Fallback: Generate single narration track
+            narration_path = self.output_dir / "narration_single.m4a"
             if not (self.config.reuse_existing and narration_path.exists()):
                 narration_lines = [scene.get('narration', '') for scene in script.get('scenes', [])]
                 generated_audio = self.voice_synthesizer.synthesize_voice(
@@ -292,6 +291,9 @@ class CartoonShortsGenerator:
             final_clips = video_clips
             logger.info("✅ Videos already created with correct duration matching audio clips")
             
+            # Use single narration track for final compilation
+            scene_audio_paths = [str(narration_path)]
+            
             # Step 7: Create subtitles (optional)
             subtitles_path = self.output_dir / "subtitles.srt"
             if self.config.add_subtitles:
@@ -311,7 +313,7 @@ class CartoonShortsGenerator:
             logger.info("Step 9: Compiling final video...")
             self.video_processor.compile_final_video(
                 final_clips,
-                str(narration_path) if isinstance(narration_path, (str, Path)) else narration_path,
+                scene_audio_paths,  # Pass audio paths directly - compile_final_video will handle concatenation
                 background_music,
                 str(subtitles_path) if self.config.add_subtitles else None,
                 str(final_output)
