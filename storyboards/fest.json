@@ -1,0 +1,50 @@
+{
+  "title": "The Festival of the Hidden Lake",
+  "description": "Two curious friends in an Indian village discover a secret path to a hidden lake, where a magical festival awaits them.",
+  "total_duration": 60,
+  "tags": ["kids story", "Indian culture", "adventure", "friendship", "magic"],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "The village wakes to a bright morning, colorful flags fluttering in the wind.",
+      "visual_prompt": "(wide shot) Indian village morning, colorful flags, smiling villagers",
+      "narration": "In the heart of an Indian village, the morning began with joy and color."
+    },
+    {
+      "duration": 8,
+      "description": "Two friends spot a faint trail leading toward the forest edge.",
+      "visual_prompt": "(wide shot) forest edge, hidden path, two friends looking curious",
+      "narration": "Ravi and Meera noticed a hidden path leading into the forest."
+    },
+    {
+      "duration": 8,
+      "description": "They walk through lush greenery, hearing the sound of flowing water.",
+      "visual_prompt": "(wide shot) forest path, green trees, distant waterfall sound",
+      "narration": "They followed the trail, the sound of water growing louder."
+    },
+    {
+      "duration": 8,
+      "description": "A sparkling hidden lake appears, glowing under golden sunlight.",
+      "visual_prompt": "(wide shot) hidden lake, sparkling water, golden sunlight",
+      "narration": "Suddenly, a hidden lake shimmered before their eyes."
+    },
+    {
+      "duration": 8,
+      "description": "Villagers in colorful clothes prepare for a magical festival by the lake.",
+      "visual_prompt": "(wide shot) lakeside festival, colorful clothes, flower garlands",
+      "narration": "By the lake, villagers gathered for a magical celebration."
+    },
+    {
+      "duration": 8,
+      "description": "They join in, dancing and laughing under a sky filled with lanterns.",
+      "visual_prompt": "(wide shot) night festival, glowing lanterns, joyful dancing",
+      "narration": "Ravi and Meera danced as lanterns floated into the night sky."
+    },
+    {
+      "duration": 12,
+      "description": "The friends walk back home, carrying the memory of the magical night.",
+      "visual_prompt": "(wide shot) village night, two friends walking, soft lantern light",
+      "narration": "They returned home, hearts full of joy and wonder."
+    }
+  ]
+}
