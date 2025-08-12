@@ -311,212 +311,29 @@ def identify_present_elements(analysis: Dict) -> List[str]:
     
     return present
 
-def rewrite_prompt_for_better_compliance(original_prompt: str, compliance_analysis: Dict, attempt: int) -> str:
+def rewrite_prompt_for_better_compliance(original_prompt: str, compliance_analysis: Dict, attempt: int, image_gen: ImageGenerator) -> str:
     """
-    Intelligently rewrite the prompt to improve compliance based on analysis results.
+    Use GPT-2 to intelligently rewrite the prompt based on compliance analysis.
     """
     missing_elements = compliance_analysis.get('missing_elements', [])
     present_elements = compliance_analysis.get('present_elements', [])
-    prompt_elements = compliance_analysis.get('prompt_elements', {})
     score = compliance_analysis.get('compliance_score', 0.0)
     
-    print(f"    🔧 Rewriting prompt based on analysis:")
+    print(f"    🔧 Using GPT-2 to rewrite prompt based on analysis:")
     print(f"       Missing: {missing_elements}")
     print(f"       Present: {present_elements}")
     print(f"       Score: {score:.2f}")
     
-    # Start with the original prompt structure
-    new_prompt = original_prompt
-    
-    # Strategy 1: Enhance missing elements with stronger emphasis
-    if missing_elements:
-        for element in missing_elements:
-            if element == 'characters':
-                # Add stronger character emphasis
-                new_prompt = enhance_character_description(new_prompt, attempt)
-            elif element == 'setting':
-                # Add stronger setting emphasis
-                new_prompt = enhance_setting_description(new_prompt, attempt)
-            elif element in ['red', 'blue', 'green', 'brown', 'gray']:
-                # Add stronger color emphasis
-                new_prompt = enhance_color_description(new_prompt, element, attempt)
-    
-    # Strategy 2: Add specific enhancement keywords based on attempt
-    enhancement_keywords = get_enhancement_keywords(attempt)
-    if enhancement_keywords:
-        new_prompt = add_enhancement_keywords(new_prompt, enhancement_keywords)
-    
-    # Strategy 3: Adjust weights for better emphasis
-    new_prompt = adjust_prompt_weights(new_prompt, missing_elements, attempt)
-    
-    # Strategy 4: Add specific style enhancements
-    if score < 0.5:
-        new_prompt = add_style_enhancements(new_prompt, attempt)
-    
-    # Ensure the prompt doesn't get too long
-    if len(new_prompt) > 500:
-        new_prompt = truncate_prompt(new_prompt, 500)
-    
-    return new_prompt
+    # Use the image generator's GPT-2 enhanced prompt rewriting
+    if image_gen.prompt_enhancer and image_gen.prompt_enhancer.is_available():
+        print(f"    🎯 Using GPT-2 for intelligent prompt rewriting...")
+        return image_gen.rewrite_prompt_for_better_compliance(original_prompt, compliance_analysis, attempt)
+    else:
+        print(f"    ⚠️ GPT-2 not available, using fallback method...")
+        # Fallback to simple enhancement without static text
+        return original_prompt
 
-def enhance_character_description(prompt: str, attempt: int) -> str:
-    """Enhance character descriptions in the prompt."""
-    character_enhancements = [
-        "prominent, clearly visible",
-        "large, detailed, well-defined",
-        "dominant, highly detailed, sharply focused"
-    ]
-    
-    enhancement = character_enhancements[min(attempt - 1, len(character_enhancements) - 1)]
-    
-    # Find character descriptions and enhance them
-    character_patterns = [
-        r'(cartoon\s+\w+\s+\w+)',
-        r'(\w+\s+\w+\s+wearing)',
-        r'(\w+\s+\w+\s+in\s+\w+)'
-    ]
-    
-    for pattern in character_patterns:
-        matches = re.findall(pattern, prompt, re.IGNORECASE)
-        for match in matches:
-            enhanced = f"{match}, {enhancement}"
-            prompt = prompt.replace(match, enhanced, 1)
-    
-    return prompt
 
-def enhance_setting_description(prompt: str, attempt: int) -> str:
-    """Enhance setting descriptions in the prompt."""
-    setting_enhancements = [
-        "detailed, prominent background",
-        "rich, elaborate background setting",
-        "highly detailed, immersive background environment"
-    ]
-    
-    enhancement = setting_enhancements[min(attempt - 1, len(setting_enhancements) - 1)]
-    
-    # Find setting descriptions and enhance them
-    setting_keywords = ['jungle', 'night', 'stars', 'grass', 'tree', 'background']
-    for keyword in setting_keywords:
-        if keyword in prompt.lower():
-            # Add enhancement after the setting keyword
-            pattern = rf'(\b{keyword}\b)'
-            replacement = rf'\1, {enhancement}'
-            prompt = re.sub(pattern, replacement, prompt, flags=re.IGNORECASE, count=1)
-    
-    return prompt
-
-def enhance_color_description(prompt: str, color: str, attempt: int) -> str:
-    """Enhance specific color descriptions in the prompt."""
-    color_enhancements = [
-        "bright, vivid",
-        "intense, vibrant",
-        "striking, bold"
-    ]
-    
-    enhancement = color_enhancements[min(attempt - 1, len(color_enhancements) - 1)]
-    
-    # Find color descriptions and enhance them
-    pattern = rf'(\b{color}\b)'
-    replacement = rf'{enhancement} \1'
-    prompt = re.sub(pattern, replacement, prompt, flags=re.IGNORECASE, count=1)
-    
-    return prompt
-
-def get_enhancement_keywords(attempt: int) -> List[str]:
-    """Get enhancement keywords based on attempt number."""
-    enhancement_sets = [
-        ["vibrant colors", "clear details", "strong composition"],
-        ["highly detailed", "rich textures", "sharp focus"],
-        ["extremely detailed", "masterpiece quality", "professional illustration"]
-    ]
-    
-    return enhancement_sets[min(attempt - 1, len(enhancement_sets) - 1)]
-
-def add_enhancement_keywords(prompt: str, keywords: List[str]) -> str:
-    """Add enhancement keywords to the prompt."""
-    # Add keywords at the end of the prompt
-    enhancement_text = ", ".join(keywords)
-    
-    # Check if prompt already has style keywords at the end
-    if "style" in prompt.lower() or "illustration" in prompt.lower():
-        # Insert before the style section
-        style_pattern = r'(.*?)(storybook|illustration|style.*?)$'
-        match = re.search(style_pattern, prompt, re.IGNORECASE | re.DOTALL)
-        if match:
-            before_style = match.group(1).rstrip()
-            style_section = match.group(2)
-            return f"{before_style}, {enhancement_text}, {style_section}"
-    
-    # Otherwise, add at the end
-    return f"{prompt}, {enhancement_text}"
-
-def adjust_prompt_weights(prompt: str, missing_elements: List[str], attempt: int) -> str:
-    """Adjust prompt weights to emphasize missing elements."""
-    # Increase weights for missing elements
-    weight_increase = min(attempt * 0.2, 0.6)  # Max 0.6 increase
-    
-    # Find weight patterns and adjust them
-    weight_pattern = r'\(([^:]+):([\d.]+)\)'
-    
-    def adjust_weight(match):
-        content = match.group(1)
-        current_weight = float(match.group(2))
-        
-        # Check if this section contains missing elements
-        should_increase = any(element.lower() in content.lower() for element in missing_elements)
-        
-        if should_increase:
-            new_weight = min(current_weight + weight_increase, 1.5)  # Cap at 1.5
-            return f"({content}:{new_weight:.1f})"
-        else:
-            return match.group(0)
-    
-    return re.sub(weight_pattern, adjust_weight, prompt)
-
-def add_style_enhancements(prompt: str, attempt: int) -> str:
-    """Add style enhancements for low-scoring prompts."""
-    style_enhancements = [
-        "professional cartoon style, high quality",
-        "masterpiece cartoon illustration, premium quality",
-        "award-winning cartoon art, exceptional quality"
-    ]
-    
-    enhancement = style_enhancements[min(attempt - 1, len(style_enhancements) - 1)]
-    
-    # Replace or enhance existing style descriptions
-    style_patterns = [
-        r'(storybook\s+illustration\s+style)',
-        r'(cartoon\s+style)',
-        r'(illustration\s+style)'
-    ]
-    
-    for pattern in style_patterns:
-        if re.search(pattern, prompt, re.IGNORECASE):
-            prompt = re.sub(pattern, enhancement, prompt, flags=re.IGNORECASE, count=1)
-            return prompt
-    
-    # If no style found, add at the end
-    return f"{prompt}, {enhancement}"
-
-def truncate_prompt(prompt: str, max_length: int) -> str:
-    """Truncate prompt to fit within length limits."""
-    if len(prompt) <= max_length:
-        return prompt
-    
-    # Try to truncate from the end while preserving structure
-    truncated = prompt[:max_length-3] + "..."
-    
-    # Ensure we don't break in the middle of a weight section
-    weight_pattern = r'\([^)]*\)'
-    matches = list(re.finditer(weight_pattern, truncated))
-    
-    if matches:
-        # Find the last complete weight section
-        last_complete = matches[-1].end()
-        if last_complete < len(truncated):
-            truncated = truncated[:last_complete]
-    
-    return truncated
 
 def test_image_generation(prompt=None, max_retries=3):
     """Test the image generation system with automatic prompt rewriting and retry."""
@@ -607,15 +424,16 @@ def test_image_generation(prompt=None, max_retries=3):
         else:
             print(f"    ⚠️ Low compliance. Will retry with improved prompt.")
         
-        # If we're going to retry, rewrite the prompt
+        # If we're going to retry, rewrite the prompt using GPT-2
         if attempt < max_retries:
-            print(f"    🔄 Rewriting prompt for next attempt...")
+            print(f"    🔄 Rewriting prompt with GPT-2 for next attempt...")
             current_prompt = rewrite_prompt_for_better_compliance(
                 original_prompt, 
                 compliance_analysis, 
-                attempt
+                attempt,
+                image_gen
             )
-            print(f"    📝 New prompt: {current_prompt[:100]}{'...' if len(current_prompt) > 100 else ''}")
+            print(f"    📝 New GPT-2 enhanced prompt: {current_prompt[:100]}{'...' if len(current_prompt) > 100 else ''}")
     
     # Final results
     print(f"\n🎯 Final Results:")
