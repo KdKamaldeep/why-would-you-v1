@@ -7,7 +7,7 @@ import os
 import logging
 from pathlib import Path
 import sys
-import os
+import argparse
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from core.image_generator import ImageGenerator
@@ -16,7 +16,7 @@ from core.image_generator import ImageGenerator
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def test_image_generation():
+def test_image_generation(prompt=None):
     """Test the image generation system."""
     
     print("🎨 Testing Stable Diffusion Image Generation")
@@ -39,15 +39,14 @@ def test_image_generation():
         print("⚠️ Stable Diffusion not available - will use placeholder images")
         print("💡 To enable SD, run: bash download_models.sh")
     
-    # Test prompts with enhanced cartoon style keywords
-    test_prompts = [
-  "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow, standing together under large jungle tree:1.3), (lush tropical jungle background with ferns, flowers, and vines, bright green leaves:1.2), (morning sunlight streaming through trees, soft warm glow, storybook illustration style:1.1)"
-]
-
-
-
+    # Use provided prompt or default test prompt
+    if prompt is None:
+        prompt = "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow, standing together under large jungle tree:1.3), (lush tropical jungle background with ferns, flowers, and vines, bright green leaves:1.2), (morning sunlight streaming through trees, soft warm glow, storybook illustration style:1.1)"
+    
+    test_prompts = [prompt]
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
+    print(f"📝 Using prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
     
     # Generate images
     image_paths = image_gen.generate_multiple_images(test_prompts, str(output_dir))
@@ -73,5 +72,30 @@ def test_image_generation():
         print("   2. Install: pip install diffusers transformers accelerate safetensors")
         print("   3. Restart this test script")
 
+def main():
+    """Main function to handle command line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Test Stable Diffusion image generation with custom prompts",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python test_image_generation.py
+  python test_image_generation.py --prompt "a cute cartoon cat playing in a garden"
+  python test_image_generation.py -p "cartoon style, colorful background, happy characters"
+        """
+    )
+    
+    parser.add_argument(
+        '-p', '--prompt',
+        type=str,
+        help='Custom prompt for image generation (optional)',
+        default=None
+    )
+    
+    args = parser.parse_args()
+    
+    # Run the test with the provided prompt
+    test_image_generation(args.prompt)
+
 if __name__ == "__main__":
-    test_image_generation()
+    main()

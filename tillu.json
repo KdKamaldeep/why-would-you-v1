@@ -1,99 +1,109 @@
 {
-  "title": "Tillu, Golu & Pinky's Silly Jungle Day",
-  "description": "Tillu the monkey, Golu the bear, and Pinky the squirrel have a day of silly jungle adventures full of laughs and surprises.",
+  "title": "Tillu, Golu and Pinky's Jungle Prank",
+  "description": "A mischievous monkey, a gentle bear, and a clever squirrel team up for a day of funny jungle adventures.",
   "total_duration": 50,
   "cast": [],
   "scenes": [
     {
       "duration": 5,
-      "description": "wide shot of sunny jungle, monkey swinging, bear with picnic basket, squirrel hopping",
-      "visual_prompt": "(wide shot) sunny jungle, brown cartoon monkey wearing red scarf swinging on vines, brown bear in blue vest carrying picnic basket, small gray squirrel with green bow hopping, cartoon style",
-      "narration": "जंगल में सुबह हो चुकी है, और तिल्लू, गोलू और पिंकी पिकनिक के लिए निकल पड़े हैं।",
-      "subtitle": "A Sunny Start",
-      "characters": ["Tillu", "Golu", "Pinky"]
+      "description": "wide shot of three friends planning their day under a tree",
+      "visual_prompts": [
+        "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow, sitting together under a large banyan tree:1.3), (lush green jungle clearing with flowers, vines, and grass:1.2), (soft morning sunlight filtering through leaves, warm cheerful storybook style:1.1)"
+      ],
+      "narration": "सुबह-सुबह, टिल्लू, गोलू और पिंकी एक नई शरारत की योजना बना रहे हैं।",
+      "subtitle": "Morning Mischief"
     },
     {
       "duration": 5,
-      "description": "close-up of monkey dropping bananas while laughing",
-      "visual_prompt": "close-up cartoon brown monkey wearing red scarf laughing, bananas falling, bright jungle background",
-      "narration": "तिल्लू हंसते-हंसते केले गिरा देता है।",
-      "subtitle": "Banana Trouble",
-      "characters": ["Tillu"]
+      "description": "Tillu swinging from vines while friends laugh",
+      "visual_prompts": [
+        "(medium shot, cartoon brown monkey wearing red scarf swinging on jungle vine while cartoon brown bear in blue vest and cartoon gray squirrel with green bow laugh below:1.3), (dense jungle background with tall trees and bright green leaves:1.2), (sunlit playful scene, bright colors, storybook illustration style:1.1)"
+      ],
+      "narration": "टिल्लू बेल पर झूल रहा है, और गोलू-पिंकी हँस-हँस कर लोटपोट हो रहे हैं।",
+      "subtitle": "Vine Acrobatics"
     },
     {
       "duration": 5,
-      "description": "medium shot of bear slipping on banana peel",
-      "visual_prompt": "medium shot cartoon brown bear in blue vest slipping on banana peel, green jungle background",
-      "narration": "गोलू केले पकड़ने की कोशिश करता है, लेकिन खुद ही फिसल जाता है।",
-      "subtitle": "Slippery Situation",
-      "characters": ["Golu"]
+      "description": "friends sneaking behind a bush to surprise parrot",
+      "visual_prompts": [
+        "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow hiding behind bush peeking at colorful parrot:1.3), (tropical jungle with flowers, ferns, and tall grass:1.2), (bright daylight, playful atmosphere, storybook art style:1.1)"
+      ],
+      "narration": "तीनों झाड़ियों के पीछे छुपकर तोते को चौंकाने की कोशिश कर रहे हैं।",
+      "subtitle": "The Sneaky Plan"
     },
     {
       "duration": 5,
-      "description": "wide shot of squirrel running to colorful bush",
-      "visual_prompt": "(wide shot) small gray squirrel with green bow running to rainbow-colored bush in jungle clearing, cartoon style",
-      "narration": "पिंकी को एक रंग-बिरा झाड़ी दिखाई देती है।",
-      "subtitle": "The Mysterious Bush",
-      "characters": ["Pinky"]
+      "description": "Golu accidentally stepping into a muddy puddle",
+      "visual_prompts": [
+        "(medium shot, cartoon brown bear in blue vest stepping into muddy puddle while cartoon brown monkey wearing red scarf and cartoon gray squirrel with green bow laugh:1.3), (jungle path with plants and puddles:1.2), (soft golden light, humorous storybook illustration style:1.1)"
+      ],
+      "narration": "गोलू गलती से कीचड़ में पैर रख देता है, और सब खिलखिलाने लगते हैं।",
+      "subtitle": "Muddy Surprise"
     },
     {
       "duration": 5,
-      "description": "medium shot of friends peeking into bush",
-      "visual_prompt": "medium shot cartoon brown monkey with red scarf, brown bear in blue vest, gray squirrel with green bow peeking into rainbow-colored bush, cartoon jungle style",
-      "narration": "तीनों झाड़ी के अंदर झांकते हैं और हंसने लगते हैं।",
-      "subtitle": "Peek-a-Bush",
-      "characters": ["Tillu", "Golu", "Pinky"]
+      "description": "friends building a leaf hat for fun",
+      "visual_prompts": [
+        "(close-up, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow making a big leaf hat together:1.3), (lush green jungle with large banana leaves:1.2), (warm sunlight, cute and colorful storybook style:1.1)"
+      ],
+      "narration": "तीनों मिलकर पत्तों से मजेदार टोपी बना रहे हैं।",
+      "subtitle": "Leaf Hat Creation"
     },
     {
       "duration": 5,
-      "description": "close-up of frogs with flower hats jumping out",
-      "visual_prompt": "close-up small green frogs wearing colorful flower hats jumping out of bush, bright cartoon jungle style",
-      "narration": "अंदर छोटे-छोटे मेंढक फूलों की टोपी पहने नाच रहे हैं।",
-      "subtitle": "Dancing Frogs",
-      "characters": ["Frogs"]
+      "description": "Tillu chasing butterflies",
+      "visual_prompts": [
+        "(wide shot, cartoon brown monkey wearing red scarf running after colorful butterflies while cartoon brown bear in blue vest and cartoon gray squirrel with green bow watch:1.3), (meadow area of jungle with flowers and tall grass:1.2), (sunny day, light breeze, cheerful storybook illustration style:1.1)"
+      ],
+      "narration": "टिल्लू रंग-बिरंगी तितलियों के पीछे दौड़ रहा है।",
+      "subtitle": "Butterfly Chase"
     },
     {
       "duration": 5,
-      "description": "wide shot of friends dancing with frogs",
-      "visual_prompt": "(wide shot) cartoon brown monkey with red scarf, brown bear in blue vest, gray squirrel with green bow dancing with green frogs wearing flower hats in jungle clearing",
-      "narration": "तीनों दोस्तों ने मेंढकों के साथ नाचना शुरू कर दिया।",
-      "subtitle": "Dance Party",
-      "characters": ["Tillu", "Golu", "Pinky", "Frogs"]
+      "description": "Pinky balancing on a log over a stream",
+      "visual_prompts": [
+        "(medium shot, cartoon gray squirrel with green bow balancing on fallen log over small stream while cartoon brown monkey wearing red scarf and cartoon brown bear in blue vest cheer:1.3), (clear jungle stream with stones and plants:1.2), (afternoon light, playful and adventurous storybook style:1.1)"
+      ],
+      "narration": "पिंकी पानी के ऊपर लकड़ी के तने पर संतुलन बना रही है।",
+      "subtitle": "Balancing Act"
     },
     {
       "duration": 5,
-      "description": "medium shot of bear knocking picnic basket",
-      "visual_prompt": "medium shot cartoon brown bear in blue vest accidentally knocking picnic basket, fruit spilling out, cartoon jungle style",
-      "narration": "नाचते-नाचते गोलू ने टोकरी गिरा दी।",
-      "subtitle": "Picnic Spill",
-      "characters": ["Golu"]
+      "description": "friends sharing fruits",
+      "visual_prompts": [
+        "(medium shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sitting together sharing mangoes:1.3), (shady spot in jungle with fruit basket:1.2), (soft dappled sunlight, cozy and friendly storybook style:1.1)"
+      ],
+      "narration": "तीनों आम बाँटकर खा रहे हैं और हँस रहे हैं।",
+      "subtitle": "Fruit Feast"
     },
     {
       "duration": 5,
-      "description": "close-up of friends sharing food with frogs",
-      "visual_prompt": "close-up cartoon brown monkey with red scarf, brown bear in blue vest, gray squirrel with green bow sharing fruit with green frogs in flower hats, cartoon jungle style",
-      "narration": "सबने मिलकर खाना बांटा और खूब हंसी-मजाक किया।",
-      "subtitle": "Sharing is Fun",
-      "characters": ["Tillu", "Golu", "Pinky", "Frogs"]
+      "description": "group watching fireflies at night",
+      "visual_prompts": [
+        "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow watching glowing fireflies together:1.3), (dark jungle clearing with tall grass:1.2), (soft moonlight, magical night, storybook illustration style:1.1)"
+      ],
+      "narration": "रात को, तीनों जगमगाते जुगनुओं को देखते हैं।",
+      "subtitle": "Magical Night"
     },
     {
       "duration": 5,
-      "description": "wide shot of sunset, friends waving goodbye to frogs",
-      "visual_prompt": "(wide shot) cartoon brown monkey with red scarf, brown bear in blue vest, gray squirrel with green bow waving to green frogs wearing flower hats under orange sunset in jungle",
-      "narration": "शाम हो गई, और तीनों दोस्तों ने मेंढकों को अलविदा कहा।",
-      "subtitle": "Goodbye Frogs",
-      "characters": ["Tillu", "Golu", "Pinky", "Frogs"]
+      "description": "friends sleeping under tree with moonlight",
+      "visual_prompts": [
+        "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sleeping peacefully under tree:1.3), (calm jungle night with stars and grass:1.2), (soft blue moonlight, serene storybook illustration style:1.1)"
+      ],
+      "narration": "पूरा दिन मस्ती करने के बाद, तीनों पेड़ के नीचे मीठी नींद में सो जाते हैं।",
+      "subtitle": "Sweet Dreams"
     }
   ],
   "tags": [
+    "funny",
     "jungle",
     "monkey",
     "bear",
     "squirrel",
-    "frogs",
-    "funny",
     "friendship",
     "storybook",
-    "kids"
+    "kids",
+    "adventure"
   ]
 }
