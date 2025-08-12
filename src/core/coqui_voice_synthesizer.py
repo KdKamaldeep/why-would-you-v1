@@ -23,6 +23,12 @@ warnings.filterwarnings("ignore", message=".*torchaudio.load.*")
 warnings.filterwarnings("ignore", message=".*StreamingMediaDecoder.*")
 warnings.filterwarnings("ignore", message=".*torchcodec.*")
 
+# Suppress attention mask warnings from transformers (used by TTS)
+warnings.filterwarnings("ignore", message=".*attention mask is not set.*")
+warnings.filterwarnings("ignore", message=".*pad token is same as eos token.*")
+warnings.filterwarnings("ignore", message=".*CLIPFeatureExtractor is deprecated.*")
+warnings.filterwarnings("ignore", message=".*Some weights of the model checkpoint were not used.*")
+
 logger = logging.getLogger(__name__)
 
 # Patch for PyTorch 2.6 weights_only issue

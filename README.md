@@ -159,6 +159,9 @@ python -c "from src.core.animation_generator import AnimationGenerator; print('�
 # Test attention mask fix
 python test_warning_fixes.py
 
+# Test TTS warning suppression
+python test_tts_warning_fixes.py
+
 # Test subtitle functionality
 python test_subtitle_functionality.py
 
@@ -187,9 +190,9 @@ python reinstall_dependencies.py
 - **Status**: ✅ **Implemented**
 
 ### **TTS Compatibility Issues (Fixed)**
-- **Problem**: "GPT2InferenceModel object has no attribute 'generate'" and torchaudio deprecation warnings
-- **Solution**: Reverted to compatible versions (transformers==4.49.0, TTS==0.22.0) and added warning suppression
-- **Impact**: Restores XTTS voice generation functionality and eliminates torchaudio warnings
+- **Problem**: "GPT2InferenceModel object has no attribute 'generate'", torchaudio deprecation warnings, and attention mask warnings
+- **Solution**: Reverted to compatible versions (transformers==4.49.0, TTS==0.22.0) and added comprehensive warning suppression
+- **Impact**: Restores XTTS voice generation functionality and eliminates all TTS-related warnings
 - **Status**: ✅ **Resolved**
 
 ## 📚 **Documentation**
