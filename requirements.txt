@@ -63,4 +63,5 @@ pydantic==1.10.14
 ###############################################
 # Text-to-Speech (Coqui TTS)
 ###############################################
-TTS==0.22.0
+# Updated TTS version to fix GPT2InferenceModel compatibility issues
+TTS>=0.25.0

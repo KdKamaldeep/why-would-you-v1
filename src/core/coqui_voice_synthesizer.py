@@ -12,10 +12,16 @@ Based on: https://docs.coqui.ai/en/dev/models/bark.html
 import os
 import logging
 import tempfile
+import warnings
 import numpy as np
 from typing import List, Optional, Dict, Any
 import torch
 from pydantic import BaseModel
+
+# Suppress torchaudio deprecation warnings
+warnings.filterwarnings("ignore", message=".*torchaudio.load.*")
+warnings.filterwarnings("ignore", message=".*StreamingMediaDecoder.*")
+warnings.filterwarnings("ignore", message=".*torchcodec.*")
 
 logger = logging.getLogger(__name__)
 

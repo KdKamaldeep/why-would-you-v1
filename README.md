@@ -154,8 +154,14 @@ python -c "from src.core.animation_generator import AnimationGenerator; print('�
 # Test attention mask fix
 python test_attention_mask_fix.py
 
+# Test subtitle functionality
+python test_subtitle_functionality.py
+
 # Update dependencies to fix warnings
 python update_dependencies.py
+
+# Fix TTS and torchaudio issues
+python fix_tts_issues.py
 ```
 
 ## 🔧 **Recent Fixes**
@@ -170,6 +176,18 @@ python update_dependencies.py
 - **Problem**: "CLIPFeatureExtractor is deprecated" and "Some weights of the model checkpoint were not used"
 - **Solution**: Updated transformers library and added warning suppression
 - **Impact**: Eliminates deprecation warnings and unused weight warnings
+- **Status**: ✅ **Resolved**
+
+### **Subtitle Functionality (Added)**
+- **Feature**: Added subtitle support to image generation
+- **Implementation**: Professional subtitle rendering with background and text shadows
+- **Usage**: Pass subtitle parameter to `generate_cartoon_image()` method
+- **Status**: ✅ **Implemented**
+
+### **TTS Compatibility Issues (Fixed)**
+- **Problem**: "GPT2InferenceModel object has no attribute 'generate'" and torchaudio deprecation warnings
+- **Solution**: Updated TTS to >=0.25.0 and added warning suppression
+- **Impact**: Fixes XTTS voice generation and eliminates torchaudio warnings
 - **Status**: ✅ **Resolved**
 
 ## 📚 **Documentation**
