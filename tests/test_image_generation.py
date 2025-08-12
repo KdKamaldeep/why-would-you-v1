@@ -41,7 +41,7 @@ def test_image_generation():
     
     # Test prompts with enhanced cartoon style keywords
     test_prompts = [
-  "medium shot of two children looking at an old map by warm lantern light in a cozy Indian village, storybook illustration style, soft warm glow"
+  "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow, standing together under large jungle tree:1.3), (lush tropical jungle background with ferns, flowers, and vines, bright green leaves:1.2), (morning sunlight streaming through trees, soft warm glow, storybook illustration style:1.1)"
 ]
 
 
