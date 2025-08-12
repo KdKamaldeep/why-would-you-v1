@@ -9,6 +9,8 @@ from pathlib import Path
 import sys
 import argparse
 import re
+import numpy as np
+from PIL import Image
 from typing import Dict, List, Tuple
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 
@@ -24,8 +26,6 @@ def analyze_prompt_compliance(image_path: str, prompt: str) -> Dict[str, any]:
     Returns a dictionary with compliance scores and analysis.
     """
     try:
-        from PIL import Image
-        import numpy as np
         from collections import Counter
         
         # Load the image
