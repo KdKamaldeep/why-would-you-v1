@@ -54,7 +54,7 @@ WhyWouldYou-v1/
 git clone <repository-url>
 cd WhyWouldYou-v1
 
-# Install dependencies
+# Install dependencies (compatible versions for Python 3.11)
 pip install -r requirements.txt
 
 # Setup the project
@@ -63,6 +63,11 @@ python -m src.utils.setup
 # Download models
 bash src/utils/download_models.sh
 ```
+
+**Note**: The current configuration uses compatible versions:
+- `transformers==4.49.0` and `TTS==0.22.0` for Python 3.11 compatibility
+- Warning suppressions handle deprecation messages
+- All functionality is preserved with stable versions
 
 ### **2. Configuration**
 ```bash
@@ -152,16 +157,13 @@ python tests/test_image_generation.py
 python -c "from src.core.animation_generator import AnimationGenerator; print('✅ Animation system ready')"
 
 # Test attention mask fix
-python test_attention_mask_fix.py
+python test_warning_fixes.py
 
 # Test subtitle functionality
 python test_subtitle_functionality.py
 
-# Update dependencies to fix warnings
-python update_dependencies.py
-
-# Fix TTS and torchaudio issues
-python fix_tts_issues.py
+# Reinstall dependencies (if needed)
+python reinstall_dependencies.py
 ```
 
 ## 🔧 **Recent Fixes**
@@ -186,8 +188,8 @@ python fix_tts_issues.py
 
 ### **TTS Compatibility Issues (Fixed)**
 - **Problem**: "GPT2InferenceModel object has no attribute 'generate'" and torchaudio deprecation warnings
-- **Solution**: Updated TTS to >=0.25.0 and added warning suppression
-- **Impact**: Fixes XTTS voice generation and eliminates torchaudio warnings
+- **Solution**: Reverted to compatible versions (transformers==4.49.0, TTS==0.22.0) and added warning suppression
+- **Impact**: Restores XTTS voice generation functionality and eliminates torchaudio warnings
 - **Status**: ✅ **Resolved**
 
 ## 📚 **Documentation**
