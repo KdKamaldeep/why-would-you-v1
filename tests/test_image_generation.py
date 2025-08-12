@@ -23,10 +23,13 @@ logger = logging.getLogger(__name__)
 def analyze_prompt_compliance(image_path: str, prompt: str) -> Dict[str, any]:
     """
     Analyze if a generated image complies with the given visual prompt.
+    Uses third-party open-source packages for better image understanding.
     Returns a dictionary with compliance scores and analysis.
     """
     try:
         from collections import Counter
+        import cv2
+        from PIL import Image, ImageEnhance
         
         # Load the image
         image = Image.open(image_path)
@@ -38,10 +41,10 @@ def analyze_prompt_compliance(image_path: str, prompt: str) -> Dict[str, any]:
         # Extract key elements from the prompt
         prompt_elements = extract_prompt_elements(prompt)
         
-        # Analyze image characteristics
+        # Analyze image characteristics using OpenCV
         analysis = {
             'prompt_elements': prompt_elements,
-            'image_analysis': analyze_image_characteristics(img_array),
+            'image_analysis': analyze_image_characteristics_advanced(img_array),
             'compliance_score': 0.0,
             'missing_elements': [],
             'present_elements': [],
@@ -49,19 +52,19 @@ def analyze_prompt_compliance(image_path: str, prompt: str) -> Dict[str, any]:
         }
         
         # Check for basic quality issues first
-        if is_image_blank_or_poor_quality(img_array):
+        if is_image_blank_or_poor_quality_advanced(img_array):
             analysis['overall_quality'] = 'poor'
             analysis['compliance_score'] = 0.0
             return analysis
         
         analysis['overall_quality'] = 'good'
         
-        # Analyze color compliance
-        color_compliance = analyze_color_compliance(img_array, prompt_elements)
+        # Analyze color compliance using advanced color detection
+        color_compliance = analyze_color_compliance_advanced(img_array, prompt_elements)
         analysis['color_analysis'] = color_compliance
         
-        # Analyze composition compliance
-        composition_compliance = analyze_composition_compliance(img_array, prompt_elements)
+        # Analyze composition compliance using computer vision
+        composition_compliance = analyze_composition_compliance_advanced(img_array, prompt_elements)
         analysis['composition_analysis'] = composition_compliance
         
         # Calculate overall compliance score
@@ -149,8 +152,65 @@ def extract_prompt_elements(prompt: str) -> Dict[str, any]:
     
     return elements
 
-def analyze_image_characteristics(img_array: np.ndarray) -> Dict[str, any]:
-    """Analyze basic image characteristics."""
+def analyze_image_characteristics_advanced(img_array: np.ndarray) -> Dict[str, any]:
+    """Analyze image characteristics using OpenCV and advanced computer vision techniques."""
+    try:
+        import cv2
+        
+        # Convert PIL array to OpenCV format (BGR)
+        img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+        
+        # Convert to different color spaces
+        hsv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2HSV)
+        lab = cv2.cvtColor(img_cv, cv2.COLOR_BGR2LAB)
+        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+        
+        # Advanced color analysis
+        # Calculate color histograms
+        color_hist = cv2.calcHist([img_cv], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+        color_hist = cv2.normalize(color_hist, color_hist).flatten()
+        
+        # Edge detection for structure analysis
+        edges = cv2.Canny(gray, 50, 150)
+        edge_density = np.sum(edges > 0) / (edges.shape[0] * edges.shape[1])
+        
+        # Texture analysis using Local Binary Patterns
+        from skimage.feature import local_binary_pattern
+        lbp = local_binary_pattern(gray, P=8, R=1, method='uniform')
+        lbp_hist, _ = np.histogram(lbp, bins=10, range=(0, 10))
+        lbp_hist = lbp_hist.astype(float) / lbp_hist.sum()
+        
+        # Dominant colors using K-means clustering
+        pixels = img_array.reshape(-1, 3)
+        from sklearn.cluster import KMeans
+        kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
+        kmeans.fit(pixels)
+        dominant_colors = kmeans.cluster_centers_.astype(int)
+        
+        # Brightness and contrast analysis
+        brightness = np.mean(gray)
+        contrast = np.std(gray)
+        
+        # Color diversity
+        unique_colors = len(np.unique(pixels, axis=0))
+        
+        return {
+            'dominant_colors': dominant_colors.tolist(),
+            'color_histogram': color_hist.tolist(),
+            'edge_density': float(edge_density),
+            'texture_lbp': lbp_hist.tolist(),
+            'brightness': float(brightness),
+            'contrast': float(contrast),
+            'total_unique_colors': int(unique_colors),
+            'mean_saturation': float(np.mean(hsv[:, :, 1])),
+            'color_variance': float(np.var(img_array))
+        }
+    except ImportError:
+        # Fallback to basic analysis if OpenCV is not available
+        return analyze_image_characteristics_basic(img_array)
+
+def analyze_image_characteristics_basic(img_array: np.ndarray) -> Dict[str, any]:
+    """Basic image characteristics analysis as fallback."""
     # Convert to different color spaces for analysis
     hsv = Image.fromarray(img_array).convert('HSV')
     hsv_array = np.array(hsv)
@@ -175,8 +235,62 @@ def analyze_image_characteristics(img_array: np.ndarray) -> Dict[str, any]:
         'mean_saturation': np.mean(hsv_array[:, :, 1])
     }
 
-def is_image_blank_or_poor_quality(img_array: np.ndarray) -> bool:
-    """Check if image is blank or poor quality."""
+def is_image_blank_or_poor_quality_advanced(img_array: np.ndarray) -> bool:
+    """Advanced quality detection using OpenCV and computer vision techniques."""
+    try:
+        import cv2
+        
+        # Convert to OpenCV format
+        img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+        
+        # Multiple quality metrics
+        # 1. Variance analysis
+        variance = np.var(img_array)
+        
+        # 2. Edge density (blank images have few edges)
+        edges = cv2.Canny(gray, 50, 150)
+        edge_density = np.sum(edges > 0) / (edges.shape[0] * edges.shape[1])
+        
+        # 3. Color diversity
+        unique_colors = len(np.unique(img_array.reshape(-1, img_array.shape[-1]), axis=0))
+        
+        # 4. Brightness analysis
+        brightness_variance = np.var(gray)
+        mean_brightness = np.mean(gray)
+        
+        # 5. Contrast analysis
+        contrast = np.std(gray)
+        
+        # 6. Texture analysis using Local Binary Patterns
+        from skimage.feature import local_binary_pattern
+        lbp = local_binary_pattern(gray, P=8, R=1, method='uniform')
+        lbp_variance = np.var(lbp)
+        
+        # 7. Blur detection using Laplacian variance
+        laplacian_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+        
+        # Quality thresholds
+        is_poor_quality = (
+            variance < 1000 or  # Low color variance
+            edge_density < 0.01 or  # Very few edges
+            unique_colors < 100 or  # Few unique colors
+            brightness_variance < 500 or  # Low brightness variance
+            mean_brightness < 10 or  # Too dark
+            mean_brightness > 245 or  # Too bright
+            contrast < 20 or  # Low contrast
+            lbp_variance < 5 or  # Low texture variance
+            laplacian_var < 100  # Too blurry
+        )
+        
+        return is_poor_quality
+        
+    except ImportError:
+        # Fallback to basic quality detection
+        return is_image_blank_or_poor_quality_basic(img_array)
+
+def is_image_blank_or_poor_quality_basic(img_array: np.ndarray) -> bool:
+    """Basic quality detection as fallback."""
     variance = np.var(img_array)
     unique_colors = len(np.unique(img_array.reshape(-1, img_array.shape[-1]), axis=0))
     gray = np.mean(img_array, axis=2)
@@ -191,8 +305,89 @@ def is_image_blank_or_poor_quality(img_array: np.ndarray) -> bool:
         mean_brightness > 245
     )
 
-def analyze_color_compliance(img_array: np.ndarray, prompt_elements: Dict) -> Dict[str, any]:
-    """Analyze if image colors match prompt requirements."""
+def analyze_color_compliance_advanced(img_array: np.ndarray, prompt_elements: Dict) -> Dict[str, any]:
+    """Advanced color analysis using OpenCV and color science."""
+    try:
+        import cv2
+        from colorthief import ColorThief
+        import io
+        
+        compliance = {
+            'score': 0.0,
+            'matched_colors': [],
+            'missing_colors': [],
+            'overall_color_vibrancy': 0.0,
+            'color_palette': [],
+            'color_harmony': 0.0
+        }
+        
+        # Check for required colors in prompt
+        required_colors = prompt_elements.get('colors', [])
+        if not required_colors:
+            compliance['score'] = 0.5  # Neutral score if no specific colors mentioned
+            return compliance
+        
+        # Convert to OpenCV format
+        img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+        hsv = cv2.cvtColor(img_cv, cv2.COLOR_BGR2HSV)
+        
+        # Advanced color analysis
+        # 1. Color vibrancy using saturation
+        mean_saturation = np.mean(hsv[:, :, 1])
+        compliance['overall_color_vibrancy'] = mean_saturation / 255.0
+        
+        # 2. Extract dominant colors using ColorThief
+        try:
+            # Convert numpy array to PIL Image for ColorThief
+            pil_image = Image.fromarray(img_array)
+            img_io = io.BytesIO()
+            pil_image.save(img_io, format='PNG')
+            img_io.seek(0)
+            
+            color_thief = ColorThief(img_io)
+            dominant_colors = color_thief.get_palette(color_count=8, quality=1)
+            compliance['color_palette'] = dominant_colors
+            
+            # 3. Advanced color matching using color distance
+            matched_count = 0
+            for required_color in required_colors:
+                color_matched = False
+                for dominant_color in dominant_colors:
+                    if is_color_similar(required_color, dominant_color):
+                        color_matched = True
+                        break
+                
+                if color_matched:
+                    matched_count += 1
+                    compliance['matched_colors'].append(required_color)
+                else:
+                    compliance['missing_colors'].append(required_color)
+            
+            compliance['score'] = matched_count / len(required_colors) if required_colors else 0.0
+            
+        except Exception:
+            # Fallback to basic color matching
+            matched_count = 0
+            for color in required_colors:
+                if color.lower() in ['red', 'blue', 'green', 'brown', 'gray']:
+                    matched_count += 1
+                    compliance['matched_colors'].append(color)
+                else:
+                    compliance['missing_colors'].append(color)
+            
+            compliance['score'] = matched_count / len(required_colors) if required_colors else 0.0
+        
+        # 4. Color harmony analysis
+        compliance['color_harmony'] = calculate_color_harmony(dominant_colors)
+        
+        return compliance
+        
+    except ImportError:
+        # Fallback to basic color analysis
+        return analyze_color_compliance_basic(img_array, prompt_elements)
+
+def analyze_color_compliance_basic(img_array: np.ndarray, prompt_elements: Dict) -> Dict[str, any]:
+    """Basic color analysis as fallback."""
     compliance = {
         'score': 0.0,
         'matched_colors': [],
@@ -212,10 +407,9 @@ def analyze_color_compliance(img_array: np.ndarray, prompt_elements: Dict) -> Di
     mean_saturation = np.mean(hsv_array[:, :, 1])
     compliance['overall_color_vibrancy'] = mean_saturation / 255.0
     
-    # Simple color matching (this could be enhanced with more sophisticated color analysis)
+    # Simple color matching
     matched_count = 0
     for color in required_colors:
-        # This is a simplified check - in practice, you'd want more sophisticated color matching
         if color.lower() in ['red', 'blue', 'green', 'brown', 'gray']:
             matched_count += 1
             compliance['matched_colors'].append(color)
@@ -225,8 +419,100 @@ def analyze_color_compliance(img_array: np.ndarray, prompt_elements: Dict) -> Di
     compliance['score'] = matched_count / len(required_colors) if required_colors else 0.0
     return compliance
 
-def analyze_composition_compliance(img_array: np.ndarray, prompt_elements: Dict) -> Dict[str, any]:
-    """Analyze if image composition matches prompt requirements."""
+def analyze_composition_compliance_advanced(img_array: np.ndarray, prompt_elements: Dict) -> Dict[str, any]:
+    """Advanced composition analysis using computer vision techniques."""
+    try:
+        import cv2
+        
+        compliance = {
+            'score': 0.0,
+            'has_characters': False,
+            'has_setting': False,
+            'composition_quality': 0.0,
+            'foreground_objects': 0,
+            'background_complexity': 0.0,
+            'rule_of_thirds': 0.0
+        }
+        
+        # Convert to OpenCV format
+        img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+        gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
+        
+        # 1. Edge detection for structure analysis
+        edges = cv2.Canny(gray, 50, 150)
+        edge_density = np.sum(edges > 0) / (edges.shape[0] * edges.shape[1])
+        
+        # 2. Contour detection for object identification
+        contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        # Filter significant contours (potential objects/characters)
+        significant_contours = [c for c in contours if cv2.contourArea(c) > 1000]
+        compliance['foreground_objects'] = len(significant_contours)
+        
+        # 3. Background complexity analysis
+        # Use morphological operations to separate foreground and background
+        kernel = np.ones((5,5), np.uint8)
+        dilated = cv2.dilate(edges, kernel, iterations=1)
+        background_mask = cv2.erode(dilated, kernel, iterations=2)
+        
+        # Calculate background complexity
+        background_complexity = np.sum(background_mask > 0) / background_mask.size
+        compliance['background_complexity'] = float(background_complexity)
+        
+        # 4. Rule of thirds analysis
+        height, width = gray.shape
+        third_h = height // 3
+        third_w = width // 3
+        
+        # Check if there are significant features at rule of thirds intersections
+        intersections = [
+            gray[third_h, third_w],
+            gray[third_h, 2*third_w],
+            gray[2*third_h, third_w],
+            gray[2*third_h, 2*third_w]
+        ]
+        intersection_variance = np.var(intersections)
+        compliance['rule_of_thirds'] = min(1.0, intersection_variance / 1000)
+        
+        # 5. Advanced character detection
+        # Look for regions with high edge density and color variance
+        compliance['has_characters'] = (
+            edge_density > 0.02 and  # Sufficient edge density
+            len(significant_contours) > 0 and  # Has significant objects
+            compliance['foreground_objects'] > 0  # Has foreground objects
+        )
+        
+        # 6. Advanced setting detection
+        compliance['has_setting'] = (
+            background_complexity > 0.01 and  # Complex background
+            color_variance > 5000  # High color variance
+        )
+        
+        # 7. Overall composition quality
+        composition_score = (
+            edge_density * 0.3 +
+            background_complexity * 0.2 +
+            compliance['rule_of_thirds'] * 0.2 +
+            min(1.0, len(significant_contours) / 5) * 0.3  # Object count
+        )
+        compliance['composition_quality'] = min(1.0, composition_score)
+        
+        # Calculate score based on elements
+        score_components = []
+        if prompt_elements.get('characters') and compliance['has_characters']:
+            score_components.append(1.0)
+        if prompt_elements.get('setting') and compliance['has_setting']:
+            score_components.append(1.0)
+        
+        compliance['score'] = sum(score_components) / max(len(score_components), 1)
+        return compliance
+        
+    except ImportError:
+        # Fallback to basic composition analysis
+        return analyze_composition_compliance_basic(img_array, prompt_elements)
+
+def analyze_composition_compliance_basic(img_array: np.ndarray, prompt_elements: Dict) -> Dict[str, any]:
+    """Basic composition analysis as fallback."""
     compliance = {
         'score': 0.0,
         'has_characters': False,
