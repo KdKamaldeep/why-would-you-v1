@@ -150,7 +150,18 @@ python tests/test_image_generation.py
 
 # Test animation system
 python -c "from src.core.animation_generator import AnimationGenerator; print('✅ Animation system ready')"
+
+# Test attention mask fix
+python test_attention_mask_fix.py
 ```
+
+## 🔧 **Recent Fixes**
+
+### **Attention Mask Issue (Fixed)**
+- **Problem**: "The attention mask is not set and cannot be inferred from input because pad token is same as eos token"
+- **Solution**: Properly configured tokenizer pad_token during pipeline initialization
+- **Impact**: Eliminates warnings and improves text processing reliability
+- **Status**: ✅ **Resolved**
 
 ## 📚 **Documentation**
 
