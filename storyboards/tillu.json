@@ -3,15 +3,15 @@
   "description": "Aarav and Meera venture into the heart of Shantivan Jungle to uncover the mystery of a legendary lion who protects the forest and its creatures.",
   "total_duration": 50,
   "cast": [
-    {"name": "Aarav", "role": "curious and brave boy"},
-    {"name": "Meera", "role": "clever and resourceful girl"},
-    {"name": "Simha", "role": "majestic and wise lion, guardian of the jungle"}
+    { "name": "Aarav", "role": "curious and brave boy" },
+    { "name": "Meera", "role": "clever and resourceful girl" },
+    { "name": "Simha", "role": "majestic and wise lion, guardian of the jungle" }
   ],
   "scenes": [
     {
       "duration": 5,
       "description": "sunlit village edge with children listening to elder's jungle tale",
-      "visual_prompt": "wide shot of Indian village, children around elder under banyan tree",
+      "visual_prompt": "(wide shot:1.2) Indian village edge, children gathered around elderly man under a banyan tree, warm golden sunlight, storybook cozy:1.3",
       "narration": "दादी ने शांतिवन जंगल के शेर की कहानी सुनाई।",
       "subtitle": "The Legend",
       "characters": ["Elder", "Children"]
@@ -19,7 +19,7 @@
     {
       "duration": 5,
       "description": "close-up of Aarav and Meera looking at a hand-drawn lion symbol",
-      "visual_prompt": "close-up of children studying old paper with lion symbol, warm light",
+      "visual_prompt": "close-up of two children examining old paper with lion symbol, warm light, rustic wooden table, storybook antique:1.2",
       "narration": "आरव और मीरा ने पुराने कागज पर शेर का चिन्ह देखा।",
       "subtitle": "The Clue",
       "characters": ["Aarav", "Meera"]
@@ -27,7 +27,7 @@
     {
       "duration": 5,
       "description": "children packing small bag for jungle trip",
-      "visual_prompt": "medium shot of children packing bag with fruits and water, sunlight",
+      "visual_prompt": "medium shot of two children packing a small bag with water bottle and fruits, sunlight streaming through window, storybook warm:1.3",
       "narration": "उन्होंने जंगल की यात्रा के लिए तैयारी की।",
       "subtitle": "Preparations",
       "characters": ["Aarav", "Meera"]
@@ -35,7 +35,7 @@
     {
       "duration": 5,
       "description": "children walking into dense jungle trail at sunrise",
-      "visual_prompt": "wide shot of children entering lush jungle trail, morning mist, sun rays",
+      "visual_prompt": "(wide shot:1.2) two children entering lush green jungle trail, early morning mist, soft sun rays through trees, storybook magical:1.3",
       "narration": "सुबह-सुबह वे शांतिवन में दाखिल हुए।",
       "subtitle": "Into the Jungle",
       "characters": ["Aarav", "Meera"]
@@ -43,7 +43,7 @@
     {
       "duration": 5,
       "description": "colorful birds flying over jungle stream",
-      "visual_prompt": "wide shot of tropical birds flying over jungle stream, lush greenery",
+      "visual_prompt": "wide shot of bright tropical birds flying over sparkling jungle stream, lush greenery, soft sunlight, storybook vibrant:1.3",
       "narration": "रास्ते में रंग-बिरंगे पक्षी उनके साथ उड़ रहे थे।",
       "subtitle": "Jungle Wonders",
       "characters": ["Aarav", "Meera"]
@@ -51,7 +51,7 @@
     {
       "duration": 5,
       "description": "children spotting lion paw prints on forest floor",
-      "visual_prompt": "medium shot of children seeing lion paw prints on muddy jungle ground",
+      "visual_prompt": "medium shot of children kneeling to see large lion paw prints on muddy ground, jungle plants around, storybook detail:1.2",
       "narration": "अचानक उन्हें शेर के पदचिन्ह दिखाई दिए।",
       "subtitle": "The Tracks",
       "characters": ["Aarav", "Meera"]
@@ -59,7 +59,7 @@
     {
       "duration": 5,
       "description": "majestic lion emerging from the trees in golden light",
-      "visual_prompt": "wide shot of golden-maned lion stepping into sunlight, lush jungle",
+      "visual_prompt": "wide shot of golden-maned lion stepping out from forest shadows into golden sunlight, lush background, storybook majestic:1.3",
       "narration": "पेड़ों के पीछे से शेर बाहर आया।",
       "subtitle": "The Guardian Appears",
       "characters": ["Simha", "Aarav", "Meera"]
@@ -67,7 +67,7 @@
     {
       "duration": 5,
       "description": "close-up of lion's kind eyes as children smile",
-      "visual_prompt": "close-up of lion's gentle eyes meeting children's smiles, warm light",
+      "visual_prompt": "close-up of lion's gentle eyes meeting children's smiles, warm light, storybook magical:1.3",
       "narration": "उसकी आंखों में प्यार और अपनापन था।",
       "subtitle": "A Gentle Soul",
       "characters": ["Simha", "Aarav", "Meera"]
@@ -75,7 +75,7 @@
     {
       "duration": 5,
       "description": "lion guiding children out of jungle path at sunset",
-      "visual_prompt": "medium shot of lion leading children along jungle trail at sunset",
+      "visual_prompt": "medium shot of lion leading children on jungle trail at sunset, golden sky",
       "narration": "शेर उन्हें सुरक्षित बाहर तक छोड़ने आया।",
       "subtitle": "Safe Passage",
       "characters": ["Simha", "Aarav", "Meera"]
@@ -83,7 +83,7 @@
     {
       "duration": 5,
       "description": "village evening with children telling their adventure story",
-      "visual_prompt": "wide shot of village evening, children telling story under lanterns",
+      "visual_prompt": "(wide shot:1.2) Indian village evening, children excitedly telling story to villagers, warm lantern light, storybook cozy:1.3",
       "narration": "गाँव में सब उनकी कहानी सुनकर खुश हुए।",
       "subtitle": "The Tale Lives On",
       "characters": ["Aarav", "Meera", "Villagers"]
