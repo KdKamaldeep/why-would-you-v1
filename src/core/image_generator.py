@@ -213,22 +213,28 @@ class ImageGenerator:
             logger.info("💡 Will use placeholder images instead")
             self.sd_available = False
     
-    def generate_cartoon_image(self, prompt: str, output_path: str) -> str:
-        """Generate a cartoon-style image using Stable Diffusion."""
+    def generate_cartoon_image(self, prompt: str, output_path: str, subtitle: str = None) -> str:
+        """Generate a cartoon-style image using Stable Diffusion with optional subtitle."""
         try:
             logger.info(f"🎨 Generating cartoon image for prompt: {prompt}")
             
             # If we have a working pipeline, use it
             if self.sd_available and self.pipe is not None:
-                return self._generate_sd_image(prompt, output_path)
+                result_path = self._generate_sd_image(prompt, output_path)
             else:
                 # Fallback to placeholder
                 logger.info("⚠️ Using placeholder image (SD pipeline not available)")
-                return self._generate_placeholder_image(prompt, output_path)
+                result_path = self._generate_placeholder_image(prompt, output_path)
+            
+            # Add subtitle if provided
+            if subtitle:
+                result_path = self._add_subtitle_to_image(result_path, subtitle)
+                
+            return result_path
                 
         except Exception as e:
             logger.error(f"❌ Error generating image: {e}")
-            return self._generate_placeholder_image(prompt, output_path)
+            return self._generate_placeholder_image(prompt, output_path, subtitle)
     
     def _generate_sd_image(self, prompt: str, output_path: str) -> str:
         """Generate image using Stable Diffusion."""
@@ -290,8 +296,8 @@ class ImageGenerator:
         logger.info(f"✅ Generated {len(image_paths)} images successfully!")
         return image_paths
     
-    def _generate_placeholder_image(self, prompt: str, output_path: str) -> str:
-        """Generate a colorful placeholder image with better design."""
+    def _generate_placeholder_image(self, prompt: str, output_path: str, subtitle: str = None) -> str:
+        """Generate a colorful placeholder image with better design and optional subtitle."""
         try:
             # Create a gradient background instead of solid blue
             img = Image.new('RGB', (768, 1024), color='white')
