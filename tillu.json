@@ -1,109 +1,108 @@
 {
-  "title": "Tillu, Golu and Pinky's Jungle Prank",
-  "description": "A mischievous monkey, a gentle bear, and a clever squirrel team up for a day of funny jungle adventures.",
+  "title": "Leo the Brave Jungle Lion",
+  "description": "A young lion named Leo spends a day exploring the jungle, meeting friends, and showing his courage.",
   "total_duration": 50,
   "cast": [],
   "scenes": [
     {
       "duration": 5,
-      "description": "wide shot of three friends planning their day under a tree",
+      "description": "lion cub waking in jungle morning light",
       "visual_prompts": [
-        "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow, sitting together under a large banyan tree:1.3), (lush green jungle clearing with flowers, vines, and grass:1.2), (soft morning sunlight filtering through leaves, warm cheerful storybook style:1.1)"
+        "(wide shot) lion cub in sunlit jungle clearing, soft warm light"
       ],
-      "narration": "सुबह-सुबह, टिल्लू, गोलू और पिंकी एक नई शरारत की योजना बना रहे हैं।",
-      "subtitle": "Morning Mischief"
+      "narration": "सुबह-सुबह लियो ने जंगल में अपनी आंखें खोलीं।",
+      "subtitle": "Morning in the Jungle"
     },
     {
       "duration": 5,
-      "description": "Tillu swinging from vines while friends laugh",
+      "description": "lion cub walking on jungle path",
       "visual_prompts": [
-        "(medium shot, cartoon brown monkey wearing red scarf swinging on jungle vine while cartoon brown bear in blue vest and cartoon gray squirrel with green bow laugh below:1.3), (dense jungle background with tall trees and bright green leaves:1.2), (sunlit playful scene, bright colors, storybook illustration style:1.1)"
+        "(medium shot) lion cub walking jungle trail, green trees around"
       ],
-      "narration": "टिल्लू बेल पर झूल रहा है, और गोलू-पिंकी हँस-हँस कर लोटपोट हो रहे हैं।",
-      "subtitle": "Vine Acrobatics"
+      "narration": "वह जंगल के रास्ते पर धीरे-धीरे चला।",
+      "subtitle": "Jungle Path"
     },
     {
       "duration": 5,
-      "description": "friends sneaking behind a bush to surprise parrot",
+      "description": "parrots flying over trees",
       "visual_prompts": [
-        "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow hiding behind bush peeking at colorful parrot:1.3), (tropical jungle with flowers, ferns, and tall grass:1.2), (bright daylight, playful atmosphere, storybook art style:1.1)"
+        "(wide shot) colorful parrots flying above tall green trees"
       ],
-      "narration": "तीनों झाड़ियों के पीछे छुपकर तोते को चौंकाने की कोशिश कर रहे हैं।",
-      "subtitle": "The Sneaky Plan"
+      "narration": "ऊपर पेड़ों के बीच तोते उड़ रहे थे।",
+      "subtitle": "Parrot Flight"
     },
     {
       "duration": 5,
-      "description": "Golu accidentally stepping into a muddy puddle",
+      "description": "lion cub greeting deer",
       "visual_prompts": [
-        "(medium shot, cartoon brown bear in blue vest stepping into muddy puddle while cartoon brown monkey wearing red scarf and cartoon gray squirrel with green bow laugh:1.3), (jungle path with plants and puddles:1.2), (soft golden light, humorous storybook illustration style:1.1)"
+        "(medium shot) lion cub meeting deer in jungle clearing"
       ],
-      "narration": "गोलू गलती से कीचड़ में पैर रख देता है, और सब खिलखिलाने लगते हैं।",
-      "subtitle": "Muddy Surprise"
+      "narration": "लियो ने मैदान में हिरन को नमस्ते कहा।",
+      "subtitle": "Meeting the Deer"
     },
     {
       "duration": 5,
-      "description": "friends building a leaf hat for fun",
+      "description": "monkey offering banana to lion cub",
       "visual_prompts": [
-        "(close-up, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow making a big leaf hat together:1.3), (lush green jungle with large banana leaves:1.2), (warm sunlight, cute and colorful storybook style:1.1)"
+        "(close-up) monkey giving banana to lion cub, playful mood"
       ],
-      "narration": "तीनों मिलकर पत्तों से मजेदार टोपी बना रहे हैं।",
-      "subtitle": "Leaf Hat Creation"
+      "narration": "एक बंदर ने उसे केला दिया।",
+      "subtitle": "Banana Gift"
     },
     {
       "duration": 5,
-      "description": "Tillu chasing butterflies",
+      "description": "storm clouds gather in jungle",
       "visual_prompts": [
-        "(wide shot, cartoon brown monkey wearing red scarf running after colorful butterflies while cartoon brown bear in blue vest and cartoon gray squirrel with green bow watch:1.3), (meadow area of jungle with flowers and tall grass:1.2), (sunny day, light breeze, cheerful storybook illustration style:1.1)"
+        "(wide shot) dark clouds over jungle, leaves blowing in wind"
       ],
-      "narration": "टिल्लू रंग-बिरंगी तितलियों के पीछे दौड़ रहा है।",
-      "subtitle": "Butterfly Chase"
+      "narration": "अचानक आकाश में काले बादल छा गए।",
+      "subtitle": "Storm Coming"
     },
     {
       "duration": 5,
-      "description": "Pinky balancing on a log over a stream",
+      "description": "lion cub roaring to warn friends",
       "visual_prompts": [
-        "(medium shot, cartoon gray squirrel with green bow balancing on fallen log over small stream while cartoon brown monkey wearing red scarf and cartoon brown bear in blue vest cheer:1.3), (clear jungle stream with stones and plants:1.2), (afternoon light, playful and adventurous storybook style:1.1)"
+        "(close-up) lion cub roaring, trees swaying in background"
       ],
-      "narration": "पिंकी पानी के ऊपर लकड़ी के तने पर संतुलन बना रही है।",
-      "subtitle": "Balancing Act"
+      "narration": "लियो ने जोर से दहाड़ लगाई ताकि सब सावधान हों।",
+      "subtitle": "Warning Roar"
     },
     {
       "duration": 5,
-      "description": "friends sharing fruits",
+      "description": "animals taking shelter from rain",
       "visual_prompts": [
-        "(medium shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sitting together sharing mangoes:1.3), (shady spot in jungle with fruit basket:1.2), (soft dappled sunlight, cozy and friendly storybook style:1.1)"
+        "(medium shot) deer, monkeys under tree in rain"
       ],
-      "narration": "तीनों आम बाँटकर खा रहे हैं और हँस रहे हैं।",
-      "subtitle": "Fruit Feast"
+      "narration": "सब जानवर पेड़ों के नीचे बारिश से बचने लगे।",
+      "subtitle": "Shelter in Rain"
     },
     {
       "duration": 5,
-      "description": "group watching fireflies at night",
+      "description": "rainbow over jungle after rain",
       "visual_prompts": [
-        "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow watching glowing fireflies together:1.3), (dark jungle clearing with tall grass:1.2), (soft moonlight, magical night, storybook illustration style:1.1)"
+        "(wide shot) rainbow above green jungle, wet leaves shining"
       ],
-      "narration": "रात को, तीनों जगमगाते जुगनुओं को देखते हैं।",
-      "subtitle": "Magical Night"
+      "narration": "बारिश के बाद जंगल में इंद्रधनुष खिल गया।",
+      "subtitle": "Rainbow"
     },
     {
       "duration": 5,
-      "description": "friends sleeping under tree with moonlight",
+      "description": "lion cub resting under starry sky",
       "visual_prompts": [
-        "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sleeping peacefully under tree:1.3), (calm jungle night with stars and grass:1.2), (soft blue moonlight, serene storybook illustration style:1.1)"
+        "(wide shot) lion cub resting under stars, calm jungle night"
       ],
-      "narration": "पूरा दिन मस्ती करने के बाद, तीनों पेड़ के नीचे मीठी नींद में सो जाते हैं।",
-      "subtitle": "Sweet Dreams"
+      "narration": "रात को लियो तारे देखते हुए सो गया।",
+      "subtitle": "Peaceful Night"
     }
   ],
   "tags": [
-    "funny",
+    "lion",
     "jungle",
-    "monkey",
-    "bear",
-    "squirrel",
-    "friendship",
-    "storybook",
+    "wildlife",
+    "adventure",
     "kids",
-    "adventure"
+    "storybook",
+    "friendship",
+    "nature"
   ]
 }

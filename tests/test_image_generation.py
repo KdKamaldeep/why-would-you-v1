@@ -41,7 +41,7 @@ def test_image_generation(prompt=None):
     
     # Use provided prompt or default test prompt
     if prompt is None:
-        prompt = "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow, standing together under large jungle tree:1.3), (lush tropical jungle background with ferns, flowers, and vines, bright green leaves:1.2), (morning sunlight streaming through trees, soft warm glow, storybook illustration style:1.1)"
+        prompt = "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sleeping peacefully under tree:1.3), (calm jungle night with stars and grass:1.2), (soft blue moonlight, serene storybook illustration style:1.1)"
     
     test_prompts = [prompt]
 
