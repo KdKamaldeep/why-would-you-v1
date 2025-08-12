@@ -483,6 +483,7 @@ def analyze_composition_compliance_advanced(img_array: np.ndarray, prompt_elemen
         )
         
         # 6. Advanced setting detection
+        color_variance = np.var(img_array)
         compliance['has_setting'] = (
             background_complexity > 0.01 and  # Complex background
             color_variance > 5000  # High color variance
@@ -599,25 +600,132 @@ def identify_present_elements(analysis: Dict) -> List[str]:
 
 def rewrite_prompt_for_better_compliance(original_prompt: str, compliance_analysis: Dict, attempt: int, image_gen: ImageGenerator) -> str:
     """
-    Use GPT-2 to intelligently rewrite the prompt based on compliance analysis.
+    Use GPT-2 to intelligently rewrite the prompt based on compliance analysis and advanced image characteristics.
     """
     missing_elements = compliance_analysis.get('missing_elements', [])
     present_elements = compliance_analysis.get('present_elements', [])
     score = compliance_analysis.get('compliance_score', 0.0)
+    image_analysis = compliance_analysis.get('image_analysis', {})
     
     print(f"    🔧 Using GPT-2 to rewrite prompt based on analysis:")
     print(f"       Missing: {missing_elements}")
     print(f"       Present: {present_elements}")
     print(f"       Score: {score:.2f}")
     
-    # Use the image generator's GPT-2 enhanced prompt rewriting
+    # Extract advanced image characteristics for prompt enhancement
+    enhancement_data = extract_enhancement_data_from_analysis(image_analysis, compliance_analysis)
+    
+    # Use the image generator's GPT-2 enhanced prompt rewriting with advanced analysis
     if image_gen.prompt_enhancer and image_gen.prompt_enhancer.is_available():
-        print(f"    🎯 Using GPT-2 for intelligent prompt rewriting...")
-        return image_gen.rewrite_prompt_for_better_compliance(original_prompt, compliance_analysis, attempt)
+        print(f"    🎯 Using GPT-2 for intelligent prompt rewriting with advanced analysis...")
+        print(f"    📊 Enhancement data: {enhancement_data}")
+        return image_gen.rewrite_prompt_for_better_compliance_with_analysis(
+            original_prompt, compliance_analysis, enhancement_data, attempt
+        )
     else:
-        print(f"    ⚠️ GPT-2 not available, using fallback method...")
-        # Fallback to simple enhancement without static text
-        return original_prompt
+        print(f"    ⚠️ GPT-2 not available, using enhanced fallback method...")
+        # Enhanced fallback using analysis data
+        return enhance_prompt_with_analysis_data(original_prompt, enhancement_data, attempt)
+
+def extract_enhancement_data_from_analysis(image_analysis: Dict, compliance_analysis: Dict) -> Dict:
+    """Extract enhancement data from advanced image analysis."""
+    enhancement_data = {
+        'color_issues': [],
+        'composition_issues': [],
+        'quality_issues': [],
+        'style_suggestions': [],
+        'technical_improvements': []
+    }
+    
+    # Analyze color characteristics
+    dominant_colors = image_analysis.get('dominant_colors', [])
+    color_variance = image_analysis.get('color_variance', 0)
+    mean_saturation = image_analysis.get('mean_saturation', 0)
+    total_unique_colors = image_analysis.get('total_unique_colors', 0)
+    
+    # Color analysis
+    if color_variance < 5000:
+        enhancement_data['color_issues'].append('low_color_variance')
+    if mean_saturation < 50:
+        enhancement_data['color_issues'].append('low_saturation')
+    if total_unique_colors < 1000:
+        enhancement_data['color_issues'].append('limited_color_palette')
+    
+    # Analyze composition characteristics
+    edge_density = image_analysis.get('edge_density', 0)
+    brightness = image_analysis.get('brightness', 0)
+    contrast = image_analysis.get('contrast', 0)
+    
+    # Composition analysis
+    if edge_density < 0.02:
+        enhancement_data['composition_issues'].append('low_detail')
+    if brightness < 50:
+        enhancement_data['composition_issues'].append('too_dark')
+    elif brightness > 200:
+        enhancement_data['composition_issues'].append('too_bright')
+    if contrast < 30:
+        enhancement_data['composition_issues'].append('low_contrast')
+    
+    # Analyze texture and quality
+    texture_lbp = image_analysis.get('texture_lbp', [])
+    if texture_lbp and max(texture_lbp) < 0.1:
+        enhancement_data['quality_issues'].append('low_texture_detail')
+    
+    # Style suggestions based on analysis
+    if color_variance > 10000 and mean_saturation > 100:
+        enhancement_data['style_suggestions'].append('vibrant_colors')
+    if edge_density > 0.05:
+        enhancement_data['style_suggestions'].append('high_detail')
+    if brightness > 150:
+        enhancement_data['style_suggestions'].append('bright_lighting')
+    
+    # Technical improvements
+    if compliance_analysis.get('color_analysis', {}).get('score', 0) < 0.5:
+        enhancement_data['technical_improvements'].append('enhance_color_description')
+    if compliance_analysis.get('composition_analysis', {}).get('score', 0) < 0.5:
+        enhancement_data['technical_improvements'].append('enhance_composition_description')
+    
+    return enhancement_data
+
+def enhance_prompt_with_analysis_data(original_prompt: str, enhancement_data: Dict, attempt: int) -> str:
+    """Enhance prompt using analysis data when GPT-2 is not available."""
+    enhanced_prompt = original_prompt
+    
+    # Add style enhancements based on analysis
+    style_suggestions = enhancement_data.get('style_suggestions', [])
+    if 'vibrant_colors' in style_suggestions:
+        enhanced_prompt += ", vibrant colors, saturated palette"
+    if 'high_detail' in style_suggestions:
+        enhanced_prompt += ", highly detailed, sharp focus"
+    if 'bright_lighting' in style_suggestions:
+        enhanced_prompt += ", bright lighting, well-lit scene"
+    
+    # Address quality issues
+    quality_issues = enhancement_data.get('quality_issues', [])
+    if 'low_texture_detail' in quality_issues:
+        enhanced_prompt += ", textured surfaces, rich details"
+    
+    # Address composition issues
+    composition_issues = enhancement_data.get('composition_issues', [])
+    if 'low_detail' in composition_issues:
+        enhanced_prompt += ", detailed rendering, fine details"
+    if 'low_contrast' in composition_issues:
+        enhanced_prompt += ", high contrast, dramatic lighting"
+    
+    # Add technical improvements
+    technical_improvements = enhancement_data.get('technical_improvements', [])
+    if 'enhance_color_description' in technical_improvements:
+        enhanced_prompt += ", color-rich, chromatic variety"
+    if 'enhance_composition_description' in technical_improvements:
+        enhanced_prompt += ", well-composed, balanced layout"
+    
+    # Add attempt-specific enhancements
+    if attempt == 2:
+        enhanced_prompt += ", enhanced details, improved composition"
+    elif attempt >= 3:
+        enhanced_prompt += ", masterwork quality, professional illustration"
+    
+    return enhanced_prompt
 
 
 
@@ -778,6 +886,61 @@ Examples:
     
     # Run the test with the provided prompt and retry settings
     test_image_generation(args.prompt, args.retries)
+
+def is_color_similar(color1: tuple, color2: tuple, threshold: float = 50.0) -> bool:
+    """Check if two colors are similar using Euclidean distance in RGB space."""
+    if len(color1) != 3 or len(color2) != 3:
+        return False
+    
+    # Calculate Euclidean distance in RGB space
+    distance = np.sqrt(sum((c1 - c2) ** 2 for c1, c2 in zip(color1, color2)))
+    return distance <= threshold
+
+def calculate_color_harmony(colors: list) -> float:
+    """Calculate color harmony score based on color relationships."""
+    if not colors or len(colors) < 2:
+        return 0.5
+    
+    try:
+        # Convert colors to HSV for better harmony analysis
+        import cv2
+        harmony_scores = []
+        
+        for i, color1 in enumerate(colors):
+            for j, color2 in enumerate(colors[i+1:], i+1):
+                # Convert RGB to HSV
+                color1_hsv = cv2.cvtColor(np.array([[color1]], dtype=np.uint8), cv2.COLOR_RGB2HSV)[0, 0]
+                color2_hsv = cv2.cvtColor(np.array([[color2]], dtype=np.uint8), cv2.COLOR_RGB2HSV)[0, 0]
+                
+                # Calculate hue difference
+                hue_diff = abs(color1_hsv[0] - color2_hsv[0])
+                if hue_diff > 90:  # Wrap around
+                    hue_diff = 180 - hue_diff
+                
+                # Harmony rules: complementary (180°), analogous (30°), triadic (120°)
+                if 170 <= hue_diff <= 190:  # Complementary
+                    harmony_scores.append(1.0)
+                elif 25 <= hue_diff <= 35:  # Analogous
+                    harmony_scores.append(0.8)
+                elif 115 <= hue_diff <= 125:  # Triadic
+                    harmony_scores.append(0.9)
+                else:
+                    # Other relationships get lower scores
+                    harmony_scores.append(max(0.1, 1.0 - (hue_diff / 180.0)))
+        
+        return np.mean(harmony_scores) if harmony_scores else 0.5
+        
+    except ImportError:
+        # Fallback: simple RGB distance-based harmony
+        distances = []
+        for i, color1 in enumerate(colors):
+            for j, color2 in enumerate(colors[i+1:], i+1):
+                distance = np.sqrt(sum((c1 - c2) ** 2 for c1, c2 in zip(color1, color2)))
+                # Normalize distance (max possible distance is sqrt(255^2 * 3) ≈ 441)
+                normalized_distance = distance / 441.0
+                distances.append(1.0 - normalized_distance)
+        
+        return np.mean(distances) if distances else 0.5
 
 if __name__ == "__main__":
     main()

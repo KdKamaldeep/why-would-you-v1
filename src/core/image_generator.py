@@ -904,6 +904,164 @@ class ImageGenerator:
         
         return new_prompt
 
+    def rewrite_prompt_for_better_compliance_with_analysis(self, original_prompt: str, compliance_analysis: Dict, enhancement_data: Dict, attempt: int) -> str:
+        """
+        Intelligently rewrite the prompt using advanced image analysis data.
+        Incorporates detailed image characteristics for more targeted improvements.
+        """
+        missing_elements = compliance_analysis.get('missing_elements', [])
+        present_elements = compliance_analysis.get('present_elements', [])
+        image_analysis = compliance_analysis.get('image_analysis', {})
+        score = compliance_analysis.get('compliance_score', 0.0)
+        
+        logger.info(f"🔧 Advanced prompt rewriting with image analysis:")
+        logger.info(f"   Missing: {missing_elements}")
+        logger.info(f"   Enhancement data: {enhancement_data}")
+        logger.info(f"   Score: {score:.2f}")
+        
+        # Try GPT-2 rewriting with advanced analysis if available
+        if self.prompt_enhancer and self.prompt_enhancer.is_available():
+            gpt2_prompt = self._rewrite_prompt_with_gpt2_and_analysis(
+                original_prompt, compliance_analysis, enhancement_data, attempt
+            )
+            if gpt2_prompt and gpt2_prompt != original_prompt:
+                logger.info(f"🎯 Using GPT-2 rewritten prompt with advanced analysis")
+                return gpt2_prompt
+        
+        # Fallback to enhanced rule-based rewriting
+        logger.info(f"🎯 Using enhanced rule-based prompt rewriting")
+        return self._rewrite_prompt_with_enhanced_rules(original_prompt, compliance_analysis, enhancement_data, attempt)
+
+    def _rewrite_prompt_with_gpt2_and_analysis(self, original_prompt: str, compliance_analysis: Dict, enhancement_data: Dict, attempt: int) -> str:
+        """
+        Use GPT-2 to intelligently rewrite the prompt based on advanced image analysis.
+        """
+        missing_elements = compliance_analysis.get('missing_elements', [])
+        image_analysis = compliance_analysis.get('image_analysis', {})
+        score = compliance_analysis.get('compliance_score', 0.0)
+        
+        # Extract specific analysis data for GPT-2
+        color_issues = enhancement_data.get('color_issues', [])
+        composition_issues = enhancement_data.get('composition_issues', [])
+        quality_issues = enhancement_data.get('quality_issues', [])
+        style_suggestions = enhancement_data.get('style_suggestions', [])
+        
+        # Create detailed GPT-2 prompt with analysis data
+        analysis_summary = []
+        if color_issues:
+            analysis_summary.append(f"Color issues: {', '.join(color_issues)}")
+        if composition_issues:
+            analysis_summary.append(f"Composition issues: {', '.join(composition_issues)}")
+        if quality_issues:
+            analysis_summary.append(f"Quality issues: {', '.join(quality_issues)}")
+        if style_suggestions:
+            analysis_summary.append(f"Style suggestions: {', '.join(style_suggestions)}")
+        
+        analysis_text = "; ".join(analysis_summary) if analysis_summary else "No specific issues detected"
+        
+        # Create specific GPT-2 prompts based on the analysis and attempt
+        if attempt == 1:
+            gpt2_prompt = f"""Rewrite this visual prompt to address these specific issues: {analysis_text}. 
+            Missing elements: {', '.join(missing_elements)}. 
+            Focus on improving color, composition, and detail quality. 
+            Original prompt: {original_prompt}"""
+        elif attempt == 2:
+            gpt2_prompt = f"""Transform this prompt into a highly detailed, vibrant cartoon scene. 
+            Address these issues: {analysis_text}. 
+            Emphasize missing elements: {', '.join(missing_elements)}. 
+            Add rich textures and enhanced composition. 
+            Original: {original_prompt}"""
+        else:
+            gpt2_prompt = f"""Create a masterpiece-quality cartoon scene with exceptional detail. 
+            Fix these issues: {analysis_text}. 
+            Ensure all missing elements are prominent: {', '.join(missing_elements)}. 
+            Use professional illustration techniques and vibrant colors. 
+            Original prompt: {original_prompt}"""
+        
+        try:
+            # Use GPT-2 to enhance the prompt
+            enhanced_prompt = self.prompt_enhancer.enhance_prompt(
+                gpt2_prompt,
+                enhancement_type="cartoon_detailed",
+                max_tokens=77  # Keep within diffusion model limits
+            )
+            
+            # Add specific technical improvements based on analysis
+            technical_improvements = enhancement_data.get('technical_improvements', [])
+            if technical_improvements:
+                improvement_text = ", ".join(technical_improvements[:2])  # Limit to 2 improvements
+                enhanced_prompt = f"{enhanced_prompt}, {improvement_text}"
+                enhanced_prompt = self.prompt_enhancer._limit_tokens(enhanced_prompt, 77)
+            
+            logger.info(f"🎯 GPT-2 enhanced prompt with analysis: {enhanced_prompt}")
+            return enhanced_prompt
+            
+        except Exception as e:
+            logger.error(f"❌ GPT-2 rewriting with analysis failed: {e}")
+            return original_prompt
+
+    def _rewrite_prompt_with_enhanced_rules(self, original_prompt: str, compliance_analysis: Dict, enhancement_data: Dict, attempt: int) -> str:
+        """
+        Enhanced rule-based prompt rewriting using advanced image analysis data.
+        """
+        missing_elements = compliance_analysis.get('missing_elements', [])
+        score = compliance_analysis.get('compliance_score', 0.0)
+        
+        # Start with the original prompt
+        new_prompt = original_prompt
+        
+        # Apply enhancements based on analysis data
+        color_issues = enhancement_data.get('color_issues', [])
+        composition_issues = enhancement_data.get('composition_issues', [])
+        quality_issues = enhancement_data.get('quality_issues', [])
+        style_suggestions = enhancement_data.get('style_suggestions', [])
+        
+        # Address color issues
+        if 'low_color_variance' in color_issues:
+            new_prompt += ", diverse color palette, chromatic variety"
+        if 'low_saturation' in color_issues:
+            new_prompt += ", saturated colors, vibrant hues"
+        if 'limited_color_palette' in color_issues:
+            new_prompt += ", rich color spectrum, multiple hues"
+        
+        # Address composition issues
+        if 'low_detail' in composition_issues:
+            new_prompt += ", highly detailed, fine details"
+        if 'too_dark' in composition_issues:
+            new_prompt += ", bright lighting, well-lit scene"
+        if 'too_bright' in composition_issues:
+            new_prompt += ", balanced lighting, natural illumination"
+        if 'low_contrast' in composition_issues:
+            new_prompt += ", high contrast, dramatic lighting"
+        
+        # Address quality issues
+        if 'low_texture_detail' in quality_issues:
+            new_prompt += ", textured surfaces, rich details"
+        
+        # Add style suggestions
+        if 'vibrant_colors' in style_suggestions:
+            new_prompt += ", vibrant color palette"
+        if 'high_detail' in style_suggestions:
+            new_prompt += ", highly detailed rendering"
+        if 'bright_lighting' in style_suggestions:
+            new_prompt += ", bright, clear lighting"
+        
+        # Add attempt-specific enhancements
+        if attempt == 2:
+            new_prompt += ", enhanced details, improved composition"
+        elif attempt >= 3:
+            new_prompt += ", masterwork quality, professional illustration"
+        
+        # Ensure we don't exceed token limits
+        if len(new_prompt) > 200:  # Rough token limit check
+            # Truncate while keeping essential parts
+            parts = new_prompt.split(',')
+            if len(parts) > 8:  # Keep first 8 parts
+                new_prompt = ','.join(parts[:8])
+        
+        logger.info(f"🎯 Enhanced rule-based prompt: {new_prompt}")
+        return new_prompt
+
     def _enhance_character_description(self, prompt: str, attempt: int) -> str:
         """Enhance character descriptions in the prompt."""
         character_enhancements = [
