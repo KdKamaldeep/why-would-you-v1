@@ -1,0 +1,97 @@
+{
+  "title": "Tillu, The Monkey Who Loved Bananas",
+  "description": "Tillu, a mischievous monkey, goes on a hilarious adventure to find the world's biggest banana, learning teamwork and kindness along the way.",
+  "total_duration": 50,
+  "cast": [],
+  "scenes": [
+    {
+      "duration": 5,
+      "description": "wide shot of sunny jungle morning with Tillu hanging upside down from a tree",
+      "visual_prompt": "(wide shot:1.3) sunny green jungle morning, Tillu the mischievous monkey hanging upside down from branch, birds chirping, storybook funny style:1.4",
+      "narration": "सुबह-सुबह टिल्लू पेड़ की टहनी से उल्टा लटककर सोच रहा था कि आज क्या मस्ती की जाए।",
+      "subtitle": "Monkey Mischief",
+      "characters": ["Tillu", "Birds"]
+    },
+    {
+      "duration": 5,
+      "description": "close-up of Tillu sniffing a giant banana poster",
+      "visual_prompt": "close-up of Tillu the mischievous monkey sniffing a colorful poster of world's biggest banana, silly expression, storybook comic style",
+      "narration": "अचानक उसे एक पोस्टर दिखा — दुनिया का सबसे बड़ा केला! बस, टिल्लू ने ठान लिया, यही चाहिए!",
+      "subtitle": "Banana Dream",
+      "characters": ["Tillu"]
+    },
+    {
+      "duration": 5,
+      "description": "medium shot of Tillu asking Golu the bear for help",
+      "visual_prompt": "medium shot of Tillu the mischievous monkey talking to Golu the lazy but clever bear lying on hammock, jungle background, playful expressions, storybook humor style",
+      "narration": "टिल्लू ने अपने आलसी दोस्त गोलू से कहा — ‘चलो खजाने की खोज पर!’",
+      "subtitle": "Recruiting Golu",
+      "characters": ["Tillu", "Golu"]
+    },
+    {
+      "duration": 5,
+      "description": "wide shot of Tillu, Golu, and Pinky walking through jungle with a hand-drawn map",
+      "visual_prompt": "(wide shot:1.3) Tillu the mischievous monkey, Golu the lazy bear, and Pinky the fast-talking squirrel walking with crumpled hand-drawn map, lush jungle background, storybook adventure style:1.4",
+      "narration": "गोलू और पिंकी गिलहरी भी टीम में शामिल हो गए, और मस्ती भरी खोज शुरू हो गई।",
+      "subtitle": "Banana Quest Begins",
+      "characters": ["Tillu", "Golu", "Pinky"]
+    },
+    {
+      "duration": 5,
+      "description": "medium shot of Pinky chattering excitedly and pointing at a banana-shaped cloud",
+      "visual_prompt": "medium shot of Pinky the fast-talking squirrel pointing at banana-shaped cloud in sky, Tillu the mischievous monkey and Golu the bear laughing, bright jungle background, storybook funny style",
+      "narration": "पिंकी चिल्लाई — ‘देखो! आसमान में केला!’",
+      "subtitle": "Banana in the Sky",
+      "characters": ["Pinky", "Tillu", "Golu"]
+    },
+    {
+      "duration": 5,
+      "description": "wide shot of friends crossing a wobbly rope bridge over a river",
+      "visual_prompt": "(wide shot:1.3) Tillu the mischievous monkey, Golu the bear, and Pinky the squirrel crossing wobbly rope bridge over sparkling river, exaggerated funny movements, storybook comic style:1.4",
+      "narration": "तीनों ने पुल पार किया, लेकिन टिल्लू बीच में ही केले के सपने देखने लगा।",
+      "subtitle": "Bridge of Giggles",
+      "characters": ["Tillu", "Golu", "Pinky"]
+    },
+    {
+      "duration": 5,
+      "description": "medium shot of Tillu finding a giant golden banana in a clearing",
+      "visual_prompt": "medium shot of Tillu the mischievous monkey holding giant golden banana with sparkle effects, amazed expression, jungle clearing, storybook magical style",
+      "narration": "आखिरकार, उन्हें सुनहरी केला मिल गया!",
+      "subtitle": "Golden Banana Found",
+      "characters": ["Tillu"]
+    },
+    {
+      "duration": 5,
+      "description": "wide shot of all animals sharing the banana together in jungle",
+      "visual_prompt": "(wide shot:1.3) Tillu the monkey, Golu the bear, Pinky the squirrel, and other jungle animals sharing giant banana, laughing and happy, storybook friendship style:1.4",
+      "narration": "टिल्लू ने तय किया कि केला सबके साथ बांटा जाएगा।",
+      "subtitle": "Banana Feast",
+      "characters": ["Tillu", "Golu", "Pinky", "Animals"]
+    },
+    {
+      "duration": 5,
+      "description": "close-up of Tillu with banana peel on his head, making a silly face",
+      "visual_prompt": "close-up of Tillu the mischievous monkey wearing banana peel as hat, making silly face, bright jungle background, storybook comic style",
+      "narration": "और फिर, टिल्लू ने छिलके को टोपी बना लिया।",
+      "subtitle": "Banana Hat",
+      "characters": ["Tillu"]
+    },
+    {
+      "duration": 5,
+      "description": "wide shot of sunset in jungle with friends resting together",
+      "visual_prompt": "(wide shot:1.3) jungle at sunset, Tillu the monkey, Golu the bear, and Pinky the squirrel resting happily, warm golden light, storybook peaceful style:1.4",
+      "narration": "दिन का अंत हंसी, दोस्ती और केले के मीठे स्वाद के साथ हुआ।",
+      "subtitle": "Sweet Ending",
+      "characters": ["Tillu", "Golu", "Pinky"]
+    }
+  ],
+  "tags": [
+    "monkey",
+    "banana",
+    "friendship",
+    "funny",
+    "storybook",
+    "jungle",
+    "adventure"
+  ]
+}
