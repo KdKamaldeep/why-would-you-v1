@@ -6,11 +6,16 @@ Image Generator Module - Handles cartoon image generation using Stable Diffusion
 import os
 import time
 import logging
+import warnings
 import torch
 from PIL import Image, ImageDraw, ImageFont
 from typing import List, Optional
 from pathlib import Path
 from .prompt_enhancer import PromptEnhancer
+
+# Suppress deprecation warnings for CLIP classes
+warnings.filterwarnings("ignore", message=".*CLIPFeatureExtractor.*")
+warnings.filterwarnings("ignore", message=".*Some weights of the model checkpoint were not used.*")
 
 logger = logging.getLogger(__name__)
 
@@ -123,6 +128,12 @@ class ImageGenerator:
                         if hasattr(self.pipe.tokenizer, 'pad_token') and self.pipe.tokenizer.pad_token is None:
                             self.pipe.tokenizer.pad_token = self.pipe.tokenizer.eos_token
                             logger.info("🔧 Configured tokenizer pad_token to avoid attention mask warnings")
+                        
+                        # Also configure the text encoder tokenizer if available
+                        if hasattr(self.pipe, 'text_encoder') and hasattr(self.pipe.text_encoder, 'config'):
+                            if hasattr(self.pipe.text_encoder.config, 'pad_token_id') and self.pipe.text_encoder.config.pad_token_id is None:
+                                self.pipe.text_encoder.config.pad_token_id = self.pipe.tokenizer.eos_token_id
+                                logger.info("🔧 Configured text encoder pad_token_id")
                     
                     self.sd_available = True
                     logger.info("✅ Stable Diffusion pipeline initialized from pretrained repo!")
@@ -186,6 +197,12 @@ class ImageGenerator:
                 if hasattr(self.pipe.tokenizer, 'pad_token') and self.pipe.tokenizer.pad_token is None:
                     self.pipe.tokenizer.pad_token = self.pipe.tokenizer.eos_token
                     logger.info("🔧 Configured tokenizer pad_token to avoid attention mask warnings")
+                
+                # Also configure the text encoder tokenizer if available
+                if hasattr(self.pipe, 'text_encoder') and hasattr(self.pipe.text_encoder, 'config'):
+                    if hasattr(self.pipe.text_encoder.config, 'pad_token_id') and self.pipe.text_encoder.config.pad_token_id is None:
+                        self.pipe.text_encoder.config.pad_token_id = self.pipe.tokenizer.eos_token_id
+                        logger.info("🔧 Configured text encoder pad_token_id")
 
             self.sd_available = True
             logger.info("✅ Stable Diffusion pipeline initialized successfully!")

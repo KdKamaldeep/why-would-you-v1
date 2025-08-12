@@ -153,6 +153,9 @@ python -c "from src.core.animation_generator import AnimationGenerator; print('�
 
 # Test attention mask fix
 python test_attention_mask_fix.py
+
+# Update dependencies to fix warnings
+python update_dependencies.py
 ```
 
 ## 🔧 **Recent Fixes**
@@ -161,6 +164,12 @@ python test_attention_mask_fix.py
 - **Problem**: "The attention mask is not set and cannot be inferred from input because pad token is same as eos token"
 - **Solution**: Properly configured tokenizer pad_token during pipeline initialization
 - **Impact**: Eliminates warnings and improves text processing reliability
+- **Status**: ✅ **Resolved**
+
+### **CLIP Deprecation Warnings (Fixed)**
+- **Problem**: "CLIPFeatureExtractor is deprecated" and "Some weights of the model checkpoint were not used"
+- **Solution**: Updated transformers library and added warning suppression
+- **Impact**: Eliminates deprecation warnings and unused weight warnings
 - **Status**: ✅ **Resolved**
 
 ## 📚 **Documentation**

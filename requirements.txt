@@ -31,20 +31,19 @@ opencv-python
 ###############################################
 
 ###############################################
-# Hugging Face and related ML libraries (pinned)
+# Hugging Face and related ML libraries (updated)
 ###############################################
-diffusers==0.30.2
-# Transformers >= 4.50 removed GenerationMixin from PreTrainedModel, which breaks
-# Coqui TTS 0.22.0's internal GPT2InferenceModel that relies on model.generate.
-# Pin below 4.50 to avoid 'GPT2InferenceModel' has no attribute 'generate' errors.
-transformers==4.49.0
-accelerate==0.27.2
-safetensors==0.4.3
-huggingface_hub==0.30.1
-einops==0.7.0
-omegaconf==2.3.0
-ftfy==6.1.3
-regex==2023.12.25
+diffusers>=0.31.0
+# Updated transformers to eliminate CLIP deprecation warnings
+# Note: If you encounter TTS issues, you may need to update TTS to a newer version
+transformers>=4.50.0
+accelerate>=0.28.0
+safetensors>=0.4.3
+huggingface_hub>=0.30.1
+einops>=0.7.0
+omegaconf>=2.3.0
+ftfy>=6.1.3
+regex>=2023.12.25
 
 ###############################################
 # Alternative face processing (no CMake required)
