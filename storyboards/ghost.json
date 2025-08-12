@@ -1,0 +1,70 @@
+{
+  "title": "The Silly Ghost of Mango Manor",
+  "description": "Two kids discover a friendly but clumsy ghost in the old mango house who loves jokes and silly scares.",
+  "total_duration": 50,
+  "cast": [
+    {"name": "Rohan", "role": "brave and curious boy"},
+    {"name": "Pooja", "role": "smart and funny girl"},
+    {"name": "Boo", "role": "clumsy friendly ghost who loves pranks"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "wide shot of spooky old mango house with bats flying",
+      "visual_prompt": "(wide shot:1.2) spooky old house, mango tree, bats flying, funny spooky style:1.3",
+      "narration": "रहन और पूजा ने सुना कि आम के पुराने घर में भूत रहता है, लेकिन वो बड़ा मज़ाकिया है!",
+      "subtitle": "The Spooky Mango House",
+      "characters": ["Rohan", "Pooja"]
+    },
+    {
+      "duration": 9,
+      "description": "close-up of Rohan and Pooja sneaking inside with flashlights",
+      "visual_prompt": "(close-up:1.2) kids with flashlights sneaking inside old house, curious faces, warm spooky glow:1.3",
+      "narration": "उन्होंने टॉर्च लेकर अंदर चुपके से घुसना तय किया, क्या होगा पता नहीं!",
+      "subtitle": "Sneaking In",
+      "characters": ["Rohan", "Pooja"]
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Boo the ghost tripping over a bucket",
+      "visual_prompt": "(medium shot:1.2) cute ghost tripping on bucket, surprised face, silly spooky style:1.3",
+      "narration": "भूत बू अचानक बाल्टी से टकराया और जमीन पर गिर पड़ा — ओह, क्या मज़ाक था!",
+      "subtitle": "Oops! Boo Falls",
+      "characters": ["Boo"]
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of kids laughing as Boo tries to scare but fails",
+      "visual_prompt": "(wide shot:1.2) kids laughing, ghost trying to scare, funny expressions, colorful spooky room:1.3",
+      "narration": "बू ने डराने की कोशिश की, लेकिन वह इतना नटखट था कि वे सब हँस पड़े!",
+      "subtitle": "Failed Scare",
+      "characters": ["Rohan", "Pooja", "Boo"]
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of ghost and kids playing hide and seek",
+      "visual_prompt": "(medium shot:1.2) ghost and kids playing hide and seek, smiling faces, bright spooky room:1.3",
+      "narration": "अब वे सब छुपन-छुपाई खेलने लगे — भूत भी! क्या मज़ा था!",
+      "subtitle": "Ghostly Games",
+      "characters": ["Rohan", "Pooja", "Boo"]
+    },
+    {
+      "duration": 9,
+      "description": "close-up of Boo waving goodbye as kids leave happy",
+      "visual_prompt": "(close-up:1.2) ghost waving goodbye, kids smiling, warm moonlight outside window:1.3",
+      "narration": "रहन और पूजा ने बोओ को विदा किया और सोचा, 'क्या भूत था ये!'",
+      "subtitle": "Goodbye Boo",
+      "characters": ["Rohan", "Pooja", "Boo"]
+    }
+  ],
+  "tags": [
+    "kids",
+    "funny",
+    "horror",
+    "ghost",
+    "adventure",
+    "storybook",
+    "friendship",
+    "magic"
+  ]
+}
