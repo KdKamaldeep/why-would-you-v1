@@ -6,11 +6,16 @@ Image Generator Module - Handles cartoon image generation using Stable Diffusion
 import os
 import time
 import logging
+import warnings
 import torch
 from PIL import Image, ImageDraw, ImageFont
 from typing import List, Optional
 from pathlib import Path
 from .prompt_enhancer import PromptEnhancer
+
+# Suppress deprecation warnings for CLIP classes
+warnings.filterwarnings("ignore", message=".*CLIPFeatureExtractor.*")
+warnings.filterwarnings("ignore", message=".*Some weights of the model checkpoint were not used.*")
 
 logger = logging.getLogger(__name__)
 
@@ -117,6 +122,19 @@ class ImageGenerator:
                                 logger.info(f"✅ LoRA loaded with scale ~ {self.lora_scale}")
                         except Exception as le:
                             logger.warning(f"⚠️ Failed to load LoRA '{self.lora_path}': {le}")
+                    
+                    # Configure tokenizer to avoid attention mask warnings
+                    if hasattr(self.pipe, 'tokenizer') and self.pipe.tokenizer is not None:
+                        if hasattr(self.pipe.tokenizer, 'pad_token') and self.pipe.tokenizer.pad_token is None:
+                            self.pipe.tokenizer.pad_token = self.pipe.tokenizer.eos_token
+                            logger.info("🔧 Configured tokenizer pad_token to avoid attention mask warnings")
+                        
+                        # Also configure the text encoder tokenizer if available
+                        if hasattr(self.pipe, 'text_encoder') and hasattr(self.pipe.text_encoder, 'config'):
+                            if hasattr(self.pipe.text_encoder.config, 'pad_token_id') and self.pipe.text_encoder.config.pad_token_id is None:
+                                self.pipe.text_encoder.config.pad_token_id = self.pipe.tokenizer.eos_token_id
+                                logger.info("🔧 Configured text encoder pad_token_id")
+                    
                     self.sd_available = True
                     logger.info("✅ Stable Diffusion pipeline initialized from pretrained repo!")
                     return
@@ -174,6 +192,18 @@ class ImageGenerator:
                 except Exception as le:
                     logger.warning(f"⚠️ Failed to load LoRA '{self.lora_path}': {le}")
 
+            # Configure tokenizer to avoid attention mask warnings
+            if hasattr(self.pipe, 'tokenizer') and self.pipe.tokenizer is not None:
+                if hasattr(self.pipe.tokenizer, 'pad_token') and self.pipe.tokenizer.pad_token is None:
+                    self.pipe.tokenizer.pad_token = self.pipe.tokenizer.eos_token
+                    logger.info("🔧 Configured tokenizer pad_token to avoid attention mask warnings")
+                
+                # Also configure the text encoder tokenizer if available
+                if hasattr(self.pipe, 'text_encoder') and hasattr(self.pipe.text_encoder, 'config'):
+                    if hasattr(self.pipe.text_encoder.config, 'pad_token_id') and self.pipe.text_encoder.config.pad_token_id is None:
+                        self.pipe.text_encoder.config.pad_token_id = self.pipe.tokenizer.eos_token_id
+                        logger.info("🔧 Configured text encoder pad_token_id")
+
             self.sd_available = True
             logger.info("✅ Stable Diffusion pipeline initialized successfully!")
             logger.info("🎨 Ready to generate professional cartoon images!")
@@ -183,22 +213,28 @@ class ImageGenerator:
             logger.info("💡 Will use placeholder images instead")
             self.sd_available = False
     
-    def generate_cartoon_image(self, prompt: str, output_path: str) -> str:
-        """Generate a cartoon-style image using Stable Diffusion."""
+    def generate_cartoon_image(self, prompt: str, output_path: str, subtitle: str = None) -> str:
+        """Generate a cartoon-style image using Stable Diffusion with optional subtitle."""
         try:
             logger.info(f"🎨 Generating cartoon image for prompt: {prompt}")
             
             # If we have a working pipeline, use it
             if self.sd_available and self.pipe is not None:
-                return self._generate_sd_image(prompt, output_path)
+                result_path = self._generate_sd_image(prompt, output_path)
             else:
                 # Fallback to placeholder
                 logger.info("⚠️ Using placeholder image (SD pipeline not available)")
-                return self._generate_placeholder_image(prompt, output_path)
+                result_path = self._generate_placeholder_image(prompt, output_path, subtitle)
+            
+            # Add subtitle if provided
+            if subtitle:
+                result_path = self._add_subtitle_to_image(result_path, subtitle)
+                
+            return result_path
                 
         except Exception as e:
             logger.error(f"❌ Error generating image: {e}")
-            return self._generate_placeholder_image(prompt, output_path)
+            return self._generate_placeholder_image(prompt, output_path, subtitle)
     
     def _generate_sd_image(self, prompt: str, output_path: str) -> str:
         """Generate image using Stable Diffusion."""
@@ -226,7 +262,8 @@ class ImageGenerator:
                     width=768,
                     height=1024,
                     num_images_per_prompt=1,
-                    generator=torch.Generator(device=self.device).manual_seed(42)  # Consistent results
+                    generator=torch.Generator(device=self.device).manual_seed(42),  # Consistent results
+                    return_dict=True
                 )
             
             # Save the image
@@ -241,15 +278,21 @@ class ImageGenerator:
             logger.info("🔄 Falling back to placeholder image")
             return self._generate_placeholder_image(prompt, output_path)
     
-    def generate_multiple_images(self, prompts: List[str], output_dir: str) -> List[str]:
-        """Generate multiple cartoon images for a list of prompts."""
+    def generate_multiple_images(self, prompts: List[str], output_dir: str, subtitles: List[str] = None) -> List[str]:
+        """Generate multiple cartoon images for a list of prompts with optional subtitles."""
         image_paths = []
         Path(output_dir).mkdir(parents=True, exist_ok=True)
         
         for i, prompt in enumerate(prompts):
             logger.info(f"🎬 Generating scene {i+1}/{len(prompts)}")
             output_path = f"{output_dir}/scene_{i+1}.png"
-            image_path = self.generate_cartoon_image(prompt, output_path)
+            
+            # Get subtitle if available
+            subtitle = None
+            if subtitles and i < len(subtitles):
+                subtitle = subtitles[i]
+            
+            image_path = self.generate_cartoon_image(prompt, output_path, subtitle)
             image_paths.append(image_path)
             
             # Small delay between generations to prevent memory issues
@@ -259,8 +302,106 @@ class ImageGenerator:
         logger.info(f"✅ Generated {len(image_paths)} images successfully!")
         return image_paths
     
-    def _generate_placeholder_image(self, prompt: str, output_path: str) -> str:
-        """Generate a colorful placeholder image with better design."""
+    def _add_subtitle_to_image(self, image_path: str, subtitle: str) -> str:
+        """Add subtitle text to an existing image."""
+        try:
+            # Load the image
+            img = Image.open(image_path)
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            # Create a copy to draw on
+            img_with_subtitle = img.copy()
+            draw = ImageDraw.Draw(img_with_subtitle)
+            
+            # Try to load a good font for subtitles
+            try:
+                # Try different font options
+                font_options = [
+                    "arial.ttf",
+                    "Arial.ttf", 
+                    "DejaVuSans.ttf",
+                    "LiberationSans-Regular.ttf"
+                ]
+                subtitle_font = None
+                for font_path in font_options:
+                    try:
+                        subtitle_font = ImageFont.truetype(font_path, 32)
+                        break
+                    except:
+                        continue
+                
+                if subtitle_font is None:
+                    subtitle_font = ImageFont.load_default()
+            except:
+                subtitle_font = ImageFont.load_default()
+            
+            # Calculate subtitle position (bottom of image)
+            img_width, img_height = img.size
+            subtitle_y = img_height - 120  # 120 pixels from bottom
+            
+            # Split subtitle into lines if too long
+            words = subtitle.split()
+            lines = []
+            current_line = []
+            
+            for word in words:
+                current_line.append(word)
+                test_line = ' '.join(current_line)
+                bbox = draw.textbbox((0, 0), test_line, font=subtitle_font)
+                if bbox[2] - bbox[0] > img_width - 40:  # 20px margin on each side
+                    if len(current_line) > 1:
+                        current_line.pop()
+                        lines.append(' '.join(current_line))
+                        current_line = [word]
+                    else:
+                        lines.append(word)
+                        current_line = []
+            
+            if current_line:
+                lines.append(' '.join(current_line))
+            
+            # Limit to 3 lines maximum
+            lines = lines[:3]
+            
+            # Draw subtitle background
+            line_height = 40
+            total_height = len(lines) * line_height
+            bg_y_start = subtitle_y - 10
+            bg_y_end = subtitle_y + total_height + 10
+            
+            # Semi-transparent background
+            bg_overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
+            bg_draw = ImageDraw.Draw(bg_overlay)
+            bg_draw.rectangle([0, bg_y_start, img_width, bg_y_end], fill=(0, 0, 0, 180))
+            
+            # Composite the background
+            img_with_subtitle = Image.alpha_composite(img_with_subtitle.convert('RGBA'), bg_overlay).convert('RGB')
+            draw = ImageDraw.Draw(img_with_subtitle)
+            
+            # Draw subtitle text
+            for i, line in enumerate(lines):
+                bbox = draw.textbbox((0, 0), line, font=subtitle_font)
+                text_width = bbox[2] - bbox[0]
+                x = (img_width - text_width) // 2
+                y = subtitle_y + (i * line_height)
+                
+                # Draw text shadow
+                draw.text((x + 2, y + 2), line, fill='black', font=subtitle_font)
+                # Draw main text
+                draw.text((x, y), line, fill='white', font=subtitle_font)
+            
+            # Save the image with subtitle
+            img_with_subtitle.save(image_path, quality=95)
+            logger.info(f"✅ Added subtitle to image: {subtitle}")
+            return image_path
+            
+        except Exception as e:
+            logger.error(f"❌ Error adding subtitle to image: {e}")
+            return image_path
+
+    def _generate_placeholder_image(self, prompt: str, output_path: str, subtitle: str = None) -> str:
+        """Generate a colorful placeholder image with better design and optional subtitle."""
         try:
             # Create a gradient background instead of solid blue
             img = Image.new('RGB', (768, 1024), color='white')
@@ -335,19 +476,46 @@ class ImageGenerator:
                 draw.text((x, y_offset), line, fill='darkblue', font=text_font)
                 y_offset += 35
             
-            # Add a note about the placeholder
-            note = "⚠️ Placeholder - Install diffusers for AI images"
-            note_bbox = draw.textbbox((0, 0), note, font=text_font)
-            note_width = note_bbox[2] - note_bbox[0]
-            note_x = (768 - note_width) // 2
-            draw.text((note_x, 750), note, fill='red', font=text_font)
+            # Add subtitle if provided
+            if subtitle:
+                try:
+                    subtitle_font = ImageFont.truetype("arial.ttf", 28)
+                except:
+                    subtitle_font = ImageFont.load_default()
+                
+                # Draw subtitle background
+                subtitle_y = 850
+                bbox = draw.textbbox((0, 0), subtitle, font=subtitle_font)
+                text_width = bbox[2] - bbox[0]
+                x = (768 - text_width) // 2
+                
+                # Semi-transparent background for subtitle
+                bg_overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
+                bg_draw = ImageDraw.Draw(bg_overlay)
+                bg_draw.rectangle([x-10, subtitle_y-10, x+text_width+10, subtitle_y+40], fill=(0, 0, 0, 180))
+                
+                # Composite the background
+                img = Image.alpha_composite(img.convert('RGBA'), bg_overlay).convert('RGB')
+                draw = ImageDraw.Draw(img)
+                
+                # Draw subtitle text
+                draw.text((x + 2, subtitle_y + 2), subtitle, fill='black', font=subtitle_font)
+                draw.text((x, subtitle_y), subtitle, fill='white', font=subtitle_font)
             
-            # Add installation instructions
-            install_note = "Run: pip install diffusers transformers accelerate safetensors"
-            install_bbox = draw.textbbox((0, 0), install_note, font=text_font)
-            install_width = install_bbox[2] - install_bbox[0]
-            install_x = (768 - install_width) // 2
-            draw.text((install_x, 780), install_note, fill='darkgreen', font=text_font)
+            # Add a note about the placeholder (only if no subtitle)
+            if not subtitle:
+                note = "⚠️ Placeholder - Install diffusers for AI images"
+                note_bbox = draw.textbbox((0, 0), note, font=text_font)
+                note_width = note_bbox[2] - note_bbox[0]
+                note_x = (768 - note_width) // 2
+                draw.text((note_x, 950), note, fill='red', font=text_font)
+                
+                # Add installation instructions
+                install_note = "Run: pip install diffusers transformers accelerate safetensors"
+                install_bbox = draw.textbbox((0, 0), install_note, font=text_font)
+                install_width = install_bbox[2] - install_bbox[0]
+                install_x = (768 - install_width) // 2
+                draw.text((install_x, 980), install_note, fill='darkgreen', font=text_font)
             
             img.save(output_path, quality=95)
             logger.info(f"✅ Generated enhanced placeholder image: {output_path}")

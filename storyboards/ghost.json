@@ -1,0 +1,70 @@
+{
+  "title": "Vicky the Friendly Vampire",
+  "description": "Vicky, a tiny cute vampire, makes new friends in the night park and shares funny spooky adventures with them.",
+  "total_duration": 50,
+  "cast": [
+    {"name": "Vicky", "role": "cute little vampire"},
+    {"name": "Aarav", "role": "curious boy"},
+    {"name": "Meera", "role": "brave girl"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "wide shot of children playing in night park under soft moonlight",
+      "visual_prompt": "(wide shot:1.2) children playing happily in night park, soft moonlight, trees and benches, storybook style:1.3",
+      "narration": "आरव और मीरा रात के पार्क में खेल रहे थे, जब उन्होंने कुछ अजीब देखा।",
+      "subtitle": "Night Playtime",
+      "characters": ["Aarav", "Meera"]
+    },
+    {
+      "duration": 8,
+      "description": "close-up of small cute vampire hiding behind tree with playful eyes",
+      "visual_prompt": "(close-up:1.2) small cute vampire hiding behind tree, playful eyes, night, storybook style:1.3",
+      "narration": "पड़ोसी पेड़ के पीछे एक छोटा प्यारा वैम्पायर छिपा था।",
+      "subtitle": "The Hidden Vampire",
+      "characters": ["Vicky"]
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of children approaching vampire cautiously with smiles",
+      "visual_prompt": "(medium shot:1.2) two children cautiously approaching small vampire, friendly smiles, night park background, storybook style:1.3",
+      "narration": "आरव और मीरा धीरे-धीरे वैम्पायर के पास गए, डर के बजाय दोस्ती दिखाते हुए।",
+      "subtitle": "Making Friends",
+      "characters": ["Aarav", "Meera", "Vicky"]
+    },
+    {
+      "duration": 8,
+      "description": "close-up of vampire showing funny little fangs and silly smile",
+      "visual_prompt": "(close-up:1.2) small vampire showing tiny funny fangs and silly smile, night, storybook style:1.3",
+      "narration": "विक्की ने अपनी छोटी-छोटी दांतें दिखाई और सबको हँसाया।",
+      "subtitle": "Funny Fangs",
+      "characters": ["Vicky"]
+    },
+    {
+      "duration": 9,
+      "description": "wide shot of all three laughing and playing hide and seek in park",
+      "visual_prompt": "(wide shot:1.2) children and small vampire laughing, playing hide and seek in night park, storybook style:1.3",
+      "narration": "तीनों ने मिलकर छुपन-छुपाई खेली और रात को मज़ेदार बना दिया।",
+      "subtitle": "Hide and Seek Fun",
+      "characters": ["Aarav", "Meera", "Vicky"]
+    },
+    {
+      "duration": 9,
+      "description": "medium shot of vampire waving goodbye under glowing moon",
+      "visual_prompt": "(medium shot:1.2) small vampire waving goodbye under glowing full moon, night park, storybook style:1.3",
+      "narration": "रात खत्म हुई और विक्की ने चाँद के नीचे हाथ हिलाकर विदा ली।",
+      "subtitle": "Goodnight Vicky",
+      "characters": ["Vicky"]
+    }
+  ],
+  "tags": [
+    "kids",
+    "funny",
+    "vampire",
+    "friendship",
+    "storybook",
+    "adventure",
+    "night",
+    "cute"
+  ]
+}

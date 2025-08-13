@@ -1,0 +1,64 @@
+{
+  "title": "The Brave Lion of Sundarvan",
+  "description": "A young lion in the Sundarvan jungle learns courage and kindness while protecting his friends.",
+  "total_duration": 60,
+  "tags": ["lion story", "jungle adventure", "kids story", "Indian culture", "animal tale"],
+  "scenes": [
+    {
+      "duration": 7,
+      "description": "A peaceful sunrise over the Sundarvan jungle.",
+      "visual_prompt": "(wide shot) sunrise over lush jungle trees",
+      "narration": "सुंदरवन जंगल में सुबह का सूरज धीरे-धीरे उग रहा था।",
+      "subtitle": "सुंदरवन जंगल में सुबह का सूरज धीरे-धीरे उग रहा था।"
+    },
+    {
+      "duration": 6,
+      "description": "A young lion walks along a riverbank.",
+      "visual_prompt": "(wide shot) young lion near calm river",
+      "narration": "एक युवा शेर नदी किनारे टहल रहा था।",
+      "subtitle": "एक युवा शेर नदी किनारे टहल रहा था।"
+    },
+    {
+      "duration": 7,
+      "description": "The lion sees a group of deer trapped in vines.",
+      "visual_prompt": "(wide shot) deer stuck in green vines",
+      "narration": "शेर ने देखा कि कुछ हिरण बेलों में फँसे हुए हैं।",
+      "subtitle": "शेर ने देखा कि कुछ हिरण बेलों में फँसे हुए हैं।"
+    },
+    {
+      "duration": 7,
+      "description": "The lion uses his claws to free the deer.",
+      "visual_prompt": "(wide shot) lion cutting vines with claws",
+      "narration": "शेर ने अपने पंजों से बेलें काटकर हिरणों को छुड़ा दिया।",
+      "subtitle": "शेर ने अपने पंजों से बेलें काटकर हिरणों को छुड़ा दिया।"
+    },
+    {
+      "duration": 6,
+      "description": "The deer thank the lion and run away happily.",
+      "visual_prompt": "(wide shot) deer running happily in jungle",
+      "narration": "हिरणों ने शेर को धन्यवाद दिया और खुशी से भाग गए।",
+      "subtitle": "हिरणों ने शेर को धन्यवाद दिया और खुशी से भाग गए।"
+    },
+    {
+      "duration": 7,
+      "description": "A storm arrives, shaking the jungle.",
+      "visual_prompt": "(wide shot) heavy rain in dense jungle",
+      "narration": "अचानक तूफ़ान आया और जंगल हिलने लगा।",
+      "subtitle": "अचानक तूफ़ान आया और जंगल हिलने लगा।"
+    },
+    {
+      "duration": 7,
+      "description": "The lion shelters small animals under a large tree.",
+      "visual_prompt": "(wide shot) lion with animals under tree",
+      "narration": "शेर ने छोटे जानवरों को एक बड़े पेड़ के नीचे शरण दी।",
+      "subtitle": "शेर ने छोटे जानवरों को एक बड़े पेड़ के नीचे शरण दी।"
+    },
+    {
+      "duration": 6,
+      "description": "The storm clears and a rainbow appears.",
+      "visual_prompt": "(wide shot) rainbow over bright jungle",
+      "narration": "तूफ़ान के बाद इंद्रधनुष ने जंगल को रंगीन बना दिया।",
+      "subtitle": "तूफ़ान के बाद इंद्रधनुष ने जंगल को रंगीन बना दिया।"
+    }
+  ]
+}

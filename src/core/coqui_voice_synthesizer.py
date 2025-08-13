@@ -12,10 +12,22 @@ Based on: https://docs.coqui.ai/en/dev/models/bark.html
 import os
 import logging
 import tempfile
+import warnings
 import numpy as np
 from typing import List, Optional, Dict, Any
 import torch
 from pydantic import BaseModel
+
+# Suppress torchaudio deprecation warnings
+warnings.filterwarnings("ignore", message=".*torchaudio.load.*")
+warnings.filterwarnings("ignore", message=".*StreamingMediaDecoder.*")
+warnings.filterwarnings("ignore", message=".*torchcodec.*")
+
+# Suppress attention mask warnings from transformers (used by TTS)
+warnings.filterwarnings("ignore", message=".*attention mask is not set.*")
+warnings.filterwarnings("ignore", message=".*pad token is same as eos token.*")
+warnings.filterwarnings("ignore", message=".*CLIPFeatureExtractor is deprecated.*")
+warnings.filterwarnings("ignore", message=".*Some weights of the model checkpoint were not used.*")
 
 logger = logging.getLogger(__name__)
 

@@ -47,7 +47,7 @@ def check_requirements():
     print("✅ All requirements satisfied!")
     return True
 
-def generate_cartoon(prompt, style="cartoon", duration=30, language="en"):
+def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True):
     """Generate a cartoon video with the given prompt."""
     try:
         # Import the main generator
@@ -58,6 +58,7 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en"):
         print(f"🎨 Style: {style}")
         print(f"⏱️ Duration: {duration} seconds")
         print(f"🗣️ Language: {language}")
+        print(f"🎯 Prompt enhancement: {'Enabled' if enable_prompt_enhancement else 'Disabled'}")
         print("-" * 50)
         
         # Create video configuration
@@ -67,7 +68,8 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en"):
             style=style,
             output_path="output",
             add_subtitles=False,
-            language=language
+            language=language,
+            enable_prompt_enhancement=enable_prompt_enhancement
         )
         
         # Initialize generator
@@ -102,6 +104,7 @@ Examples:
   python simple_cartoon_generator.py --prompt "A baby lion opens a smoothie shop"
   python simple_cartoon_generator.py --prompt "A robot learns to dance" --style anime
   python simple_cartoon_generator.py --prompt "Magic forest adventure" --duration 45
+  python simple_cartoon_generator.py --prompt "Animal friends adventure" --storyboard storyboards/tillu.json --no-reuse --style indian --language hi --no-prompt-enhancement
         """
     )
     
@@ -141,6 +144,12 @@ Examples:
         "--no-reuse",
         action="store_true",
         help="Force regeneration of all assets (ignore cached outputs)"
+    )
+    
+    parser.add_argument(
+        "--no-prompt-enhancement",
+        action="store_true",
+        help="Disable prompt enhancement (use raw prompts without AI enhancement)"
     )
     
     parser.add_argument(
@@ -212,7 +221,8 @@ Examples:
                 scene_duration=scene_duration,
                 reuse_existing=(not args.no_reuse),
                 add_subtitles=False,
-                language=args.language
+                language=args.language,
+                enable_prompt_enhancement=(not args.no_prompt_enhancement)
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
@@ -220,7 +230,7 @@ Examples:
             print(f"❌ Failed to use storyboard: {e}")
             output_path = None
     else:
-        output_path = generate_cartoon(args.prompt, args.style, args.duration, args.language)
+        output_path = generate_cartoon(args.prompt, args.style, args.duration, args.language, not args.no_prompt_enhancement)
     
     if output_path:
         print(f"\n🎊 Success! Your cartoon is ready at: {output_path}")

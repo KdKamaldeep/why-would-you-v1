@@ -54,7 +54,7 @@ WhyWouldYou-v1/
 git clone <repository-url>
 cd WhyWouldYou-v1
 
-# Install dependencies
+# Install dependencies (compatible versions for Python 3.11)
 pip install -r requirements.txt
 
 # Setup the project
@@ -63,6 +63,11 @@ python -m src.utils.setup
 # Download models
 bash src/utils/download_models.sh
 ```
+
+**Note**: The current configuration uses compatible versions:
+- `transformers==4.49.0` and `TTS==0.22.0` for Python 3.11 compatibility
+- Warning suppressions handle deprecation messages
+- All functionality is preserved with stable versions
 
 ### **2. Configuration**
 ```bash
@@ -150,7 +155,45 @@ python tests/test_image_generation.py
 
 # Test animation system
 python -c "from src.core.animation_generator import AnimationGenerator; print('✅ Animation system ready')"
+
+# Test attention mask fix
+python test_warning_fixes.py
+
+# Test TTS warning suppression
+python test_tts_warning_fixes.py
+
+# Test subtitle functionality
+python test_subtitle_functionality.py
+
+# Reinstall dependencies (if needed)
+python reinstall_dependencies.py
 ```
+
+## 🔧 **Recent Fixes**
+
+### **Attention Mask Issue (Fixed)**
+- **Problem**: "The attention mask is not set and cannot be inferred from input because pad token is same as eos token"
+- **Solution**: Properly configured tokenizer pad_token during pipeline initialization
+- **Impact**: Eliminates warnings and improves text processing reliability
+- **Status**: ✅ **Resolved**
+
+### **CLIP Deprecation Warnings (Fixed)**
+- **Problem**: "CLIPFeatureExtractor is deprecated" and "Some weights of the model checkpoint were not used"
+- **Solution**: Updated transformers library and added warning suppression
+- **Impact**: Eliminates deprecation warnings and unused weight warnings
+- **Status**: ✅ **Resolved**
+
+### **Subtitle Functionality (Added)**
+- **Feature**: Added subtitle support to image generation
+- **Implementation**: Professional subtitle rendering with background and text shadows
+- **Usage**: Pass subtitle parameter to `generate_cartoon_image()` method
+- **Status**: ✅ **Implemented**
+
+### **TTS Compatibility Issues (Fixed)**
+- **Problem**: "GPT2InferenceModel object has no attribute 'generate'", torchaudio deprecation warnings, and attention mask warnings
+- **Solution**: Reverted to compatible versions (transformers==4.49.0, TTS==0.22.0) and added comprehensive warning suppression
+- **Impact**: Restores XTTS voice generation functionality and eliminates all TTS-related warnings
+- **Status**: ✅ **Resolved**
 
 ## 📚 **Documentation**
 
