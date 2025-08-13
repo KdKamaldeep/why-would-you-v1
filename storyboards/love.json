@@ -1,0 +1,82 @@
+{
+  "title": "The Midnight Adventure of Lavanya, Garry, and Adhi",
+  "description": "Three friends—Lavanya, Garry, and Adhi—explore the magical night forest and discover a hidden glowing treasure together.",
+  "total_duration": 50,
+  "cast": [
+    {"name": "Lavanya", "role": "brave girl with long black hair and pink dress"},
+    {"name": "Garry", "role": "curious boy with short brown hair and blue hoodie"},
+    {"name": "Adhi", "role": "funny boy with curly hair and green t-shirt"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "wide shot of three kids standing at the edge of a glowing forest under moonlight",
+      "visual_prompt": "(wide shot:1.2) three kids standing at glowing forest edge under moonlight; Lavanya (brave girl with long black hair and pink dress), Garry (curious boy with short brown hair and blue hoodie), Adhi (funny boy with curly hair and green t-shirt), storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "लावण्य, गैरी और आदि चाँदनी रात में जादुई जंगल के पास खड़े थे, एक रोमांचक खोज के लिए तैयार।",
+      "subtitle": "The Magical Forest",
+      "characters": ["Lavanya", "Garry", "Adhi"],
+      "motion_prompt": "three kids looking excited at glowing forest"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of kids cautiously stepping into glowing forest path",
+      "visual_prompt": "(medium shot:1.2) Lavanya, Garry, and Adhi cautiously stepping into glowing forest path; characters styled as before, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "तीनों बच्चे धीरे-धीरे चमकती पगडंडी पर चले, हर तरफ रंगीन रोशनी फैली हुई थी।",
+      "subtitle": "Into the Glow",
+      "characters": ["Lavanya", "Garry", "Adhi"],
+      "motion_prompt": "kids walking into glowing forest path"
+    },
+    {
+      "duration": 8,
+      "description": "close-up of glowing treasure chest nestled among sparkling flowers",
+      "visual_prompt": "(close-up:1.2) glowing treasure chest nestled among sparkling flowers in forest, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "उन्होंने एक चमकता हुआ खजाना देखा, जो जादुई फूलों के बीच छुपा था।",
+      "subtitle": "The Hidden Treasure",
+      "characters": [],
+      "motion_prompt": "treasure chest glowing softly"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of kids opening treasure chest excitedly with glowing light spilling out",
+      "visual_prompt": "(medium shot:1.2) Lavanya, Garry, and Adhi opening glowing treasure chest excitedly; characters styled as before, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "लावण्य, गैरी और आदि ने मिलकर खजाने को खोला और उसकी चमक से आँखें चमक उठीं।",
+      "subtitle": "Treasure Found",
+      "characters": ["Lavanya", "Garry", "Adhi"],
+      "motion_prompt": "kids opening chest with glowing light spilling out"
+    },
+    {
+      "duration": 9,
+      "description": "wide shot of kids dancing and celebrating near glowing chest in forest",
+      "visual_prompt": "(wide shot:1.2) Lavanya, Garry, and Adhi dancing and celebrating near glowing treasure chest in magical forest, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "तीनों ने खुशी से नाचते हुए रात को यादगार बना दिया।",
+      "subtitle": "Joyful Celebration",
+      "characters": ["Lavanya", "Garry", "Adhi"],
+      "motion_prompt": "kids dancing and playing around glowing chest"
+    },
+    {
+      "duration": 9,
+      "description": "medium shot of kids waving goodbye under moonlit sky near forest edge",
+      "visual_prompt": "(medium shot:1.2) Lavanya, Garry, and Adhi waving goodbye under moonlit sky near forest edge; characters styled as before, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "रात खत्म हुई और बच्चों ने चाँद के नीचे हाथ हिलाकर विदा ली। अगर आपको यह कहानी पसंद आई हो, तो कृपया इस चैनल को सब्सक्राइब करें और बेल आइकन दबाएं।",
+      "subtitle": "Goodnight Friends",
+      "characters": ["Lavanya", "Garry", "Adhi"],
+      "motion_prompt": "kids waving goodbye and walking away"
+    }
+  ],
+  "tags": [
+    "kids",
+    "magical",
+    "friendship",
+    "storybook",
+    "adventure",
+    "night",
+    "cute",
+    "treasure"
+  ]
+}
