@@ -11,7 +11,7 @@
     {
       "duration": 8,
       "description": "wide shot of three kids under 10 standing at the edge of a glowing forest under moonlight",
-      "visual_prompt": "(wide shot:1.2) three kids under 10 standing at glowing forest edge under moonlight; Lavanya (brave girl with long black hair and pink dress), Garry (curious boy with short brown hair and blue hoodie), Adhi (funny boy with curly hair and green t-shirt), storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) Lavanya (brave girl under 10 with long black hair and pink dress), Garry (curious boy under 10 with short brown hair and blue hoodie), Adhi (funny boy under 10 with curly hair and green t-shirt) standing at glowing forest edge under moonlight, storybook style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लावण्य, गैरी और आदि, दस साल से छोटे दोस्त, चाँदनी रात में जादुई जंगल के पास खड़े थे, एक रोमांचक खोज के लिए तैयार।",
       "subtitle": "The Magical Forest",
@@ -21,7 +21,7 @@
     {
       "duration": 8,
       "description": "medium shot of kids cautiously stepping into glowing forest path",
-      "visual_prompt": "(medium shot:1.2) Lavanya, Garry, and Adhi cautiously stepping into glowing forest path; characters styled as before, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) Lavanya (brave girl under 10 with long black hair and pink dress), Garry (curious boy under 10 with short brown hair and blue hoodie), and Adhi (funny boy under 10 with curly hair and green t-shirt) cautiously stepping into glowing forest path, storybook style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "तीनों बच्चे धीरे-धीरे चमकती पगडंडी पर चले, हर तरफ रंगीन रोशनी फैली हुई थी।",
       "subtitle": "Into the Glow",
@@ -41,7 +41,7 @@
     {
       "duration": 8,
       "description": "medium shot of kids opening treasure chest excitedly with glowing light spilling out",
-      "visual_prompt": "(medium shot:1.2) Lavanya, Garry, and Adhi opening glowing treasure chest excitedly; characters styled as before, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) Lavanya (brave girl under 10 with long black hair and pink dress), Garry (curious boy under 10 with short brown hair and blue hoodie), and Adhi (funny boy under 10 with curly hair and green t-shirt) opening glowing treasure chest excitedly, storybook style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लावण्य, गैरी और आदि ने मिलकर खजाने को खोला और उसकी चमक से आँखें चमक उठीं।",
       "subtitle": "Treasure Found",
@@ -51,7 +51,7 @@
     {
       "duration": 9,
       "description": "wide shot of kids dancing and celebrating near glowing chest in forest",
-      "visual_prompt": "(wide shot:1.2) Lavanya, Garry, and Adhi dancing and celebrating near glowing treasure chest in magical forest, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) Lavanya (brave girl under 10 with long black hair and pink dress), Garry (curious boy under 10 with short brown hair and blue hoodie), and Adhi (funny boy under 10 with curly hair and green t-shirt) dancing and celebrating near glowing treasure chest in magical forest, storybook style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "तीनों ने खुशी से नाचते हुए रात को यादगार बना दिया।",
       "subtitle": "Joyful Celebration",
@@ -61,7 +61,7 @@
     {
       "duration": 9,
       "description": "medium shot of kids waving goodbye under moonlit sky near forest edge",
-      "visual_prompt": "(medium shot:1.2) Lavanya, Garry, and Adhi waving goodbye under moonlit sky near forest edge; characters styled as before, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) Lavanya (brave girl under 10 with long black hair and pink dress), Garry (curious boy under 10 with short brown hair and blue hoodie), and Adhi (funny boy under 10 with curly hair and green t-shirt) waving goodbye under moonlit sky near forest edge, storybook style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "रात खत्म हुई और बच्चों ने चाँद के नीचे हाथ हिलाकर विदा ली। अगर आपको यह कहानी पसंद आई हो, तो कृपया इस चैनल को सब्सक्राइब करें और बेल आइकन दबाएं।",
       "subtitle": "Goodnight Friends",
