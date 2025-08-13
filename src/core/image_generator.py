@@ -213,14 +213,16 @@ class ImageGenerator:
             logger.info("💡 Will use placeholder images instead")
             self.sd_available = False
     
-    def generate_cartoon_image(self, prompt: str, output_path: str, subtitle: str = None) -> str:
-        """Generate a cartoon-style image using Stable Diffusion with optional subtitle."""
+    def generate_cartoon_image(self, prompt: str, output_path: str, subtitle: str = None, negative_prompt: str = None) -> str:
+        """Generate a cartoon-style image using Stable Diffusion with optional subtitle and negative prompt."""
         try:
             logger.info(f"🎨 Generating cartoon image for prompt: {prompt}")
+            if negative_prompt:
+                logger.info(f"🎨 Using negative prompt: {negative_prompt}")
             
             # If we have a working pipeline, use it
             if self.sd_available and self.pipe is not None:
-                result_path = self._generate_sd_image(prompt, output_path)
+                result_path = self._generate_sd_image(prompt, output_path, negative_prompt)
             else:
                 # Fallback to placeholder
                 logger.info("⚠️ Using placeholder image (SD pipeline not available)")
@@ -236,21 +238,22 @@ class ImageGenerator:
             logger.error(f"❌ Error generating image: {e}")
             return self._generate_placeholder_image(prompt, output_path, subtitle)
     
-    def _generate_sd_image(self, prompt: str, output_path: str) -> str:
+    def _generate_sd_image(self, prompt: str, output_path: str, negative_prompt: str = None) -> str:
         """Generate image using Stable Diffusion."""
         try:
             # Use the prompt as-is (enhancement is now handled in _compose_image_prompt)
             final_prompt = prompt
             logger.info(f"🎯 Using prompt (enhancement handled upstream): {prompt}")
             
-            # Strong cartoon-specific negative prompts to avoid realistic images
-            negative_prompt = (
-                "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
-                "blurry, low quality, dark, scary, violent, adult content, nsfw, "
-                "hyperrealistic, detailed textures, photographic, film grain, "
-                "realistic lighting, realistic shadows, realistic proportions, "
-                "detailed skin, detailed hair, detailed clothing textures"
-            )
+            # Use provided negative prompt or fall back to default cartoon-specific negative prompts
+            if negative_prompt is None:
+                negative_prompt = (
+                    "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
+                    "blurry, low quality, dark, scary, violent, adult content, nsfw, "
+                    "hyperrealistic, detailed textures, photographic, film grain, "
+                    "realistic lighting, realistic shadows, realistic proportions, "
+                    "detailed skin, detailed hair, detailed clothing textures"
+                )
             
             # Generate image with cartoon-optimized settings
             with torch.autocast(self.device):
@@ -278,8 +281,8 @@ class ImageGenerator:
             logger.info("🔄 Falling back to placeholder image")
             return self._generate_placeholder_image(prompt, output_path)
     
-    def generate_multiple_images(self, prompts: List[str], output_dir: str, subtitles: List[str] = None) -> List[str]:
-        """Generate multiple cartoon images for a list of prompts with optional subtitles."""
+    def generate_multiple_images(self, prompts: List[str], output_dir: str, subtitles: List[str] = None, negative_prompts: List[str] = None) -> List[str]:
+        """Generate multiple cartoon images for a list of prompts with optional subtitles and negative prompts."""
         image_paths = []
         Path(output_dir).mkdir(parents=True, exist_ok=True)
         
@@ -292,7 +295,12 @@ class ImageGenerator:
             if subtitles and i < len(subtitles):
                 subtitle = subtitles[i]
             
-            image_path = self.generate_cartoon_image(prompt, output_path, subtitle)
+            # Get negative prompt if available
+            negative_prompt = None
+            if negative_prompts and i < len(negative_prompts):
+                negative_prompt = negative_prompts[i]
+            
+            image_path = self.generate_cartoon_image(prompt, output_path, subtitle, negative_prompt)
             image_paths.append(image_path)
             
             # Small delay between generations to prevent memory issues
@@ -656,7 +664,7 @@ class ImageGenerator:
         logger.info(f"🎯 Fallback adjusted prompt: {adjusted_prompt}")
         return adjusted_prompt
 
-    def generate_cartoon_image_with_validation(self, prompt: str, output_path: str, max_attempts: int = 3) -> str:
+    def generate_cartoon_image_with_validation(self, prompt: str, output_path: str, max_attempts: int = 3, negative_prompt: str = None) -> str:
         """
         Generate a cartoon image with validation and automatic prompt adjustment.
         Retries with adjusted prompts if the generated image is blank or poor quality.
@@ -667,7 +675,7 @@ class ImageGenerator:
             logger.info(f"🎨 Generating image (attempt {attempt}/{max_attempts})")
             
             # Generate the image
-            result_path = self.generate_cartoon_image(prompt, output_path)
+            result_path = self.generate_cartoon_image(prompt, output_path, negative_prompt=negative_prompt)
             
             # Validate the generated image
             if not self._is_image_blank_or_poor_quality(result_path):

@@ -227,15 +227,17 @@ class CartoonShortsGenerator:
                     logger.info(f"Skipping image generation (exists): {image_path}")
                     final_image_path = str(image_path)
                 else:
-                    prompt = self._compose_image_prompt(scene)
+                    prompt, negative_prompt = self._compose_image_prompt(scene)
                     logger.info(f"🖼️ Scene {i+1}: Generating image with prompt ({len(prompt)} characters)")
                     logger.info(f"🖼️ Scene {i+1}: Prompt preview: {prompt[:100]}...")
+                    if negative_prompt:
+                        logger.info(f"🖼️ Scene {i+1}: Using negative prompt ({len(negative_prompt)} characters)")
                     
                     # Use validation method if enabled, otherwise use standard generation
                     if self.config.enable_image_validation:
-                        final_image_path = self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3)
+                        final_image_path = self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3, negative_prompt=negative_prompt)
                     else:
-                        final_image_path = self.image_generator.generate_cartoon_image(prompt, str(image_path))
+                        final_image_path = self.image_generator.generate_cartoon_image(prompt, str(image_path), negative_prompt=negative_prompt)
                     logger.info(f"🖼️ Scene {i+1}: Image generation completed: {final_image_path}")
                 
                 image_paths.append(final_image_path)
@@ -567,11 +569,14 @@ class CartoonShortsGenerator:
         millisecs = int((seconds % 1) * 1000)
         return f"{hours:02d}:{minutes:02d}:{secs:02d},{millisecs:03d}"
 
-    def _compose_image_prompt(self, scene: Dict) -> str:
-        """Compose an image prompt using the visual_prompt from script with optional GPT-2 enhancement."""
+    def _compose_image_prompt(self, scene: Dict) -> tuple[str, str]:
+        """Compose an image prompt and negative prompt using the visual_prompt from script with optional GPT-2 enhancement."""
         # Get the visual_prompt from the script (this is the key requirement)
         visual_prompt = scene.get('visual_prompt', scene.get('description', ''))
         base_prompt = visual_prompt or "Cartoon scene"
+        
+        # Get the negative prompt from the script
+        negative_prompt = scene.get('negative_prompt', '')
 
         # If prompt enhancement is enabled, enhance the visual_prompt specifically
         if self.config.enable_prompt_enhancement and hasattr(self, 'image_generator') and self.image_generator.prompt_enhancer:
@@ -581,10 +586,10 @@ class CartoonShortsGenerator:
                 enhancement_type="cartoon",
                 max_tokens=77  # Diffusion model token limit
             )
-            return enhanced_prompt
+            return enhanced_prompt, negative_prompt
         else:
             logger.info(f"🎯 Using original visual_prompt from script: {base_prompt}")
-            return base_prompt
+            return base_prompt, negative_prompt
 
 def main():
     """Main CLI entry point."""
