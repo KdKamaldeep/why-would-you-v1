@@ -1,0 +1,82 @@
+{
+  "title": "Riya and the Lost Star",
+  "description": "Riya, a brave little girl, finds a fallen star in her garden and helps it return to the night sky through a magical journey.",
+  "total_duration": 50,
+  "cast": [
+    {"name": "Riya", "role": "brave little girl"},
+    {"name": "Fallen Star", "role": "tiny glowing star"},
+    {"name": "Wise Owl", "role": "helpful forest owl"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "wide shot of Riya playing in her garden under twinkling stars",
+      "visual_prompt": "(wide shot:1.2) little girl playing in garden under twinkling night sky, flowers and trees, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "रिया अपने बगीचे में खेल रही थी, जब उसने आसमान से गिरता हुआ एक चमकीला तारा देखा।",
+      "subtitle": "The Falling Star",
+      "characters": ["Riya"],
+      "motion_prompt": "girl playing and noticing a falling star"
+    },
+    {
+      "duration": 8,
+      "description": "close-up of tiny glowing star resting on soft grass",
+      "visual_prompt": "(close-up:1.2) tiny glowing star resting gently on grass, night garden background, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "तारा धीरे-धीरे बगीचे की घास पर आकर रुक गया, जैसे मदद चाहता हो।",
+      "subtitle": "The Lost Star",
+      "characters": ["Fallen Star"],
+      "motion_prompt": "star glowing softly on grass"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Riya gently picking up the glowing star",
+      "visual_prompt": "(medium shot:1.2) little girl gently holding glowing star in hands, soft night garden, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "रिया ने धीरे-धीरे तारे को अपने हाथों में उठाया और उसे सुरक्षित रखा।",
+      "subtitle": "A Gentle Touch",
+      "characters": ["Riya", "Fallen Star"],
+      "motion_prompt": "girl holding glowing star carefully"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of wise owl perched on a branch, looking kindly at Riya",
+      "visual_prompt": "(medium shot:1.2) wise owl perched on tree branch, night sky background, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "तभी एक समझदार उल्लू आया और कहा, ‘मैं तुम्हारी मदद कर सकता हूँ तारे को वापस आसमान भेजने में।’",
+      "subtitle": "The Wise Owl",
+      "characters": ["Wise Owl", "Riya"],
+      "motion_prompt": "owl watching kindly from tree"
+    },
+    {
+      "duration": 9,
+      "description": "wide shot of Riya following the owl through glowing forest path",
+      "visual_prompt": "(wide shot:1.2) little girl following owl along glowing forest path, night magical forest, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "रिया उल्लू के पीछे-पीछे जादुई जंगल की रौशन पगडंडी पर चली।",
+      "subtitle": "The Journey Begins",
+      "characters": ["Riya", "Wise Owl"],
+      "motion_prompt": "girl walking following owl on forest path"
+    },
+    {
+      "duration": 9,
+      "description": "medium shot of Riya releasing the glowing star back to the sky under a full moon",
+      "visual_prompt": "(medium shot:1.2) little girl releasing glowing star into night sky under full moon, magical forest, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अंत में, रिया ने तारे को चाँद की रोशनी में वापस आसमान भेज दिया। धन्यवाद कहती हुई, उसने कहा, ‘अगर आपको यह कहानी पसंद आई हो, तो कृपया इस चैनल को सब्सक्राइब करें और बेल आइकन दबाएं।’",
+      "subtitle": "Star’s Return",
+      "characters": ["Riya", "Fallen Star"],
+      "motion_prompt": "girl releasing star flying up into sky"
+    }
+  ],
+  "tags": [
+    "kids",
+    "magical",
+    "star",
+    "friendship",
+    "storybook",
+    "adventure",
+    "night",
+    "cute"
+  ]
+}
