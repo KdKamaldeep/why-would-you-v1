@@ -47,13 +47,14 @@ def test_image_generation(prompt=None):
   "(wide shot) (full scene view) foreground: [Misthi, 9, green salwar kameez, braid, marigold:1.4], midground: [river, small boat:1.1], background: [crumbling fort, warm sky:0.9], storybook style, soft handpainted (wide shot)",
   "(wide shot) (full scene view) foreground: [Misthi listening to elders on charpoy:1.4], midground: [clay lamps:1.0], background: [fort silhouette, dark sky:0.9], storybook style, soft handpainted (wide shot)",
   "(wide shot) (full scene view) foreground: [Misthi holding brass lantern:1.4], midground: [marigold garlands, rangoli:1.0], background: [path to fort:0.9], storybook style, soft handpainted (wide shot)",
-  "(wide shot) (full scene view) foreground: [Misthi brushing tall grass:1.4], midground: [mossy carved stones, fireflies:1.1], background: [dense forest, moonlight:0.9], storybook style, soft handpainted (wide shot)",
+  "(wide shot) (full scene view) foreground: [Misthi brushing tall grass:1.4], midground: [mossy stones, fireflies:1.1], background: [dense forest, moon:0.9], storybook style, soft handpainted (wide shot)",
   "(wide shot) (full scene view) foreground: [Misthi holding lantern at fort gate:1.4], midground: [carved lock, river, moon:1.1], background: [stone walls, vines:0.9], storybook style, soft handpainted (wide shot)",
   "(wide shot) (full scene view) foreground: [Misthi leaning over stone well:1.4], midground: [water ripples, starlight:1.1], background: [broken arch, banyan branches:0.9], storybook style, soft handpainted (wide shot)",
-  "(wide shot) (full scene view) foreground: [Misthi climbing rope ladder:1.4], midground: [torch-lit carved walls:1.1], background: [bronze chest:0.9], storybook style, soft handpainted (wide shot)",
+  "(wide shot) (full scene view) foreground: [Misthi climbing rope ladder:1.4], midground: [torch-lit walls:1.1], background: [bronze chest:0.9], storybook style, soft handpainted (wide shot)",
   "(wide shot) (full scene view) foreground: [Misthi lifting silver-blue flute:1.4], midground: [glowing water rising:1.1], background: [river outline:0.9], storybook style, soft handpainted (wide shot)",
   "(wide shot) (full scene view) foreground: [Misthi playing glowing flute:1.4], midground: [cheering villagers, water pots:1.1], background: [green fields, flowing river:0.9], storybook style, soft handpainted (wide shot)"
 ]
+
 
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
