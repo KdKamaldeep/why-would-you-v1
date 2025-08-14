@@ -601,22 +601,15 @@ class CartoonShortsGenerator:
         # Determine aspect ratio for intelligent prompt adaptation
         is_16_9_format = self.config.width > self.config.height and self.config.width / self.config.height > 1.5
         
-        # If prompt enhancement is enabled, use intelligent adaptation
+        # If prompt enhancement is enabled, use simple enhancement without format-specific restrictions
         if self.config.enable_prompt_enhancement and hasattr(self, 'image_generator') and self.image_generator.prompt_enhancer:
-            if is_16_9_format:
-                # For 16:9, use context-aware enhancement to prevent background clutter
-                enhancement_context = f"Adapt this cartoon scene for widescreen format, focusing on main subjects and clean composition: {base_prompt}"
-                logger.info(f"🎬 Using intelligent 16:9 prompt adaptation")
-            else:
-                # For 9:16, use standard enhancement
-                enhancement_context = base_prompt
-                logger.info(f"🎯 Using standard prompt enhancement for 9:16 format")
-            
+            # Use simple enhancement for all formats - no format-specific restrictions
             enhanced_prompt = self.image_generator.prompt_enhancer.enhance_prompt(
-                enhancement_context,
+                base_prompt,
                 enhancement_type="cartoon",
                 max_tokens=77  # Diffusion model token limit
             )
+            logger.info(f"🎯 Enhanced prompt: {enhanced_prompt[:100]}...")
             return enhanced_prompt, negative_prompt
         else:
             logger.info(f"🎯 Using original visual_prompt from script: {base_prompt}")

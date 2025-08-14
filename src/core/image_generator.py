@@ -267,16 +267,10 @@ class ImageGenerator:
                 # Use user-provided negative prompt as-is - no automatic enhancement
                 pass
             
-            # Optimize generation parameters based on aspect ratio
-            if is_16_9_format:
-                # Higher guidance scale for more focused composition in wide format
-                guidance_scale = 8.5
-                # More steps for better quality in wider format
-                num_steps = 35
-                logger.info(f"🎬 Using 16:9 optimized settings: guidance_scale={guidance_scale}, steps={num_steps}")
-            else:
-                guidance_scale = 7.5
-                num_steps = 30
+            # Use consistent generation parameters for all formats
+            guidance_scale = 7.5
+            num_steps = 30
+            logger.info(f"🎬 Using standard settings: guidance_scale={guidance_scale}, steps={num_steps}")
             
             # Generate image with optimized settings
             with torch.autocast(self.device):
