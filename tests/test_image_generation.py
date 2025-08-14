@@ -50,9 +50,9 @@ def test_image_generation(prompt=None, negative_prompt=None, video_format="short
         print("⚠️ Stable Diffusion not available - will use placeholder images")
         print("💡 To enable SD, run: bash download_models.sh")
     
-    # Use provided prompt or default test prompt
+    # Use provided prompt or default test prompt (optimized to fit within 77 tokens)
     if prompt is None:
-        prompt = "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sleeping peacefully under tree:1.3), (calm jungle night with stars and grass:1.2), (soft blue moonlight, serene storybook illustration style:1.1)"
+        prompt = "(Lavanya:1.2), (11-year-old girl:1.1), (yellow dress:1.1), (flying:1.2), (golden glowbirds:1.1), (magical sky:0.9), (storybook style:0.8)"
     
     test_prompts = [prompt]
     test_negative_prompts = [negative_prompt] if negative_prompt else None
