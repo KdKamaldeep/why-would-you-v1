@@ -1,57 +1,44 @@
 {
-  "title": "Ravi and the Lost Conch",
-  "description": "Ravi, a curious Indian boy, discovers a mysterious conch on the beach and embarks on an adventure to return it to the ocean spirit.",
+  "title": "Ravi and the Golden Shell",
+  "description": "A little Indian boy named Ravi discovers a magical golden shell on the beach, leading him on a warm, storybook-style adventure.",
   "total_duration": 60,
   "scenes": [
     {
       "duration": 8,
-      "description": "Ravi walking along the golden beach collecting seashells.",
-      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, brown shorts, barefoot, walking along golden sandy beach, gentle ocean waves in background, warm sunset light, storybook style)",
-      "narration": "Ravi loved exploring the beach every evening, hoping to find rare seashells for his growing collection.",
-      "subtitle": "Ravi loved exploring the beach every evening, hoping to find rare seashells."
+      "description": "Ravi walks barefoot along the golden sandy beach, gentle ocean waves at his feet, warm sunset light all around.",
+      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, walking along golden sandy beach, gentle ocean waves, warm sunset light, storybook illustration style, soft hand-painted look, natural proportions, warm colors (wide shot)",
+      "narration": "Ravi loved walking on the beach every evening, feeling the soft sand under his feet and the warm breeze on his face."
     },
     {
-      "duration": 8,
-      "description": "Ravi spots a glowing conch half-buried in the sand.",
-      "visual_prompt": "(wide shot, little Indian boy kneeling on golden sandy beach, brushing sand off a glowing spiral conch, soft ocean waves in background, warm orange sunset light, storybook style)",
-      "narration": "One day, he noticed a strange glow under the sand. Curious, he dug gently and uncovered a shimmering golden conch.",
-      "subtitle": "One day, he noticed a strange glow under the sand and uncovered a golden conch."
+      "duration": 10,
+      "description": "Ravi spots a shimmering golden shell half-buried in the sand.",
+      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, kneeling on golden sandy beach, picking up glowing golden shell, gentle ocean waves in background, warm sunset light, storybook illustration style, soft hand-painted look, natural proportions, warm colors (wide shot)",
+      "narration": "One evening, something sparkled in the sand — a beautiful golden shell, glowing softly in the sunlight."
     },
     {
-      "duration": 8,
-      "description": "Ravi holds the conch to his ear and hears a faint voice calling for help.",
-      "visual_prompt": "(wide shot, little Indian boy holding glowing spiral conch to his ear, eyes wide in surprise, ocean waves shimmering behind, warm sunset glow, storybook style)",
-      "narration": "When Ravi held it close, he heard a soft voice pleading, ‘Please… take me home to the Coral Palace.’",
-      "subtitle": "When Ravi held it close, he heard a soft voice pleading, ‘Please… take me home.’"
+      "duration": 10,
+      "description": "The shell glows brighter, releasing soft golden sparkles into the air.",
+      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, holding glowing golden shell in both hands, golden sparkles rising into the air, ocean waves behind, warm evening light, storybook illustration style, soft hand-painted look, natural proportions, magical atmosphere (wide shot)",
+      "narration": "As Ravi held it, the shell began to glow even brighter, sending golden sparkles dancing into the air."
     },
     {
-      "duration": 8,
-      "description": "Ravi wades into the water, holding the conch carefully.",
-      "visual_prompt": "(wide shot, little Indian boy wading into shallow turquoise water, holding glowing spiral conch with both hands, gentle waves, horizon glowing with sunset, storybook style)",
-      "narration": "Knowing the ocean was calling, Ravi stepped into the water, determined to help the mysterious voice.",
-      "subtitle": "Knowing the ocean was calling, Ravi stepped into the water, determined to help."
+      "duration": 10,
+      "description": "A magical pathway of light appears over the ocean.",
+      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, standing at water's edge, looking at glowing golden light pathway stretching across the ocean, magical sparkles in the air, warm sunset colors, storybook illustration style, soft hand-painted look, natural proportions, magical atmosphere (wide shot)",
+      "narration": "Before his eyes, a path of golden light appeared across the water, inviting him to follow."
     },
     {
-      "duration": 8,
-      "description": "A majestic sea turtle appears to guide Ravi.",
-      "visual_prompt": "(wide shot, large friendly sea turtle emerging from the water in front of little Indian boy holding glowing conch, golden sunlight on water, storybook style)",
-      "narration": "Suddenly, a great sea turtle appeared. ‘Follow me,’ it said, ‘I’ll take you to the Coral Palace.’",
-      "subtitle": "Suddenly, a great sea turtle appeared. ‘Follow me,’ it said."
-    },
-    {
-      "duration": 8,
-      "description": "Ravi returns the conch to a glowing coral structure underwater.",
-      "visual_prompt": "(wide shot, little Indian boy underwater with friendly sea turtle, placing glowing spiral conch on a radiant coral palace, colorful fish swimming around, beams of sunlight filtering through water, storybook style)",
-      "narration": "They swam together to a glowing coral palace, where Ravi gently placed the conch back in its rightful place.",
-      "subtitle": "They swam to a glowing coral palace, where Ravi placed the conch back."
+      "duration": 10,
+      "description": "Ravi follows the path and finds a hidden island with colorful flowers and palm trees.",
+      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, walking on glowing golden pathway above water, reaching small tropical island with colorful flowers, palm trees, and warm sunlight, storybook illustration style, soft hand-painted look, natural proportions, magical tone (wide shot)",
+      "narration": "He stepped carefully along the glowing path until he reached a secret island filled with bright flowers and tall palm trees."
     },
     {
       "duration": 12,
-      "description": "The ocean rewards Ravi with a pearl as thanks.",
-      "visual_prompt": "(wide shot, little Indian boy standing back on golden beach, holding a shiny pearl, ocean waves behind him, warm evening light, storybook style)",
-      "narration": "As a thank you, the ocean gave Ravi a shining pearl — a reminder that kindness always finds its way back.",
-      "subtitle": "The ocean gave Ravi a shining pearl — kindness always comes back."
+      "description": "Ravi places the shell on a rock, releasing a wave of magic that brightens the island.",
+      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, placing glowing golden shell on large smooth rock, magical wave of golden light spreading across tropical island, flowers blooming, palm leaves swaying, warm sunset glow, storybook illustration style, soft hand-painted look, natural proportions, magical tone (wide shot)",
+      "narration": "He gently set the shell on a smooth rock, and a wave of golden light swept across the island, making every flower bloom brighter."
     }
   ],
-  "tags": ["storybook", "Indian boy", "beach adventure", "ocean spirit", "kindness"]
+  "tags": ["storybook", "magical", "Indian setting", "beach", "adventure", "child protagonist"]
 }
