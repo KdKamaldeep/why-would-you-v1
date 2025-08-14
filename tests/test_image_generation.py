@@ -16,7 +16,7 @@ from core.image_generator import ImageGenerator
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def test_image_generation(prompt=None, video_format="shorts"):
+def test_image_generation(prompt=None, negative_prompt=None, video_format="shorts"):
     """Test the image generation system."""
     
     print("🎨 Testing Stable Diffusion Image Generation")
@@ -54,15 +54,18 @@ def test_image_generation(prompt=None, video_format="shorts"):
     if prompt is None:
         prompt = "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sleeping peacefully under tree:1.3), (calm jungle night with stars and grass:1.2), (soft blue moonlight, serene storybook illustration style:1.1)"
     
-    test_prompts =[prompt]
+    test_prompts = [prompt]
+    test_negative_prompts = [negative_prompt] if negative_prompt else None
 
 
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
     print(f"📝 Using prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
+    if negative_prompt:
+        print(f"🚫 Using negative prompt: {negative_prompt[:100]}{'...' if len(negative_prompt) > 100 else ''}")
     
     # Generate images
-    image_paths = image_gen.generate_multiple_images(test_prompts, str(output_dir))
+    image_paths = image_gen.generate_multiple_images(test_prompts, str(output_dir), negative_prompts=test_negative_prompts)
     
     # Report results
     print(f"\n✅ Generated {len(image_paths)} images:")
@@ -95,8 +98,9 @@ Examples:
   python test_image_generation.py
   python test_image_generation.py --prompt "a cute cartoon cat playing in a garden"
   python test_image_generation.py -p "cartoon style, colorful background, happy characters"
+  python test_image_generation.py --negative-prompt "dark, scary, realistic"
   python test_image_generation.py --video-format normal --prompt "wide shot of cartoon characters"
-  python test_image_generation.py -f shorts -p "vertical cartoon scene"
+  python test_image_generation.py -f shorts -p "vertical cartoon scene" -n "crowded, busy background"
         """
     )
     
@@ -104,6 +108,13 @@ Examples:
         '-p', '--prompt',
         type=str,
         help='Custom prompt for image generation (optional)',
+        default=None
+    )
+    
+    parser.add_argument(
+        '-n', '--negative-prompt',
+        type=str,
+        help='Negative prompt to avoid certain elements (optional)',
         default=None
     )
     
@@ -116,8 +127,8 @@ Examples:
     
     args = parser.parse_args()
     
-    # Run the test with the provided prompt and video format
-    test_image_generation(args.prompt, args.video_format)
+    # Run the test with the provided prompt, negative prompt, and video format
+    test_image_generation(args.prompt, args.negative_prompt, args.video_format)
 
 if __name__ == "__main__":
     main()
