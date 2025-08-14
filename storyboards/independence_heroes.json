@@ -1,0 +1,102 @@
+{
+  "title": "Heroes of Freedom: The Spirit of Independence",
+  "description": "A tale of four brave Indian freedom fighters who united in spirit to inspire the nation's struggle for independence, each bringing their unique courage and determination.",
+  "total_duration": 60,
+  "cast": [
+    {
+      "name": "Khudiram Bose",
+      "role": "young revolutionary freedom fighter",
+      "outfit": "white dhoti and kurta, revolutionary cap",
+      "age": 18,
+      "personality": "brave, determined, fearless"
+    },
+    {
+      "name": "Kartar Singh Sarabha",
+      "role": "Sikh revolutionary leader",
+      "outfit": "white kurta, turban, revolutionary sash",
+      "age": 19,
+      "personality": "charismatic, inspiring, courageous"
+    },
+    {
+      "name": "Rani Gaidinliu",
+      "role": "Naga spiritual leader and freedom fighter",
+      "outfit": "traditional Naga dress, warrior ornaments",
+      "age": 16,
+      "personality": "spiritual, strong-willed, protective"
+    },
+    {
+      "name": "Alluri Sitarama Raju",
+      "role": "tribal leader and revolutionary",
+      "outfit": "tribal attire, bow and arrow, warrior paint",
+      "age": 27,
+      "personality": "strategic, protective, noble"
+    },
+    {
+      "name": "Village Elder",
+      "role": "wise community leader",
+      "outfit": "traditional Indian attire, white beard",
+      "age": 65,
+      "personality": "wise, supportive, encouraging"
+    },
+    {
+      "name": "Young Children",
+      "role": "inspired village children",
+      "outfit": "simple village clothes",
+      "age": "8-12",
+      "personality": "curious, inspired, hopeful"
+    }
+  ],
+  "scenes": [
+    {
+      "duration": 12,
+      "description": "The four heroes gather around a sacred fire, sharing their dreams of a free India while village children listen in awe.",
+      "visual_prompt": "(Khudiram Bose:1.2), (white dhoti kurta:1.1), (Kartar Singh Sarabha:1.2), (turban:1.1), (Rani Gaidinliu:1.2), (Naga dress:1.1), (Alluri Sitarama Raju:1.2), (tribal attire:1.1), (sacred fire:1.3), (village children:1.0), (night sky:1.0), (determined expressions:1.2)",
+      "negative_prompt": "modern clothing, weapons, violence, blurry, low resolution, distorted",
+      "narration": "चार वीर स्वतंत्रता सेनानी एक पवित्र अग्नि के चारों ओर इकट्ठे हुए, अपने सपनों को साझा करते हुए।",
+      "subtitle": "Sacred Gathering",
+      "characters": ["Khudiram Bose", "Kartar Singh Sarabha", "Rani Gaidinliu", "Alluri Sitarama Raju", "Young Children"],
+      "motion_prompt": "Heroes sitting around fire, children listening attentively"
+    },
+    {
+      "duration": 12,
+      "description": "Khudiram and Kartar Singh teach village children about courage and the importance of education for freedom.",
+      "visual_prompt": "(Khudiram Bose:1.3), (teaching:1.2), (Kartar Singh Sarabha:1.3), (village children:1.2), (books:1.1), (village setting:1.0), (morning light:1.1), (inspiring gestures:1.2)",
+      "negative_prompt": "modern classroom, violence, weapons, blurry, low resolution",
+      "narration": "खुदीराम और करतार सिंह बच्चों को साहस और शिक्षा के महत्व के बारे में सिखाते हैं।",
+      "subtitle": "Teaching Courage",
+      "characters": ["Khudiram Bose", "Kartar Singh Sarabha", "Young Children"],
+      "motion_prompt": "Khudiram and Kartar teaching children with books"
+    },
+    {
+      "duration": 12,
+      "description": "Rani Gaidinliu leads a spiritual ceremony with Alluri Sitarama Raju, blessing the village and its people.",
+      "visual_prompt": "(Rani Gaidinliu:1.3), (spiritual ceremony:1.4), (Alluri Sitarama Raju:1.3), (village people:1.2), (traditional ceremony:1.2), (blessing:1.3), (peaceful atmosphere:1.1), (cultural elements:1.2)",
+      "negative_prompt": "violence, weapons, modern elements, blurry, low resolution",
+      "narration": "रानी गैदिनल्यू और अल्लूरी सीताराम राजू एक आध्यात्मिक समारोह का नेतृत्व करते हैं।",
+      "subtitle": "Spiritual Blessing",
+      "characters": ["Rani Gaidinliu", "Alluri Sitarama Raju", "Village Elder", "Young Children"],
+      "motion_prompt": "Rani and Alluri performing spiritual ceremony"
+    },
+    {
+      "duration": 12,
+      "description": "All four heroes stand together on a hilltop, looking towards the future with hope and determination.",
+      "visual_prompt": "(Khudiram Bose:1.2), (Kartar Singh Sarabha:1.2), (Rani Gaidinliu:1.2), (Alluri Sitarama Raju:1.2), (hilltop:1.3), (sunrise:1.4), (united stance:1.3), (determined expressions:1.2), (freedom flag:1.1), (hope:1.3)",
+      "negative_prompt": "violence, weapons, modern buildings, blurry, low resolution",
+      "narration": "चारों वीर एक पहाड़ी पर खड़े होकर आने वाले कल की ओर देखते हैं।",
+      "subtitle": "United Vision",
+      "characters": ["Khudiram Bose", "Kartar Singh Sarabha", "Rani Gaidinliu", "Alluri Sitarama Raju"],
+      "motion_prompt": "Four heroes standing together on hilltop at sunrise"
+    },
+    {
+      "duration": 12,
+      "description": "The heroes bid farewell to the village, promising to return when India is free, as children wave goodbye.",
+      "visual_prompt": "(Khudiram Bose:1.2), (Kartar Singh Sarabha:1.2), (Rani Gaidinliu:1.2), (Alluri Sitarama Raju:1.2), (village children:1.3), (waving goodbye:1.3), (village setting:1.1), (emotional farewell:1.2), (hope:1.2), (promise:1.3)",
+      "negative_prompt": "sadness, violence, weapons, modern elements, blurry, low resolution",
+      "narration": "वीरों ने गाँव से विदा ली, भारत के स्वतंत्र होने पर वापस आने का वादा किया।",
+      "subtitle": "Promise of Return",
+      "characters": ["Khudiram Bose", "Kartar Singh Sarabha", "Rani Gaidinliu", "Alluri Sitarama Raju", "Young Children", "Village Elder"],
+      "motion_prompt": "Heroes saying goodbye, children waving"
+    }
+  ],
+  "tags": ["independence", "freedom fighters", "heroes", "inspiration", "courage", "unity", "hope", "cultural", "historical", "educational"]
+}
