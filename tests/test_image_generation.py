@@ -16,19 +16,30 @@ from core.image_generator import ImageGenerator
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def test_image_generation(prompt=None):
+def test_image_generation(prompt=None, video_format="shorts"):
     """Test the image generation system."""
     
     print("🎨 Testing Stable Diffusion Image Generation")
     print("=" * 50)
     
+    # Set dimensions based on video format
+    if video_format.lower() == "shorts":
+        width, height = 768, 1024  # 9:16 aspect ratio
+        print(f"📐 Using YouTube Shorts format: {width}x{height} (9:16)")
+    elif video_format.lower() == "normal":
+        width, height = 1920, 1080  # 16:9 aspect ratio
+        print(f"📐 Using Normal video format: {width}x{height} (16:9)")
+    else:
+        width, height = 768, 1024  # Default to shorts
+        print(f"📐 Using default format: {width}x{height}")
+    
     # Create output directory
     output_dir = Path("test_output")
     output_dir.mkdir(exist_ok=True)
     
-    # Initialize image generator
+    # Initialize image generator with specified dimensions
     print("🚀 Initializing Image Generator...")
-    image_gen = ImageGenerator()
+    image_gen = ImageGenerator(width=width, height=height)
     
     # Check if SD is available
     if image_gen.is_sd_available():
@@ -84,6 +95,8 @@ Examples:
   python test_image_generation.py
   python test_image_generation.py --prompt "a cute cartoon cat playing in a garden"
   python test_image_generation.py -p "cartoon style, colorful background, happy characters"
+  python test_image_generation.py --video-format normal --prompt "wide shot of cartoon characters"
+  python test_image_generation.py -f shorts -p "vertical cartoon scene"
         """
     )
     
@@ -94,10 +107,17 @@ Examples:
         default=None
     )
     
+    parser.add_argument(
+        '-f', '--video-format',
+        choices=['shorts', 'normal'],
+        default='shorts',
+        help='Video format: "shorts" for 9:16 YouTube Shorts, "normal" for 16:9 standard videos'
+    )
+    
     args = parser.parse_args()
     
-    # Run the test with the provided prompt
-    test_image_generation(args.prompt)
+    # Run the test with the provided prompt and video format
+    test_image_generation(args.prompt, args.video_format)
 
 if __name__ == "__main__":
     main()
