@@ -1,50 +1,43 @@
 {
-  "title": "Ravi and the Ocean's Secret",
-  "description": "Ravi, a curious little boy, discovers a mysterious bottle on the beach and follows its clues to a hidden treasure.",
+  "title": "Ravi और सुनहरी रेत का रहस्य",
+  "description": "Ravi, एक जिज्ञासु छोटा भारतीय लड़का, समुद्र तट पर एक रहस्यमय सीप पाता है और एक जादुई रोमांच में निकल पड़ता है।",
   "total_duration": 60,
   "scenes": [
     {
-      "duration": 8,
-      "description": "Ravi walking along the beach at sunset",
-      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, walking along golden sandy beach, gentle ocean waves, warm sunset light, storybook style)",
-      "narration": "रवि को समुद्र के किनारे टहलना पसंद था क्योंकि लहरों की आवाज़ उसे सुकून देती थी और हर दिन कुछ नया दिखाती थी।",
-      "subtitle": "Ravi loves walking by the sea because the sound of the waves calms him and shows him something new every day."
+      "duration": 10,
+      "description": "Ravi walks along the golden sandy beach",
+      "visual_prompt": "wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, walking along golden sandy beach, gentle ocean waves, warm sunset light, storybook style",
+      "narration": "Ravi को हमेशा समुद्र तट की सुनहरी रेत और लहरों की आवाज़ पसंद थी। आज वह नए रोमांच की तलाश में निकला था।"
     },
     {
       "duration": 10,
-      "description": "Ravi noticing a bottle half-buried in the sand",
-      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, noticing a glass bottle half-buried in golden sand, warm sunset light, storybook style)",
-      "narration": "एक दिन, रवि ने रेत में आधी दबी हुई बोतल देखी, जैसे समुद्र ने उसे कोई खास तोहफ़ा दिया हो।",
-      "subtitle": "One day, Ravi saw a bottle half-buried in the sand, as if the sea had gifted him something special."
-    },
-    {
-      "duration": 12,
-      "description": "Ravi opening the bottle and finding a rolled-up map inside",
-      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, opening glass bottle and pulling out rolled-up old treasure map, warm sunset light, storybook style)",
-      "narration": "बोतल के अंदर उसे एक पुराना नक्शा मिला, जैसे किसी समुद्री डाकू ने उसे छुपा कर रखा हो।",
-      "subtitle": "Inside the bottle, he found an old map, as if a pirate had hidden it there."
+      "description": "Ravi finds a glowing seashell",
+      "visual_prompt": "wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, picking up glowing seashell from golden sandy beach, warm sunlight, storybook style",
+      "narration": "अचानक उसे एक चमकती हुई सीप मिली, जैसे उसमें कोई रहस्य छिपा हो।"
     },
     {
       "duration": 10,
-      "description": "Ravi following the map through the palm trees",
-      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, walking through tall palm trees holding treasure map, golden light, storybook style)",
-      "narration": "नक्शे के सहारे वह ऊँचे नारियल के पेड़ों के बीच से गुज़रा, जैसे वह किसी रोमांचक सफर पर हो।",
-      "subtitle": "Following the map, he walked through tall coconut trees, as if he was on an exciting journey."
+      "description": "Seashell shows magical underwater world",
+      "visual_prompt": "wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, holding glowing seashell, vision of magical underwater palace with colorful fish and corals, warm light, storybook style",
+      "narration": "सीप को कान से लगाते ही, उसने एक जादुई पानी के नीचे की दुनिया देखी।"
     },
     {
       "duration": 10,
-      "description": "Ravi finding a small wooden chest under a tree",
-      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, finding small wooden chest under large palm tree, warm light, storybook style)",
-      "narration": "पेड़ के नीचे उसे एक छोटा लकड़ी का संदूक मिला, जो समय और रहस्यों से भरा हुआ लग रहा था।",
-      "subtitle": "Under the tree, he found a small wooden chest that seemed filled with time and secrets."
+      "description": "Ravi meets a friendly turtle",
+      "visual_prompt": "wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, standing on shore talking to friendly sea turtle, ocean waves in background, storybook style",
+      "narration": "एक दोस्ताना कछुआ किनारे आया, जिसने Ravi को समुद्र के रहस्यों के बारे में बताया।"
     },
     {
       "duration": 10,
-      "description": "Ravi opening the chest and finding seashells and a glowing pearl",
-      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, opening small wooden chest filled with colorful seashells and glowing pearl, warm sunset light, storybook style)",
-      "narration": "संदूक खोलते ही उसमें रंग-बिरंगे सीप और एक चमकता हुआ मोती मिला, जैसे समुद्र ने अपनी सबसे कीमती चीज़ उसे सौंप दी हो।",
-      "subtitle": "As he opened the chest, he found colorful shells and a glowing pearl, as if the ocean had given him its most precious gift."
+      "description": "Ravi waves goodbye to the turtle",
+      "visual_prompt": "wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, waving goodbye to sea turtle swimming back into ocean, sunset light, storybook style",
+      "narration": "सूरज ढलते ही, Ravi ने कछुए को अलविदा कहा और घर की ओर चल पड़ा, लेकिन उसकी आंखों में अब भी रोमांच की चमक थी।"
+    },
+    {
+      "duration": 10,
+      "description": "Closing scene with message",
+      "visual_prompt": "wide shot, golden sunset over calm ocean, glowing seashell resting on sand, storybook style",
+      "narration": "अगर आपको यह कहानी पसंद आई हो, तो चैनल को सब्सक्राइब करें और घंटी का आइकन दबाना न भूलें।"
     }
-  ],
-  "tags": ["storybook", "Indian", "adventure", "treasure", "beach"]
+  ]
 }
