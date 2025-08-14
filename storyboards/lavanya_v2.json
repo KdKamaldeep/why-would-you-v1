@@ -17,7 +17,7 @@
     {
       "duration": 8,
       "description": "wide shot of Lavanya looking up at the sky from her garden, dreaming of flying",
-      "visual_prompt": "(wide shot:1.2) little Indian girl with long black hair in braids, wearing blue dress, looking up at sky with dreamy expression, garden backdrop, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) cute little Indian girl with long black hair in braids, wearing bright blue dress, looking up at sky with dreamy expression, colorful garden with flowers, bright sunny day, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लवन्या आसमान की ओर देख रही थी और सोच रही थी कि काश वह उड़ सकती।",
       "subtitle": "Dreaming of Flight",
@@ -27,7 +27,7 @@
     {
       "duration": 8,
       "description": "close-up of Lavanya's feet slowly lifting off the ground, magical sparkles around",
-      "visual_prompt": "(close-up:1.2) little Indian girl's feet lifting off ground, magical sparkles, surprised expression, storybook style:1.3",
+      "visual_prompt": "(close-up:1.2) cute little Indian girl's feet lifting off ground, colorful magical sparkles, surprised happy expression, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "अचानक उसके पैर जमीन से ऊपर उठने लगे और जादुई चमक दिखाई दी।",
       "subtitle": "The First Flight",
@@ -37,7 +37,7 @@
     {
       "duration": 8,
       "description": "medium shot of Lavanya floating in the air, arms spread like wings, happy expression",
-      "visual_prompt": "(medium shot:1.2) little Indian girl floating in air, arms spread like wings, blue dress, happy expression, magical sparkles, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) cute little Indian girl floating in air, arms spread like wings, bright blue dress, big happy smile, colorful magical sparkles, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "'मैं उड़ रही हूँ!' लवन्या ने खुशी से चिल्लाया।",
       "subtitle": "Flying High",
@@ -47,7 +47,7 @@
     {
       "duration": 8,
       "description": "wide shot of Lavanya flying through fluffy white clouds, meeting a cloud bird",
-      "visual_prompt": "(wide shot:1.2) little Indian girl flying through white fluffy clouds, meeting cloud bird with friendly face, blue sky backdrop, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) cute little Indian girl flying through big fluffy white clouds, meeting friendly cloud bird with cute face, bright blue sky, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "वह बादलों के बीच उड़ रही थी जब एक बादल पक्षी से मुलाकात हुई।",
       "subtitle": "Meeting Cloud Bird",
@@ -57,7 +57,7 @@
     {
       "duration": 8,
       "description": "medium shot of Lavanya and Cloud Bird flying together, talking and laughing",
-      "visual_prompt": "(medium shot:1.2) little Indian girl and cloud bird flying together, talking, laughing, blue dress, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) cute little Indian girl and friendly cloud bird flying together, talking, laughing, bright blue dress, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "बादल पक्षी ने कहा, 'चलो मैं तुम्हें आसमान के रहस्य दिखाता हूँ।'",
       "subtitle": "Flying Together",
@@ -67,7 +67,7 @@
     {
       "duration": 8,
       "description": "wide shot of a beautiful rainbow butterfly joining their flight",
-      "visual_prompt": "(wide shot:1.2) rainbow butterfly with colorful wings joining girl and cloud bird in flight, magical sparkles, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) beautiful rainbow butterfly with bright colorful wings joining girl and cloud bird in flight, colorful magical sparkles, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "एक सुंदर इंद्रधनुष तितली भी उनके साथ उड़ने लगी।",
       "subtitle": "Rainbow Butterfly",
@@ -77,7 +77,7 @@
     {
       "duration": 8,
       "description": "wide shot of sky dolphins swimming through the clouds",
-      "visual_prompt": "(wide shot:1.2) playful sky dolphins swimming through fluffy clouds, magical atmosphere, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) cute playful sky dolphins swimming through big fluffy clouds, happy expressions, magical atmosphere, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "आसमान में डॉल्फिन बादलों के बीच तैर रहे थे।",
       "subtitle": "Sky Dolphins",
@@ -87,7 +87,7 @@
     {
       "duration": 8,
       "description": "medium shot of Lavanya playing with the sky dolphins",
-      "visual_prompt": "(medium shot:1.2) little Indian girl playing with sky dolphins, laughing, magical water effects, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) cute little Indian girl playing with friendly sky dolphins, laughing, bright blue dress, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लवन्या आसमानी डॉल्फिन के साथ खेल रही थी।",
       "subtitle": "Playing with Dolphins",
@@ -97,7 +97,7 @@
     {
       "duration": 8,
       "description": "wide shot of a magnificent cloud castle in the distance",
-      "visual_prompt": "(wide shot:1.2) magnificent cloud castle in distance, white fluffy clouds, towers, magical atmosphere, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) big beautiful cloud castle in distance, white fluffy clouds, simple towers, bright colors, magical atmosphere, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "दूर में एक शानदार बादल महल दिखाई दिया।",
       "subtitle": "Cloud Castle",
@@ -107,7 +107,7 @@
     {
       "duration": 8,
       "description": "medium shot of Lavanya and friends landing on the cloud castle balcony",
-      "visual_prompt": "(medium shot:1.2) little Indian girl and friends landing on cloud castle balcony, white fluffy clouds, magical atmosphere, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) cute little Indian girl and friends landing on cloud castle balcony, white fluffy clouds, bright colors, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "वे सभी बादल महल के बालकनी पर उतरे।",
       "subtitle": "Landing on Castle",
@@ -117,7 +117,7 @@
     {
       "duration": 8,
       "description": "wide shot of star children dancing around Lavanya in the castle",
-      "visual_prompt": "(wide shot:1.2) star children with glowing bodies dancing around little girl in cloud castle, magical sparkles, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) cute star children with bright glowing bodies dancing around little girl in cloud castle, colorful sparkles, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "तारों के बच्चे महल में लवन्या के चारों ओर नृत्य करने लगे।",
       "subtitle": "Star Children Dance",
@@ -127,7 +127,7 @@
     {
       "duration": 8,
       "description": "medium shot of Lavanya playing with the star children, laughing and spinning",
-      "visual_prompt": "(medium shot:1.2) little Indian girl playing with star children, laughing, spinning, blue dress, magical sparkles, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) cute little Indian girl playing with star children, laughing, spinning, bright blue dress, colorful sparkles, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लवन्या तारों के बच्चों के साथ खेल रही थी और खुशी से हँस रही थी।",
       "subtitle": "Playing with Stars",
@@ -137,7 +137,7 @@
     {
       "duration": 8,
       "description": "wide shot of aurora fairies creating beautiful light patterns",
-      "visual_prompt": "(wide shot:1.2) aurora fairies with colorful wings creating beautiful light patterns in sky, magical aurora effects, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) cute aurora fairies with bright colorful wings creating beautiful light patterns in sky, bright colors, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "औरोरा परियों ने आसमान में सुंदर रोशनी के पैटर्न बनाए।",
       "subtitle": "Aurora Fairies",
@@ -147,7 +147,7 @@
     {
       "duration": 8,
       "description": "medium shot of Lavanya dancing with the aurora fairies",
-      "visual_prompt": "(medium shot:1.2) little Indian girl dancing with aurora fairies, colorful lights, magical atmosphere, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) cute little Indian girl dancing with aurora fairies, bright colorful lights, happy expression, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लवन्या औरोरा परियों के साथ नृत्य कर रही थी।",
       "subtitle": "Dancing with Fairies",
@@ -157,7 +157,7 @@
     {
       "duration": 8,
       "description": "wide shot of the moon appearing, with Moon Princess waving from it",
-      "visual_prompt": "(wide shot:1.2) moon appearing in sky, beautiful moon princess waving from moon, magical atmosphere, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) big bright moon appearing in sky, beautiful moon princess with crown waving from moon, bright colors, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "चाँद आसमान में दिखाई दिया और चंद्रमा राजकुमारी ने हाथ हिलाया।",
       "subtitle": "Moon Princess",
@@ -167,7 +167,7 @@
     {
       "duration": 8,
       "description": "medium shot of Lavanya flying towards the moon with her friends",
-      "visual_prompt": "(medium shot:1.2) little Indian girl flying towards moon with cloud bird and rainbow butterfly, magical journey, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) cute little Indian girl flying towards moon with cloud bird and rainbow butterfly, bright colors, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लवन्या अपने दोस्तों के साथ चाँद की ओर उड़ रही थी।",
       "subtitle": "Flying to the Moon",
@@ -177,7 +177,7 @@
     {
       "duration": 8,
       "description": "wide shot of comet rider on a shooting star",
-      "visual_prompt": "(wide shot:1.2) brave comet rider riding on shooting star, magical trail, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) brave comet rider with helmet riding on bright shooting star, colorful trail, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "एक बहादुर धूमकेतु सवार उल्का पर सवार होकर आया।",
       "subtitle": "Comet Rider",
@@ -187,7 +187,7 @@
     {
       "duration": 8,
       "description": "medium shot of Lavanya riding the shooting star with the comet rider",
-      "visual_prompt": "(medium shot:1.2) little Indian girl riding shooting star with comet rider, magical journey, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) cute little Indian girl riding bright shooting star with comet rider, happy expression, bright colors, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लवन्या धूमकेतु सवार के साथ उल्का पर सवार हो गई।",
       "subtitle": "Riding the Comet",
@@ -197,7 +197,7 @@
     {
       "duration": 8,
       "description": "wide shot of Wind Spirit creating beautiful wind patterns in the sky",
-      "visual_prompt": "(wide shot:1.2) wind spirit with flowing robes creating wind patterns in sky, magical wind effects, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) friendly wind spirit with flowing robes creating beautiful wind patterns in sky, bright colors, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "हवा की आत्मा ने आसमान में सुंदर हवा के पैटर्न बनाए।",
       "subtitle": "Wind Spirit",
@@ -207,7 +207,7 @@
     {
       "duration": 8,
       "description": "wide shot of Lavanya and all her sky friends flying in formation through the stars",
-      "visual_prompt": "(wide shot:1.2) little Indian girl and all sky friends flying in formation through stars, magical sky journey, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) cute little Indian girl and all sky friends flying in formation through bright stars, colorful magical sky journey, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लवन्या और उसके सभी आसमानी दोस्त तारों के बीच उड़ रहे थे।",
       "subtitle": "Flying Through Stars",
@@ -217,7 +217,7 @@
     {
       "duration": 8,
       "description": "wide shot of Lavanya gently landing back in her garden, with her sky friends waving goodbye",
-      "visual_prompt": "(wide shot:1.2) little Indian girl gently landing in garden, sky friends waving goodbye from sky, magical ending, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) cute little Indian girl gently landing in colorful garden, sky friends waving goodbye from bright sky, happy ending, simple cartoon style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
       "narration": "लवन्या धीरे से अपने बगीचे में वापस उतरी और उसके आसमानी दोस्तों ने अलविदा कहा। 'अगर आपको यह कहानी पसंद आई हो, तो कृपया सब्सक्राइब करें और बेल आइकन दबाएं।'",
       "subtitle": "Returning Home",
