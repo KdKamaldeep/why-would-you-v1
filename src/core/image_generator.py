@@ -250,6 +250,40 @@ class ImageGenerator:
             # Determine aspect ratio for intelligent optimization
             is_16_9_format = self.width > self.height and self.width / self.height > 1.5
             
+            # Validate dimensions - some models have limitations
+            max_dimension = 1024  # Common limit for many SD models
+            if self.width > max_dimension or self.height > max_dimension:
+                logger.warning(f"⚠️ Dimensions {self.width}x{self.height} exceed recommended maximum of {max_dimension}")
+                logger.info(f"🔄 Scaling down to fit within limits while preserving aspect ratio")
+                
+                # Scale down while preserving aspect ratio
+                if self.width > self.height:
+                    # Landscape
+                    new_width = max_dimension
+                    new_height = int((self.height / self.width) * max_dimension)
+                else:
+                    # Portrait
+                    new_height = max_dimension
+                    new_width = int((self.width / self.height) * max_dimension)
+                
+                # Ensure dimensions are multiples of 8 (SD requirement)
+                new_width = (new_width // 8) * 8
+                new_height = (new_height // 8) * 8
+                
+                logger.info(f"📐 Scaled dimensions: {new_width}x{new_height}")
+                actual_width, actual_height = new_width, new_height
+            else:
+                actual_width, actual_height = self.width, self.height
+            
+            # Memory optimization for larger images
+            if actual_width * actual_height > 768 * 1024:  # If larger than shorts format
+                logger.info(f"🧠 Large image detected, optimizing memory usage")
+                # Reduce steps for larger images to save memory
+                num_steps = 20  # Reduced from 30
+                logger.info(f"📉 Reduced steps to {num_steps} for memory optimization")
+            else:
+                num_steps = 30
+            
             # Use provided negative prompt or create intelligent default
             if negative_prompt is None:
                 # Base negative prompt for cartoon style
@@ -269,8 +303,17 @@ class ImageGenerator:
             
             # Use consistent generation parameters for all formats
             guidance_scale = 7.5
-            num_steps = 30
             logger.info(f"🎬 Using standard settings: guidance_scale={guidance_scale}, steps={num_steps}")
+            logger.info(f"📐 Generating with dimensions: {actual_width}x{actual_height}")
+            
+            # Clear CUDA cache before generation if available
+            if self.device == 'cuda':
+                try:
+                    import torch
+                    torch.cuda.empty_cache()
+                    logger.info("🧹 CUDA cache cleared before generation")
+                except Exception:
+                    pass
             
             # Generate image with optimized settings
             with torch.autocast(self.device):
@@ -279,8 +322,8 @@ class ImageGenerator:
                     negative_prompt=negative_prompt,
                     num_inference_steps=num_steps,
                     guidance_scale=guidance_scale,
-                    width=self.width,
-                    height=self.height,
+                    width=actual_width,
+                    height=actual_height,
                     num_images_per_prompt=1,
                     generator=torch.Generator(device=self.device).manual_seed(42),  # Consistent results
                     return_dict=True
@@ -288,7 +331,22 @@ class ImageGenerator:
             
             # Save the image
             image = result.images[0]
+            
+            # If we scaled down, resize to original dimensions
+            if actual_width != self.width or actual_height != self.height:
+                logger.info(f"🔄 Resizing from {actual_width}x{actual_height} to {self.width}x{self.height}")
+                image = image.resize((self.width, self.height), Image.Resampling.LANCZOS)
+            
             image.save(output_path, quality=95)
+            
+            # Clear CUDA cache after generation
+            if self.device == 'cuda':
+                try:
+                    import torch
+                    torch.cuda.empty_cache()
+                    logger.info("🧹 CUDA cache cleared after generation")
+                except Exception:
+                    pass
             
             logger.info(f"✅ Generated professional SD image: {output_path}")
             return output_path
@@ -296,6 +354,16 @@ class ImageGenerator:
         except Exception as e:
             logger.error(f"❌ SD generation failed: {e}")
             logger.info("🔄 Falling back to placeholder image")
+            
+            # Clear CUDA cache on error
+            if self.device == 'cuda':
+                try:
+                    import torch
+                    torch.cuda.empty_cache()
+                    logger.info("🧹 CUDA cache cleared after error")
+                except Exception:
+                    pass
+            
             return self._generate_placeholder_image(prompt, output_path)
     
     def generate_multiple_images(self, prompts: List[str], output_dir: str, subtitles: List[str] = None, negative_prompts: List[str] = None) -> List[str]:
