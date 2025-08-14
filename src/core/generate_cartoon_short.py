@@ -601,19 +601,9 @@ class CartoonShortsGenerator:
         # Determine aspect ratio for intelligent prompt adaptation
         is_16_9_format = self.config.width > self.config.height and self.config.width / self.config.height > 1.5
         
-        # If prompt enhancement is enabled, use simple enhancement without format-specific restrictions
-        if self.config.enable_prompt_enhancement and hasattr(self, 'image_generator') and self.image_generator.prompt_enhancer:
-            # Use simple enhancement for all formats - no format-specific restrictions
-            enhanced_prompt = self.image_generator.prompt_enhancer.enhance_prompt(
-                base_prompt,
-                enhancement_type="cartoon",
-                max_tokens=77  # Diffusion model token limit
-            )
-            logger.info(f"🎯 Enhanced prompt: {enhanced_prompt[:100]}...")
-            return enhanced_prompt, negative_prompt
-        else:
-            logger.info(f"🎯 Using original visual_prompt from script: {base_prompt}")
-            return base_prompt, negative_prompt
+        # Disable prompt enhancement to preserve original prompt structure with weights
+        logger.info(f"🎯 Using original visual_prompt from script: {base_prompt}")
+        return base_prompt, negative_prompt         
 
 def main():
     """Main CLI entry point."""
