@@ -1,0 +1,71 @@
+{
+  "title": "Misthi and the Secret of the Old Fort",
+  "description": "Misthi, a curious 9-year-old from a riverside village, follows a mysterious tune to uncover an ancient secret hidden inside the old fort.",
+  "total_duration": 210,
+  "tags": ["Indian story", "adventure", "mystery", "storybook", "traditional culture", "warm evening light"],
+  "scenes": [
+    {
+      "duration": 15,
+      "description": "In her riverside village, Misthi overhears a strange flute tune drifting from the old fort at dusk.",
+      "visual_prompt": "(wide shot) (full scene view) foreground: Misthi, 9, green salwar kameez, braid with marigold flower, standing on ghat steps; midground: calm river with small fishing boat; background: distant crumbling fort on hill under warm evening sky; storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "narration": "गाँव की शाम थी। नदी किनारे खड़ी मिष्ठी ने अचानक एक अनजानी बाँसुरी की धुन सुनी, जो पुराने किले की ओर से आ रही थी।",
+      "subtitle": "It was evening. By the river, Misthi heard a strange flute tune coming from the old fort."
+    },
+    {
+      "duration": 18,
+      "description": "The village elders warn her about the fort, saying no one who entered at night returned.",
+      "visual_prompt": "(wide shot) (full scene view) foreground: Misthi listening to three elders sitting on woven charpoy; midground: clay lamps glowing on verandas; background: fort silhouette against darkening sky; storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "narration": "बुजुर्गों ने चेताया, 'रात में किले में जाने वाला कभी वापस नहीं आया।' लेकिन मिष्ठी के मन में रहस्य जानने की जिज्ञासा बढ़ गई।",
+      "subtitle": "The elders warned, 'None who enter the fort at night return.' Misthi's curiosity grew."
+    },
+    {
+      "duration": 20,
+      "description": "Armed with a small lantern, Misthi walks through the festival-decorated village toward the fort path.",
+      "visual_prompt": "(wide shot) (full scene view) foreground: Misthi holding brass lantern, determined face; midground: villagers hanging marigold garlands, rangoli patterns at doorsteps; background: narrow dirt path leading toward shadowy fort; storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "narration": "एक पीतल की लालटेन लेकर, वह सजते हुए गाँव से होकर किले के रास्ते पर निकल पड़ी। हर कदम पर धुन साफ़ होती जा रही थी।",
+      "subtitle": "With a brass lantern, she walked through the decorated village toward the fort. The tune grew clearer."
+    },
+    {
+      "duration": 22,
+      "description": "The forest path is overgrown; she finds old carved stones and follows glowing fireflies.",
+      "visual_prompt": "(wide shot) (full scene view) foreground: Misthi brushing aside tall grass; midground: moss-covered carved stone slab; background: swarm of glowing fireflies leading deeper into trees; storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "narration": "जंगल का रास्ता झाड़ियों से ढका था। उसे काई लगे पत्थरों पर अजीब नक्काशियाँ मिलीं। जुगनू उसे आगे ले जा रहे थे।",
+      "subtitle": "The jungle path was overgrown. Mossy carved stones appeared. Fireflies led her onward."
+    },
+    {
+      "duration": 25,
+      "description": "She reaches the fort gate; the flute music stops. A large carved lock glows faintly.",
+      "visual_prompt": "(wide shot) (full scene view) foreground: Misthi holding lantern up to large wooden fort gate; midground: ancient lock carved with river and moon symbols; background: high stone walls with hanging vines under moonlight; storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "narration": "किले के फाटक पर पहुँचते ही बाँसुरी थम गई। एक बड़ा सा ताला चाँदनी में हल्का चमक रहा था, जिस पर नदी और चाँद के चिन्ह बने थे।",
+      "subtitle": "At the fort gate, the flute stopped. The carved lock glowed with river and moon symbols."
+    },
+    {
+      "duration": 25,
+      "description": "Inside the courtyard, she discovers a hidden well with water reflecting stars.",
+      "visual_prompt": "(wide shot) (full scene view) foreground: Misthi peering into deep stone well; midground: faint ripples reflecting starlight; background: broken archways and banyan branches overhead; storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "narration": "अंदर एक पुराना कुआँ था, जिसके पानी में तारों की परछाई चमक रही थी। मानो पानी आकाश को छू रहा हो।",
+      "subtitle": "Inside was an old well, its water reflecting the stars as if touching the sky."
+    },
+    {
+      "duration": 28,
+      "description": "A secret passage opens beneath the well; she climbs down into a torch-lit chamber.",
+      "visual_prompt": "(wide shot) (full scene view) foreground: Misthi climbing rope ladder into stone passage; midground: glowing torches on carved walls; background: chamber with bronze chest at center; storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "narration": "कुएँ के तल में एक गुप्त दरवाज़ा खुला। मिष्ठी रस्सी के सहारे नीचे उतरी और मशालों से जगमगाते कक्ष में पहुँची, जहाँ बीच में पीतल का संदूक रखा था।",
+      "subtitle": "A hidden door opened beneath the well. Misthi descended to a torch-lit chamber with a bronze chest."
+    },
+    {
+      "duration": 28,
+      "description": "Inside the chest, she finds a river-shaped flute; playing it makes the water glow above.",
+      "visual_prompt": "(wide shot) (full scene view) foreground: Misthi lifting silver-blue flute from chest; midground: glowing water flowing up through chamber ceiling; background: faint outlines of river above through stone opening; storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "narration": "संदूक में नदी के आकार की बाँसुरी थी। जैसे ही उसने उसे बजाया, ऊपर कुएँ का पानी सुनहरी रोशनी में चमक उठा।",
+      "subtitle": "The chest held a river-shaped flute. When she played it, the well’s water glowed golden."
+    },
+    {
+      "duration": 29,
+      "description": "Returning to the village, Misthi plays the flute; the river flows full again, saving the harvest.",
+      "visual_prompt": "(wide shot) (full scene view) foreground: Misthi on riverbank playing glowing flute; midground: villagers cheering, carrying water pots; background: fields turning green as river rushes past; storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "narration": "गाँव लौटकर मिष्ठी ने बाँसुरी बजाई। नदी का जल भर आया, खेत हरे हो गए और लोगों के चेहरों पर खुशी लौट आई।",
+      "subtitle": "Back in the village, Misthi played. The river filled, fields turned green, and joy returned."
+    }
+  ]
+}
