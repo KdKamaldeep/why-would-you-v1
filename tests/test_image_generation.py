@@ -52,7 +52,7 @@ def test_image_generation(prompt=None, negative_prompt=None, video_format="short
     
     # Use provided prompt or default test prompt (optimized to fit within 77 tokens)
     if prompt is None:
-        prompt = "(wide shot:1.2) little Indian girl with long black hair tied , wearing pink frock, sitting near a pond under full moonlight, soft ripples in water, lotus flowers, storybook style:1.3"
+        prompt = "(wide shot:1.2) single little Indian girl with long black hair tied in two braids, wearing pink frock, sitting alone near a pond under full moonlight, soft ripples in water, lotus flowers, storybook style:1.3"
     
     test_prompts = [prompt]
     test_negative_prompts = [negative_prompt] if negative_prompt else None
