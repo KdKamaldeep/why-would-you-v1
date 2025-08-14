@@ -241,29 +241,62 @@ class ImageGenerator:
             return self._generate_placeholder_image(prompt, output_path, subtitle)
     
     def _generate_sd_image(self, prompt: str, output_path: str, negative_prompt: str = None) -> str:
-        """Generate image using Stable Diffusion."""
+        """Generate image using Stable Diffusion with intelligent aspect ratio optimization."""
         try:
             # Use the prompt as-is (enhancement is now handled in _compose_image_prompt)
             final_prompt = prompt
             logger.info(f"🎯 Using prompt (enhancement handled upstream): {prompt}")
             
-            # Use provided negative prompt or fall back to default cartoon-specific negative prompts
+            # Determine aspect ratio for intelligent optimization
+            is_16_9_format = self.width > self.height and self.width / self.height > 1.5
+            
+            # Use provided negative prompt or create intelligent default
             if negative_prompt is None:
-                negative_prompt = (
+                # Base negative prompt for cartoon style
+                base_negative_prompt = (
                     "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
                     "blurry, low quality, dark, scary, violent, adult content, nsfw, "
                     "hyperrealistic, detailed textures, photographic, film grain, "
                     "realistic lighting, realistic shadows, realistic proportions, "
                     "detailed skin, detailed hair, detailed clothing textures"
                 )
+                
+                # For 16:9 format, add intelligent composition-focused negative prompts
+                if is_16_9_format:
+                    # Focus on preventing background clutter while maintaining quality
+                    composition_negatives = (
+                        "crowded scene, multiple background characters, "
+                        "busy background, cluttered composition, "
+                        "distracting background elements, too many subjects"
+                    )
+                    negative_prompt = f"{base_negative_prompt}, {composition_negatives}"
+                    logger.info(f"🎬 Using 16:9 optimized negative prompts")
+                else:
+                    negative_prompt = base_negative_prompt
+            else:
+                # Enhance user-provided negative prompt for 16:9 if needed
+                if is_16_9_format and not any(word in negative_prompt.lower() for word in ["crowded", "cluttered", "busy"]):
+                    negative_prompt += ", crowded scene, cluttered composition"
+                    logger.info(f"🎬 Enhanced user negative prompt for 16:9 format")
             
-            # Generate image with cartoon-optimized settings
+            # Optimize generation parameters based on aspect ratio
+            if is_16_9_format:
+                # Higher guidance scale for more focused composition in wide format
+                guidance_scale = 8.5
+                # More steps for better quality in wider format
+                num_steps = 35
+                logger.info(f"🎬 Using 16:9 optimized settings: guidance_scale={guidance_scale}, steps={num_steps}")
+            else:
+                guidance_scale = 7.5
+                num_steps = 30
+            
+            # Generate image with optimized settings
             with torch.autocast(self.device):
                 result = self.pipe(
                     prompt=final_prompt,
                     negative_prompt=negative_prompt,
-                    num_inference_steps=30,  # More steps for better cartoon quality
-                    guidance_scale=7.5,      # Balanced for cartoon style
+                    num_inference_steps=num_steps,
+                    guidance_scale=guidance_scale,
                     width=self.width,
                     height=self.height,
                     num_images_per_prompt=1,

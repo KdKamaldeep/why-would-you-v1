@@ -590,19 +590,30 @@ class CartoonShortsGenerator:
         return f"{hours:02d}:{minutes:02d}:{secs:02d},{millisecs:03d}"
 
     def _compose_image_prompt(self, scene: Dict) -> tuple[str, str]:
-        """Compose an image prompt and negative prompt using the visual_prompt from script with optional GPT-2 enhancement."""
+        """Compose an image prompt and negative prompt using the visual_prompt from script with intelligent aspect ratio adaptation."""
         # Get the visual_prompt from the script (this is the key requirement)
-        visual_prompt = scene.get('visual_prompt', scene.get('description', ''))
+        visual_prompt = scene.get('visual_prompt', '')
         base_prompt = visual_prompt or "Cartoon scene"
         
         # Get the negative prompt from the script
         negative_prompt = scene.get('negative_prompt', '')
 
-        # If prompt enhancement is enabled, enhance the visual_prompt specifically
+        # Determine aspect ratio for intelligent prompt adaptation
+        is_16_9_format = self.config.width > self.config.height and self.config.width / self.config.height > 1.5
+        
+        # If prompt enhancement is enabled, use intelligent adaptation
         if self.config.enable_prompt_enhancement and hasattr(self, 'image_generator') and self.image_generator.prompt_enhancer:
-            logger.info(f"🎯 Enhancing visual_prompt from script: {base_prompt}")
+            if is_16_9_format:
+                # For 16:9, use context-aware enhancement to prevent background clutter
+                enhancement_context = f"Adapt this cartoon scene for widescreen format, focusing on main subjects and clean composition: {base_prompt}"
+                logger.info(f"🎬 Using intelligent 16:9 prompt adaptation")
+            else:
+                # For 9:16, use standard enhancement
+                enhancement_context = base_prompt
+                logger.info(f"🎯 Using standard prompt enhancement for 9:16 format")
+            
             enhanced_prompt = self.image_generator.prompt_enhancer.enhance_prompt(
-                base_prompt,
+                enhancement_context,
                 enhancement_type="cartoon",
                 max_tokens=77  # Diffusion model token limit
             )
