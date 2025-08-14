@@ -1,0 +1,74 @@
+You are generating a JSON story for animated video creation. Follow this structure strictly:
+
+Fields: title, description, total_duration, tags, scenes (array of {duration, description, visual_prompt, narration, subtitle}).
+
+Rules:
+- Narration must be in Hindi only and narration must match scene duration; all other text in English.
+- Keep scene-to-scene continuity and consistent magical tone.
+- Motivation for characters should be established early.
+- Ensure Indian setting authenticity with traditional decorations, cultural accuracy, and natural proportions (no anime style).
+- Visual prompts must:
+  - Begin with (wide shot) (full scene view)
+  - End with (wide shot)
+  - Include foreground/midground/background depth cues
+  - Be storybook magical style
+  - Fit within 77 tokens
+- Warm evening light when relevant.
+- Maintain consistent character descriptions throughout all scenes.
+- Avoid overly complex sentence structures in narrations; keep them smooth for TTS.
+- Ensure objects or events carry over correctly between scenes (continuity).
+- Scene durations must sum to total_duration.
+- Visual prompts should be descriptive but concise enough to avoid truncation.
+- Keep tone soft hand-painted with warm colors for Indian adventure stories.
+
+
+You are generating a JSON story for animated video creation. Follow this structure strictly:
+
+Fields: 
+- title
+- description
+- total_duration
+- tags
+- scenes (array of {duration, description, visual_prompt, narration, subtitle})
+
+You are generating a JSON story for animated video creation. Follow this structure strictly:
+
+Fields: 
+- title
+- description
+- total_duration
+- tags
+- scenes (array of {duration, description, visual_prompt, narration, subtitle})
+
+Rules:
+1. Narration must be in **Hindi only** and **match scene duration** for smooth TTS (~2.5 words/sec). 
+2. All other text (title, description, tags, subtitles) in English.
+3. Keep **scene-to-scene continuity** and a **consistent magical tone**.
+4. Motivation for characters should be established early.
+5. Ensure **Indian setting authenticity** with traditional decorations, cultural accuracy, natural proportions, and soft hand-painted storybook style.
+6. **Character style fixed and consistent** across all scenes. Example:
+   "CharacterName, age, Indian girl/boy, outfit details, warm brown skin, round face, big brown eyes, long braid with marigold, brass anklet, barefoot"
+7. Visual prompts rules:
+   - Begin with `(wide shot) (full scene view)` and end with `(wide shot)`
+   - Include **foreground, midground, and background** depth cues
+   - **≤77 tokens** for Stable Diffusion
+   - Storybook magical style, soft hand-painted, natural proportions
+   - Include warm evening light when relevant
+8. Ensure objects, events, and magical elements **carry over correctly between scenes**.
+9. Scene durations must **sum to total_duration**.
+10. Narration can include **call-to-action at the end** (optional), e.g., "अगर आपको यह कहानी पसंद आई, तो कृपया इस चैनल को सब्सक्राइब करें और बेल के आइकन को दबाएँ!"
+
+Instructions:
+- Start the story by establishing the **setting and main character’s motivation**.
+- Gradually build **adventure and mystery**.
+- Add a **magical/mystery reveal** mid-story.
+- End with **resolution**, optionally with **CTA**.
+- Ensure **scene-by-scene narration timing matches duration**.
+- All visual prompts must include:
+  - **Foreground**: main character + immediate action
+  - **Midground**: interactive objects, props, or magical elements
+  - **Background**: landscape, architecture, magical elements, sky, lighting
+- Keep **visual prompts concise, descriptive, and ≤77 tokens**.
+- Maintain **consistent magical storybook tone** throughout.
+
+Output must be in **valid JSON** with all fields properly filled.
