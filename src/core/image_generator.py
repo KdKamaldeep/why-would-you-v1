@@ -261,23 +261,11 @@ class ImageGenerator:
                     "detailed skin, detailed hair, detailed clothing textures"
                 )
                 
-                # For 16:9 format, add intelligent composition-focused negative prompts
-                if is_16_9_format:
-                    # Focus on preventing background clutter while maintaining quality
-                    composition_negatives = (
-                        "crowded scene, multiple background characters, "
-                        "busy background, cluttered composition, "
-                        "distracting background elements, too many subjects"
-                    )
-                    negative_prompt = f"{base_negative_prompt}, {composition_negatives}"
-                    logger.info(f"🎬 Using 16:9 optimized negative prompts")
-                else:
-                    negative_prompt = base_negative_prompt
+                # Use base negative prompt for all formats - no static composition handling
+                negative_prompt = base_negative_prompt
             else:
-                # Enhance user-provided negative prompt for 16:9 if needed
-                if is_16_9_format and not any(word in negative_prompt.lower() for word in ["crowded", "cluttered", "busy"]):
-                    negative_prompt += ", crowded scene, cluttered composition"
-                    logger.info(f"🎬 Enhanced user negative prompt for 16:9 format")
+                # Use user-provided negative prompt as-is - no automatic enhancement
+                pass
             
             # Optimize generation parameters based on aspect ratio
             if is_16_9_format:
