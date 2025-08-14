@@ -1,82 +1,57 @@
 {
-  "title": "Ravi and the Whispering Shell",
-  "description": "Ravi, a curious boy, finds a talking seashell on the beach and sets out to return it to the ocean so it can reunite with its family of shells.",
-  "total_duration": 50,
-  "cast": [
-    {"name": "Ravi", "role": "curious little boy"},
-    {"name": "Whispering Shell", "role": "magical talking seashell"},
-    {"name": "Sea Turtle", "role": "wise ocean guide"}
-  ],
+  "title": "Ravi and the Lost Conch",
+  "description": "Ravi, a curious Indian boy, discovers a mysterious conch on the beach and embarks on an adventure to return it to the ocean spirit.",
+  "total_duration": 60,
   "scenes": [
     {
       "duration": 8,
-      "description": "wide shot of Ravi walking along a sandy beach at sunset",
-      "visual_prompt": "(wide shot:1.2) little Indian boy with short black hair, wearing yellow t-shirt and shorts, walking barefoot on golden sandy beach during warm sunset, gentle ocean waves, storybook style:1.3",
-      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
-      "narration": "रवि शाम को समुद्र किनारे टहल रहा था, क्योंकि उसे रंग-बिरंगे शंख-सीपियाँ इकट्ठा करना बहुत पसंद था।",
-      "subtitle": "The Evening Walk",
-      "characters": ["Ravi"],
-      "motion_prompt": "boy walking along beach, looking at sand for shells"
+      "description": "Ravi walking along the golden beach collecting seashells.",
+      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, brown shorts, barefoot, walking along golden sandy beach, gentle ocean waves in background, warm sunset light, storybook style)",
+      "narration": "Ravi loved exploring the beach every evening, hoping to find rare seashells for his growing collection.",
+      "subtitle": "Ravi loved exploring the beach every evening, hoping to find rare seashells."
     },
     {
       "duration": 8,
-      "description": "close-up of a glowing seashell half-buried in sand",
-      "visual_prompt": "(close-up:1.2) glowing magical seashell with soft golden light, half-buried in golden sand, small gentle waves nearby, storybook style:1.3",
-      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
-      "narration": "अचानक उसे रेत में आधा दबा एक चमकता हुआ शंख मिला, जो धीरे-धीरे फुसफुसा रहा था।",
-      "subtitle": "The Whispering Shell",
-      "characters": ["Whispering Shell"],
-      "motion_prompt": "shell glowing faintly in sand"
+      "description": "Ravi spots a glowing conch half-buried in the sand.",
+      "visual_prompt": "(wide shot, little Indian boy kneeling on golden sandy beach, brushing sand off a glowing spiral conch, soft ocean waves in background, warm orange sunset light, storybook style)",
+      "narration": "One day, he noticed a strange glow under the sand. Curious, he dug gently and uncovered a shimmering golden conch.",
+      "subtitle": "One day, he noticed a strange glow under the sand and uncovered a golden conch."
     },
     {
       "duration": 8,
-      "description": "medium shot of Ravi holding the shell close to his ear, listening",
-      "visual_prompt": "(medium shot:1.2) little Indian boy wearing yellow t-shirt and shorts, holding glowing magical seashell to his ear, listening with curious expression, beach background, storybook style:1.3",
-      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
-      "narration": "जब रवि ने शंख को कान से लगाया, तो उसने कहा — ‘मुझे अपने परिवार के पास समुद्र में लौटना है, क्या तुम मदद करोगे?’",
-      "subtitle": "A Plea for Help",
-      "characters": ["Ravi", "Whispering Shell"],
-      "motion_prompt": "boy listening to shell speaking softly"
+      "description": "Ravi holds the conch to his ear and hears a faint voice calling for help.",
+      "visual_prompt": "(wide shot, little Indian boy holding glowing spiral conch to his ear, eyes wide in surprise, ocean waves shimmering behind, warm sunset glow, storybook style)",
+      "narration": "When Ravi held it close, he heard a soft voice pleading, ‘Please… take me home to the Coral Palace.’",
+      "subtitle": "When Ravi held it close, he heard a soft voice pleading, ‘Please… take me home.’"
     },
     {
       "duration": 8,
-      "description": "medium shot of a wise sea turtle emerging from the waves",
-      "visual_prompt": "(medium shot:1.2) wise green sea turtle with gentle eyes emerging from ocean waves, glowing slightly in sunset light, storybook style:1.3",
-      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
-      "narration": "तभी एक समझदार समुद्री कछुआ किनारे आया और बोला — ‘मैं तुम्हें सही जगह तक पहुँचने का रास्ता दिखा सकता हूँ।’",
-      "subtitle": "The Ocean Guide",
-      "characters": ["Sea Turtle", "Ravi"],
-      "motion_prompt": "sea turtle approaching boy from water"
+      "description": "Ravi wades into the water, holding the conch carefully.",
+      "visual_prompt": "(wide shot, little Indian boy wading into shallow turquoise water, holding glowing spiral conch with both hands, gentle waves, horizon glowing with sunset, storybook style)",
+      "narration": "Knowing the ocean was calling, Ravi stepped into the water, determined to help the mysterious voice.",
+      "subtitle": "Knowing the ocean was calling, Ravi stepped into the water, determined to help."
     },
     {
-      "duration": 9,
-      "description": "wide shot of Ravi riding on the turtle’s back across glowing waves",
-      "visual_prompt": "(wide shot:1.2) little Indian boy wearing yellow t-shirt and shorts, sitting on wise green sea turtle’s back, riding across glowing ocean waves under sunset sky, storybook style:1.3",
-      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
-      "narration": "रवि ने सोचा, ‘अगर मैं मदद करूँ, तो यह शंख अपने परिवार से फिर मिल पाएगा।’ वह कछुए की पीठ पर बैठकर समुद्र की ओर बढ़ गया।",
-      "subtitle": "The Sea Voyage",
-      "characters": ["Ravi", "Sea Turtle"],
-      "motion_prompt": "boy riding turtle across waves"
+      "duration": 8,
+      "description": "A majestic sea turtle appears to guide Ravi.",
+      "visual_prompt": "(wide shot, large friendly sea turtle emerging from the water in front of little Indian boy holding glowing conch, golden sunlight on water, storybook style)",
+      "narration": "Suddenly, a great sea turtle appeared. ‘Follow me,’ it said, ‘I’ll take you to the Coral Palace.’",
+      "subtitle": "Suddenly, a great sea turtle appeared. ‘Follow me,’ it said."
     },
     {
-      "duration": 9,
-      "description": "medium shot of Ravi placing the shell gently among other seashells underwater",
-      "visual_prompt": "(medium shot:1.2) little Indian boy underwater, gently placing glowing magical seashell among other beautiful seashells on coral reef, colorful fish swimming around, storybook style:1.3",
-      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
-      "narration": "अंत में, रवि ने शंख को उसके परिवार के पास रखा। मुस्कुराते हुए शंख ने कहा — ‘धन्यवाद, छोटे दोस्त।’ अगर आपको यह कहानी पसंद आई हो, तो कृपया सब्सक्राइब करें और बेल आइकन दबाएं।",
-      "subtitle": "Home in the Reef",
-      "characters": ["Ravi", "Whispering Shell"],
-      "motion_prompt": "boy placing shell on coral reef"
+      "duration": 8,
+      "description": "Ravi returns the conch to a glowing coral structure underwater.",
+      "visual_prompt": "(wide shot, little Indian boy underwater with friendly sea turtle, placing glowing spiral conch on a radiant coral palace, colorful fish swimming around, beams of sunlight filtering through water, storybook style)",
+      "narration": "They swam together to a glowing coral palace, where Ravi gently placed the conch back in its rightful place.",
+      "subtitle": "They swam to a glowing coral palace, where Ravi placed the conch back."
+    },
+    {
+      "duration": 12,
+      "description": "The ocean rewards Ravi with a pearl as thanks.",
+      "visual_prompt": "(wide shot, little Indian boy standing back on golden beach, holding a shiny pearl, ocean waves behind him, warm evening light, storybook style)",
+      "narration": "As a thank you, the ocean gave Ravi a shining pearl — a reminder that kindness always finds its way back.",
+      "subtitle": "The ocean gave Ravi a shining pearl — kindness always comes back."
     }
   ],
-  "tags": [
-    "kids",
-    "magical",
-    "beach",
-    "friendship",
-    "storybook",
-    "adventure",
-    "ocean",
-    "cute"
-  ]
+  "tags": ["storybook", "Indian boy", "beach adventure", "ocean spirit", "kindness"]
 }
