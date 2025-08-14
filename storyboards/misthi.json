@@ -21,7 +21,7 @@
     {
       "duration": 25,
       "description": "She walks through the festival-decorated village with lantern in hand.",
-      "visual_prompt": "(wide shot) (full scene view) foreground: [Misthi holding brass lantern:1.4], midground: [marigold garlands, rangoli at doorsteps:1.0], background: [dirt path to shadowy fort:0.9], storybook magical style, soft hand-painted, natural proportions (wide shot)",
+      "visual_prompt": "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sleeping peacefully under tree:1.3), (calm jungle night with stars and grass:1.2), (soft blue moonlight, serene storybook illustration style:1.1)",
       "narration": "मिष्ठी ने लालटेन पकड़ी और सजते हुए गाँव से होकर किले की ओर बढ़ी। रास्ते पर फूलों की खुशबू और माला की झिलमिलाहट उसे साहस दे रही थी।",
       "subtitle": "Holding a brass lantern, Misthi walked through the decorated village toward the fort. The fragrance and glow encouraged her."
     },
