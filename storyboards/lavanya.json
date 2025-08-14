@@ -1,0 +1,196 @@
+{
+  "title": "Lavanya and the Glowbird's Melody",
+  "description": "Lavanya discovers magical glowbirds that guide her through a forest full of wonders.",
+  "total_duration": 180,
+  "cast": [
+    {
+      "name": "Lavanya",
+      "role": "adventurous little girl",
+      "age": 11,
+      "type": "beatingull girl",
+      "style": "red dress, brown hair, cheerful, curious"
+    },
+    {
+      "name": "Glowbird Leader",
+      "role": "majestic magical bird",
+      "style": "large glowing feathers, radiant aura, wise expression"
+    },
+    {
+      "name": "Glowbird Friends",
+      "role": "playful glowing birds",
+      "style": "small, colorful, mischievous"
+    },
+    {
+      "name": "Forest Sprite",
+      "role": "tiny glowing humanoid creature",
+      "style": "soft glowing light, playful, tiny wings"
+    },
+    {
+      "name": "Wise Owl",
+      "role": "ancient owl",
+      "style": "perched, large wise eyes, mystical aura"
+    }
+  ],
+  "scenes": [
+    {
+      "duration": 12,
+      "description": "Lavanya discovers Glowbird Leader in the forest",
+      "visual_prompt": "(wide) Lavanya, 11 yrs, beatingull girl, red dress, brown hair foreground, Glowbird Leader glowing midground, forest background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "लावण्या ने जंगल में चमकदार पक्षी देखा।",
+      "subtitle": "The Glowing Discovery",
+      "characters": ["Lavanya", "Glowbird Leader"],
+      "motion_prompt": "Lavanya looking amazed at Glowbird Leader"
+    },
+    {
+      "duration": 12,
+      "description": "Glowbird Leader sings a magical melody",
+      "visual_prompt": "(medium) Lavanya, 11 yrs, beatingull girl foreground, Glowbird Leader glowing singing midground, forest background, magical storybook style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "चमकदार पक्षी ने जादुई धुन गाई।",
+      "subtitle": "The Magical Song",
+      "characters": ["Lavanya", "Glowbird Leader"],
+      "motion_prompt": "Glowbird Leader singing, Lavanya listening"
+    },
+    {
+      "duration": 12,
+      "description": "Glowbird Friends join Lavanya playfully",
+      "visual_prompt": "(wide) Lavanya, 11 yrs, beatingull girl foreground, Glowbird Friends glowing midground, forest background, playful storybook style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "छोटे पक्षी लावण्या के चारों ओर खेलते हुए इकट्ठे हुए।",
+      "subtitle": "Friendly Glow",
+      "characters": ["Lavanya", "Glowbird Friends"],
+      "motion_prompt": "Glowbird Friends flying around Lavanya"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya reaches out to touch a glowbird",
+      "visual_prompt": "(medium) Lavanya, 11 yrs, beatingull girl reaching foreground, Glowbird Friends glowing midground, Forest Sprite faint glow midground, forest background, magical storybook style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "लावण्या ने चमकते पक्षी को छूने की कोशिश की।",
+      "subtitle": "Touch of Magic",
+      "characters": ["Lavanya", "Glowbird Friends", "Forest Sprite"],
+      "motion_prompt": "Lavanya reaching hand to glowbirds, sprite floating nearby"
+    },
+    {
+      "duration": 12,
+      "description": "Glowbirds circle Lavanya happily under Wise Owl watch",
+      "visual_prompt": "(wide) Lavanya, 11 yrs, beatingull girl foreground, Glowbird Friends glowing midground, Wise Owl perched background, forest background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "पक्षी खुश होकर लावण्या के चारों ओर उड़ते रहे।",
+      "subtitle": "Playful Flight",
+      "characters": ["Lavanya", "Glowbird Friends", "Wise Owl"],
+      "motion_prompt": "Glowbird Friends circling Lavanya while Wise Owl watches"
+    },
+    {
+      "duration": 12,
+      "description": "Forest Sprite guides Lavanya through sparkling path",
+      "visual_prompt": "(medium) Lavanya, 11 yrs, beatingull girl following, Forest Sprite glowing midground, Glowbird Friends flying, forest background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "Forest Sprite ने लावण्या को चमकदार रास्ते पर ले जाया।",
+      "subtitle": "Guided Path",
+      "characters": ["Lavanya", "Forest Sprite", "Glowbird Friends"],
+      "motion_prompt": "Forest Sprite flying ahead, Lavanya following"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya discovers a hidden glowing waterfall",
+      "visual_prompt": "(wide) Lavanya, 11 yrs, beatingull girl foreground, Glowbird Leader and Friends midground, sparkling waterfall background, magical storybook style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "लावण्या ने एक छिपा हुआ चमकदार झरना देखा।",
+      "subtitle": "Hidden Wonder",
+      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Lavanya looking in awe at waterfall, birds fluttering"
+    },
+    {
+      "duration": 12,
+      "description": "Glowbird Leader hovers near waterfall singing",
+      "visual_prompt": "(close-up) Lavanya foreground, Glowbird Leader glowing midground, waterfall background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "Glowbird Leader झरने के पास उड़ता हुआ गा रहा था।",
+      "subtitle": "Melody by the Water",
+      "characters": ["Lavanya", "Glowbird Leader"],
+      "motion_prompt": "Glowbird Leader hovering, singing, Lavanya listening"
+    },
+    {
+      "duration": 12,
+      "description": "Forest Sprite performs sparkling tricks around Lavanya",
+      "visual_prompt": "(medium) Lavanya, 11 yrs, beatingull girl foreground, Forest Sprite glowing midground, forest background, magical playful style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "Forest Sprite ने लावण्या के चारों ओर चमकते जादू दिखाए।",
+      "subtitle": "Magical Tricks",
+      "characters": ["Lavanya", "Forest Sprite"],
+      "motion_prompt": "Forest Sprite spinning and sparkling, Lavanya clapping"
+    },
+    {
+      "duration": 12,
+      "description": "Glowbird Friends gather to form a glowing heart",
+      "visual_prompt": "(wide) Lavanya foreground, Glowbird Friends forming glowing heart midground, forest background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "छोटे पक्षियों ने एक चमकता दिल बनाकर लावण्या को दिखाया।",
+      "subtitle": "Heart of Glow",
+      "characters": ["Lavanya", "Glowbird Friends"],
+      "motion_prompt": "Glowbird Friends forming heart shape around Lavanya"
+    },
+    {
+      "duration": 12,
+      "description": "Wise Owl shares a secret about forest magic",
+      "visual_prompt": "(medium) Lavanya, 11 yrs, beatingull girl foreground, Wise Owl perched midground, Glowbird Leader and Friends midground, forest background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "Wise Owl ने लावण्या को जंगल के जादू का राज बताया।",
+      "subtitle": "The Secret of the Forest",
+      "characters": ["Lavanya", "Wise Owl", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Wise Owl speaking, Lavanya listening, birds fluttering"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya dances under sparkling glowbird lights",
+      "visual_prompt": "(wide) Lavanya dancing foreground, Glowbird Friends glowing midground, forest background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "लावण्या चमकते पक्षियों की रोशनी में नाच रही थी।",
+      "subtitle": "Dance of Light",
+      "characters": ["Lavanya", "Glowbird Friends"],
+      "motion_prompt": "Lavanya twirling while birds fly around her"
+    },
+    {
+      "duration": 12,
+      "description": "Glowbird Leader guides Lavanya to glowing tree",
+      "visual_prompt": "(wide) Lavanya foreground, Glowbird Leader midground, glowing tree background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "Glowbird Leader ने लावण्या को चमकते पेड़ तक ले गया।",
+      "subtitle": "Glowing Tree",
+      "characters": ["Lavanya", "Glowbird Leader"],
+      "motion_prompt": "Glowbird Leader flying ahead, Lavanya following"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya waves goodbye to glowbirds under starry sky",
+      "visual_prompt": "(wide) Lavanya, 11 yrs, beatingull girl waving foreground, Glowbird Leader and Friends flying midground, starry forest background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "रात खत्म हुई और लावण्या ने चमकदार पक्षियों को अलविदा कहा।",
+      "subtitle": "Goodnight Glow",
+      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Lavanya waving goodbye as birds fly away"
+    },
+    {
+      "duration": 12,
+      "description": "Forest Sprite waves softly as Lavanya leaves",
+      "visual_prompt": "(medium) Lavanya walking foreground, Forest Sprite glowing midground, forest background, storybook magical style",
+      "negative_prompt": "blurry, dark, distorted, unnatural colors, scary, violent",
+      "narration": "Forest Sprite ने हल्की मुस्कान के साथ अलविदा कहा।",
+      "subtitle": "Farewell Friend",
+      "characters": ["Lavanya", "Forest Sprite"],
+      "motion_prompt": "Lavanya walking away, sprite waving softly"
+    }
+  ],
+  "tags": [
+    "kids",
+    "magical",
+    "birds",
+    "friendship",
+    "storybook",
+    "adventure",
+    "night",
+    "cute"
+  ]
+}
