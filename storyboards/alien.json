@@ -1,0 +1,191 @@
+{
+  "title": "Aditya's Space Adventure - The Candy Planet",
+  "description": "Aditya, a curious 10-year-old boy, discovers a magical spaceship and travels to a mysterious planet called Candyfire, where everything is made of candy and he meets friendly alien friends who teach him about friendship across the universe.",
+  "total_duration": 120,
+  "cast": [
+    {"name": "Aditya", "role": "curious 10-year-old boy who loves space"},
+    {"name": "Sparkle", "role": "friendly alien with rainbow skin and candy hair"},
+    {"name": "Bubble", "role": "round alien made of jelly who can bounce"},
+    {"name": "Candy King", "role": "wise ruler of Candyfire planet"},
+    {"name": "Lollipop Guards", "role": "protective guards made of giant lollipops"},
+    {"name": "Chocolate River", "role": "flowing river made of melted chocolate"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "wide shot of Aditya in his bedroom looking at space posters and dreaming of space travel",
+      "visual_prompt": "(wide shot:1.2) cute little Indian boy with short black hair, wearing red t-shirt, sitting in bedroom with space posters on wall, looking up at stars through window, bright room, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य अपने कमरे में बैठा था और अंतरिक्ष के बारे में सोच रहा था।",
+      "subtitle": "Dreaming of Space",
+      "characters": ["Aditya"],
+      "motion_prompt": "boy looking at space posters dreaming"
+    },
+    {
+      "duration": 8,
+      "description": "close-up of a small glowing spaceship appearing in Aditya's room",
+      "visual_prompt": "(close-up:1.2) small glowing spaceship with bright lights appearing in boy's room, magical sparkles, surprised happy expression, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अचानक उसके कमरे में एक छोटा चमकता हुआ अंतरिक्ष यान दिखाई दिया।",
+      "subtitle": "Magical Spaceship",
+      "characters": ["Aditya"],
+      "motion_prompt": "spaceship appearing in room"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Aditya entering the spaceship with excitement",
+      "visual_prompt": "(medium shot:1.2) cute little Indian boy entering small glowing spaceship, excited expression, red t-shirt, bright lights, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य खुशी से अंतरिक्ष यान में चढ़ गया।",
+      "subtitle": "Entering the Ship",
+      "characters": ["Aditya"],
+      "motion_prompt": "boy entering spaceship"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of the spaceship flying through colorful space with stars and planets",
+      "visual_prompt": "(wide shot:1.2) small spaceship flying through colorful space, bright stars, colorful planets, magical space journey, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अंतरिक्ष यान रंगीन अंतरिक्ष में उड़ रहा था।",
+      "subtitle": "Flying Through Space",
+      "characters": ["Aditya"],
+      "motion_prompt": "spaceship flying through space"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Candyfire planet appearing - a colorful planet made of candy",
+      "visual_prompt": "(wide shot:1.2) colorful candy planet Candyfire, made of bright candies, lollipops, chocolate mountains, rainbow colors, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "दूर में कैंडीफायर ग्रह दिखाई दिया - एक रंगीन कैंडी का ग्रह।",
+      "subtitle": "Candyfire Planet",
+      "characters": ["Aditya"],
+      "motion_prompt": "candy planet appearing"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of spaceship landing on Candyfire with Aditya looking amazed",
+      "visual_prompt": "(medium shot:1.2) spaceship landing on candy planet, cute little Indian boy looking amazed, bright candy landscape, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अंतरिक्ष यान कैंडीफायर पर उतरा और आदित्य आश्चर्यचकित था।",
+      "subtitle": "Landing on Candyfire",
+      "characters": ["Aditya"],
+      "motion_prompt": "spaceship landing on candy planet"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Sparkle alien greeting Aditya with rainbow skin and candy hair",
+      "visual_prompt": "(wide shot:1.2) friendly alien Sparkle with rainbow skin and candy hair greeting little Indian boy, bright colors, happy expressions, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "स्पार्कल नाम का दोस्ताना एलियन आदित्य का स्वागत कर रहा था।",
+      "subtitle": "Meeting Sparkle",
+      "characters": ["Aditya", "Sparkle"],
+      "motion_prompt": "alien greeting boy"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Bubble alien bouncing around Aditya",
+      "visual_prompt": "(medium shot:1.2) round jelly alien Bubble bouncing around little Indian boy, playful movement, bright colors, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "बबल नाम का जेली एलियन आदित्य के चारों ओर उछल रहा था।",
+      "subtitle": "Bouncing Bubble",
+      "characters": ["Aditya", "Bubble"],
+      "motion_prompt": "jelly alien bouncing around boy"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of chocolate river flowing through candy mountains",
+      "visual_prompt": "(wide shot:1.2) flowing chocolate river through candy mountains, bright candy landscape, colorful scene, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "चॉकलेट की नदी कैंडी के पहाड़ों के बीच बह रही थी।",
+      "subtitle": "Chocolate River",
+      "characters": ["Aditya", "Sparkle", "Bubble"],
+      "motion_prompt": "chocolate river flowing"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Aditya and aliens playing by the chocolate river",
+      "visual_prompt": "(medium shot:1.2) cute little Indian boy and friendly aliens playing by chocolate river, laughing, bright colors, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य और एलियन चॉकलेट नदी के पास खेल रहे थे।",
+      "subtitle": "Playing by the River",
+      "characters": ["Aditya", "Sparkle", "Bubble"],
+      "motion_prompt": "boy and aliens playing by river"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Candy King's palace made of giant candies and lollipops",
+      "visual_prompt": "(wide shot:1.2) Candy King's palace made of giant candies and lollipops, bright colors, magical candy architecture, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "कैंडी किंग का महल विशाल कैंडी और लॉलीपॉप से बना था।",
+      "subtitle": "Candy Palace",
+      "characters": ["Aditya", "Sparkle", "Bubble"],
+      "motion_prompt": "candy palace in distance"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Lollipop Guards welcoming Aditya to the palace",
+      "visual_prompt": "(medium shot:1.2) friendly lollipop guards welcoming little Indian boy to candy palace, bright colors, happy expressions, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "लॉलीपॉप गार्ड आदित्य का महल में स्वागत कर रहे थे।",
+      "subtitle": "Lollipop Guards",
+      "characters": ["Aditya", "Lollipop Guards"],
+      "motion_prompt": "lollipop guards welcoming boy"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Candy King sitting on a throne made of candy",
+      "visual_prompt": "(wide shot:1.2) wise Candy King sitting on candy throne, friendly expression, bright candy palace, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "कैंडी किंग कैंडी के सिंहासन पर बैठे थे।",
+      "subtitle": "Meeting the King",
+      "characters": ["Aditya", "Candy King"],
+      "motion_prompt": "candy king on throne"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Aditya and Candy King talking and laughing together",
+      "visual_prompt": "(medium shot:1.2) cute little Indian boy and Candy King talking and laughing together, friendly conversation, bright colors, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य और कैंडी किंग बात कर रहे थे और हँस रहे थे।",
+      "subtitle": "Friendly Chat",
+      "characters": ["Aditya", "Candy King"],
+      "motion_prompt": "boy and king talking"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Aditya and all alien friends having a candy party",
+      "visual_prompt": "(wide shot:1.2) cute little Indian boy and all alien friends having candy party, colorful candies, happy celebration, bright colors, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य और सभी एलियन दोस्त कैंडी पार्टी मना रहे थे।",
+      "subtitle": "Candy Party",
+      "characters": ["Aditya", "Sparkle", "Bubble", "Candy King", "Lollipop Guards"],
+      "motion_prompt": "boy and aliens having party"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Aditya saying goodbye to his alien friends",
+      "visual_prompt": "(wide shot:1.2) cute little Indian boy saying goodbye to alien friends, spaceship ready, emotional farewell, bright colors, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य अपने एलियन दोस्तों को अलविदा कह रहा था। 'अगर आपको यह कहानी पसंद आई हो, तो कृपया सब्सक्राइब करें और बेल आइकन दबाएं।'",
+      "subtitle": "Goodbye Friends",
+      "characters": ["Aditya", "Sparkle", "Bubble", "Candy King", "Lollipop Guards"],
+      "motion_prompt": "boy saying goodbye to aliens"
+    }
+  ],
+  "tags": [
+    "kids",
+    "space",
+    "alien",
+    "candy",
+    "adventure",
+    "friendship",
+    "imagination",
+    "planet",
+    "spaceship",
+    "chocolate",
+    "rainbow",
+    "fantasy",
+    "cute",
+    "fun"
+  ]
+}
