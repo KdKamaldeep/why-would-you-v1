@@ -1,182 +1,172 @@
 {
-  "title": "Lavanya and the Skybound Glowbird",
-  "description": "Lavanya, an 11-year-old energetic girl, flies across magical skies with a glowing bird, discovering the wonders of the world from above.",
+  "title": "Lavanya and the Glowbird Adventure",
+  "description": "Lavanya, an 11-year-old adventurous little girl, flies with magical glowbirds and explores a world of wonder.",
   "total_duration": 180,
   "cast": [
     {
       "name": "Lavanya",
-      "role": "11-year-old adventurous little girl, bright and cheerful"
+      "role": "11-year-old bright-eyed adventurous girl"
     },
     {
       "name": "Glowbird Leader",
-      "role": "magical glowing bird with sparkling wings"
+      "role": "magical glowing bird leader"
     },
     {
       "name": "Glowbird Friends",
-      "role": "playful glowing birds following Lavanya"
+      "role": "playful glowing birds"
     }
   ],
   "scenes": [
     {
       "duration": 12,
-      "description": "Lavanya steps onto a magical cloud as the glowbird waits",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya, 11 yrs, bright yellow dress, brown braid, foreground 1.4, Glowbird Leader midground 1.1, soft glowing clouds background 0.9, flying pose, magical sky, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, busy background, low resolution, blurry",
-      "narration": "लावण्या ने जादुई बादल पर कदम रखा, उसके सामने चमकदार पक्षी इंतजार कर रहा था।",
-      "subtitle": "Scene 1",
+      "description": "Lavanya standing on a hilltop gazing at the sky as Glowbird Leader appears",
+      "visual_prompt": "(wide shot) Lavanya, 11 years, yellow dress, brown braid, foreground, Glowbird Leader midground, magical soft glow, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "लावन्या ने पहाड़ी पर खड़े होकर चमकते पक्षी को देखा।",
+      "subtitle": "Magic Appears",
       "characters": ["Lavanya", "Glowbird Leader"],
-      "motion_prompt": "Lavanya stepping on magical cloud with glowbird"
+      "motion_prompt": "Lavanya looking at glowing bird"
     },
     {
       "duration": 12,
-      "description": "Lavanya takes off with the glowbird into the sky",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress fluttering, Glowbird Leader glowing, foreground 1.4, sky clouds midground 1.1, sunlit horizon background 0.9, magical flying, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "लावण्या ने पक्षी के साथ आसमान में उड़ान भरी।",
-      "subtitle": "Scene 2",
+      "description": "Glowbird Leader flying around Lavanya, inviting her to join",
+      "visual_prompt": "(wide shot) Lavanya in yellow dress, Glowbird Leader flying midair, sky background, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "चमकदार पक्षी लावन्या के चारों ओर उड़कर उसे साथ चलने के लिए बुला रहा था।",
+      "subtitle": "Invitation to Fly",
       "characters": ["Lavanya", "Glowbird Leader"],
-      "motion_prompt": "Lavanya flying with glowbird above clouds"
+      "motion_prompt": "Glowbird Leader circling Lavanya"
     },
     {
       "duration": 12,
-      "description": "Lavanya looks down to see sparkling rivers and mountains",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya in flight, yellow dress, Glowbird Leader, foreground 1.4, sparkling rivers midground 1.1, distant mountains background 0.9, magical sky, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, busy background, blurry",
-      "narration": "उसने नीचे देखा, चमकती नदियाँ और दूर पहाड़ नजर आए।",
-      "subtitle": "Scene 3",
+      "description": "Lavanya starts flying, holding Glowbird Leader",
+      "visual_prompt": "(wide shot) Lavanya holding Glowbird Leader, flying above clouds, sky glowing with soft sunset, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "लावन्या ने पक्षी को पकड़कर आसमान में उड़ना शुरू किया।",
+      "subtitle": "First Flight",
       "characters": ["Lavanya", "Glowbird Leader"],
-      "motion_prompt": "Lavanya looking down at sparkling rivers from sky"
+      "motion_prompt": "Lavanya flying with Glowbird Leader"
     },
     {
       "duration": 12,
-      "description": "Glowbird Friends join Lavanya for playful flight",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader and Glowbird Friends glowing midground 1.1, soft clouds background 0.9, magical playful flight, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, blurry, busy background",
-      "narration": "कुछ और चमकदार पक्षी उसके साथ खेलने लगे।",
-      "subtitle": "Scene 4",
-      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
-      "motion_prompt": "Lavanya flying with multiple glowbirds playfully"
-    },
-    {
-      "duration": 12,
-      "description": "Lavanya glides over a rainbow-colored waterfall",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader foreground 1.4, rainbow waterfall midground 1.1, soft clouds background 0.9, magical glow, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "लावण्या ने इंद्रधनुष के रंगों वाला झरना पार किया।",
-      "subtitle": "Scene 5",
+      "description": "Lavanya amazed at sparkling river below while flying",
+      "visual_prompt": "(wide shot) Lavanya flying, sparkling river below, Glowbird Leader beside her, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "नीचे चमकती नदी देखकर लावन्या हैरान हो गई।",
+      "subtitle": "River of Light",
       "characters": ["Lavanya", "Glowbird Leader"],
-      "motion_prompt": "Lavanya gliding over rainbow waterfall"
+      "motion_prompt": "Lavanya flying over sparkling river"
     },
     {
       "duration": 12,
-      "description": "Lavanya and glowbirds soar past glowing mountains",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader and friends, foreground 1.4, glowing mountains midground 1.1, sky background 0.9, magical flight, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "वे चमकती पहाड़ियों के ऊपर से उड़ते गए।",
-      "subtitle": "Scene 6",
+      "description": "Glowbird Friends join Lavanya, forming a glowing trail in sky",
+      "visual_prompt": "(wide shot) Lavanya flying, Glowbird Leader leading, 3 Glowbird Friends forming glowing trail, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "और छोटे चमकते पक्षी लावन्या के पीछे चमकते हुए उड़ने लगे।",
+      "subtitle": "Flying Friends",
       "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
-      "motion_prompt": "Lavanya and glowbirds soaring past glowing mountains"
+      "motion_prompt": "Glowbirds flying with Lavanya in trail"
     },
     {
       "duration": 12,
-      "description": "Lavanya laughs as wind flows through her hair",
-      "visual_prompt": "(medium shot) (full scene view) Lavanya close-up flying, yellow dress fluttering, braid flying, Glowbird Leader foreground 1.4, clouds midground 1.1, sky background 0.9, magical storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "हवा उसके बालों में खेल रही थी, लावण्या हँस रही थी।",
-      "subtitle": "Scene 7",
+      "description": "Lavanya sees a magical forest from above",
+      "visual_prompt": "(wide shot) Lavanya flying above enchanted forest, Glowbirds around, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "लावन्या ने ऊपर से जादुई जंगल देखा।",
+      "subtitle": "Forest from Sky",
+      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Lavanya flying above magical forest"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya and Glowbirds swoop down near sparkling waterfall",
+      "visual_prompt": "(wide shot) Lavanya and Glowbirds near glowing waterfall, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "लावन्या और पक्षी चमकते झरने के पास झुकते हुए आए।",
+      "subtitle": "Waterfall Wonder",
+      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Flying near glowing waterfall"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya laughs as Glowbirds twirl around her",
+      "visual_prompt": "(close-up) Lavanya laughing, Glowbirds twirling, sky background, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "पक्षियों के चारों ओर घूमते हुए, लावन्या हंस पड़ी।",
+      "subtitle": "Joyful Flight",
+      "characters": ["Lavanya", "Glowbird Friends"],
+      "motion_prompt": "Lavanya laughing with twirling Glowbirds"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya floats above clouds with golden sunlight",
+      "visual_prompt": "(wide shot) Lavanya flying above clouds, Glowbird Leader beside her, warm sunlight, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "सूरज की सुनहरी रोशनी में, लावन्या बादलों के ऊपर तैर रही थी।",
+      "subtitle": "Golden Clouds",
       "characters": ["Lavanya", "Glowbird Leader"],
-      "motion_prompt": "Lavanya laughing while flying"
+      "motion_prompt": "Lavanya flying above clouds with sunlight"
     },
     {
       "duration": 12,
-      "description": "Lavanya flies above a village, people waving below",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader foreground 1.4, Glowbird Friends midground 1.1, small village background 0.9, magical glowing sky, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans close up, multiple kids, crowded, blurry",
-      "narration": "नीचे गाँव दिखा, लोग हाथ हिला रहे थे।",
-      "subtitle": "Scene 8",
+      "description": "Lavanya waves at birds below as she glides",
+      "visual_prompt": "(wide shot) Lavanya flying, waving at distant birds below, Glowbirds around, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "नीचे पक्षियों को देखते हुए, लावन्या ने हाथ हिलाया।",
+      "subtitle": "Waving Below",
+      "characters": ["Lavanya", "Glowbird Friends"],
+      "motion_prompt": "Lavanya waving while flying"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya spots a rainbow river from high above",
+      "visual_prompt": "(wide shot) Lavanya flying high, rainbow-colored river below, Glowbirds nearby, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "उच्च से, लावन्या ने इंद्रधनुषी नदी देखी।",
+      "subtitle": "Rainbow River",
+      "characters": ["Lavanya", "Glowbird Friends"],
+      "motion_prompt": "Lavanya flying above rainbow river"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya dives playfully with Glowbirds through fluffy clouds",
+      "visual_prompt": "(wide shot) Lavanya diving with Glowbirds through soft clouds, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "लावन्या और पक्षी मुलायम बादलों से खेलते हुए नीचे डाइव करने लगे।",
+      "subtitle": "Cloud Dive",
+      "characters": ["Lavanya", "Glowbird Friends"],
+      "motion_prompt": "Lavanya diving through clouds with Glowbirds"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya glides over mountains as sun begins to set",
+      "visual_prompt": "(wide shot) Lavanya flying over mountains, warm sunset, Glowbirds around, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "सूरज ढलते हुए, लावन्या पहाड़ों के ऊपर तैर रही थी।",
+      "subtitle": "Sunset Glide",
+      "characters": ["Lavanya", "Glowbird Friends"],
+      "motion_prompt": "Lavanya gliding over mountains"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya and Glowbirds fly toward glowing moon in night sky",
+      "visual_prompt": "(wide shot) Lavanya flying toward full moon, Glowbirds around, night sky, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "पूर्णिमा के उजले चाँद की ओर, लावन्या और पक्षी उड़ रहे थे।",
+      "subtitle": "Moonlight Flight",
+      "characters": ["Lavanya", "Glowbird Friends"],
+      "motion_prompt": "Flying toward moon with Glowbirds"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya lands safely back on hilltop with Glowbirds",
+      "visual_prompt": "(wide shot) Lavanya landing on hilltop, Glowbirds nearby, magical glow, storybook style, 16:9",
+      "negative_prompt": "blurry, low resolution, extra humans, distorted, crowded",
+      "narration": "लावन्या सुरक्षित पहाड़ी पर उतर गई, और पक्षी उसके पास थे। अगर आपको यह कहानी पसंद आई हो, तो कृपया इस चैनल को सब्सक्राइब करें और बेल आइकन दबाएं।",
+      "subtitle": "Safe Landing",
       "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
-      "motion_prompt": "Lavanya flying above village, people waving below"
-    },
-    {
-      "duration": 12,
-      "description": "Lavanya and glowbirds fly through a glowing cloud tunnel",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader foreground 1.4, Glowbird Friends midground 1.1, glowing cloud tunnel background 0.9, magical storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "वे चमकते बादलों की सुरंग से गुजरते गए।",
-      "subtitle": "Scene 9",
-      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
-      "motion_prompt": "Lavanya and glowbirds flying through glowing cloud tunnel"
-    },
-    {
-      "duration": 12,
-      "description": "Lavanya hovers over a sparkling lake reflecting the sky",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader foreground 1.4, sparkling lake midground 1.1, sky background 0.9, magical reflection, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "एक चमकती झील ने आकाश का प्रतिबिंब दिखाया।",
-      "subtitle": "Scene 10",
-      "characters": ["Lavanya", "Glowbird Leader"],
-      "motion_prompt": "Lavanya hovering over sparkling lake"
-    },
-    {
-      "duration": 12,
-      "description": "Lavanya and glowbirds fly toward a golden sunset",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader and friends foreground 1.4, sun setting background 0.9, clouds midground 1.1, magical sky, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "वे सुनहरी सूर्यास्त की ओर उड़ते गए।",
-      "subtitle": "Scene 11",
-      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
-      "motion_prompt": "Lavanya and glowbirds flying toward golden sunset"
-    },
-    {
-      "duration": 12,
-      "description": "Lavanya waves to the glowbirds as they play in the sky",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader foreground 1.4, Glowbird Friends midground 1.1, clouds background 0.9, playful flight, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "लावण्या ने हाथ हिलाया, पक्षी आसमान में खेल रहे थे।",
-      "subtitle": "Scene 12",
-      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
-      "motion_prompt": "Lavanya waving to glowbirds in playful flight"
-    },
-    {
-      "duration": 12,
-      "description": "Lavanya glides through sparkling stars emerging in the sky",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader foreground 1.4, Glowbird Friends midground 1.1, sparkling stars background 0.9, magical night sky, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "तारे चमकने लगे, लावण्या उनके बीच से गुजर रही थी।",
-      "subtitle": "Scene 13",
-      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
-      "motion_prompt": "Lavanya gliding through sparkling stars"
-    },
-    {
-      "duration": 12,
-      "description": "Lavanya and glowbirds perform a joyful spiral dance in the sky",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya flying, yellow dress, Glowbird Leader and friends foreground 1.4, soft clouds background 0.9, magical spiral dance, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "लावण्या और पक्षी आकाश में घुमावदार नृत्य कर रहे थे।",
-      "subtitle": "Scene 14",
-      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
-      "motion_prompt": "Lavanya and glowbirds spiral dancing in sky"
-    },
-    {
-      "duration": 12,
-      "description": "Lavanya lands gently on a magical cloud as the sun sets",
-      "visual_prompt": "(wide shot) (full scene view) Lavanya landing, yellow dress, Glowbird Leader foreground 1.4, Glowbird Friends midground 1.1, sunset clouds background 0.9, magical landing, storybook style, foreground focus only (wide shot)",
-      "negative_prompt": "extra humans, crowded, multiple children, low resolution, blurry",
-      "narration": "सूरज ढलते ही लावण्या जादुई बादल पर सुरक्षित उतर गई। अगर आपको यह कहानी पसंद आई हो, तो कृपया इस चैनल को सब्सक्राइब करें और बेल आइकन दबाएं।",
-      "subtitle": "Scene 15",
-      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
-      "motion_prompt": "Lavanya landing gently on magical cloud"
+      "motion_prompt": "Lavanya landing with Glowbirds"
     }
   ],
-  "tags": [
-    "kids",
-    "magical",
-    "birds",
-    "friendship",
-    "storybook",
-    "adventure",
-    "flying",
-    "sky",
-    "cute"
-  ]
+  "tags": ["kids", "magical", "birds", "friendship", "storybook", "adventure", "sky", "flying"]
 }
