@@ -46,9 +46,30 @@ WhyWouldYou-v1/
 └── 🚀 main.py                  # Main entry point
 ```
 
-## 🚀 **Quick Start**
+## 🎬 **Video Formats**
 
-### **1. Installation**
+The system now supports multiple video formats:
+
+### **YouTube Shorts (9:16 Aspect Ratio)**
+- **Dimensions**: 768x1024 pixels
+- **Perfect for**: TikTok, Instagram Reels, YouTube Shorts
+- **Usage**: `--video-format shorts` (default)
+
+### **Normal Video (16:9 Aspect Ratio)**
+- **Dimensions**: 1920x1080 pixels  
+- **Perfect for**: YouTube, Vimeo, general video platforms
+- **Usage**: `--video-format normal`
+
+### **Example Usage:**
+```bash
+# Create YouTube Shorts (default)
+python main.py "A dragon learns to bake cookies" --video-format shorts
+
+# Create normal video
+python main.py "A dragon learns to bake cookies" --video-format normal
+```
+
+## 🚀 **Quick Start**
 ```bash
 # Clone the repository
 git clone <repository-url>

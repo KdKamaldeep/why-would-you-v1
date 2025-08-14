@@ -57,6 +57,7 @@ class VideoConfig:
     prompt: str
     duration: int = 30
     fps: int = 15
+    video_format: str = "shorts"  # "shorts" for 9:16, "normal" for 16:9
     width: int = 768
     height: int = 1024  # Vertical format for Shorts
     output_path: str = "output"
@@ -80,6 +81,22 @@ class VideoConfig:
     # Control image validation and automatic prompt adjustment
     enable_image_validation: bool = True  # Enable automatic blank image detection and prompt adjustment
 
+    def __post_init__(self):
+        """Set dimensions based on video format."""
+        if self.video_format.lower() == "shorts":
+            # YouTube Shorts: 9:16 aspect ratio
+            self.width = 768
+            self.height = 1024
+        elif self.video_format.lower() == "normal":
+            # Normal video: 16:9 aspect ratio
+            self.width = 1920
+            self.height = 1080
+        else:
+            # Default to shorts if invalid format
+            self.video_format = "shorts"
+            self.width = 768
+            self.height = 1024
+
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
     
@@ -100,12 +117,14 @@ class CartoonShortsGenerator:
                 model_path=model_path, 
                 lora_path=lora_path, 
                 lora_scale=0.85,
-                enable_prompt_enhancement=config.enable_prompt_enhancement
+                enable_prompt_enhancement=config.enable_prompt_enhancement,
+                width=config.width,
+                height=config.height
             )
         except TypeError:
             # Fallback for older ImageGenerator signature
             self.image_generator = ImageGenerator(model_path=model_path)
-        self.animation_generator = AnimationGenerator()
+        self.animation_generator = AnimationGenerator(width=config.width, height=config.height)
         # Initialize Coqui TTS voice synthesizer
         self.voice_synthesizer = CoquiVoiceSynthesizer(
             CoquiVoiceConfig(language=config.language)
@@ -126,7 +145,8 @@ class CartoonShortsGenerator:
         
         try:
             # Early exit if final video already exists and reuse is enabled
-            final_output = self.output_dir / "final_short.mp4"
+            output_filename = "final_short.mp4" if self.config.video_format == "shorts" else "final_video.mp4"
+            final_output = self.output_dir / output_filename
             if self.config.reuse_existing and final_output.exists():
                 logger.info(f"Final video already exists and reuse is enabled: {final_output}")
                 return str(final_output)
@@ -593,9 +613,11 @@ class CartoonShortsGenerator:
 
 def main():
     """Main CLI entry point."""
-    parser = argparse.ArgumentParser(description="Generate cartoon-style YouTube Shorts videos")
+    parser = argparse.ArgumentParser(description="Generate cartoon-style videos (YouTube Shorts or normal format)")
     parser.add_argument("--prompt", required=True, help="Story prompt (e.g., 'A baby lion opens a smoothie shop in the jungle')")
     parser.add_argument("--duration", type=int, default=30, help="Video duration in seconds")
+    parser.add_argument("--video-format", choices=["shorts", "normal"], default="shorts", 
+                       help="Video format: 'shorts' for 9:16 YouTube Shorts, 'normal' for 16:9 standard videos")
     parser.add_argument("--output", default="output", help="Output directory")
     parser.add_argument("--style", default="cartoon", help="Visual style")
     parser.add_argument("--voice", default="", help="Reference speaker WAV path for Coqui XTTS (optional)")
@@ -621,6 +643,7 @@ def main():
     config = VideoConfig(
         prompt=args.prompt,
         duration=args.duration,
+        video_format=args.video_format,
         output_path=args.output,
         style=args.style,
         voice_id=args.voice,

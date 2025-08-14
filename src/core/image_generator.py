@@ -25,7 +25,7 @@ class ImageGenerator:
     Supports optional LoRA for style adaptation.
     """
     
-    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8, enable_prompt_enhancement: bool = True):
+    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8, enable_prompt_enhancement: bool = True, width: int = 768, height: int = 1024):
         self.model_path = model_path
         self.lora_path = lora_path
         self.lora_scale = lora_scale
@@ -34,6 +34,8 @@ class ImageGenerator:
         self.sd_available = False
         self.enable_prompt_enhancement = enable_prompt_enhancement
         self.prompt_enhancer = None
+        self.width = width
+        self.height = height
         
         # Initialize prompt enhancer if enabled
         if self.enable_prompt_enhancement:
@@ -262,8 +264,8 @@ class ImageGenerator:
                     negative_prompt=negative_prompt,
                     num_inference_steps=30,  # More steps for better cartoon quality
                     guidance_scale=7.5,      # Balanced for cartoon style
-                    width=768,
-                    height=1024,
+                    width=self.width,
+                    height=self.height,
                     num_images_per_prompt=1,
                     generator=torch.Generator(device=self.device).manual_seed(42),  # Consistent results
                     return_dict=True
@@ -412,16 +414,16 @@ class ImageGenerator:
         """Generate a colorful placeholder image with better design and optional subtitle."""
         try:
             # Create a gradient background instead of solid blue
-            img = Image.new('RGB', (768, 1024), color='white')
+            img = Image.new('RGB', (self.width, self.height), color='white')
             draw = ImageDraw.Draw(img)
             
             # Create a colorful gradient background
-            for y in range(1024):
-                color_r = int(135 + (y / 1024) * 120)  # 135-255
-                color_g = int(206 + (y / 1024) * 49)   # 206-255  
-                color_b = int(250 - (y / 1024) * 50)   # 250-200
+            for y in range(self.height):
+                color_r = int(135 + (y / self.height) * 120)  # 135-255
+                color_g = int(206 + (y / self.height) * 49)   # 206-255  
+                color_b = int(250 - (y / self.height) * 50)   # 250-200
                 color = (min(255, color_r), min(255, color_g), min(255, color_b))
-                draw.line([(0, y), (768, y)], fill=color)
+                draw.line([(0, y), (self.width, y)], fill=color)
             
             # Add decorative elements
             # Draw some simple shapes for visual appeal
@@ -443,7 +445,7 @@ class ImageGenerator:
             title = "🎬 Cartoon Scene"
             title_bbox = draw.textbbox((0, 0), title, font=title_font)
             title_width = title_bbox[2] - title_bbox[0]
-            title_x = (768 - title_width) // 2
+            title_x = (self.width - title_width) // 2
             
             # Add text shadow
             draw.text((title_x + 2, 302), title, fill='gray', font=title_font)
@@ -458,7 +460,7 @@ class ImageGenerator:
                 current_line.append(word)
                 test_line = ' '.join(current_line)
                 bbox = draw.textbbox((0, 0), test_line, font=text_font)
-                if bbox[2] - bbox[0] > 600:  # Max width
+                if bbox[2] - bbox[0] > self.width - 100:  # Max width with margin
                     if len(current_line) > 1:
                         current_line.pop()
                         lines.append(' '.join(current_line))
@@ -473,11 +475,11 @@ class ImageGenerator:
             # Limit to 8 lines
             lines = lines[:8]
             
-            y_offset = 400
+            y_offset = int(self.height * 0.4)  # 40% from top
             for line in lines:
                 bbox = draw.textbbox((0, 0), line, font=text_font)
                 text_width = bbox[2] - bbox[0]
-                x = (768 - text_width) // 2
+                x = (self.width - text_width) // 2
                 
                 # Add text shadow
                 draw.text((x + 1, y_offset + 1), line, fill='gray', font=text_font)
@@ -492,10 +494,10 @@ class ImageGenerator:
                     subtitle_font = ImageFont.load_default()
                 
                 # Draw subtitle background
-                subtitle_y = 850
+                subtitle_y = int(self.height * 0.85)  # 85% from top
                 bbox = draw.textbbox((0, 0), subtitle, font=subtitle_font)
                 text_width = bbox[2] - bbox[0]
-                x = (768 - text_width) // 2
+                x = (self.width - text_width) // 2
                 
                 # Semi-transparent background for subtitle
                 bg_overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
@@ -532,9 +534,9 @@ class ImageGenerator:
         except Exception as e:
             logger.error(f"❌ Error creating placeholder: {e}")
             # Create a simple fallback image
-            img = Image.new('RGB', (768, 1024), color='lightblue')
+            img = Image.new('RGB', (self.width, self.height), color='lightblue')
             draw = ImageDraw.Draw(img)
-            draw.text((384, 512), f"Scene: {prompt}", fill='black', anchor='mm')
+            draw.text((self.width // 2, self.height // 2), f"Scene: {prompt}", fill='black', anchor='mm')
             img.save(output_path)
             return output_path
     
