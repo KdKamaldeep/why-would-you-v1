@@ -1,44 +1,50 @@
 {
-  "title": "Ravi and the Golden Shell",
-  "description": "A little Indian boy named Ravi discovers a magical golden shell on the beach, leading him on a warm, storybook-style adventure.",
+  "title": "Ravi and the Ocean's Secret",
+  "description": "Ravi, a curious little boy, discovers a mysterious bottle on the beach and follows its clues to a hidden treasure.",
   "total_duration": 60,
   "scenes": [
     {
       "duration": 8,
-      "description": "Ravi walks barefoot along the golden sandy beach, gentle ocean waves at his feet, warm sunset light all around.",
-      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, walking along golden sandy beach, gentle ocean waves, warm sunset light, storybook illustration style, soft hand-painted look, natural proportions, warm colors (wide shot)",
-      "narration": "Ravi loved walking on the beach every evening, feeling the soft sand under his feet and the warm breeze on his face."
+      "description": "Ravi walking along the beach at sunset",
+      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, walking along golden sandy beach, gentle ocean waves, warm sunset light, storybook style)",
+      "narration": "रवि को समुद्र के किनारे टहलना पसंद था क्योंकि लहरों की आवाज़ उसे सुकून देती थी और हर दिन कुछ नया दिखाती थी।",
+      "subtitle": "Ravi loves walking by the sea because the sound of the waves calms him and shows him something new every day."
     },
     {
       "duration": 10,
-      "description": "Ravi spots a shimmering golden shell half-buried in the sand.",
-      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, kneeling on golden sandy beach, picking up glowing golden shell, gentle ocean waves in background, warm sunset light, storybook illustration style, soft hand-painted look, natural proportions, warm colors (wide shot)",
-      "narration": "One evening, something sparkled in the sand — a beautiful golden shell, glowing softly in the sunlight."
-    },
-    {
-      "duration": 10,
-      "description": "The shell glows brighter, releasing soft golden sparkles into the air.",
-      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, holding glowing golden shell in both hands, golden sparkles rising into the air, ocean waves behind, warm evening light, storybook illustration style, soft hand-painted look, natural proportions, magical atmosphere (wide shot)",
-      "narration": "As Ravi held it, the shell began to glow even brighter, sending golden sparkles dancing into the air."
-    },
-    {
-      "duration": 10,
-      "description": "A magical pathway of light appears over the ocean.",
-      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, standing at water's edge, looking at glowing golden light pathway stretching across the ocean, magical sparkles in the air, warm sunset colors, storybook illustration style, soft hand-painted look, natural proportions, magical atmosphere (wide shot)",
-      "narration": "Before his eyes, a path of golden light appeared across the water, inviting him to follow."
-    },
-    {
-      "duration": 10,
-      "description": "Ravi follows the path and finds a hidden island with colorful flowers and palm trees.",
-      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, walking on glowing golden pathway above water, reaching small tropical island with colorful flowers, palm trees, and warm sunlight, storybook illustration style, soft hand-painted look, natural proportions, magical tone (wide shot)",
-      "narration": "He stepped carefully along the glowing path until he reached a secret island filled with bright flowers and tall palm trees."
+      "description": "Ravi noticing a bottle half-buried in the sand",
+      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, noticing a glass bottle half-buried in golden sand, warm sunset light, storybook style)",
+      "narration": "एक दिन, रवि ने रेत में आधी दबी हुई बोतल देखी, जैसे समुद्र ने उसे कोई खास तोहफ़ा दिया हो।",
+      "subtitle": "One day, Ravi saw a bottle half-buried in the sand, as if the sea had gifted him something special."
     },
     {
       "duration": 12,
-      "description": "Ravi places the shell on a rock, releasing a wave of magic that brightens the island.",
-      "visual_prompt": "(wide shot) (full scene view) little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, placing glowing golden shell on large smooth rock, magical wave of golden light spreading across tropical island, flowers blooming, palm leaves swaying, warm sunset glow, storybook illustration style, soft hand-painted look, natural proportions, magical tone (wide shot)",
-      "narration": "He gently set the shell on a smooth rock, and a wave of golden light swept across the island, making every flower bloom brighter."
+      "description": "Ravi opening the bottle and finding a rolled-up map inside",
+      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, opening glass bottle and pulling out rolled-up old treasure map, warm sunset light, storybook style)",
+      "narration": "बोतल के अंदर उसे एक पुराना नक्शा मिला, जैसे किसी समुद्री डाकू ने उसे छुपा कर रखा हो।",
+      "subtitle": "Inside the bottle, he found an old map, as if a pirate had hidden it there."
+    },
+    {
+      "duration": 10,
+      "description": "Ravi following the map through the palm trees",
+      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, walking through tall palm trees holding treasure map, golden light, storybook style)",
+      "narration": "नक्शे के सहारे वह ऊँचे नारियल के पेड़ों के बीच से गुज़रा, जैसे वह किसी रोमांचक सफर पर हो।",
+      "subtitle": "Following the map, he walked through tall coconut trees, as if he was on an exciting journey."
+    },
+    {
+      "duration": 10,
+      "description": "Ravi finding a small wooden chest under a tree",
+      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, finding small wooden chest under large palm tree, warm light, storybook style)",
+      "narration": "पेड़ के नीचे उसे एक छोटा लकड़ी का संदूक मिला, जो समय और रहस्यों से भरा हुआ लग रहा था।",
+      "subtitle": "Under the tree, he found a small wooden chest that seemed filled with time and secrets."
+    },
+    {
+      "duration": 10,
+      "description": "Ravi opening the chest and finding seashells and a glowing pearl",
+      "visual_prompt": "(wide shot, little Indian boy, short black hair, yellow t-shirt, shorts, barefoot, opening small wooden chest filled with colorful seashells and glowing pearl, warm sunset light, storybook style)",
+      "narration": "संदूक खोलते ही उसमें रंग-बिरंगे सीप और एक चमकता हुआ मोती मिला, जैसे समुद्र ने अपनी सबसे कीमती चीज़ उसे सौंप दी हो।",
+      "subtitle": "As he opened the chest, he found colorful shells and a glowing pearl, as if the ocean had given him its most precious gift."
     }
   ],
-  "tags": ["storybook", "magical", "Indian setting", "beach", "adventure", "child protagonist"]
+  "tags": ["storybook", "Indian", "adventure", "treasure", "beach"]
 }
