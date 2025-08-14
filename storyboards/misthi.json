@@ -1,71 +1,172 @@
 {
-  "title": "Misthi and the Secret of the Old Fort",
-  "description": "Misthi, a curious 9-year-old from a riverside village, follows a mysterious tune to uncover an ancient secret hidden inside the old fort.",
-  "total_duration": 240,
-  "tags": ["Indian story", "adventure", "mystery", "storybook", "traditional culture", "warm evening light"],
+  "title": "Arjun and the Magical Glowbirds",
+  "description": "Arjun, an adventurous little boy, discovers magical glowing birds in a mystical forest and embarks on a sparkling adventure with them.",
+  "total_duration": 180,
+  "cast": [
+    {"name": "Arjun", "role": "adventurous little boy"},
+    {"name": "Glowbird Leader", "role": "bright magical bird"},
+    {"name": "Glowbird Friends", "role": "playful glowing birds"}
+  ],
   "scenes": [
     {
-      "duration": 20,
-      "description": "Misthi hears a mysterious flute from the old fort at dusk.",
-      "visual_prompt": "(wide shot) (full scene view) foreground: [Misthi, 9, Indian girl, green salwar kameez, braid with marigold, brass anklet, barefoot:1.4], midground: [calm river, small fishing boat:1.0], background: [distant crumbling fort on hill, warm evening sky:0.9], storybook magical style, soft hand-painted, natural proportions (wide shot)",
-      "narration": "गाँव की शाम थी। नदी किनारे खड़ी मिष्ठी ने अचानक एक अनजानी बाँसुरी की धुन सुनी, जो पुराने किले की ओर से आती जा रही थी। धुन में रहस्य और उत्सुकता दोनों थे। हर नोट उसकी जिज्ञासा बढ़ा रहा था।",
-      "subtitle": "It was evening. By the river, Misthi heard a mysterious flute tune from the old fort. Each note increased her curiosity."
+      "duration": 12,
+      "description": "wide shot of Arjun approaching the mystical forest at twilight",
+      "visual_prompt": "(wide shot) (full scene view) Arjun, short black hair, red tunic, brown shorts foreground 1.4, flowers midground 1.1, twilight trees background 0.9, soft magical glow, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अर्जुन जादुई जंगल की ओर बढ़ा, जहाँ हवा में हल्की चमक थी।",
+      "subtitle": "Entering the Forest",
+      "characters": ["Arjun"],
+      "motion_prompt": "boy walking into mystical forest"
     },
     {
-      "duration": 25,
-      "description": "Elders warn her about the fort at night, but her curiosity grows.",
-      "visual_prompt": "(wide shot) (full scene view) foreground: [Misthi listening to elders on charpoy:1.4], midground: [clay lamps glowing:1.0], background: [fort silhouette under darkening sky:0.9], storybook magical style, soft hand-painted, natural proportions (wide shot)",
-      "narration": "बुजुर्गों ने चेताया, 'रात में किले में जाने वाला कभी वापस नहीं आया।' लेकिन मिष्ठी का मन रहस्य जानने की इच्छा से भर गया। उसने तय किया कि वह जाकर देखेगी।",
-      "subtitle": "Elders warned that no one returns from the fort at night. Misthi’s curiosity grew; she decided to go."
+      "duration": 12,
+      "description": "wide shot of first glowing birds appearing around Arjun",
+      "visual_prompt": "(wide shot) (full scene view) Arjun red tunic foreground 1.4, small golden glowing birds midground 1.1, forest twilight background 0.9, magical soft glow, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अर्जुन ने देखा कि जंगल में छोटे चमकते पक्षी उड़ रहे थे।",
+      "subtitle": "First Glowbirds",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "glowbirds appearing around boy"
     },
     {
-      "duration": 25,
-      "description": "She walks through the festival-decorated village with lantern in hand.",
-      "visual_prompt": "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sleeping peacefully under tree:1.3), (calm jungle night with stars and grass:1.2), (soft blue moonlight, serene storybook illustration style:1.1)",
-      "narration": "मिष्ठी ने लालटेन पकड़ी और सजते हुए गाँव से होकर किले की ओर बढ़ी। रास्ते पर फूलों की खुशबू और माला की झिलमिलाहट उसे साहस दे रही थी।",
-      "subtitle": "Holding a brass lantern, Misthi walked through the decorated village toward the fort. The fragrance and glow encouraged her."
+      "duration": 12,
+      "description": "close-up of Glowbird Leader appearing and sparkling",
+      "visual_prompt": "(wide shot) (full scene view) Glowbird Leader, bright golden feathers, sparkling wings foreground 1.4, smaller glowbirds midground 1.1, forest background 0.9, magical soft glow, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "एक चमकदार प्रमुख पक्षी अर्जुन के सामने आया, उसके पंख जादुई चमक रहे थे।",
+      "subtitle": "Glowbird Leader",
+      "characters": ["Glowbird Leader"],
+      "motion_prompt": "glowbird leader fluttering wings"
     },
     {
-      "duration": 25,
-      "description": "Overgrown forest path; carved stones and glowing fireflies guide her.",
-      "visual_prompt": "(wide shot) (full scene view) foreground: [Misthi brushing tall grass:1.4], midground: [mossy carved stones, glowing fireflies:1.1], background: [dense forest canopy under moonlight:0.9], storybook magical style, soft hand-painted, natural proportions (wide shot)",
-      "narration": "जंगल का रास्ता घना था। मिष्ठी ने काई लगे पत्थरों पर नक्काशियाँ देखीं। जुगनू जैसे मार्गदर्शक उसे गुप्त स्थान की ओर खींच रहे थे।",
-      "subtitle": "The forest path was overgrown. Mossy carved stones appeared. Fireflies guided her toward a hidden place."
+      "duration": 12,
+      "description": "medium shot of Arjun reaching out hand as glowbirds gather",
+      "visual_prompt": "(wide shot) (full scene view) Arjun red tunic foreground 1.4, golden glowbirds midground 1.1, forest path background 0.9, sparkling magical lights, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अर्जुन ने हाथ बढ़ाया और चमकते पक्षी उसके चारों ओर इकट्ठा हो गए।",
+      "subtitle": "Friendly Glow",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "glowbirds flying around boy"
     },
     {
-      "duration": 25,
-      "description": "She reaches the fort gate; flute music stops; a carved lock glows faintly.",
-      "visual_prompt": "(wide shot) (full scene view) foreground: [Misthi holding lantern at fort gate:1.4], midground: [carved lock with river and moon:1.1], background: [tall stone walls with vines under moonlight:0.9], storybook magical style, soft hand-painted, natural proportions (wide shot)",
-      "narration": "किले के फाटक पर पहुँचते ही बाँसुरी की धुन थम गई। ताला चाँदनी में हल्का चमक रहा था। मिष्ठी ने गहरी साँस ली और ताले को छुआ।",
-      "subtitle": "At the fort gate, the flute stopped. The carved lock glowed; Misthi touched it, taking a deep breath."
+      "duration": 12,
+      "description": "close-up of Arjun laughing with glowbirds illuminating his face",
+      "visual_prompt": "(wide shot) (full scene view) Arjun laughing foreground 1.4, glowing birds midground 1.1, moonlit forest background 0.9, soft magical glow, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अर्जुन की हँसी जंगल में गूंज उठी जब पक्षियों की चमक उसके चेहरे पर पड़ने लगी।",
+      "subtitle": "Joyful Laughter",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "boy laughing with glowbirds around"
     },
     {
-      "duration": 30,
-      "description": "Inside the courtyard, she discovers a hidden well reflecting stars.",
-      "visual_prompt": "(wide shot) (full scene view) foreground: [Misthi leaning over stone well:1.4], midground: [ripples reflecting starlight:1.1], background: [broken archways, banyan branches:0.9], storybook magical style, soft hand-painted, natural proportions (wide shot)",
-      "narration": "किले के आँगन में एक पुराना कुआँ दिखाई दिया। उसके पानी में तारों की परछाई चमक रही थी। मिष्ठी ने झुककर देखा, मानो पूरा आकाश समेट रखा हो।",
-      "subtitle": "In the fort courtyard, an old well reflected the stars. Misthi leaned over, feeling a mix of curiosity and wonder."
+      "duration": 12,
+      "description": "wide shot of glowbirds leading Arjun deeper into the forest",
+      "visual_prompt": "(wide shot) (full scene view) Arjun red tunic foreground 1.4, glowbirds flying midground 1.1, dense mystical forest background 0.9, sparkling magical path, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "चमकते पक्षी अर्जुन को जंगल के गहरे हिस्से में ले गए।",
+      "subtitle": "Following the Glowbirds",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "boy following glowbirds"
     },
     {
-      "duration": 30,
-      "description": "A secret passage opens beneath the well; she climbs into a torch-lit chamber.",
-      "visual_prompt": "(wide shot) (full scene view) foreground: [Misthi climbing rope ladder:1.4], midground: [torch-lit carved stone walls:1.1], background: [bronze chest in chamber center:0.9], storybook magical style, soft hand-painted, natural proportions (wide shot)",
-      "narration": "कुएँ के तल में एक गुप्त दरवाज़ा खुला। मिष्ठी रस्सी से नीचे उतरी। कमरे की दीवारों पर मशालें जल रही थीं और बीच में पीतल का संदूक था।",
-      "subtitle": "A hidden door opened beneath the well. Misthi descended; torch-lit walls revealed a bronze chest."
+      "duration": 12,
+      "description": "medium shot of Arjun discovering a glowing crystal in the forest",
+      "visual_prompt": "(wide shot) (full scene view) Arjun red tunic foreground 1.4, glowing crystal midground 1.1, forest background 0.9, sparkling magical aura, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अर्जुन ने देखा कि एक जादुई क्रिस्टल जंगल में चमक रहा था।",
+      "subtitle": "Glowing Crystal",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "boy discovering glowing crystal"
     },
     {
-      "duration": 30,
-      "description": "Inside the chest, a river-shaped flute makes the water above glow.",
-      "visual_prompt": "(wide shot) (full scene view) foreground: [Misthi lifting silver-blue flute:1.4], midground: [glowing water rising:1.1], background: [faint river outline above:0.9], storybook magical style, soft hand-painted, natural proportions (wide shot)",
-      "narration": "संदूक में नदी के आकार की बाँसुरी थी। जैसे ही उसने बजाया, कुएँ का पानी सुनहरी रोशनी में चमक उठा। जल ऊपर फैल गया, रहस्य और जादू प्रकट हुए।",
-      "subtitle": "The chest held a river-shaped flute. When she played it, the well’s water glowed golden, revealing magic and mystery."
+      "duration": 12,
+      "description": "close-up of glowbirds circling the crystal",
+      "visual_prompt": "(wide shot) (full scene view) glowbirds circling crystal foreground 1.4, Arjun midground 1.1, forest background 0.9, sparkling magical glow, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "पक्षियों ने क्रिस्टल के चारों ओर घुमते हुए उसे और भी चमकदार बना दिया।",
+      "subtitle": "Crystal Glow",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "glowbirds circling glowing crystal"
     },
     {
-      "duration": 25,
-      "description": "Returning to the village, Misthi plays the flute; river flows full, saving the harvest.",
-      "visual_prompt": "(wide shot) (full scene view) foreground: [Misthi playing glowing flute:1.4], midground: [cheering villagers with water pots:1.1], background: [green fields, flowing river:0.9], storybook magical style, soft hand-painted, natural proportions (wide shot)",
-      "narration": "गाँव लौटकर मिष्ठी ने बाँसुरी बजाई। नदी का जल भर आया, खेत हरे-भरे हो गए और लोगों के चेहरों पर खुशी लौट आई। उसकी हिम्मत और जिज्ञासा पूरी तरह सफल हुई। अगर आपको यह कहानी पसंद आई, तो कृपया इस चैनल को सब्सक्राइब करें और बेल के आइकन को दबाएँ!",
-      "subtitle": "Back in the village, Misthi played. The river filled, fields turned green, and joy returned. Her courage and curiosity succeeded. If you liked this story, please subscribe to this channel and hit the bell icon!"
+      "duration": 12,
+      "description": "wide shot of Arjun and glowbirds dancing around crystal",
+      "visual_prompt": "(wide shot) (full scene view) Arjun dancing foreground 1.4, glowbirds swirling midground 1.1, glowing crystal background 0.9, magical sparkling lights, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अर्जुन और चमकते पक्षी क्रिस्टल के चारों ओर नाचने लगे, दृश्य जादू भरा था।",
+      "subtitle": "The Crystal Dance",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "boy and glowbirds dancing around glowing crystal"
+    },
+    {
+      "duration": 12,
+      "description": "medium shot of Arjun touching crystal, sending beams of light",
+      "visual_prompt": "(wide shot) (full scene view) Arjun touching crystal foreground 1.4, beams of light midground 1.1, forest background 0.9, sparkling magical rays, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "जब अर्जुन ने क्रिस्टल को छुआ, तो प्रकाश की किरणें चारों ओर फैल गईं।",
+      "subtitle": "Beams of Light",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "beams of light spreading from crystal"
+    },
+    {
+      "duration": 12,
+      "description": "close-up of glowbird leader landing on Arjun's shoulder",
+      "visual_prompt": "(wide shot) (full scene view) Glowbird Leader perched on Arjun's shoulder foreground 1.4, glowbirds midground 1.1, forest background 0.9, sparkling magical glow, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "मुख्य पक्षी अर्जुन के कंधे पर बैठ गया, जैसे दोस्त बन गया हो।",
+      "subtitle": "New Friend",
+      "characters": ["Arjun", "Glowbird Leader"],
+      "motion_prompt": "glowbird landing on boy's shoulder"
+    },
+    {
+      "duration": 12,
+      "description": "wide shot of Arjun flying slightly as glowbirds lift him over glowing flowers",
+      "visual_prompt": "(wide shot) (full scene view) Arjun hovering foreground 1.4, glowbirds lifting him midground 1.1, glowing flowers background 0.9, sparkling magical lights, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "चमकते पक्षियों ने अर्जुन को फूलों के ऊपर हवा में उठाया।",
+      "subtitle": "Flying Adventure",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "boy lifted by glowbirds flying above flowers"
+    },
+    {
+      "duration": 12,
+      "description": "medium shot of Arjun waving joyfully as glowbirds spin around",
+      "visual_prompt": "(wide shot) (full scene view) Arjun waving foreground 1.4, glowbirds spinning midground 1.1, forest background 0.9, sparkling magical glow, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अर्जुन ने खुश होकर हाथ हिलाया जब पक्षी उसके चारों ओर घूम रहे थे।",
+      "subtitle": "Joyful Flight",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "boy waving while flying with glowbirds"
+    },
+    {
+      "duration": 12,
+      "description": "wide shot of Arjun returning to forest floor as glowbirds settle around",
+      "visual_prompt": "(wide shot) (full scene view) Arjun landing foreground 1.4, glowbirds settling midground 1.1, forest background 0.9, magical glow fading, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अर्जुन जंगल की जमीन पर वापस उतरा और पक्षी उसके आसपास बैठ गए।",
+      "subtitle": "Safe Landing",
+      "characters": ["Arjun", "Glowbird Friends"],
+      "motion_prompt": "boy landing as glowbirds settle around"
+    },
+    {
+      "duration": 12,
+      "description": "medium shot of Arjun saying goodbye under starry sky",
+      "visual_prompt": "(wide shot) (full scene view) Arjun waving foreground 1.4, glowbirds flying away midground 1.1, starry sky background 0.9, soft magical glow, storybook style (wide shot)",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "रात खत्म हुई और अर्जुन ने तारों भरे आकाश के नीचे पक्षियों को अलविदा कहा। अगर आपको यह कहानी पसंद आई हो, तो कृपया इस चैनल को सब्सक्राइब करें और बेल आइकन दबाएं।",
+      "subtitle": "Goodnight Magic",
+      "characters": ["Arjun", "Glowbird Leader"],
+      "motion_prompt": "boy waving goodbye to glowbirds flying away"
     }
+  ],
+  "tags": [
+    "kids",
+    "magical",
+    "birds",
+    "friendship",
+    "storybook",
+    "adventure",
+    "night",
+    "cute"
   ]
 }
