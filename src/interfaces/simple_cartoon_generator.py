@@ -47,7 +47,7 @@ def check_requirements():
     print("✅ All requirements satisfied!")
     return True
 
-def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True):
+def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts"):
     """Generate a cartoon video with the given prompt."""
     try:
         # Import the main generator
@@ -59,6 +59,7 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
         print(f"⏱️ Duration: {duration} seconds")
         print(f"🗣️ Language: {language}")
         print(f"🎯 Prompt enhancement: {'Enabled' if enable_prompt_enhancement else 'Disabled'}")
+        print(f"📐 Video format: {video_format}")
         print("-" * 50)
         
         # Create video configuration
@@ -66,6 +67,7 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
             prompt=prompt,
             duration=duration,
             style=style,
+            video_format=video_format,
             output_path="output",
             add_subtitles=False,
             language=language,
@@ -104,6 +106,7 @@ Examples:
   python simple_cartoon_generator.py --prompt "A baby lion opens a smoothie shop"
   python simple_cartoon_generator.py --prompt "A robot learns to dance" --style anime
   python simple_cartoon_generator.py --prompt "Magic forest adventure" --duration 45
+  python simple_cartoon_generator.py --prompt "Animal friends adventure" --video-format normal
   python simple_cartoon_generator.py --prompt "Animal friends adventure" --storyboard storyboards/tillu.json --no-reuse --style indian --language hi --no-prompt-enhancement
         """
     )
@@ -126,6 +129,13 @@ Examples:
         type=int,
         default=30,
         help="Video duration in seconds (default: 30)"
+    )
+
+    parser.add_argument(
+        "--video-format", "-f",
+        choices=["shorts", "normal"],
+        default="shorts",
+        help="Video format: 'shorts' for YouTube Shorts (9:16) or 'normal' for standard video (16:9)"
     )
 
     parser.add_argument(
@@ -214,6 +224,7 @@ Examples:
                 prompt=args.prompt,
                 duration=args.duration,
                 style=args.style,
+                video_format=args.video_format,
                 output_path="output",
                 title=title,
                 description=description,
@@ -230,7 +241,7 @@ Examples:
             print(f"❌ Failed to use storyboard: {e}")
             output_path = None
     else:
-        output_path = generate_cartoon(args.prompt, args.style, args.duration, args.language, not args.no_prompt_enhancement)
+        output_path = generate_cartoon(args.prompt, args.style, args.duration, args.language, not args.no_prompt_enhancement, args.video_format)
     
     if output_path:
         print(f"\n🎊 Success! Your cartoon is ready at: {output_path}")
