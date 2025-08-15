@@ -80,6 +80,8 @@ class VideoConfig:
     scene_pause_duration: float = 0.0  # Default 0.0 second pause between scenes (no black screens)
     # Control image validation and automatic prompt adjustment
     enable_image_validation: bool = True  # Enable automatic blank image detection and prompt adjustment
+    # Character face mappings for face-based generation
+    character_faces: DictType[str, str] = None  # Maps character names to face image paths
 
     def __post_init__(self):
         """Set dimensions based on video format."""
@@ -255,9 +257,9 @@ class CartoonShortsGenerator:
                     
                     # Use validation method if enabled, otherwise use standard generation
                     if self.config.enable_image_validation:
-                        final_image_path = self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3, negative_prompt=negative_prompt)
+                        final_image_path = self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3, negative_prompt=negative_prompt, character_faces=self.config.character_faces)
                     else:
-                        final_image_path = self.image_generator.generate_cartoon_image(prompt, str(image_path), negative_prompt=negative_prompt)
+                        final_image_path = self.image_generator.generate_cartoon_image(prompt, str(image_path), negative_prompt=negative_prompt, character_faces=self.config.character_faces)
                     logger.info(f"🖼️ Scene {i+1}: Image generation completed: {final_image_path}")
                 
                 image_paths.append(final_image_path)

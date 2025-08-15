@@ -5,6 +5,7 @@ A complete AI-powered system for generating professional-quality cartoon videos 
 ## 🚀 **Features**
 
 - 🎨 **Stable Diffusion Image Generation** - Professional cartoon-style images
+- 🎭 **Face-Based Character Generation** - Use existing faces for character consistency
 - 🎬 **FFmpeg Animation System** - 6 professional animation effects
 - 📝 **GPT-4 Story Generation** - Intelligent script creation
 - 🎤 **ElevenLabs Voice Generation** - Natural narration
@@ -101,6 +102,9 @@ cp config.env .env
 ```bash
 # Simple generation
 python main.py "A dragon learns to bake cookies"
+
+# Face-based character generation (using storyboard)
+python -m src.interfaces.simple_cartoon_generator --prompt "A brave lion opens a smoothie shop" --storyboard storyboards/example.json
 
 # Interactive interface
 python -m src.interfaces.quick_start

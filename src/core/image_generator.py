@@ -215,15 +215,20 @@ class ImageGenerator:
             logger.info("💡 Will use placeholder images instead")
             self.sd_available = False
     
-    def generate_cartoon_image(self, prompt: str, output_path: str, subtitle: str = None, negative_prompt: str = None) -> str:
-        """Generate a cartoon-style image using Stable Diffusion with optional subtitle and negative prompt."""
+    def generate_cartoon_image(self, prompt: str, output_path: str, subtitle: str = None, negative_prompt: str = None, character_faces: dict = None) -> str:
+        """Generate a cartoon-style image using Stable Diffusion with optional subtitle, negative prompt, and character faces."""
         try:
             logger.info(f"🎨 Generating cartoon image for prompt: {prompt}")
             if negative_prompt:
                 logger.info(f"🎨 Using negative prompt: {negative_prompt}")
+            if character_faces:
+                logger.info(f"👥 Using character faces: {list(character_faces.keys())}")
             
+            # If we have character faces and face-based generation is available, use it
+            if character_faces and self._can_use_face_generation():
+                result_path = self._generate_face_based_image(prompt, output_path, negative_prompt, character_faces)
             # If we have a working pipeline, use it
-            if self.sd_available and self.pipe is not None:
+            elif self.sd_available and self.pipe is not None:
                 result_path = self._generate_sd_image(prompt, output_path, negative_prompt)
             else:
                 # Fallback to placeholder
@@ -239,6 +244,96 @@ class ImageGenerator:
         except Exception as e:
             logger.error(f"❌ Error generating image: {e}")
             return self._generate_placeholder_image(prompt, output_path, subtitle)
+    
+    def _can_use_face_generation(self) -> bool:
+        """Check if face-based generation is available."""
+        try:
+            # Check if face detection libraries are available
+            import mediapipe
+            return True
+        except ImportError:
+            try:
+                import cv2
+                return True
+            except ImportError:
+                return False
+    
+    def _generate_face_based_image(self, prompt: str, output_path: str, negative_prompt: str = None, character_faces: dict = None) -> str:
+        """Generate image using face-based generation for characters."""
+        try:
+            from .face_image_generator import FaceImageGenerator
+            
+            logger.info("🎭 Using face-based image generation")
+            
+            # Initialize face-based generator
+            face_generator = FaceImageGenerator(
+                model_path=self.model_path,
+                device='cuda' if torch.cuda.is_available() else 'cpu'
+            )
+            
+            # Find the best matching character face for this prompt
+            best_face_path = self._find_best_character_face(prompt, character_faces)
+            
+            if best_face_path:
+                logger.info(f"🎭 Using face from: {best_face_path}")
+                
+                # Generate image with face
+                result = face_generator.generate_with_face(
+                    prompt=prompt,
+                    face_image_path=best_face_path,
+                    negative_prompt=negative_prompt or "",
+                    output_path=output_path
+                )
+                
+                if result:
+                    logger.info(f"✅ Face-based image generated successfully: {output_path}")
+                    return output_path
+                else:
+                    logger.warning("⚠️ Face-based generation failed, falling back to standard generation")
+            
+            # Fallback to standard generation
+            return self._generate_sd_image(prompt, output_path, negative_prompt)
+            
+        except Exception as e:
+            logger.error(f"❌ Face-based generation failed: {e}")
+            logger.info("🔄 Falling back to standard generation")
+            return self._generate_sd_image(prompt, output_path, negative_prompt)
+    
+    def _find_best_character_face(self, prompt: str, character_faces: dict) -> str:
+        """Find the best matching character face for the given prompt."""
+        if not character_faces:
+            return None
+        
+        # Simple keyword matching - can be enhanced with more sophisticated NLP
+        prompt_lower = prompt.lower()
+        
+        for character_name, face_path in character_faces.items():
+            character_lower = character_name.lower()
+            
+            # Check if character name appears in the prompt
+            if character_lower in prompt_lower:
+                logger.info(f"🎭 Found character '{character_name}' in prompt")
+                return face_path
+            
+            # Check for common variations
+            if character_lower.replace(' ', '') in prompt_lower.replace(' ', ''):
+                logger.info(f"🎭 Found character '{character_name}' (variation) in prompt")
+                return face_path
+        
+        # If no exact match, try to find the most relevant character
+        # This is a simple heuristic - can be improved
+        for character_name, face_path in character_faces.items():
+            character_lower = character_name.lower()
+            
+            # Check for common character types
+            character_types = ['lion', 'robot', 'princess', 'king', 'queen', 'wizard', 'dragon', 'cat', 'dog', 'bear']
+            for char_type in character_types:
+                if char_type in character_lower and char_type in prompt_lower:
+                    logger.info(f"🎭 Found character type '{char_type}' for '{character_name}'")
+                    return face_path
+        
+        logger.info("🎭 No character face match found, using first available face")
+        return list(character_faces.values())[0] if character_faces else None
     
     def _generate_sd_image(self, prompt: str, output_path: str, negative_prompt: str = None) -> str:
         """Generate image using Stable Diffusion with intelligent aspect ratio optimization."""
@@ -749,7 +844,7 @@ class ImageGenerator:
         logger.info(f"🎯 Fallback adjusted prompt: {adjusted_prompt}")
         return adjusted_prompt
 
-    def generate_cartoon_image_with_validation(self, prompt: str, output_path: str, max_attempts: int = 3, negative_prompt: str = None) -> str:
+    def generate_cartoon_image_with_validation(self, prompt: str, output_path: str, max_attempts: int = 3, negative_prompt: str = None, character_faces: dict = None) -> str:
         """
         Generate a cartoon image with validation and automatic prompt adjustment.
         Retries with adjusted prompts if the generated image is blank or poor quality.
@@ -760,7 +855,7 @@ class ImageGenerator:
             logger.info(f"🎨 Generating image (attempt {attempt}/{max_attempts})")
             
             # Generate the image
-            result_path = self.generate_cartoon_image(prompt, output_path, negative_prompt=negative_prompt)
+            result_path = self.generate_cartoon_image(prompt, output_path, negative_prompt=negative_prompt, character_faces=character_faces)
             
             # Validate the generated image
             if not self._is_image_blank_or_poor_quality(result_path):
