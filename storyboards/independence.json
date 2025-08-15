@@ -73,11 +73,11 @@
     },
     {
       "title": "Patel at Red Fort",
-      "visual_prompt": "(medium shot:1.2) Sardar Patel at Red Fort, Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) on flagpole, white dhoti kurta, round spectacles, warm sepia lighting, historical drama style:1.3",
+      "visual_prompt": "(wide shot:1.2) Sardar Patel standing proudly at Red Fort courtyard, facing the Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) fluttering high on tall flagpole, white dhoti kurta, round spectacles, warm sepia lighting, early morning sunlight casting soft shadows, detailed Red Fort architecture in background, historical drama style:1.3",
       "subtitle": "At dawn on 15th August, Sardar Patel watched the tricolor flag being hoisted at the Red Fort for the first time.",
       "narration": "15 अगस्त की सुबह, सरदार पटेल ने लाल किले पर तिरंगा झंडा पहली बार फहराते हुए देखा।",
       "characters": ["Sardar Patel"],
-      "negative_prompt": "modern buildings, bright neon colors, cartoon style, anime style, blurry"
+      "negative_prompt": "modern buildings, cartoon style, anime style, blurry"
     },
     {
       "title": "The Symbolic Kite",
