@@ -12,7 +12,7 @@
     {
       "name": "Arjun",
       "role": "12-year-old boy from Amritsar",
-      "style": "innocent Indian child, simple cotton kurta and dhoti, bright curious eyes, short hair, traditional Indian clothing, warm skin tone, expressive face, childlike wonder, period-appropriate clothing, detailed facial features, emotional expressions"
+      "style": "innocent Indian child, simple off-white cotton kurta and dhoti with handwoven texture, bright curious eyes, short hair, traditional Indian clothing, warm skin tone, expressive face, childlike wonder, period-appropriate clothing, detailed facial features, emotional expressions"
     },
     {
       "name": "Meera",
@@ -33,83 +33,83 @@
   "scenes": [
     {
       "title": "Sardar Patel's Vision",
-      "visual_prompt": "(medium shot:1.2) Sardar Patel sitting at wooden desk, maps of India spread out, white dhoti kurta, round spectacles, 1940s study room, historical drama style:1.3",
+      "visual_prompt": "(medium shot:1.2) Sardar Patel sitting at wooden desk, maps of India spread out, white dhoti kurta, round spectacles, 1940s study room, warm sepia lighting, cinematic shadows, historical drama style:1.3",
       "subtitle": "In 1946, Sardar Patel, the Iron Man of India, worked tirelessly to unite the nation. His vision was clear - a free, united India.",
       "narration": "1946 में, सरदार पटेल, भारत के लौह पुरुष, ने देश को एकजुट करने के लिए अथक परिश्रम किया। उनकी दृष्टि स्पष्ट थी - एक स्वतंत्र, एकजुट भारत।",
       "characters": ["Sardar Patel"],
-      "negative_prompt": "modern settings, bright colors, cartoon style, anime style, blurry"
+      "negative_prompt": "modern settings, bright neon colors, cartoon style, anime style, blurry"
     },
     {
       "title": "Patel's Message Spreads",
-      "visual_prompt": "(wide shot:1.2) Sardar Patel standing on wooden platform, crowd of people listening, white dhoti kurta, round spectacles, outdoor gathering, historical drama style:1.3",
+      "visual_prompt": "(wide shot:1.2) Sardar Patel standing on wooden platform, addressing a large crowd, white dhoti kurta, round spectacles, outdoor gathering, warm sepia lighting, period-accurate setting, historical drama style:1.3",
       "subtitle": "Patel's message of unity spread across the country. His words reached every corner of India, including a small house in Amritsar.",
       "narration": "पटेल का एकता का संदेश पूरे देश में फैल गया। उनके शब्द भारत के हर कोने तक पहुंचे, अमृतसर के एक छोटे से घर तक भी।",
       "characters": ["Sardar Patel"],
-      "negative_prompt": "modern settings, bright colors, cartoon style, anime style, blurry"
+      "negative_prompt": "modern settings, bright neon colors, cartoon style, anime style, blurry"
     },
     {
       "title": "The Flag Reaches Amritsar",
-      "visual_prompt": "(wide shot:1.2) Family friend holding Indian national flag saffron white green with navy blue wheel, Arjun and Meera watching, 1940s period clothing, simple cotton kurta dhoti, traditional sari, Golden Temple background, historical drama style:1.3",
+      "visual_prompt": "(wide shot:1.2) Family friend holding Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra), Arjun and Meera watching with awe, off-white cotton kurta dhoti, traditional sari, Golden Temple in background slightly blurred, warm sepia lighting, historical drama style:1.3",
       "subtitle": "A family friend returned from Bombay with a precious gift—the tricolor flag that Sardar Patel had helped design. 'This is the flag of our dream,' he told young Arjun.",
       "narration": "एक परिवार का दोस्त बॉम्बे से एक अनमोल उपहार लेकर आया - तिरंगा झंडा जिसे सरदार पटेल ने डिज़ाइन करने में मदद की थी। 'यह हमारे सपने का झंडा है,' उसने छोटे अर्जुन से कहा।",
       "characters": ["Arjun", "Meera", "Family Friend"],
-      "negative_prompt": "modern clothing, bright colors, cartoon style, anime style, blurry"
+      "negative_prompt": "modern clothing, bright neon colors, cartoon style, anime style, blurry"
     },
     {
       "title": "Patel's Tireless Work",
-      "visual_prompt": "(medium shot:1.2) Sardar Patel sitting at table with other men, maps and documents, white dhoti kurta, round spectacles, 1940s meeting room, historical drama style:1.3",
+      "visual_prompt": "(medium shot:1.2) Sardar Patel sitting at table with other leaders, maps and documents spread out, white dhoti kurta, round spectacles, 1940s meeting room, warm sepia lighting, cinematic shadows, historical drama style:1.3",
       "subtitle": "Sardar Patel worked tirelessly, negotiating with princely states, uniting the country piece by piece. His determination was unwavering.",
       "narration": "सरदार पटेल ने अथक परिश्रम किया, रियासतों से बातचीत करते हुए, देश को टुकड़ा-टुकड़ा कर एकजुट करते हुए। उनका दृढ़ संकल्प अटल था।",
       "characters": ["Sardar Patel"],
-      "negative_prompt": "modern settings, bright colors, cartoon style, anime style, blurry"
+      "negative_prompt": "modern settings, bright neon colors, cartoon style, anime style, blurry"
     },
     {
       "title": "The Moment of Freedom",
-      "visual_prompt": "(medium shot:1.2) Sardar Patel listening to radio, emotional expression, white dhoti kurta, round spectacles, 1940s period setting, historical drama style:1.3",
+      "visual_prompt": "(medium shot:1.2) Sardar Patel listening to vintage radio, emotional expression, white dhoti kurta, round spectacles, 1940s period room, warm sepia lighting, historical drama style:1.3",
       "subtitle": "On 14th August 1947, Sardar Patel listened to the radio announcement: 'At the stroke of midnight, India will awake to life and freedom…' Tears filled his eyes.",
       "narration": "14 अगस्त 1947 को, सरदार पटेल ने रेडियो घोषणा सुनी: 'आधी रात के समय, भारत जीवन और स्वतंत्रता के लिए जागेगा...' उनकी आंखों में आंसू आ गए।",
       "characters": ["Sardar Patel"],
-      "negative_prompt": "modern settings, bright colors, cartoon style, anime style, blurry"
+      "negative_prompt": "modern settings, bright neon colors, cartoon style, anime style, blurry"
     },
     {
       "title": "Patel at Red Fort",
-      "visual_prompt": "(medium shot:1.2) Sardar Patel at Red Fort, Indian flag on flagpole, white dhoti kurta, round spectacles, historical drama style:1.3",
+      "visual_prompt": "(medium shot:1.2) Sardar Patel at Red Fort, Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) on flagpole, white dhoti kurta, round spectacles, warm sepia lighting, historical drama style:1.3",
       "subtitle": "At dawn on 15th August, Sardar Patel watched the tricolor flag being hoisted at the Red Fort for the first time.",
       "narration": "15 अगस्त की सुबह, सरदार पटेल ने लाल किले पर तिरंगा झंडा पहली बार फहराते हुए देखा।",
       "characters": ["Sardar Patel"],
-      "negative_prompt": "modern buildings, bright colors, cartoon style, anime style, blurry"
+      "negative_prompt": "modern buildings, bright neon colors, cartoon style, anime style, blurry"
     },
     {
       "title": "The Symbolic Kite",
-      "visual_prompt": "(close-up:1.2) Young boy's hands tying Indian flag to kite string, cotton kurta, Golden Temple background, historical drama style:1.3",
+      "visual_prompt": "(close-up:1.2) Young boy's hands tying Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) to kite string, off-white cotton kurta, Golden Temple in background slightly blurred, warm sepia lighting, historical drama style:1.3",
       "subtitle": "In Amritsar, young Arjun remembered Patel's words about keeping the flag safe. He tied the precious tricolor to his kite.",
       "narration": "अमृतसर में, छोटे अर्जुन को पटेल के शब्द याद आए झंडे को सुरक्षित रखने के बारे में। उसने अनमोल तिरंगे को अपनी पतंग से बांध दिया।",
       "characters": ["Arjun"],
-      "negative_prompt": "modern materials, bright colors, cartoon style, anime style, dark lighting"
+      "negative_prompt": "modern materials, bright neon colors, cartoon style, anime style, dark lighting"
     },
     {
       "title": "Freedom Takes Flight",
-      "visual_prompt": "(wide shot:1.2) Young boy in field, kite with Indian flag, cotton kurta dhoti, Golden Temple background, historical drama style:1.3",
+      "visual_prompt": "(wide shot:1.2) Young boy running in field, kite with Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) fluttering in wind, off-white cotton kurta dhoti, Golden Temple in background slightly blurred, warm sepia lighting, historical drama style:1.3",
       "subtitle": "The kite with the tricolor flag soared high above Amritsar, carrying the hopes of millions—just like Sardar Patel's vision for a united India.",
       "narration": "तिरंगे वाली पतंग अमृतसर के ऊपर ऊंची उड़ी, लाखों लोगों की आशाओं को लेकर - बिल्कुल सरदार पटेल के एकजुट भारत के सपने की तरह।",
       "characters": ["Arjun"],
-      "negative_prompt": "modern landscape, bright colors, cartoon style, anime style, dark lighting"
+      "negative_prompt": "modern landscape, bright neon colors, cartoon style, anime style, dark lighting"
     },
     {
       "title": "A Nation United",
-      "visual_prompt": "(low angle shot:1.2) Group of villagers looking up at sky, kite with Indian flag flying, traditional clothing, Golden Temple background, historical drama style:1.3",
+      "visual_prompt": "(low angle shot:1.2) Group of villagers looking up at sky, kite with Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) flying high, traditional 1940s clothing, Golden Temple in background slightly blurred, warm sepia lighting, historical drama style:1.3",
       "subtitle": "Villagers looked up with tears in their eyes. The kite symbolized Sardar Patel's dream—a united India where every citizen could fly free.",
       "narration": "ग्रामीणों ने आंसुओं से भरी आंखों से ऊपर देखा। पतंग सरदार पटेल के सपने का प्रतीक थी - एक एकजुट भारत जहां हर नागरिक स्वतंत्र उड़ सके।",
       "characters": ["Villagers"],
-      "negative_prompt": "modern clothing, bright colors, cartoon style, anime style, blurry"
+      "negative_prompt": "modern clothing, bright neon colors, cartoon style, anime style, blurry"
     },
     {
       "title": "Patel's Legacy",
-      "visual_prompt": "(wide shot:1.2) Sardar Patel standing at Red Fort, Indian flag flying, white dhoti kurta, round spectacles, Delhi skyline, historical drama style:1.3",
+      "visual_prompt": "(wide shot:1.2) Sardar Patel standing at Red Fort, Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) flying above, white dhoti kurta, round spectacles, Delhi skyline in warm sepia tone, historical drama style:1.3",
       "subtitle": "Sardar Patel stood at the Red Fort, watching the tricolor fly. His dream of a united India had become reality. The wind carried freedom across the land—from Delhi to Amritsar, from the Red Fort to a child's kite.",
       "narration": "सरदार पटेल लाल किले पर खड़े होकर तिरंगा फहराते हुए देख रहे थे। उनका एकजुट भारत का सपना सच हो गया था। हवा ने स्वतंत्रता को पूरी धरती पर फैला दिया - दिल्ली से अमृतसर तक, लाल किले से एक बच्चे की पतंग तक।",
       "characters": ["Sardar Patel"],
-      "negative_prompt": "modern Delhi, bright colors, cartoon style, anime style, blurry"
+      "negative_prompt": "modern Delhi, bright neon colors, cartoon style, anime style, blurry"
     }
   ],
   "style_settings": {
