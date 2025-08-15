@@ -49,7 +49,7 @@ class ScriptGenerator:
         - Make it engaging and entertaining for social media
         - Include VERY detailed visual descriptions for accurate cartoon-style image generation
         - Add humor, emotion, and personality
-        - Optimized for vertical video format (768x1024)
+        - Optimized for video format (supports both 9:16 and 16:9)
         - Include clear, engaging narration text for each scene (aim for 15-25 words per scene for proper timing)
         - Make sure the visual descriptions match the story content EXACTLY
         - Include specific details about characters, expressions, actions, and settings
@@ -249,7 +249,7 @@ class ScriptGenerator:
                 "description": f"Scene 3: Happy ending",
                 "visual_prompt": (
                     f"Cheerful resolution of {prompt} with Alex and Riley celebrating. Warm lighting, confetti or sparkles, "
-                    f"joyful expressions, tidy composition for 768x1024."
+                    f"joyful expressions, tidy composition."
                 ),
                 "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
                 "narration": f"In the end, they succeed—and share a laugh, already dreaming of the next adventure.",

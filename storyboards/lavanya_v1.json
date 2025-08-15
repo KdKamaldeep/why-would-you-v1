@@ -1,0 +1,85 @@
+{
+  "title": "Lavanya's Magical Garden Adventure",
+  "description": "Lavanya, a curious little girl with a green thumb, discovers a magical garden where flowers can talk and plants can dance. She learns the importance of patience and care in growing beautiful things.",
+  "total_duration": 45,
+  "cast": [
+    {"name": "Lavanya", "role": "curious little girl with green thumb"},
+    {"name": "Sunflower Queen", "role": "tall golden sunflower who can talk"},
+    {"name": "Dancing Roses", "role": "colorful roses that can dance"},
+    {"name": "Wise Old Tree", "role": "ancient tree with wisdom"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "wide shot of Lavanya in her small garden, watering plants with a watering can",
+      "visual_prompt": "(wide shot:1.2) little Indian girl with long black hair in braids, wearing green dress, watering small garden with colorful flowers, bright sunny day, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "लवन्या अपने छोटे बगीचे में फूलों को पानी दे रही थी।",
+      "subtitle": "The Little Gardener",
+      "characters": ["Lavanya"],
+      "motion_prompt": "girl watering plants in garden"
+    },
+    {
+      "duration": 8,
+      "description": "close-up of a large sunflower that suddenly opens its eyes and smiles",
+      "visual_prompt": "(close-up:1.2) large golden sunflower with friendly face, eyes opening, smiling, magical sparkles around, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अचानक एक सूरजमुखी ने अपनी आँखें खोली और मुस्कुराई।",
+      "subtitle": "The Talking Flower",
+      "characters": ["Sunflower Queen"],
+      "motion_prompt": "sunflower opening eyes and smiling"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Lavanya talking to the sunflower, looking surprised and happy",
+      "visual_prompt": "(medium shot:1.2) little Indian girl with braids, green dress, talking to large sunflower with face, surprised expression, magical garden backdrop, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "'तुम बोल सकती हो?' लवन्या ने आश्चर्य से पूछा।",
+      "subtitle": "A Magical Discovery",
+      "characters": ["Lavanya", "Sunflower Queen"],
+      "motion_prompt": "girl talking to talking sunflower"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of colorful roses dancing around in the garden",
+      "visual_prompt": "(wide shot:1.2) colorful roses with faces dancing in garden, petals moving, magical sparkles, little girl watching, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "फिर गुलाब के फूल भी नृत्य करने लगे और बगीचा जादुई हो गया।",
+      "subtitle": "Dancing Flowers",
+      "characters": ["Dancing Roses", "Lavanya"],
+      "motion_prompt": "roses dancing in garden"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Lavanya learning to care for plants from the wise old tree",
+      "visual_prompt": "(medium shot:1.2) little Indian girl with braids, green dress, sitting under wise old tree with face, tree teaching gardening, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "एक बूढ़े पेड़ ने लवन्या को पौधों की देखभाल के बारे में सिखाया।",
+      "subtitle": "Learning from Nature",
+      "characters": ["Lavanya", "Wise Old Tree"],
+      "motion_prompt": "girl learning from wise tree"
+    },
+    {
+      "duration": 5,
+      "description": "wide shot of Lavanya's garden now full of magical, colorful flowers",
+      "visual_prompt": "(wide shot:1.2) beautiful magical garden full of colorful flowers, little Indian girl with braids in green dress, happy expression, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अब लवन्या का बगीचा जादुई फूलों से भर गया था। 'अगर आपको यह कहानी पसंद आई हो, तो कृपया सब्सक्राइब करें और बेल आइकन दबाएं।'",
+      "subtitle": "A Magical Garden",
+      "characters": ["Lavanya", "Sunflower Queen", "Dancing Roses"],
+      "motion_prompt": "girl in beautiful magical garden"
+    }
+  ],
+  "tags": [
+    "kids",
+    "magical",
+    "garden",
+    "flowers",
+    "nature",
+    "learning",
+    "patience",
+    "care",
+    "adventure",
+    "cute"
+  ]
+}

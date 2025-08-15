@@ -25,7 +25,7 @@ class ImageGenerator:
     Supports optional LoRA for style adaptation.
     """
     
-    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8, enable_prompt_enhancement: bool = True):
+    def __init__(self, model_path: str = "models/toonyou_beta6.safetensors", lora_path: Optional[str] = None, lora_scale: float = 0.8, enable_prompt_enhancement: bool = True, width: int = 768, height: int = 1024):
         self.model_path = model_path
         self.lora_path = lora_path
         self.lora_scale = lora_scale
@@ -34,6 +34,8 @@ class ImageGenerator:
         self.sd_available = False
         self.enable_prompt_enhancement = enable_prompt_enhancement
         self.prompt_enhancer = None
+        self.width = width
+        self.height = height
         
         # Initialize prompt enhancer if enabled
         if self.enable_prompt_enhancement:
@@ -213,15 +215,20 @@ class ImageGenerator:
             logger.info("💡 Will use placeholder images instead")
             self.sd_available = False
     
-    def generate_cartoon_image(self, prompt: str, output_path: str, subtitle: str = None, negative_prompt: str = None) -> str:
-        """Generate a cartoon-style image using Stable Diffusion with optional subtitle and negative prompt."""
+    def generate_cartoon_image(self, prompt: str, output_path: str, subtitle: str = None, negative_prompt: str = None, character_faces: dict = None) -> str:
+        """Generate a cartoon-style image using Stable Diffusion with optional subtitle, negative prompt, and character faces."""
         try:
             logger.info(f"🎨 Generating cartoon image for prompt: {prompt}")
             if negative_prompt:
                 logger.info(f"🎨 Using negative prompt: {negative_prompt}")
+            if character_faces:
+                logger.info(f"👥 Using character faces: {list(character_faces.keys())}")
             
+            # If we have character faces and face-based generation is available, use it
+            if character_faces and self._can_use_face_generation():
+                result_path = self._generate_face_based_image(prompt, output_path, negative_prompt, character_faces)
             # If we have a working pipeline, use it
-            if self.sd_available and self.pipe is not None:
+            elif self.sd_available and self.pipe is not None:
                 result_path = self._generate_sd_image(prompt, output_path, negative_prompt)
             else:
                 # Fallback to placeholder
@@ -238,32 +245,180 @@ class ImageGenerator:
             logger.error(f"❌ Error generating image: {e}")
             return self._generate_placeholder_image(prompt, output_path, subtitle)
     
+    def _can_use_face_generation(self) -> bool:
+        """Check if face-based generation is available."""
+        try:
+            # Check if face detection libraries are available
+            import mediapipe
+            return True
+        except ImportError:
+            try:
+                import cv2
+                return True
+            except ImportError:
+                return False
+    
+    def _generate_face_based_image(self, prompt: str, output_path: str, negative_prompt: str = None, character_faces: dict = None) -> str:
+        """Generate image using face-based generation for characters."""
+        try:
+            from .face_image_generator import FaceImageGenerator
+            
+            logger.info("🎭 Using face-based image generation")
+            
+            # Initialize face-based generator
+            face_generator = FaceImageGenerator(
+                model_path=self.model_path,
+                device='cuda' if torch.cuda.is_available() else 'cpu'
+            )
+            
+            # Find the best matching character face for this prompt
+            best_face_path = self._find_best_character_face(prompt, character_faces)
+            
+            if best_face_path:
+                logger.info(f"🎭 Using face from: {best_face_path}")
+                
+                # Generate image with face
+                result = face_generator.generate_with_face(
+                    prompt=prompt,
+                    face_image_path=best_face_path,
+                    negative_prompt=negative_prompt or "",
+                    output_path=output_path
+                )
+                
+                if result:
+                    logger.info(f"✅ Face-based image generated successfully: {output_path}")
+                    return output_path
+                else:
+                    logger.warning("⚠️ Face-based generation failed, falling back to standard generation")
+            
+            # Fallback to standard generation
+            return self._generate_sd_image(prompt, output_path, negative_prompt)
+            
+        except Exception as e:
+            logger.error(f"❌ Face-based generation failed: {e}")
+            logger.info("🔄 Falling back to standard generation")
+            return self._generate_sd_image(prompt, output_path, negative_prompt)
+    
+    def _find_best_character_face(self, prompt: str, character_faces: dict) -> str:
+        """Find the best matching character face for the given prompt."""
+        if not character_faces:
+            return None
+        
+        # Simple keyword matching - can be enhanced with more sophisticated NLP
+        prompt_lower = prompt.lower()
+        
+        for character_name, face_path in character_faces.items():
+            character_lower = character_name.lower()
+            
+            # Check if character name appears in the prompt
+            if character_lower in prompt_lower:
+                logger.info(f"🎭 Found character '{character_name}' in prompt")
+                return face_path
+            
+            # Check for common variations
+            if character_lower.replace(' ', '') in prompt_lower.replace(' ', ''):
+                logger.info(f"🎭 Found character '{character_name}' (variation) in prompt")
+                return face_path
+        
+        # If no exact match, try to find the most relevant character
+        # This is a simple heuristic - can be improved
+        for character_name, face_path in character_faces.items():
+            character_lower = character_name.lower()
+            
+            # Check for common character types
+            character_types = ['lion', 'robot', 'princess', 'king', 'queen', 'wizard', 'dragon', 'cat', 'dog', 'bear']
+            for char_type in character_types:
+                if char_type in character_lower and char_type in prompt_lower:
+                    logger.info(f"🎭 Found character type '{char_type}' for '{character_name}'")
+                    return face_path
+        
+        logger.info("🎭 No character face match found, using first available face")
+        return list(character_faces.values())[0] if character_faces else None
+    
     def _generate_sd_image(self, prompt: str, output_path: str, negative_prompt: str = None) -> str:
-        """Generate image using Stable Diffusion."""
+        """Generate image using Stable Diffusion with intelligent aspect ratio optimization."""
         try:
             # Use the prompt as-is (enhancement is now handled in _compose_image_prompt)
             final_prompt = prompt
             logger.info(f"🎯 Using prompt (enhancement handled upstream): {prompt}")
             
-            # Use provided negative prompt or fall back to default cartoon-specific negative prompts
+            # Determine aspect ratio for intelligent optimization
+            is_16_9_format = self.width > self.height and self.width / self.height > 1.5
+            
+            # Validate dimensions - some models have limitations
+            max_dimension = 1024  # Common limit for many SD models
+            if self.width > max_dimension or self.height > max_dimension:
+                logger.warning(f"⚠️ Dimensions {self.width}x{self.height} exceed recommended maximum of {max_dimension}")
+                logger.info(f"🔄 Scaling down to fit within limits while preserving aspect ratio")
+                
+                # Scale down while preserving aspect ratio
+                if self.width > self.height:
+                    # Landscape
+                    new_width = max_dimension
+                    new_height = int((self.height / self.width) * max_dimension)
+                else:
+                    # Portrait
+                    new_height = max_dimension
+                    new_width = int((self.width / self.height) * max_dimension)
+                
+                # Ensure dimensions are multiples of 8 (SD requirement)
+                new_width = (new_width // 8) * 8
+                new_height = (new_height // 8) * 8
+                
+                logger.info(f"📐 Scaled dimensions: {new_width}x{new_height}")
+                actual_width, actual_height = new_width, new_height
+            else:
+                actual_width, actual_height = self.width, self.height
+            
+            # Memory optimization for larger images
+            if actual_width * actual_height > 768 * 1024:  # If larger than shorts format
+                logger.info(f"🧠 Large image detected, optimizing memory usage")
+                # Reduce steps for larger images to save memory
+                num_steps = 20  # Reduced from 30
+                logger.info(f"📉 Reduced steps to {num_steps} for memory optimization")
+            else:
+                num_steps = 30
+            
+            # Use provided negative prompt or create intelligent default
             if negative_prompt is None:
-                negative_prompt = (
+                # Base negative prompt for cartoon style
+                base_negative_prompt = (
                     "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
                     "blurry, low quality, dark, scary, violent, adult content, nsfw, "
                     "hyperrealistic, detailed textures, photographic, film grain, "
                     "realistic lighting, realistic shadows, realistic proportions, "
                     "detailed skin, detailed hair, detailed clothing textures"
                 )
+                
+                # Use base negative prompt for all formats - no static composition handling
+                negative_prompt = base_negative_prompt
+            else:
+                # Use user-provided negative prompt as-is - no automatic enhancement
+                pass
             
-            # Generate image with cartoon-optimized settings
+            # Use consistent generation parameters for all formats
+            guidance_scale = 7.5
+            logger.info(f"🎬 Using standard settings: guidance_scale={guidance_scale}, steps={num_steps}")
+            logger.info(f"📐 Generating with dimensions: {actual_width}x{actual_height}")
+            
+            # Clear CUDA cache before generation if available
+            if self.device == 'cuda':
+                try:
+                    import torch
+                    torch.cuda.empty_cache()
+                    logger.info("🧹 CUDA cache cleared before generation")
+                except Exception:
+                    pass
+            
+            # Generate image with optimized settings
             with torch.autocast(self.device):
                 result = self.pipe(
                     prompt=final_prompt,
                     negative_prompt=negative_prompt,
-                    num_inference_steps=30,  # More steps for better cartoon quality
-                    guidance_scale=7.5,      # Balanced for cartoon style
-                    width=768,
-                    height=1024,
+                    num_inference_steps=num_steps,
+                    guidance_scale=guidance_scale,
+                    width=actual_width,
+                    height=actual_height,
                     num_images_per_prompt=1,
                     generator=torch.Generator(device=self.device).manual_seed(42),  # Consistent results
                     return_dict=True
@@ -271,7 +426,22 @@ class ImageGenerator:
             
             # Save the image
             image = result.images[0]
+            
+            # If we scaled down, resize to original dimensions
+            if actual_width != self.width or actual_height != self.height:
+                logger.info(f"🔄 Resizing from {actual_width}x{actual_height} to {self.width}x{self.height}")
+                image = image.resize((self.width, self.height), Image.Resampling.LANCZOS)
+            
             image.save(output_path, quality=95)
+            
+            # Clear CUDA cache after generation
+            if self.device == 'cuda':
+                try:
+                    import torch
+                    torch.cuda.empty_cache()
+                    logger.info("🧹 CUDA cache cleared after generation")
+                except Exception:
+                    pass
             
             logger.info(f"✅ Generated professional SD image: {output_path}")
             return output_path
@@ -279,6 +449,16 @@ class ImageGenerator:
         except Exception as e:
             logger.error(f"❌ SD generation failed: {e}")
             logger.info("🔄 Falling back to placeholder image")
+            
+            # Clear CUDA cache on error
+            if self.device == 'cuda':
+                try:
+                    import torch
+                    torch.cuda.empty_cache()
+                    logger.info("🧹 CUDA cache cleared after error")
+                except Exception:
+                    pass
+            
             return self._generate_placeholder_image(prompt, output_path)
     
     def generate_multiple_images(self, prompts: List[str], output_dir: str, subtitles: List[str] = None, negative_prompts: List[str] = None) -> List[str]:
@@ -412,16 +592,16 @@ class ImageGenerator:
         """Generate a colorful placeholder image with better design and optional subtitle."""
         try:
             # Create a gradient background instead of solid blue
-            img = Image.new('RGB', (768, 1024), color='white')
+            img = Image.new('RGB', (self.width, self.height), color='white')
             draw = ImageDraw.Draw(img)
             
             # Create a colorful gradient background
-            for y in range(1024):
-                color_r = int(135 + (y / 1024) * 120)  # 135-255
-                color_g = int(206 + (y / 1024) * 49)   # 206-255  
-                color_b = int(250 - (y / 1024) * 50)   # 250-200
+            for y in range(self.height):
+                color_r = int(135 + (y / self.height) * 120)  # 135-255
+                color_g = int(206 + (y / self.height) * 49)   # 206-255  
+                color_b = int(250 - (y / self.height) * 50)   # 250-200
                 color = (min(255, color_r), min(255, color_g), min(255, color_b))
-                draw.line([(0, y), (768, y)], fill=color)
+                draw.line([(0, y), (self.width, y)], fill=color)
             
             # Add decorative elements
             # Draw some simple shapes for visual appeal
@@ -443,7 +623,7 @@ class ImageGenerator:
             title = "🎬 Cartoon Scene"
             title_bbox = draw.textbbox((0, 0), title, font=title_font)
             title_width = title_bbox[2] - title_bbox[0]
-            title_x = (768 - title_width) // 2
+            title_x = (self.width - title_width) // 2
             
             # Add text shadow
             draw.text((title_x + 2, 302), title, fill='gray', font=title_font)
@@ -458,7 +638,7 @@ class ImageGenerator:
                 current_line.append(word)
                 test_line = ' '.join(current_line)
                 bbox = draw.textbbox((0, 0), test_line, font=text_font)
-                if bbox[2] - bbox[0] > 600:  # Max width
+                if bbox[2] - bbox[0] > self.width - 100:  # Max width with margin
                     if len(current_line) > 1:
                         current_line.pop()
                         lines.append(' '.join(current_line))
@@ -473,11 +653,11 @@ class ImageGenerator:
             # Limit to 8 lines
             lines = lines[:8]
             
-            y_offset = 400
+            y_offset = int(self.height * 0.4)  # 40% from top
             for line in lines:
                 bbox = draw.textbbox((0, 0), line, font=text_font)
                 text_width = bbox[2] - bbox[0]
-                x = (768 - text_width) // 2
+                x = (self.width - text_width) // 2
                 
                 # Add text shadow
                 draw.text((x + 1, y_offset + 1), line, fill='gray', font=text_font)
@@ -492,10 +672,10 @@ class ImageGenerator:
                     subtitle_font = ImageFont.load_default()
                 
                 # Draw subtitle background
-                subtitle_y = 850
+                subtitle_y = int(self.height * 0.85)  # 85% from top
                 bbox = draw.textbbox((0, 0), subtitle, font=subtitle_font)
                 text_width = bbox[2] - bbox[0]
-                x = (768 - text_width) // 2
+                x = (self.width - text_width) // 2
                 
                 # Semi-transparent background for subtitle
                 bg_overlay = Image.new('RGBA', img.size, (0, 0, 0, 0))
@@ -532,9 +712,9 @@ class ImageGenerator:
         except Exception as e:
             logger.error(f"❌ Error creating placeholder: {e}")
             # Create a simple fallback image
-            img = Image.new('RGB', (768, 1024), color='lightblue')
+            img = Image.new('RGB', (self.width, self.height), color='lightblue')
             draw = ImageDraw.Draw(img)
-            draw.text((384, 512), f"Scene: {prompt}", fill='black', anchor='mm')
+            draw.text((self.width // 2, self.height // 2), f"Scene: {prompt}", fill='black', anchor='mm')
             img.save(output_path)
             return output_path
     
@@ -664,7 +844,7 @@ class ImageGenerator:
         logger.info(f"🎯 Fallback adjusted prompt: {adjusted_prompt}")
         return adjusted_prompt
 
-    def generate_cartoon_image_with_validation(self, prompt: str, output_path: str, max_attempts: int = 3, negative_prompt: str = None) -> str:
+    def generate_cartoon_image_with_validation(self, prompt: str, output_path: str, max_attempts: int = 3, negative_prompt: str = None, character_faces: dict = None) -> str:
         """
         Generate a cartoon image with validation and automatic prompt adjustment.
         Retries with adjusted prompts if the generated image is blank or poor quality.
@@ -675,7 +855,7 @@ class ImageGenerator:
             logger.info(f"🎨 Generating image (attempt {attempt}/{max_attempts})")
             
             # Generate the image
-            result_path = self.generate_cartoon_image(prompt, output_path, negative_prompt=negative_prompt)
+            result_path = self.generate_cartoon_image(prompt, output_path, negative_prompt=negative_prompt, character_faces=character_faces)
             
             # Validate the generated image
             if not self._is_image_blank_or_poor_quality(result_path):

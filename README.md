@@ -5,6 +5,7 @@ A complete AI-powered system for generating professional-quality cartoon videos 
 ## 🚀 **Features**
 
 - 🎨 **Stable Diffusion Image Generation** - Professional cartoon-style images
+- 🎭 **Face-Based Character Generation** - Use existing faces for character consistency
 - 🎬 **FFmpeg Animation System** - 6 professional animation effects
 - 📝 **GPT-4 Story Generation** - Intelligent script creation
 - 🎤 **ElevenLabs Voice Generation** - Natural narration
@@ -46,9 +47,30 @@ WhyWouldYou-v1/
 └── 🚀 main.py                  # Main entry point
 ```
 
-## 🚀 **Quick Start**
+## 🎬 **Video Formats**
 
-### **1. Installation**
+The system now supports multiple video formats:
+
+### **YouTube Shorts (9:16 Aspect Ratio)**
+- **Dimensions**: 768x1024 pixels
+- **Perfect for**: TikTok, Instagram Reels, YouTube Shorts
+- **Usage**: `--video-format shorts` (default)
+
+### **Normal Video (16:9 Aspect Ratio)**
+- **Dimensions**: 1920x1080 pixels  
+- **Perfect for**: YouTube, Vimeo, general video platforms
+- **Usage**: `--video-format normal`
+
+### **Example Usage:**
+```bash
+# Create YouTube Shorts (default)
+python main.py "A dragon learns to bake cookies" --video-format shorts
+
+# Create normal video
+python main.py "A dragon learns to bake cookies" --video-format normal
+```
+
+## 🚀 **Quick Start**
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -80,6 +102,9 @@ cp config.env .env
 ```bash
 # Simple generation
 python main.py "A dragon learns to bake cookies"
+
+# Face-based character generation (using storyboard)
+python -m src.interfaces.simple_cartoon_generator --prompt "A brave lion opens a smoothie shop" --storyboard storyboards/example.json
 
 # Interactive interface
 python -m src.interfaces.quick_start

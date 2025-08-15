@@ -1,0 +1,76 @@
+{
+  "title": "Lavanya and the Sky Flight",
+  "description": "Lavanya, a bright and adventurous 11-year-old girl, discovers magical glowbirds and experiences the joy of flying high in the sky with them.",
+  "total_duration": 60,
+  "cast": [
+    {
+      "name": "Lavanya",
+      "role": "adventurous 11-year-old girl",
+      "outfit": "yellow dress with brown braid",
+      "age": 11
+    },
+    {
+      "name": "Glowbird Leader",
+      "role": "bright magical bird",
+      "color": "golden"
+    },
+    {
+      "name": "Glowbird Friends",
+      "role": "playful glowing birds",
+      "color": "soft glowing"
+    }
+  ],
+  "scenes": [
+    {
+      "duration": 12,
+      "description": "Lavanya takes off into the sky with Glowbird Leader leading her.",
+      "visual_prompt": "(Lavanya:1.2), (yellow dress:1.1), (flying:1.3), (golden glowbird:1.4), (magical sky:1.0)",
+      "negative_prompt": "extra humans, crowded, blurry, low resolution, distorted",
+      "narration": "लवण्य ने अपनी पहली उड़ान भरी और आसमान में चमकते पक्षियों के साथ उड़ी।",
+      "subtitle": "First Flight",
+      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Lavanya soaring joyfully with glowbirds"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya feels the wind and sees clouds passing by.",
+      "visual_prompt": "(Lavanya:1.1), (yellow dress:1.0), (glowbirds:1.2), (clouds:1.0), (magical glow:1.1)",
+      "negative_prompt": "extra humans, crowded, blurry, low resolution, distorted",
+      "narration": "हवा की ठंडी सरसराहट और बादलों के बीच उड़ते हुए लवण्य को खुशी का एहसास हुआ।",
+      "subtitle": "Sky Breeze",
+      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Lavanya flying above clouds, enjoying the breeze"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya waves to birds below and laughs joyfully.",
+      "visual_prompt": "(Lavanya:1.3), (yellow dress:1.1), (laughing:1.2), (waving:1.1), (glowbirds:1.0), (forest below:0.9)",
+      "negative_prompt": "extra humans, crowded, blurry, low resolution, distorted",
+      "narration": "लवण्य ने नीचे उड़ते पक्षियों को हाथ हिलाया और हँसी में खो गई।",
+      "subtitle": "Joyful Waves",
+      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Lavanya waving to birds below, laughing"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya and glowbirds soar above mountains and rivers.",
+      "visual_prompt": "(Lavanya:1.2), (yellow dress:1.1), (glowbirds:1.3), (mountains:1.0), (river:1.0), (magical glow:1.0)",
+      "negative_prompt": "extra humans, crowded, blurry, low resolution, distorted",
+      "narration": "पर्वतों और नदियों के ऊपर उड़ते हुए लवण्य ने नई दुनिया का आनंद लिया।",
+      "subtitle": "Above Mountains",
+      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Lavanya flying over mountains and rivers"
+    },
+    {
+      "duration": 12,
+      "description": "Lavanya lands safely and smiles at her magical friends.",
+      "visual_prompt": "(Lavanya:1.2), (yellow dress:1.1), (landing:1.3), (glowbirds:1.0), (grassy meadow:1.0), (magical glow:1.1)",
+      "negative_prompt": "extra humans, crowded, blurry, low resolution, distorted",
+      "narration": "सुरक्षित उतरने के बाद लवण्य ने अपने जादुई दोस्तों को देखकर मुस्कुराई।",
+      "subtitle": "Safe Landing",
+      "characters": ["Lavanya", "Glowbird Leader", "Glowbird Friends"],
+      "motion_prompt": "Lavanya landing and smiling at glowbirds"
+    }
+  ],
+  "tags": ["kids", "magical", "birds", "friendship", "storybook", "adventure", "sky", "cute"]
+}

@@ -1,0 +1,195 @@
+{
+  "title": "Aditya's Space Adventure - The Candy Planet",
+  "description": "Aditya, a curious 10-year-old boy, discovers a magical spaceship and travels to a mysterious planet called Candyfire, where everything is made of candy and he meets friendly alien friends who teach him about friendship across the universe.",
+  "total_duration": 120,
+  "cast": [
+    {"name": "Aditya", "role": "curious 10-year-old boy who loves space"},
+    {"name": "Sparkle", "role": "friendly alien with rainbow skin and candy hair"},
+    {"name": "Bubble", "role": "round alien made of jelly who can bounce"},
+    {"name": "Candy King", "role": "wise ruler of Candyfire planet"},
+    {"name": "Lollipop Guards", "role": "protective guards made of giant lollipops"},
+    {"name": "Chocolate River", "role": "flowing river made of melted chocolate"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "wide shot of Aditya in his high-tech bedroom with holographic space displays and smart devices",
+      "visual_prompt": "(wide shot:1.2) cute little Indian boy with short black hair, wearing red t-shirt with space logo, sitting in high-tech bedroom with holographic space displays, smart screens showing planets, glowing gadgets, space posters, looking up at stars through smart window, bright room, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य अपने हाई-टेक कमरे में बैठा था और अंतरिक्ष के बारे में सोच रहा था।",
+      "subtitle": "Dreaming of Space",
+      "characters": ["Aditya"],
+      "motion_prompt": "boy looking at holographic displays dreaming"
+    },
+    {
+      "duration": 8,
+      "description": "close-up of an advanced holographic spaceship with energy shields and quantum drive appearing",
+      "visual_prompt": "(close-up:1.2) advanced holographic spaceship with energy shields, quantum drive, bright lights, floating in boy's room, magical sparkles, surprised happy expression, futuristic design, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अचानक उसके कमरे में एक उन्नत होलोग्राफिक अंतरिक्ष यान दिखाई दिया।",
+      "subtitle": "Magical Spaceship",
+      "characters": ["Aditya"],
+      "motion_prompt": "holographic spaceship appearing in room"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Aditya entering the holographic spaceship with excitement, wearing his red space t-shirt",
+      "visual_prompt": "(medium shot:1.2) cute little Indian boy with short black hair, wearing red t-shirt with space logo, entering holographic spaceship, excited expression, bright lights, futuristic interior, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य खुशी से होलोग्राफिक अंतरिक्ष यान में चढ़ गया।",
+      "subtitle": "Entering the Ship",
+      "characters": ["Aditya"],
+      "motion_prompt": "boy entering holographic spaceship"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of the holographic spaceship flying through colorful space with quantum portals and energy trails",
+      "visual_prompt": "(wide shot:1.2) holographic spaceship flying through colorful space, quantum portals, energy trails, bright stars, colorful planets, magical space journey, futuristic effects, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "होलोग्राफिक अंतरिक्ष यान क्वांटम पोर्टल्स के माध्यम से उड़ रहा था।",
+      "subtitle": "Flying Through Space",
+      "characters": ["Aditya"],
+      "motion_prompt": "holographic spaceship flying through quantum portals"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Candyfire planet appearing - a high-tech candy planet with energy fields and floating candy structures",
+      "visual_prompt": "(wide shot:1.2) high-tech candy planet Candyfire, made of bright candies, lollipops, chocolate mountains, rainbow colors, energy fields, floating candy structures, holographic candy buildings, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "दूर में कैंडीफायर ग्रह दिखाई दिया - एक उन्नत कैंडी का ग्रह।",
+      "subtitle": "Candyfire Planet",
+      "characters": ["Aditya"],
+      "motion_prompt": "high-tech candy planet appearing"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of holographic spaceship landing on Candyfire with Aditya in red t-shirt looking amazed",
+      "visual_prompt": "(medium shot:1.2) holographic spaceship landing on high-tech candy planet, cute little Indian boy with short black hair, wearing red t-shirt with space logo, looking amazed, bright candy landscape, energy fields, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "होलोग्राफिक अंतरिक्ष यान कैंडीफायर पर उतरा और आदित्य आश्चर्यचकित था।",
+      "subtitle": "Landing on Candyfire",
+      "characters": ["Aditya"],
+      "motion_prompt": "holographic spaceship landing on candy planet"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Sparkle alien with holographic candy hair and energy aura greeting Aditya",
+      "visual_prompt": "(wide shot:1.2) friendly alien Sparkle with rainbow skin and holographic candy hair, energy aura, greeting little Indian boy with short black hair, wearing red t-shirt with space logo, bright colors, happy expressions, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "स्पार्कल नाम का दोस्ताना एलियन आदित्य का स्वागत कर रहा था।",
+      "subtitle": "Meeting Sparkle",
+      "characters": ["Aditya", "Sparkle"],
+      "motion_prompt": "alien with holographic hair greeting boy"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Bubble alien with quantum jelly body bouncing around Aditya in red t-shirt",
+      "visual_prompt": "(medium shot:1.2) round quantum jelly alien Bubble bouncing around little Indian boy with short black hair, wearing red t-shirt with space logo, playful movement, bright colors, holographic effects, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "बबल नाम का क्वांटम जेली एलियन आदित्य के चारों ओर उछल रहा था।",
+      "subtitle": "Bouncing Bubble",
+      "characters": ["Aditya", "Bubble"],
+      "motion_prompt": "quantum jelly alien bouncing around boy"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of holographic chocolate river flowing through candy mountains with energy crystals",
+      "visual_prompt": "(wide shot:1.2) holographic chocolate river flowing through candy mountains, energy crystals, bright candy landscape, colorful scene, futuristic effects, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "होलोग्राफिक चॉकलेट की नदी कैंडी के पहाड़ों के बीच बह रही थी।",
+      "subtitle": "Chocolate River",
+      "characters": ["Aditya", "Sparkle", "Bubble"],
+      "motion_prompt": "holographic chocolate river flowing"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Aditya in red t-shirt and aliens playing by the holographic chocolate river",
+      "visual_prompt": "(medium shot:1.2) cute little Indian boy with short black hair, wearing red t-shirt with space logo, and friendly aliens playing by holographic chocolate river, laughing, bright colors, futuristic effects, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य और एलियन होलोग्राफिक चॉकलेट नदी के पास खेल रहे थे।",
+      "subtitle": "Playing by the River",
+      "characters": ["Aditya", "Sparkle", "Bubble"],
+      "motion_prompt": "boy and aliens playing by holographic river"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Candy King's holographic palace made of energy candies and quantum lollipops",
+      "visual_prompt": "(wide shot:1.2) Candy King's holographic palace made of energy candies and quantum lollipops, bright colors, magical candy architecture, energy fields, floating structures, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "कैंडी किंग का होलोग्राफिक महल एनर्जी कैंडी और क्वांटम लॉलीपॉप से बना था।",
+      "subtitle": "Candy Palace",
+      "characters": ["Aditya", "Sparkle", "Bubble"],
+      "motion_prompt": "holographic candy palace in distance"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of holographic Lollipop Guards with energy shields welcoming Aditya in red t-shirt",
+      "visual_prompt": "(medium shot:1.2) friendly holographic lollipop guards with energy shields welcoming little Indian boy with short black hair, wearing red t-shirt with space logo, to candy palace, bright colors, happy expressions, futuristic effects, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "होलोग्राफिक लॉलीपॉप गार्ड आदित्य का महल में स्वागत कर रहे थे।",
+      "subtitle": "Lollipop Guards",
+      "characters": ["Aditya", "Lollipop Guards"],
+      "motion_prompt": "holographic lollipop guards welcoming boy"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Candy King sitting on a holographic candy throne with energy crown",
+      "visual_prompt": "(wide shot:1.2) wise Candy King sitting on holographic candy throne, energy crown, friendly expression, bright candy palace, futuristic effects, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "कैंडी किंग होलोग्राफिक कैंडी के सिंहासन पर बैठे थे।",
+      "subtitle": "Meeting the King",
+      "characters": ["Aditya", "Candy King"],
+      "motion_prompt": "candy king on holographic throne"
+    },
+    {
+      "duration": 8,
+      "description": "medium shot of Aditya in red t-shirt and Candy King talking and laughing together",
+      "visual_prompt": "(medium shot:1.2) cute little Indian boy with short black hair, wearing red t-shirt with space logo, and Candy King talking and laughing together, friendly conversation, bright colors, holographic effects, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य और कैंडी किंग बात कर रहे थे और हँस रहे थे।",
+      "subtitle": "Friendly Chat",
+      "characters": ["Aditya", "Candy King"],
+      "motion_prompt": "boy and king talking"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Aditya in red t-shirt and all alien friends having a holographic candy party",
+      "visual_prompt": "(wide shot:1.2) cute little Indian boy with short black hair, wearing red t-shirt with space logo, and all alien friends having holographic candy party, colorful candies, happy celebration, bright colors, futuristic effects, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य और सभी एलियन दोस्त होलोग्राफिक कैंडी पार्टी मना रहे थे।",
+      "subtitle": "Candy Party",
+      "characters": ["Aditya", "Sparkle", "Bubble", "Candy King", "Lollipop Guards"],
+      "motion_prompt": "boy and aliens having holographic party"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Aditya in red t-shirt saying goodbye to his alien friends with holographic spaceship ready",
+      "visual_prompt": "(wide shot:1.2) cute little Indian boy with short black hair, wearing red t-shirt with space logo, saying goodbye to alien friends, holographic spaceship ready, emotional farewell, bright colors, futuristic effects, simple cartoon style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आदित्य अपने एलियन दोस्तों को अलविदा कह रहा था। 'अगर आपको यह कहानी पसंद आई हो, तो कृपया सब्सक्राइब करें और बेल आइकन दबाएं।'",
+      "subtitle": "Goodbye Friends",
+      "characters": ["Aditya", "Sparkle", "Bubble", "Candy King", "Lollipop Guards"],
+      "motion_prompt": "boy saying goodbye to aliens"
+    }
+  ],
+  "tags": [
+    "kids",
+    "space",
+    "alien",
+    "candy",
+    "adventure",
+    "friendship",
+    "imagination",
+    "planet",
+    "spaceship",
+    "chocolate",
+    "rainbow",
+    "fantasy",
+    "cute",
+    "fun",
+    "technology",
+    "holographic",
+    "quantum",
+    "futuristic"
+  ]
+}
