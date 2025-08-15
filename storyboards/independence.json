@@ -1,147 +1,83 @@
 {
-  "title": "Wings of Freedom",
-  "description": "A powerful story of Sardar Patel during India's independence movement in 1947, featuring the tricolor flag and a symbolic kite representing freedom",
-  "scene_duration": 10,
+  "title": "Anaya and the Flag of Freedom",
+  "description": "On the morning of India's Independence Day, little Anaya witnesses the flag hoisting at the Red Fort and imagines the stories of freedom hidden in its colors.",
+  "total_duration": 55,
   "cast": [
-    {
-      "name": "Sardar Patel",
-      "role": "main character - Iron Man of India",
-      "face": "faces/sardar_patel_face.jpg",
-      "style": "distinguished Indian leader, white dhoti and kurta, round spectacles, serious expression, dignified posture, 1940s period clothing, traditional Indian attire, authoritative presence, warm skin tone, detailed facial features, historical accuracy"
-    },
-    {
-      "name": "Arjun",
-      "role": "12-year-old boy from Amritsar",
-      "style": "innocent Indian child, simple off-white cotton kurta and dhoti with handwoven texture, bright curious eyes, short hair, traditional Indian clothing, warm skin tone, expressive face, childlike wonder, period-appropriate clothing, detailed facial features, emotional expressions"
-    },
-    {
-      "name": "Meera",
-      "role": "Arjun's mother",
-      "style": "caring Indian mother, traditional sari, simple jewelry, warm expression, traditional Indian clothing, dignified appearance, motherly love, period-appropriate attire, detailed facial features, emotional depth, warm skin tone"
-    },
-    {
-      "name": "Family Friend",
-      "role": "messenger from Bombay",
-      "style": "traveler from Bombay, slightly formal clothing, messenger bag, excited expression, traditional Indian clothing with urban influence, warm skin tone, detailed facial features, period-appropriate attire, emotional expressions"
-    },
-    {
-      "name": "Villagers",
-      "role": "supporting characters",
-      "style": "diverse Indian villagers, traditional clothing, various ages and backgrounds, emotional expressions, period-appropriate attire, warm skin tones, detailed facial features, traditional Indian clothing, emotional depth, community feeling"
-    }
+    {"name": "Anaya", "role": "curious little Indian girl"},
+    {"name": "Grandfather", "role": "wise old man who tells stories"},
+    {"name": "Sardar Patel", "role": "leader of India's unity"},
+    {"name": "Tricolor Flag", "role": "symbol of India's freedom"}
   ],
   "scenes": [
     {
-      "title": "Sardar Patel's Vision",
-      "visual_prompt": "(medium shot:1.2) Sardar Patel sitting at wooden desk, maps of India spread out, white dhoti kurta, round spectacles, 1940s study room, warm sepia lighting, cinematic shadows, historical drama style:1.3",
-      "subtitle": "In 1946, Sardar Patel, the Iron Man of India, worked tirelessly to unite the nation. His vision was clear - a free, united India.",
-      "narration": "1946 में, सरदार पटेल, भारत के लौह पुरुष, ने देश को एकजुट करने के लिए अथक परिश्रम किया। उनकी दृष्टि स्पष्ट थी - एक स्वतंत्र, एकजुट भारत।",
+      "duration": 8,
+      "description": "wide shot of early morning Red Fort with people gathering for flag hoisting",
+      "visual_prompt": "(wide shot:1.2) Red Fort in Delhi at sunrise, people in traditional Indian clothes gathering, saffron and pink morning sky, warm sunlight on red sandstone walls, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, modern cars, scary, violent",
+      "narration": "सुबह-सुबह लाल किले के सामने लोग झंडा फहराने के लिए इकट्ठा हो रहे थे।",
+      "subtitle": "Early morning, people gathered at the Red Fort for the flag hoisting.",
+      "characters": ["Anaya", "Grandfather"],
+      "motion_prompt": "crowd gathering in front of Red Fort"
+    },
+    {
+      "duration": 8,
+      "description": "close-up of little Anaya holding a small tricolor flag",
+      "visual_prompt": "(close-up:1.2) little Indian girl with two braids, wearing white kurta with orange dupatta, holding small Indian tricolor flag, smiling, sunlight on her face, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, scary, violent",
+      "narration": "अनाया ने अपने हाथ में छोटा सा तिरंगा मजबूती से पकड़ा हुआ था।",
+      "subtitle": "Anaya held her small tricolor tightly in her hand.",
+      "characters": ["Anaya"],
+      "motion_prompt": "girl holding flag close to chest"
+    },
+    {
+      "duration": 9,
+      "description": "medium shot of Grandfather telling Anaya about the freedom struggle",
+      "visual_prompt": "(medium shot:1.2) elderly Indian man with white kurta pajama, Gandhi cap, gentle smile, telling story to little girl with braids, tricolor bunting in background, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, scary, violent",
+      "narration": "दादाजी ने अनाया को आज़ादी के लिए लड़ी गई लड़ाई की कहानियाँ सुनाईं।",
+      "subtitle": "Grandfather told Anaya stories of the struggle for freedom.",
+      "characters": ["Grandfather", "Anaya"],
+      "motion_prompt": "grandfather speaking to girl, girl listening carefully"
+    },
+    {
+      "duration": 8,
+      "description": "wide shot of Sardar Patel standing proudly as flag is hoisted",
+      "visual_prompt": "(wide shot:1.2) Sardar Patel in white dhoti kurta and round spectacles, standing at Red Fort ramparts, Indian tricolor flag fluttering in morning breeze, crowd cheering, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, modern clothing, scary, violent",
+      "narration": "सरदार पटेल गर्व से खड़े होकर तिरंगे को लहराता देख रहे थे।",
+      "subtitle": "Sardar Patel stood proudly, watching the tricolor wave.",
       "characters": ["Sardar Patel"],
-      "negative_prompt": "modern settings, bright neon colors, cartoon style, anime style, blurry"
+      "motion_prompt": "flag unfurling and waving in breeze"
     },
     {
-      "title": "Patel's Message Spreads",
-      "visual_prompt": "(wide shot:1.2) Sardar Patel standing on wooden platform, addressing a large crowd, white dhoti kurta, round spectacles, outdoor gathering, warm sepia lighting, period-accurate setting, historical drama style:1.3",
-      "subtitle": "Patel's message of unity spread across the country. His words reached every corner of India, including a small house in Amritsar.",
-      "narration": "पटेल का एकता का संदेश पूरे देश में फैल गया। उनके शब्द भारत के हर कोने तक पहुंचे, अमृतसर के एक छोटे से घर तक भी।",
-      "characters": ["Sardar Patel"],
-      "negative_prompt": "modern settings, bright neon colors, cartoon style, anime style, blurry"
+      "duration": 11,
+      "description": "wide shot of Anaya imagining people from different states holding hands under the tricolor",
+      "visual_prompt": "(wide shot:1.2) diverse group of Indian people in traditional clothes from different states holding hands in unity, tricolor flag high above, clear blue sky, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, scary, violent",
+      "narration": "अनाया ने सोचा, एकजुट होकर ही भारत आज़ाद हुआ था और एकजुट रहकर ही आगे बढ़ेगा।",
+      "subtitle": "Anaya thought, India was freed in unity, and will grow in unity.",
+      "characters": ["Anaya", "Tricolor Flag"],
+      "motion_prompt": "people holding hands under waving flag"
     },
     {
-      "title": "The Flag Reaches Amritsar",
-      "visual_prompt": "(wide shot:1.2) Family friend holding Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra), Arjun and Meera watching with awe, off-white cotton kurta dhoti, traditional sari, Golden Temple in background slightly blurred, warm sepia lighting, historical drama style:1.3",
-      "subtitle": "A family friend returned from Bombay with a precious gift—the tricolor flag that Sardar Patel had helped design. 'This is the flag of our dream,' he told young Arjun.",
-      "narration": "एक परिवार का दोस्त बॉम्बे से एक अनमोल उपहार लेकर आया - तिरंगा झंडा जिसे सरदार पटेल ने डिज़ाइन करने में मदद की थी। 'यह हमारे सपने का झंडा है,' उसने छोटे अर्जुन से कहा।",
-      "characters": ["Arjun", "Meera", "Family Friend"],
-      "negative_prompt": "modern clothing, bright neon colors, cartoon style, anime style, blurry"
-    },
-    {
-      "title": "Patel's Tireless Work",
-      "visual_prompt": "(medium shot:1.2) Sardar Patel sitting at table with other leaders, maps and documents spread out, white dhoti kurta, round spectacles, 1940s meeting room, warm sepia lighting, cinematic shadows, historical drama style:1.3",
-      "subtitle": "Sardar Patel worked tirelessly, negotiating with princely states, uniting the country piece by piece. His determination was unwavering.",
-      "narration": "सरदार पटेल ने अथक परिश्रम किया, रियासतों से बातचीत करते हुए, देश को टुकड़ा-टुकड़ा कर एकजुट करते हुए। उनका दृढ़ संकल्प अटल था।",
-      "characters": ["Sardar Patel"],
-      "negative_prompt": "modern settings, bright neon colors, cartoon style, anime style, blurry"
-    },
-    {
-      "title": "The Moment of Freedom",
-      "visual_prompt": "(medium shot:1.2) Sardar Patel listening to vintage radio, emotional expression, white dhoti kurta, round spectacles, 1940s period room, warm sepia lighting, historical drama style:1.3",
-      "subtitle": "On 14th August 1947, Sardar Patel listened to the radio announcement: 'At the stroke of midnight, India will awake to life and freedom…' Tears filled his eyes.",
-      "narration": "14 अगस्त 1947 को, सरदार पटेल ने रेडियो घोषणा सुनी: 'आधी रात के समय, भारत जीवन और स्वतंत्रता के लिए जागेगा...' उनकी आंखों में आंसू आ गए।",
-      "characters": ["Sardar Patel"],
-      "negative_prompt": "modern settings, bright neon colors, cartoon style, anime style, blurry"
-    },
-    {
-	  "title": "Patel at Red Fort",
-	  "visual_prompt": "(wide shot:1.2) Sardar Patel standing proudly on Red Fort ramparts, overlooking the courtyard, Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) fluttering high on a tall flagpole, white dhoti kurta, round spectacles, dignified stance, early morning golden sunlight casting soft shadows, detailed Mughal architecture of Red Fort in background, groups of people gathered below, warm sepia lighting, historical drama style:1.3",
-	  "subtitle": "At dawn on 15th August, Sardar Patel watched the tricolor flag being hoisted at the Red Fort for the first time.",
-	  "narration": "15 अगस्त की सुबह, सरदार पटेल ने लाल किले पर तिरंगा झंडा पहली बार फहराते हुए देखा।",
-	  "characters": ["Sardar Patel"],
-	  "negative_prompt": "modern buildings, bright neon colors, cartoon style, anime style, blurry"
-	},
-    {
-      "title": "The Symbolic Kite",
-      "visual_prompt": "(close-up:1.2) Young boy's hands tying Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) to kite string, off-white cotton kurta, Golden Temple in background slightly blurred, warm sepia lighting, historical drama style:1.3",
-      "subtitle": "In Amritsar, young Arjun remembered Patel's words about keeping the flag safe. He tied the precious tricolor to his kite.",
-      "narration": "अमृतसर में, छोटे अर्जुन को पटेल के शब्द याद आए झंडे को सुरक्षित रखने के बारे में। उसने अनमोल तिरंगे को अपनी पतंग से बांध दिया।",
-      "characters": ["Arjun"],
-      "negative_prompt": "modern materials, bright neon colors, cartoon style, anime style, dark lighting"
-    },
-    {
-      "title": "Freedom Takes Flight",
-      "visual_prompt": "(wide shot:1.2) Young boy running in field, kite with Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) fluttering in wind, off-white cotton kurta dhoti, Golden Temple in background slightly blurred, warm sepia lighting, historical drama style:1.3",
-      "subtitle": "The kite with the tricolor flag soared high above Amritsar, carrying the hopes of millions—just like Sardar Patel's vision for a united India.",
-      "narration": "तिरंगे वाली पतंग अमृतसर के ऊपर ऊंची उड़ी, लाखों लोगों की आशाओं को लेकर - बिल्कुल सरदार पटेल के एकजुट भारत के सपने की तरह।",
-      "characters": ["Arjun"],
-      "negative_prompt": "modern landscape, bright neon colors, cartoon style, anime style, dark lighting"
-    },
-    {
-      "title": "A Nation United",
-      "visual_prompt": "(low angle shot:1.2) Group of villagers looking up at sky, kite with Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) flying high, traditional 1940s clothing, Golden Temple in background slightly blurred, warm sepia lighting, historical drama style:1.3",
-      "subtitle": "Villagers looked up with tears in their eyes. The kite symbolized Sardar Patel's dream—a united India where every citizen could fly free.",
-      "narration": "ग्रामीणों ने आंसुओं से भरी आंखों से ऊपर देखा। पतंग सरदार पटेल के सपने का प्रतीक थी - एक एकजुट भारत जहां हर नागरिक स्वतंत्र उड़ सके।",
-      "characters": ["Villagers"],
-      "negative_prompt": "modern clothing, bright neon colors, cartoon style, anime style, blurry"
-    },
-    {
-	  "title": "Patel's Legacy",
-	  "visual_prompt": "(wide shot:1.2) Sardar Patel standing proudly on the Red Fort ramparts, dignified posture, white dhoti kurta, round spectacles, Indian tricolor flag (saffron, white, green with navy blue Ashoka Chakra) fluttering high on a tall flagpole above him, warm golden sunrise casting long soft shadows, detailed Mughal architecture of Red Fort behind, distant Delhi skyline in warm sepia tones, gentle breeze moving his clothes, historical drama style:1.3",
-	  "subtitle": "Sardar Patel stood at the Red Fort, watching the tricolor fly. His dream of a united India had become reality. The wind carried freedom across the land—from Delhi to Amritsar, from the Red Fort to a child's kite.",
-	  "narration": "सरदार पटेल लाल किले पर खड़े होकर तिरंगा फहराते हुए देख रहे थे। उनका एकजुट भारत का सपना सच हो गया था। हवा ने स्वतंत्रता को पूरी धरती पर फैला दिया - दिल्ली से अमृतसर तक, लाल किले से एक बच्चे की पतंग तक। सभी को स्वतंत्रता दिवस की शुभकामनाएं।",
-	  "characters": ["Sardar Patel"],
-	  "negative_prompt": "modern Delhi, bright neon colors, cartoon style, anime style, blurry"
-	}
-
+      "duration": 11,
+      "description": "medium shot of Anaya waving her flag and shouting Happy Independence Day",
+      "visual_prompt": "(medium shot:1.2) little Indian girl with two braids, wearing white kurta with orange dupatta, waving small tricolor flag with joy, bright morning light, smiling faces around, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, scary, violent",
+      "narration": "अनाया ने खुशी से कहा, ‘सभी को स्वतंत्रता दिवस की शुभकामनाएं!’",
+      "subtitle": "Anaya shouted happily, 'Happy Independence Day to all!'",
+      "characters": ["Anaya"],
+      "motion_prompt": "girl waving flag happily in crowd"
+    }
   ],
-  "style_settings": {
-    "overall_style": "historical_drama",
-    "color_palette": "sepia_warm",
-    "lighting_style": "cinematic_natural",
-    "composition_style": "cinematic_wide",
-    "texture_detail": "high",
-    "period_accuracy": "high",
-    "character_style": "detailed_realistic",
-    "clothing_style": "traditional_indian_1940s",
-    "facial_features": "detailed_expressive",
-    "skin_tones": "warm_indian_tones",
-    "hair_style": "traditional_indian",
-    "expression_style": "emotional_authentic",
-    "pose_style": "natural_historical",
-    "background_style": "period_accurate",
-    "prop_style": "authentic_1940s"
-  },
-  "technical_notes": {
-    "aspect_ratio": "16:9",
-    "target_resolution": "1920x1080",
-    "fps": "24",
-    "color_grading": "warm_historical",
-    "sound_design": "period_ambient",
-    "music_style": "emotional_Indian_classical",
-    "character_rendering": "high_detail_realistic",
-    "facial_expression_quality": "emotionally_authentic",
-    "clothing_detail": "period_accurate_textures",
-    "lighting_on_characters": "cinematic_dramatic",
-    "background_integration": "seamless_historical",
-    "prop_authenticity": "1940s_accurate"
-  }
+  "tags": [
+    "Independence Day",
+    "India",
+    "patriotic",
+    "kids",
+    "freedom",
+    "history",
+    "storybook",
+    "Red Fort"
+  ]
 }

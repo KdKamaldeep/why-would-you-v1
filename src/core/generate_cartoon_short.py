@@ -193,6 +193,18 @@ class CartoonShortsGenerator:
                 logger.info(f"Saved storyboard: {storyboard_path}")
             except Exception as e:
                 logger.warning(f"Failed to save storyboard: {e}")
+            
+            # Load cast information for character role enhancement
+            self.cast = script.get('cast', [])
+            if self.cast:
+                logger.info(f"🎭 Loaded cast information: {len(self.cast)} characters")
+                for character in self.cast:
+                    if isinstance(character, dict):
+                        name = character.get('name', 'Unknown')
+                        role = character.get('role', 'No role specified')
+                        logger.info(f"   • {name}: {role}")
+            else:
+                logger.info("ℹ️ No cast information found in script")
 
             # Step 2: Create audio clips at the beginning
             logger.info("Step 2: Creating audio clips from each scene's narration...")
@@ -592,7 +604,7 @@ class CartoonShortsGenerator:
         return f"{hours:02d}:{minutes:02d}:{secs:02d},{millisecs:03d}"
 
     def _compose_image_prompt(self, scene: Dict) -> tuple[str, str]:
-        """Compose an image prompt and negative prompt using the visual_prompt from script with intelligent aspect ratio adaptation."""
+        """Compose an image prompt and negative prompt using the visual_prompt from script with intelligent aspect ratio adaptation and character role integration."""
         # Get the visual_prompt from the script (this is the key requirement)
         visual_prompt = scene.get('visual_prompt', '')
         base_prompt = visual_prompt or "Cartoon scene"
@@ -600,12 +612,72 @@ class CartoonShortsGenerator:
         # Get the negative prompt from the script
         negative_prompt = scene.get('negative_prompt', '')
 
+        # Enhance prompt with character role information if available
+        enhanced_prompt = self._enhance_prompt_with_character_roles(base_prompt, scene)
+
         # Determine aspect ratio for intelligent prompt adaptation
         is_16_9_format = self.config.width > self.config.height and self.config.width / self.config.height > 1.5
         
         # Disable prompt enhancement to preserve original prompt structure with weights
-        logger.info(f"🎯 Using original visual_prompt from script: {base_prompt}")
-        return base_prompt, negative_prompt         
+        logger.info(f"🎯 Using enhanced visual_prompt with character roles: {enhanced_prompt}")
+        return enhanced_prompt, negative_prompt
+    
+    def _enhance_prompt_with_character_roles(self, base_prompt: str, scene: Dict) -> str:
+        """Enhance the visual prompt with character role information from the cast."""
+        try:
+            # Get characters mentioned in this scene
+            scene_characters = scene.get('characters', [])
+            if not scene_characters:
+                return base_prompt
+            
+            # Get cast information if available
+            cast_info = getattr(self, 'cast', [])
+            if not cast_info:
+                return base_prompt
+            
+            # Create a mapping of character names to their roles
+            character_roles = {}
+            for cast_member in cast_info:
+                if isinstance(cast_member, dict):
+                    name = cast_member.get('name', '')
+                    role = cast_member.get('role', '')
+                    if name and role:
+                        character_roles[name] = role
+            
+            if not character_roles:
+                return base_prompt
+            
+            # Find characters in this scene that have role information
+            enhanced_prompt = base_prompt
+            character_enhancements = []
+            
+            for character_name in scene_characters:
+                if character_name in character_roles:
+                    role = character_roles[character_name]
+                    # Add role information to the prompt
+                    character_enhancement = f"{character_name} ({role})"
+                    character_enhancements.append(character_enhancement)
+                    
+                    # Replace character name with enhanced version in the prompt
+                    # This helps the diffusion model understand the character's role
+                    if character_name.lower() in base_prompt.lower():
+                        # Replace the character name with role-enhanced version
+                        enhanced_prompt = enhanced_prompt.replace(
+                            character_name, 
+                            character_enhancement
+                        )
+                    else:
+                        # If character name not explicitly mentioned, add role info
+                        enhanced_prompt = f"{enhanced_prompt}, {character_enhancement}"
+            
+            if character_enhancements:
+                logger.info(f"🎭 Enhanced prompt with character roles: {character_enhancements}")
+            
+            return enhanced_prompt
+            
+        except Exception as e:
+            logger.warning(f"⚠️ Error enhancing prompt with character roles: {e}")
+            return base_prompt
 
 def main():
     """Main CLI entry point."""
