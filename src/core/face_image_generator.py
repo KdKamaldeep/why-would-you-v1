@@ -82,9 +82,17 @@ class FaceImageGenerator:
     def _initialize_diffusion_pipeline(self):
         """Initialize the diffusion pipeline with optional ControlNet and IP-Adapter."""
         try:
-            from diffusers import StableDiffusionPipeline, ControlNetPipeline
+            from diffusers import StableDiffusionPipeline
             from diffusers.utils import load_image
             import safetensors
+            
+            # Try to import ControlNetPipeline, but don't fail if not available
+            try:
+                from diffusers import ControlNetPipeline
+                self.controlnet_available = True
+            except ImportError:
+                self.controlnet_available = False
+                logger.warning("⚠️ ControlNetPipeline not available in this version of diffusers")
             
             logger.info(f"🚀 Initializing diffusion pipeline...")
             logger.info(f"💻 Device: {self.device}")
@@ -116,7 +124,7 @@ class FaceImageGenerator:
                         pass
             
             # Load ControlNet if available
-            if self.controlnet_path and Path(self.controlnet_path).exists():
+            if self.controlnet_path and Path(self.controlnet_path).exists() and self.controlnet_available:
                 try:
                     from diffusers import ControlNetModel
                     self.controlnet = ControlNetModel.from_pretrained(
@@ -135,6 +143,8 @@ class FaceImageGenerator:
                     logger.info("✅ ControlNet loaded successfully")
                 except Exception as e:
                     logger.warning(f"⚠️ Failed to load ControlNet: {e}")
+            elif self.controlnet_path and Path(self.controlnet_path).exists() and not self.controlnet_available:
+                logger.warning("⚠️ ControlNet path exists but ControlNetPipeline is not available")
             
             # Load IP-Adapter if available
             if self.ip_adapter_path and Path(self.ip_adapter_path).exists():
