@@ -180,8 +180,13 @@ class FaceImageGenerator:
             Tuple of (face_region, landmarks) or None if no face detected
         """
         if isinstance(image, str):
+            logger.info(f"🔄 Loading face image from: {image}")
             image = cv2.imread(image)
+            if image is None:
+                logger.error(f"❌ Failed to load image from: {image}")
+                return None
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            logger.info(f"✅ Image loaded successfully, shape: {image.shape}")
         elif isinstance(image, Image.Image):
             image = np.array(image)
         
@@ -192,8 +197,10 @@ class FaceImageGenerator:
         try:
             # Use MediaPipe face detection
             if hasattr(self.face_detector, 'process'):
+                logger.info("🔄 Using MediaPipe face detection...")
                 results = self.face_detector.process(image)
                 if results.detections:
+                    logger.info(f"✅ Face detected with MediaPipe! Found {len(results.detections)} face(s)")
                     detection = results.detections[0]
                     bbox = detection.location_data.relative_bounding_box
                     h, w, _ = image.shape
@@ -203,6 +210,8 @@ class FaceImageGenerator:
                     width = int(bbox.width * w)
                     height = int(bbox.height * h)
                     
+                    logger.info(f"   Face bounding box: x={x}, y={y}, w={width}, h={height}")
+                    
                     # Extract face region with padding
                     padding = int(min(width, height) * 0.2)
                     x1 = max(0, x - padding)
@@ -211,6 +220,7 @@ class FaceImageGenerator:
                     y2 = min(h, y + height + padding)
                     
                     face_region = image[y1:y2, x1:x2]
+                    logger.info(f"   Face region extracted: shape={face_region.shape}")
                     
                     # Get landmarks
                     landmark_results = self.face_landmark_detector.process(image)
@@ -218,8 +228,11 @@ class FaceImageGenerator:
                     if landmark_results.multi_face_landmarks:
                         face_landmarks = landmark_results.multi_face_landmarks[0]
                         landmarks = [(int(lm.x * w), int(lm.y * h)) for lm in face_landmarks.landmark]
+                        logger.info(f"   Landmarks extracted: {len(landmarks)} points")
                     
                     return face_region, landmarks
+                else:
+                    logger.warning("⚠️ No faces detected with MediaPipe")
             
             # Fallback to OpenCV face detection
             else:
