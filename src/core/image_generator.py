@@ -338,9 +338,33 @@ class ImageGenerator:
     def _generate_sd_image(self, prompt: str, output_path: str, negative_prompt: str = None) -> str:
         """Generate image using Stable Diffusion with intelligent aspect ratio optimization."""
         try:
-            # Use the prompt as-is (enhancement is now handled in _compose_image_prompt)
-            final_prompt = prompt
-            logger.info(f"🎯 Using prompt (enhancement handled upstream): {prompt}")
+            # Apply professional prompt optimization
+            if self.enable_prompt_enhancement and self.prompt_enhancer:
+                try:
+                    # Use the new professional enhancer
+                    from .prompt_enhancer import ProfessionalPromptEnhancer
+                    enhancer = ProfessionalPromptEnhancer()
+                    analysis = enhancer.analyze_prompt(prompt, style="cartoon")
+                    
+                    # Use enhanced prompt if it's significantly better
+                    if analysis.clarity_score > 0.6 and analysis.structure_score > 0.5:
+                        final_prompt = analysis.enhanced_prompt
+                        optimized_negative = analysis.optimized_negative_prompt
+                        logger.info(f"🎯 Using enhanced prompt: {final_prompt}")
+                        logger.info(f"🎯 Using optimized negative prompt: {optimized_negative}")
+                        
+                        # Update negative prompt if we have a better one
+                        if optimized_negative and not negative_prompt:
+                            negative_prompt = optimized_negative
+                    else:
+                        final_prompt = prompt
+                        logger.info(f"🎯 Using original prompt (enhancement not beneficial): {prompt}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Prompt enhancement failed: {e}")
+                    final_prompt = prompt
+            else:
+                final_prompt = prompt
+                logger.info(f"🎯 Using original prompt: {prompt}")
             
             # Determine aspect ratio for intelligent optimization
             is_16_9_format = self.width > self.height and self.width / self.height > 1.5
