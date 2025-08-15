@@ -1,0 +1,101 @@
+{
+  "title": "The Last Train from Platform 9",
+  "description": "A chilling midnight encounter at an abandoned train station leads Rajiv onto a journey with no return.",
+  "total_duration": 80,
+  "cast": [
+    {"name": "Rajiv", "role": "the lone traveler"},
+    {"name": "Woman in Red Saree", "role": "mysterious passenger with hollow eyes"},
+    {"name": "Passengers", "role": "silent, unsettling travelers"}
+  ],
+  "scenes": [
+    {
+      "duration": 10,
+      "description": "Rajiv walking into an empty, dimly lit old railway station at midnight",
+      "visual_prompt": "(wide shot:1.2) deserted Indian railway station at night, flickering tube lights, wet concrete floor, faint fog, lonely figure of man in dark jacket entering, cinematic horror style:1.3",
+      "negative_prompt": "cartoon style, anime style, overly bright, blurry, cheerful colors",
+      "narration": "राजीव आधी रात को पुराने स्टेशन में दाखिल हुआ। दूर कहीं अंधेरे में कोई आवाज़ फुसफुसाई — 'क्यों आ गए तुम यहाँ?'",
+      "subtitle": "Rajiv stepped into the old station at midnight. Somewhere in the darkness, a whisper asked— 'Why would you come here?'",
+      "characters": ["Rajiv"],
+      "motion_prompt": "man slowly walking into dimly lit station"
+    },
+    {
+      "duration": 10,
+      "description": "Empty platform with broken bench and old vending machine",
+      "visual_prompt": "(medium shot:1.2) abandoned platform, rusted bench, broken vending machine, peeling paint on walls, faint greenish light, cinematic horror style:1.3",
+      "negative_prompt": "cartoon, anime, bright daylight, low resolution",
+      "narration": "प्लेटफ़ॉर्म खाली था, बस एक टूटी बेंच और जंग खाया वेंडिंग मशीन खड़ी थी।",
+      "subtitle": "The platform was empty — just a broken bench and a rusted vending machine.",
+      "characters": [],
+      "motion_prompt": "camera slowly panning across abandoned platform"
+    },
+    {
+      "duration": 9,
+      "description": "An ancient black steam train approaching through fog",
+      "visual_prompt": "(wide shot:1.2) old black steam locomotive emerging from dense fog, headlights cutting through mist, eerie green glow in windows, cinematic horror style:1.3",
+      "negative_prompt": "modern train, cartoon style, colorful, blurry",
+      "narration": "एक काली भाप वाली ट्रेन धुंध चीरती हुई आ रही थी। दूर से वही आवाज़ — 'क्यों सवार हो रहे हो?'",
+      "subtitle": "A black steam train emerged through the fog. From afar, the whisper came— 'Why would you get on?'",
+      "characters": ["Rajiv"],
+      "motion_prompt": "train slowly emerging from fog"
+    },
+    {
+      "duration": 8,
+      "description": "Inside the train with pale, expressionless passengers",
+      "visual_prompt": "(medium shot:1.2) dimly lit old train interior, rows of passengers with pale faces and blank stares, some wearing old-fashioned clothes, cinematic horror style:1.3",
+      "negative_prompt": "happy expressions, cartoon, bright daylight, blurry",
+      "narration": "अंदर यात्री चुपचाप बैठे थे, उनकी आँखें कहीं भी नहीं टिक रहीं थीं।",
+      "subtitle": "Inside, the passengers sat in silence, their eyes fixed on nothing.",
+      "characters": ["Passengers"],
+      "motion_prompt": "camera tracking past silent passengers"
+    },
+    {
+      "duration": 8,
+      "description": "Rajiv walking down dim train corridor toward the sound of humming",
+      "visual_prompt": "(medium shot:1.2) narrow, dimly lit train corridor, flickering lights, man walking cautiously toward shadowed end, cinematic horror style:1.3",
+      "negative_prompt": "bright colors, cartoon, daylight",
+      "narration": "राजीव धीरे-धीरे उस गुनगुनाहट की ओर बढ़ा जो डिब्बे के आखिरी छोर से आ रही थी।",
+      "subtitle": "Rajiv slowly walked toward the humming at the far end of the carriage.",
+      "characters": ["Rajiv"],
+      "motion_prompt": "man walking through narrow dim corridor"
+    },
+    {
+      "duration": 9,
+      "description": "The woman in red saree appears with long hair covering her face",
+      "visual_prompt": "(medium shot:1.2) eerie woman in crimson saree, long black hair covering most of face, dim green light from above, cinematic horror style:1.3",
+      "negative_prompt": "smiling friendly woman, cartoon, bright colors",
+      "narration": "वह वहाँ थी — लाल साड़ी में, लंबे काले बाल उसके चेहरे को ढँके हुए।",
+      "subtitle": "She was there — in a crimson saree, her long hair hiding her face.",
+      "characters": ["Woman in Red Saree"],
+      "motion_prompt": "woman standing still with hair covering face"
+    },
+    {
+      "duration": 9,
+      "description": "Close-up of her lifting her head, revealing hollow eyes and a smile",
+      "visual_prompt": "(close-up:1.2) horror close-up of woman in red saree, hollow dark eyes, unnaturally wide smile, dim green backlight, cinematic horror style:1.3",
+      "negative_prompt": "cartoon, happy face, bright daylight",
+      "narration": "उसने सिर उठाया, खोखली आँखें और अजीब सी मुस्कान — 'क्यों हमारे साथ चले आए?'",
+      "subtitle": "She looked up, hollow eyes and a strange smile— 'Why would you come with us?'",
+      "characters": ["Woman in Red Saree"],
+      "motion_prompt": "woman slowly raising head to reveal face"
+    },
+    {
+      "duration": 9,
+      "description": "The train door slams shut as it speeds into darkness",
+      "visual_prompt": "(wide shot:1.2) train doors slamming shut, motion blur as train speeds into complete darkness, cinematic horror style:1.3",
+      "negative_prompt": "bright daylight, cartoon, colorful",
+      "narration": "दरवाज़े बंद हो गए, और ट्रेन अंधेरे में समा गई — 'अब लौटने का रास्ता नहीं है। क्यों चढ़े थे?'",
+      "subtitle": "The doors slammed shut, and the train vanished into darkness— 'Now there's no way back. Why would you board?'",
+      "characters": ["Rajiv", "Woman in Red Saree", "Passengers"],
+      "motion_prompt": "train accelerating into darkness"
+    }
+  ],
+  "tags": [
+    "horror",
+    "thriller",
+    "train",
+    "ghost",
+    "india",
+    "dark",
+    "supernatural"
+  ]
+}
