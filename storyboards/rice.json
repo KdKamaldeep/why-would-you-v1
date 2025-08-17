@@ -1,0 +1,82 @@
+{
+  "title": "Why Would You Avoid White Rice for Dinner?",
+  "description": "A fun story about Aarav discovering why eating too much white rice at night might not be the best idea, told with humor and playful narration.",
+  "total_duration": 42,
+  "cast": [
+    {"name": "Aarav", "role": "curious boy who loves food"},
+    {"name": "White Rice", "role": "fluffy, tempting but sneaky food"},
+    {"name": "Grandma", "role": "wise and funny elder"}
+  ],
+  "scenes": [
+    {
+      "duration": 7,
+      "description": "wide shot of Aarav sitting at the dinner table staring at a big bowl of white rice",
+      "visual_prompt": "(wide shot:1.2) Indian boy Aarav looking at big bowl of fluffy white rice on dinner table, evening setting, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, scary, distorted",
+      "narration": "क्यों कहते हैं लोग—रात को ज़्यादा चावल मत खाओ? चलो, आरव की कहानी से जानते हैं!",
+      "subtitle": "The Dinner Dilemma",
+      "characters": ["Aarav", "White Rice"],
+      "motion_prompt": "boy staring curiously at bowl of rice"
+    },
+    {
+      "duration": 7,
+      "description": "close-up of white rice looking fluffy and shiny, almost talking to Aarav",
+      "visual_prompt": "(close-up:1.2) fluffy white rice steaming in a bowl, glowing slightly as if alive, storybook style:1.3",
+      "negative_prompt": "blurry, dark, scary, distorted",
+      "narration": "चावल मानो कह रहे हों – ‘आ जा बेटा, मुझे खा जा!’",
+      "subtitle": "The Tempting Rice",
+      "characters": ["White Rice"],
+      "motion_prompt": "rice steaming, looking magical"
+    },
+    {
+      "duration": 7,
+      "description": "medium shot of Grandma entering with a wise smile, pointing at the rice",
+      "visual_prompt": "(medium shot:1.2) Grandma with glasses, smiling wisely, pointing at steaming rice bowl, storybook style:1.3",
+      "negative_prompt": "blurry, distorted, scary",
+      "narration": "दादी बोलीं—‘रात को ज़्यादा चावल खाओगे, तो नींद तो आएगी... लेकिन पेट बोलेगा—हाय राम!’",
+      "subtitle": "Grandma’s Warning",
+      "characters": ["Grandma", "Aarav"],
+      "motion_prompt": "grandma wagging finger, boy listening"
+    },
+    {
+      "duration": 7,
+      "description": "funny shot of Aarav imagining himself bloated after eating too much rice",
+      "visual_prompt": "(medium shot:1.2) boy imagining his tummy becoming round like a balloon after eating rice, cartoon style humor, storybook style:1.3",
+      "negative_prompt": "scary, dark, distorted",
+      "narration": "आरव ने सोचा—‘अगर ज़्यादा चावल खा लूँ, तो मैं चलता-फिरता गोलगप्पा बन जाऊँगा!’",
+      "subtitle": "The Funny Imagination",
+      "characters": ["Aarav"],
+      "motion_prompt": "boy holding tummy, laughing at thought"
+    },
+    {
+      "duration": 7,
+      "description": "wide shot of Aarav eating just a small portion of rice with veggies and smiling",
+      "visual_prompt": "(wide shot:1.2) Aarav eating balanced plate with little rice, veggies, dal, smiling, storybook style:1.3",
+      "negative_prompt": "blurry, distorted, scary",
+      "narration": "फिर उसने सोचा—‘थोड़ा चावल, सब्ज़ी और दाल—बस मज़ेदार और हेल्दी खाना तैयार!’",
+      "subtitle": "The Smart Choice",
+      "characters": ["Aarav", "Grandma"],
+      "motion_prompt": "boy eating happily, grandma smiling proudly"
+    },
+    {
+      "duration": 7,
+      "description": "medium shot of Aarav waving goodnight with Grandma, rice bowl in background looking sad",
+      "visual_prompt": "(medium shot:1.2) Aarav waving goodnight, grandma smiling, rice bowl in background looking slightly sad, storybook style:1.3",
+      "negative_prompt": "blurry, scary, distorted",
+      "narration": "तो बच्चों, रात को चावल कम—सपने हों धम-धम! अगर कहानी अच्छी लगी हो, तो लाइक और सब्सक्राइब करना मत भूलना।",
+      "subtitle": "The Bedtime Secret",
+      "characters": ["Aarav", "Grandma", "White Rice"],
+      "motion_prompt": "boy waving, grandma smiling, rice bowl sulking"
+    }
+  ],
+  "tags": [
+    "kids",
+    "food",
+    "funny",
+    "health",
+    "dinner",
+    "storybook",
+    "rice",
+    "grandma wisdom"
+  ]
+}
