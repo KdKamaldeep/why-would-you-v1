@@ -72,7 +72,9 @@ if self.config.language == "hi":
 
 #### D. Robust Synthesis Strategies
 - **Multiple fallback strategies**: Try speaker_wav, speaker token, then default
-- **Kernel size error handling**: Automatically extend short text to meet model requirements
+- **Kernel size error handling**: Automatically extend short text to meet model requirements (minimum 50 chars)
+- **Smart text padding**: Language-specific meaningful content addition
+- **Text cleaning and deduplication**: Remove empty lines and duplicate text
 - **Better error handling**: Detailed error messages for debugging
 - **Language-aware logging**: Track synthesis progress for different languages
 
@@ -161,9 +163,16 @@ config = CoquiVoiceConfig(
    - Try different synthesis strategies
 
 4. **Kernel size error**
-   - Text is too short for the TTS model
-   - System automatically extends text length
-   - Ensure input text has sufficient content
+   - Text is too short for the TTS model (minimum 50 characters required)
+   - System automatically extends text with meaningful content
+   - Language-specific padding (Hindi uses Devanagari script, English uses Latin)
+   - Multiple fallback strategies for different model types
+
+5. **Text duplication and empty lines**
+   - Input text contains duplicate lines or empty strings
+   - System automatically cleans and deduplicates text
+   - Removes empty lines and duplicate content
+   - Provides fallback text if no valid content remains
 
 ### Debug Mode
 Enable detailed logging:

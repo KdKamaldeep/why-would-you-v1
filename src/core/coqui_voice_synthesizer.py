@@ -195,24 +195,65 @@ class CoquiVoiceSynthesizer:
             raise RuntimeError("Coqui TTS model not loaded")
         
         try:
-            # Join all lines with spaces
-            full_text = " ".join(narration_lines)
+            # Clean and deduplicate narration lines
+            cleaned_lines = []
+            seen_texts = set()
+            
+            for line in narration_lines:
+                if line and line.strip():  # Skip empty lines
+                    cleaned_line = line.strip()
+                    # Only add if we haven't seen this exact text before
+                    if cleaned_line not in seen_texts:
+                        cleaned_lines.append(cleaned_line)
+                        seen_texts.add(cleaned_line)
+            
+            if not cleaned_lines:
+                logger.warning("No valid text lines found, using fallback text")
+                if self.config.language == "hi":
+                    cleaned_lines = ["नमस्ते, यह एक परीक्षण संदेश है।"]
+                else:
+                    cleaned_lines = ["Hello, this is a test message."]
+            
+            # Join cleaned lines with proper spacing
+            full_text = " ".join(cleaned_lines)
+            logger.info(f"Original lines: {len(narration_lines)}, Cleaned lines: {len(cleaned_lines)}")
             logger.info(f"Synthesizing voice for text: {full_text[:100]}...")
             
             # Ensure minimum text length for TTS models
-            min_text_length = 10  # Minimum characters needed
-            if len(full_text.strip()) < min_text_length:
-                # Pad short text with silence markers or repeat content
+            min_text_length = 50  # Increased minimum characters needed for kernel size
+            original_text = full_text.strip()
+            
+            if len(original_text) < min_text_length:
+                logger.info(f"Text too short ({len(original_text)} chars), padding to minimum length")
+                
+                # Create a more substantial padding strategy
                 if self.config.language == "hi":
-                    padding_text = "। "  # Hindi full stop with space
+                    # For Hindi, add more context and repetition
+                    padding_parts = [
+                        original_text,
+                        "यह एक छोटा वाक्य है।",  # "This is a short sentence."
+                        original_text,
+                        "धन्यवाद।"  # "Thank you."
+                    ]
                 else:
-                    padding_text = ". "  # English period with space
+                    # For English, add more context and repetition
+                    padding_parts = [
+                        original_text,
+                        "This is a short sentence.",
+                        original_text,
+                        "Thank you for listening."
+                    ]
                 
-                # Repeat the text or add padding until minimum length
-                while len(full_text.strip()) < min_text_length:
-                    full_text += padding_text + full_text.strip()
+                # Join with appropriate separators
+                if self.config.language == "hi":
+                    full_text = "। ".join(padding_parts) + "।"
+                else:
+                    full_text = ". ".join(padding_parts) + "."
                 
-                logger.info(f"Padded short text to minimum length: {len(full_text)} characters")
+                logger.info(f"Padded short text to {len(full_text)} characters")
+                logger.info(f"Padded text: {full_text[:100]}...")
+            else:
+                full_text = original_text
             
             model_name_lower = (getattr(self.config, 'model_name', '') or '').lower()
 
@@ -312,9 +353,26 @@ class CoquiVoiceSynthesizer:
                 # Strategy 4: Try with longer text if kernel size error
                 if not synthesis_success and any("kernel size" in err.lower() for err in synthesis_errors):
                     try:
-                        # Add more padding for kernel size issues
-                        extended_text = full_text + " " + full_text + " " + full_text
+                        # Create a more substantial extended text for kernel size issues
+                        if self.config.language == "hi":
+                            extended_parts = [
+                                full_text,
+                                "यह एक लंबा वाक्य है जो टेक्स्ट-टू-स्पीच मॉडल के लिए पर्याप्त लंबाई प्रदान करता है।",
+                                full_text,
+                                "धन्यवाद और शुभकामनाएं।"
+                            ]
+                            extended_text = "। ".join(extended_parts) + "।"
+                        else:
+                            extended_parts = [
+                                full_text,
+                                "This is a longer sentence that provides sufficient length for the text-to-speech model.",
+                                full_text,
+                                "Thank you and best wishes."
+                            ]
+                            extended_text = ". ".join(extended_parts) + "."
+                        
                         logger.info(f"Retrying with extended text length: {len(extended_text)} characters")
+                        logger.info(f"Extended text: {extended_text[:100]}...")
                         
                         if speaker_wav_arg is not None:
                             self.tts.tts_to_file(
@@ -370,7 +428,24 @@ class CoquiVoiceSynthesizer:
                     if "kernel size" in error_msg.lower():
                         logger.warning(f"Kernel size error detected, trying with extended text: {error_msg}")
                         # Try with extended text for kernel size issues
-                        extended_text = full_text + " " + full_text + " " + full_text
+                        if self.config.language == "hi":
+                            extended_parts = [
+                                full_text,
+                                "यह एक लंबा वाक्य है जो टेक्स्ट-टू-स्पीच मॉडल के लिए पर्याप्त लंबाई प्रदान करता है।",
+                                full_text,
+                                "धन्यवाद और शुभकामनाएं।"
+                            ]
+                            extended_text = "। ".join(extended_parts) + "।"
+                        else:
+                            extended_parts = [
+                                full_text,
+                                "This is a longer sentence that provides sufficient length for the text-to-speech model.",
+                                full_text,
+                                "Thank you and best wishes."
+                            ]
+                            extended_text = ". ".join(extended_parts) + "."
+                        
+                        logger.info(f"Non-XTTS retrying with extended text length: {len(extended_text)} characters")
                         try:
                             self.tts.tts_to_file(
                                 text=extended_text,

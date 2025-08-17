@@ -33,7 +33,7 @@ def test_kernel_size_fix():
         synthesizer = CoquiVoiceSynthesizer(config)
         
         # Test with very short text that might cause kernel size issues
-        short_text = ["Hi"]  # Very short text
+        short_text = ["Hi", "Hello"]  # Very short text that should trigger padding
         
         print("🎙️  Testing with very short text...")
         result_path = synthesizer.synthesize_voice(short_text, str(output_path))
@@ -68,7 +68,7 @@ def test_hindi_kernel_size_fix():
         synthesizer = CoquiVoiceSynthesizer(config)
         
         # Test with very short Hindi text
-        short_hindi_text = ["नमस्ते"]  # Very short Hindi text
+        short_hindi_text = ["नमस्ते", "हैलो"]  # Very short Hindi text that should trigger padding
         
         print("🎙️  Testing with very short Hindi text...")
         result_path = synthesizer.synthesize_voice(short_hindi_text, str(output_path))
