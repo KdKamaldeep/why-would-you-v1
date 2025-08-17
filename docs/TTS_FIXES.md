@@ -27,7 +27,6 @@ warnings.filterwarnings("ignore", message=".*GPT2InferenceModel has generative c
 warnings.filterwarnings("ignore", message=".*doesn't directly inherit from GenerationMixin.*")
 warnings.filterwarnings("ignore", message=".*PreTrainedModel will NOT inherit from GenerationMixin.*")
 warnings.filterwarnings("ignore", message=".*this model will lose the ability to call generate.*")
-warnings.filterwarnings("ignore", message=".*trust_remote_code=True.*")
 warnings.filterwarnings("ignore", message=".*modify your model class such that it inherits from GenerationMixin.*")
 ```
 
@@ -43,8 +42,8 @@ warnings.filterwarnings("ignore", message=".*modify your model class such that i
 
 #### A. Enhanced Model Loading
 - **Language-specific prioritization**: Hindi now prioritizes XTTS v2 models
-- **Trust remote code**: Added `trust_remote_code=True` to avoid warnings
 - **Language verification**: Check if loaded model supports target language
+- **Robust fallback**: Multiple model options for different scenarios
 
 ```python
 if lang == "hi":  # Hindi

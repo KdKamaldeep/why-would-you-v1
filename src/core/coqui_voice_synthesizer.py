@@ -34,7 +34,6 @@ warnings.filterwarnings("ignore", message=".*GPT2InferenceModel has generative c
 warnings.filterwarnings("ignore", message=".*doesn't directly inherit from GenerationMixin.*")
 warnings.filterwarnings("ignore", message=".*PreTrainedModel will NOT inherit from GenerationMixin.*")
 warnings.filterwarnings("ignore", message=".*this model will lose the ability to call generate.*")
-warnings.filterwarnings("ignore", message=".*trust_remote_code=True.*")
 warnings.filterwarnings("ignore", message=".*modify your model class such that it inherits from GenerationMixin.*")
 
 # Suppress other common TTS/transformers warnings
@@ -143,8 +142,8 @@ class CoquiVoiceSynthesizer:
                 try:
                     logger.info(f"Attempting to load TTS model: {model_name}")
                     
-                    # Use trust_remote_code=True to avoid GenerationMixin warnings
-                    self.tts = TTS(model_name, trust_remote_code=True).to(device)
+                    # Load TTS model without trust_remote_code (not supported in this version)
+                    self.tts = TTS(model_name).to(device)
                     
                     # Verify the model supports the target language
                     if hasattr(self.tts, 'languages') and self.tts.languages:
