@@ -72,6 +72,7 @@ if self.config.language == "hi":
 
 #### D. Robust Synthesis Strategies
 - **Multiple fallback strategies**: Try speaker_wav, speaker token, then default
+- **Kernel size error handling**: Automatically extend short text to meet model requirements
 - **Better error handling**: Detailed error messages for debugging
 - **Language-aware logging**: Track synthesis progress for different languages
 
@@ -158,6 +159,11 @@ config = CoquiVoiceConfig(
    - Check text encoding for non-English languages
    - Verify model supports target language
    - Try different synthesis strategies
+
+4. **Kernel size error**
+   - Text is too short for the TTS model
+   - System automatically extends text length
+   - Ensure input text has sufficient content
 
 ### Debug Mode
 Enable detailed logging:

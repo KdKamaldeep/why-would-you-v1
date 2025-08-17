@@ -199,6 +199,21 @@ class CoquiVoiceSynthesizer:
             full_text = " ".join(narration_lines)
             logger.info(f"Synthesizing voice for text: {full_text[:100]}...")
             
+            # Ensure minimum text length for TTS models
+            min_text_length = 10  # Minimum characters needed
+            if len(full_text.strip()) < min_text_length:
+                # Pad short text with silence markers or repeat content
+                if self.config.language == "hi":
+                    padding_text = "। "  # Hindi full stop with space
+                else:
+                    padding_text = ". "  # English period with space
+                
+                # Repeat the text or add padding until minimum length
+                while len(full_text.strip()) < min_text_length:
+                    full_text += padding_text + full_text.strip()
+                
+                logger.info(f"Padded short text to minimum length: {len(full_text)} characters")
+            
             model_name_lower = (getattr(self.config, 'model_name', '') or '').lower()
 
             # For XTTS, prefer direct reference wav and pass language
@@ -294,6 +309,34 @@ class CoquiVoiceSynthesizer:
                         synthesis_errors.append(f"Default speaker synthesis failed: {error_msg}")
                         logger.warning(f"XTTS default speaker synthesis failed: {error_msg}")
                 
+                # Strategy 4: Try with longer text if kernel size error
+                if not synthesis_success and any("kernel size" in err.lower() for err in synthesis_errors):
+                    try:
+                        # Add more padding for kernel size issues
+                        extended_text = full_text + " " + full_text + " " + full_text
+                        logger.info(f"Retrying with extended text length: {len(extended_text)} characters")
+                        
+                        if speaker_wav_arg is not None:
+                            self.tts.tts_to_file(
+                                text=extended_text,
+                                file_path=output_path,
+                                speaker_wav=speaker_wav_arg,
+                                language=self.config.language,
+                            )
+                        else:
+                            self.tts.tts_to_file(
+                                text=extended_text,
+                                file_path=output_path,
+                                speaker="default",
+                                language=self.config.language,
+                            )
+                        synthesis_success = True
+                        logger.info("✅ XTTS synthesis successful with extended text")
+                    except Exception as e:
+                        error_msg = str(e)
+                        synthesis_errors.append(f"Extended text synthesis failed: {error_msg}")
+                        logger.warning(f"XTTS extended text synthesis failed: {error_msg}")
+                
                 if not synthesis_success:
                     logger.error(f"All XTTS synthesis strategies failed: {synthesis_errors}")
                     raise Exception(f"XTTS synthesis failed: {'; '.join(synthesis_errors)}")
@@ -310,13 +353,40 @@ class CoquiVoiceSynthesizer:
                     speaker_audio_path = os.path.join(speaker_dir, "speaker.wav")
                     shutil.copy2(voice_clone_audio, speaker_audio_path)
                     current_speaker = speaker_name
-                logger.info(f"Generating audio with speaker: {current_speaker}")
-                # Avoid passing progress_bar to suppress model_kwargs warnings
-                self.tts.tts_to_file(
-                    text=full_text,
-                    file_path=output_path,
-                    voice_dir=self.config.voice_dir
-                )
+                
+                # Try synthesis with fallback for kernel size issues
+                synthesis_success = False
+                try:
+                    logger.info(f"Generating audio with speaker: {current_speaker}")
+                    # Avoid passing progress_bar to suppress model_kwargs warnings
+                    self.tts.tts_to_file(
+                        text=full_text,
+                        file_path=output_path,
+                        voice_dir=self.config.voice_dir
+                    )
+                    synthesis_success = True
+                except Exception as e:
+                    error_msg = str(e)
+                    if "kernel size" in error_msg.lower():
+                        logger.warning(f"Kernel size error detected, trying with extended text: {error_msg}")
+                        # Try with extended text for kernel size issues
+                        extended_text = full_text + " " + full_text + " " + full_text
+                        try:
+                            self.tts.tts_to_file(
+                                text=extended_text,
+                                file_path=output_path,
+                                voice_dir=self.config.voice_dir
+                            )
+                            synthesis_success = True
+                            logger.info("✅ Non-XTTS synthesis successful with extended text")
+                        except Exception as e2:
+                            logger.error(f"Extended text synthesis also failed: {e2}")
+                            raise e2
+                    else:
+                        raise e
+                
+                if not synthesis_success:
+                    raise Exception("Non-XTTS synthesis failed")
             
             if os.path.exists(output_path):
                 logger.info(f"✅ Voice synthesized successfully: {output_path}")
