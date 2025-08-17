@@ -1,19 +1,19 @@
 {
   "title": "Why Would You Avoid White Rice for Dinner?",
-  "description": "A fun story about Aarav discovering why eating too much white rice at night might not be the best idea, told with humor and playful narration.",
-  "total_duration": 42,
+  "description": "A fun story about Aarav discovering why eating too much white rice at night might not be the best idea, told with humor and Indian grandma’s wisdom.",
+  "total_duration": 44,
   "cast": [
-    {"name": "Aarav", "role": "curious boy who loves food"},
+    {"name": "Aarav", "role": "9-year-old playful Indian boy"},
     {"name": "White Rice", "role": "fluffy, tempting but sneaky food"},
-    {"name": "Grandma", "role": "wise and funny elder"}
+    {"name": "Grandma", "role": "70-year-old wise, funny and loving grandma"}
   ],
   "scenes": [
     {
       "duration": 7,
       "description": "wide shot of Aarav sitting at the dinner table staring at a big bowl of white rice",
-      "visual_prompt": "(wide shot:1.2) Indian boy Aarav looking at big bowl of fluffy white rice on dinner table, evening setting, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) Aarav sitting on dining table1.4 looking at big bowl of fluffy white rice1.1, steel plates and bowls, evening setting, storybook style:1.3",
       "negative_prompt": "blurry, dark, low resolution, scary, distorted",
-      "narration": "क्यों कहते हैं लोग—रात को ज़्यादा चावल मत खाओ? चलो, आरव की कहानी से जानते हैं!",
+      "narration": "क्यों कहते हैं लोग—रात को ज़्यादा चावल मत खाओ? चलो, आरव की दादी की कहानी से जानते हैं!",
       "subtitle": "The Dinner Dilemma",
       "characters": ["Aarav", "White Rice"],
       "motion_prompt": "boy staring curiously at bowl of rice"
@@ -21,9 +21,9 @@
     {
       "duration": 7,
       "description": "close-up of white rice looking fluffy and shiny, almost talking to Aarav",
-      "visual_prompt": "(close-up:1.2) fluffy white rice steaming in a bowl, glowing slightly as if alive, storybook style:1.3",
+      "visual_prompt": "(close-up:1.2) fluffy white rice steaming in a steel bowl, glowing slightly as if alive, storybook style:1.3",
       "negative_prompt": "blurry, dark, scary, distorted",
-      "narration": "चावल मानो कह रहे हों – ‘आ जा बेटा, मुझे खा जा!’",
+      "narration": "चावल मानो कह रहे हों – ‘आजा बेटा, गरमा-गरम हूँ... दो प्लेट और खा ले!’",
       "subtitle": "The Tempting Rice",
       "characters": ["White Rice"],
       "motion_prompt": "rice steaming, looking magical"
@@ -31,7 +31,7 @@
     {
       "duration": 7,
       "description": "medium shot of Grandma entering with a wise smile, pointing at the rice",
-      "visual_prompt": "(medium shot:1.2) Grandma with glasses, smiling wisely, pointing at steaming rice bowl, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) Grandma with white hair in bun, cotton saree, smiling wisely, pointing at steaming rice bowl1.1, storybook style:1.3",
       "negative_prompt": "blurry, distorted, scary",
       "narration": "दादी बोलीं—‘रात को ज़्यादा चावल खाओगे, तो नींद तो आएगी... लेकिन पेट बोलेगा—हाय राम!’",
       "subtitle": "Grandma’s Warning",
@@ -41,7 +41,7 @@
     {
       "duration": 7,
       "description": "funny shot of Aarav imagining himself bloated after eating too much rice",
-      "visual_prompt": "(medium shot:1.2) boy imagining his tummy becoming round like a balloon after eating rice, cartoon style humor, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) Aarav imagining his tummy becoming round like a balloon after eating rice, cartoon style humor, storybook style:1.3",
       "negative_prompt": "scary, dark, distorted",
       "narration": "आरव ने सोचा—‘अगर ज़्यादा चावल खा लूँ, तो मैं चलता-फिरता गोलगप्पा बन जाऊँगा!’",
       "subtitle": "The Funny Imagination",
