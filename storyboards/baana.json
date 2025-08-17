@@ -1,0 +1,71 @@
+{
+  "title": "Why Would You Eat Bananas After a Workout?",
+  "description": "A fun and healthy story where Lavanya learns why bananas are the best snack after exercise, explained with humor, energy, and Grandma’s wisdom.",
+  "total_duration": 44,
+  "scenes": [
+    {
+      "duration": 7,
+      "description": "Lavanya finishing her workout and looking very tired",
+      "visual_prompt": "(wide shot:1.2) 9-year-old Indian girl Lavanya, short black hair:1.1, wearing sports T-shirt:1.1 and track pants:1.1, sweating after workout:1.1, holding water bottle:1.1, tired face:1.1, storybook style:1.3",
+      "negative_prompt": "blurry, dark, distorted, scary, extra limbs",
+      "narration": "दौड़ने और कूदने के बाद लावण्या थक कर चूर हो गई। उसका शरीर कह रहा था—‘थोड़ी मदद चाहिए!’ उसने सोचा—अब ऐसी हालत में क्या खाऊँ कि ताकत वापस आ जाए?",
+      "subtitle": "The Tired Workout",
+      "motion_prompt": "girl panting, wiping sweat"
+    },
+    {
+      "duration": 7,
+      "description": "A shiny yellow banana glowing with banana tree in background",
+      "visual_prompt": "(wide shot:1.2) ripe yellow banana:1.2 glowing with soft light:1.1, placed on wooden kitchen table:1.1, green banana tree in background:1.2, magical aura around fruit:1.1, storybook style:1.3",
+      "negative_prompt": "blurry, dark, distorted, scary, extra limbs",
+      "narration": "रसोई की मेज़ पर रखा पीला चमकता केला मानो जादुई लग रहा था। पीछे आँगन में केला का पेड़ खड़ा था, जैसे कह रहा हो—‘लावण्या, मुझे खा लो! मैं तुम्हारी थकी हुई मांसपेशियों का राज़ हूँ।’",
+      "subtitle": "The Magical Banana",
+      "motion_prompt": "banana glowing, tree swaying"
+    },
+    {
+      "duration": 7,
+      "description": "Grandma entering the kitchen with a knowing smile",
+      "visual_prompt": "(wide shot:1.2) 70-year-old Indian grandma, white hair tied in bun:1.1, wearing simple cotton saree with border:1.2, smiling wisely:1.1, pointing at banana:1.1, Lavanya standing beside in sports clothes:1.1, storybook style:1.3",
+      "negative_prompt": "blurry, scary, distorted, extra limbs",
+      "narration": "दादी रसोई में आईं और मुस्कुराते हुए बोलीं—‘लावण्या, वर्कआउट के बाद केला सबसे अच्छा है। ये तुरंत ऊर्जा देता है, ताक़त लौटाता है और थकान मिटा देता है।’",
+      "subtitle": "Grandma’s Wisdom",
+      "motion_prompt": "grandma pointing, girl listening"
+    },
+    {
+      "duration": 7,
+      "description": "Lavanya imagining her muscles filling with energy after eating a banana",
+      "visual_prompt": "(wide shot:1.2) 9-year-old Indian girl Lavanya, short hair:1.1, wearing sports T-shirt:1.1 and track pants:1.1, cartoon style imagination:1.15, glowing strong muscles:1.2, yellow sparkles around:1.1, banana energy flowing:1.15, storybook style:1.3",
+      "negative_prompt": "blurry, dark, distorted, scary, extra limbs",
+      "narration": "लावण्या ने सोचा—‘अगर मैं ये केला खा लूँ तो मेरी मांसपेशियाँ बैटरी की तरह चार्ज हो जाएँगी और मैं फिर से मज़बूत हो जाऊँगी!’",
+      "subtitle": "The Funny Imagination",
+      "motion_prompt": "girl flexing arms, glowing sparkles"
+    },
+    {
+      "duration": 7,
+      "description": "Lavanya eating the banana happily with Grandma watching",
+      "visual_prompt": "(wide shot:1.2) 9-year-old Indian girl Lavanya, short black hair:1.1, wearing sports T-shirt:1.1 and track pants:1.1, eating ripe banana:1.15 with smile:1.1, grandma age 70 in cotton saree:1.2 sitting beside, storybook style:1.3",
+      "negative_prompt": "blurry, distorted, scary, extra limbs",
+      "narration": "उसने केला छीला और बड़े मज़े से खाया—वाह! मीठा, स्वादिष्ट और ताक़त से भरपूर। दादी ने सिर हिलाकर कहा—‘देखा, हेल्दी चीज़ें खाने से शरीर और भी मज़बूत बनता है।’",
+      "subtitle": "The Healthy Bite",
+      "motion_prompt": "girl eating banana, grandma smiling"
+    },
+    {
+      "duration": 7,
+      "description": "Lavanya waving goodnight with Grandma, banana peel in dustbin, both smiling",
+      "visual_prompt": "(wide shot:1.2) 9-year-old Indian girl Lavanya, short hair:1.1, wearing cotton pajamas:1.1, waving hand:1.1, grandma age 70 in cotton saree:1.2 smiling beside, dustbin with banana peel in background:1.1, storybook style:1.3",
+      "negative_prompt": "blurry, distorted, creepy, extra limbs",
+      "narration": "उस रात लावण्या ने चैन की नींद ली, क्योंकि उसका शरीर खुश और ताक़तवर था। दादी बोलीं—‘बच्चों, याद रखो—वर्कआउट के बाद एक केला, और ऊर्जा दुगनी!’ अगर कहानी पसंद आई हो तो लाइक और सब्सक्राइब ज़रूर करना।",
+      "subtitle": "The Bedtime Secret",
+      "motion_prompt": "girl waving, grandma smiling"
+    }
+  ],
+  "tags": [
+    "kids",
+    "food",
+    "funny",
+    "health",
+    "workout",
+    "storybook",
+    "banana",
+    "grandma wisdom"
+  ]
+}
