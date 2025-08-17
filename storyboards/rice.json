@@ -33,29 +33,29 @@
     {
       "duration": 7,
       "description": "funny shot of Aarav imagining himself bloated after eating too much rice",
-      "visual_prompt": "(medium shot:1.2) cartoon style imagination: 9-year-old Indian boy Aarav wearing T-shirt and shorts, tummy becoming round like a balloon, laughing at himself, storybook humor style:1.3",
-      "negative_prompt": "scary, dark, distorted",
+      "visual_prompt": "(medium shot:1.2) (Indian boy:1.2) (age 9:1.1) (short hair:1.1) (T-shirt:1.1) (shorts:1.1) (cartoon style:1.2) (big round tummy:1.15) (funny expression:1.1) (storybook style:1.3)",
+      "negative_prompt": "blurry, dark, distorted, extra limbs, creepy",
       "narration": "आरव ने सोचा—‘अगर ज़्यादा चावल खा लूँ, तो मैं चलता-फिरता गोलगप्पा बन जाऊँगा!’",
       "subtitle": "The Funny Imagination",
-      "motion_prompt": "boy holding tummy, laughing at thought"
+      "motion_prompt": "boy holding tummy, laughing"
     },
     {
       "duration": 7,
       "description": "wide shot of Aarav eating just a small portion of rice with veggies and smiling",
-      "visual_prompt": "(wide shot:1.2) 9-year-old Indian boy Aarav eating balanced steel thali with little rice, sabzi and dal, smiling brightly, grandma in cotton saree sitting beside proudly, storybook style:1.3",
-      "negative_prompt": "blurry, distorted, scary",
+      "visual_prompt": "(wide shot:1.2) (Indian boy:1.2) (age 9:1.1) (short hair:1.1) (T-shirt:1.1) (shorts:1.1) (steel thali:1.2) (white rice small portion:1.15) (sabzi:1.1) (dal:1.1) (smiling:1.1) (Indian grandma:1.2) (age 70:1.1) (cotton saree:1.1) (storybook style:1.3)",
+      "negative_prompt": "blurry, scary, distorted, extra limbs",
       "narration": "फिर उसने सोचा—‘थोड़ा चावल, सब्ज़ी और दाल—बस मज़ेदार और हेल्दी खाना तैयार!’",
       "subtitle": "The Smart Choice",
-      "motion_prompt": "boy eating happily, grandma smiling proudly"
+      "motion_prompt": "boy eating, grandma smiling"
     },
     {
       "duration": 7,
       "description": "medium shot of Aarav waving goodnight with Grandma, rice bowl in background looking sad",
-      "visual_prompt": "(medium shot:1.2) 9-year-old Indian boy Aarav in cotton night suit waving goodnight, grandma in cotton saree smiling warmly, in background rice bowl drawn with cartoon sad eyes, storybook style:1.3",
-      "negative_prompt": "blurry, scary, distorted",
+      "visual_prompt": "(medium shot:1.2) (Indian boy:1.2) (age 9:1.1) (night suit:1.1) (waving hand:1.1) (grandma:1.2) (age 70:1.1) (cotton saree:1.1) (smiling:1.1) (rice bowl cartoon eyes:1.15) (sad expression:1.15) (storybook style:1.3)",
+      "negative_prompt": "blurry, scary, distorted, creepy, low quality",
       "narration": "तो बच्चों, रात को चावल कम—सपने हों धम-धम! अगर कहानी अच्छी लगी हो, तो लाइक और सब्सक्राइब करना मत भूलना।",
       "subtitle": "The Bedtime Secret",
-      "motion_prompt": "boy waving, grandma smiling, rice bowl sulking"
+      "motion_prompt": "boy waving, grandma smiling, rice bowl sad"
     }
   ],
   "tags": [
