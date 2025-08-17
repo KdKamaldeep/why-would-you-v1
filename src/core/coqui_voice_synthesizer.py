@@ -29,6 +29,19 @@ warnings.filterwarnings("ignore", message=".*pad token is same as eos token.*")
 warnings.filterwarnings("ignore", message=".*CLIPFeatureExtractor is deprecated.*")
 warnings.filterwarnings("ignore", message=".*Some weights of the model checkpoint were not used.*")
 
+# Suppress GPT2InferenceModel GenerationMixin warnings from transformers v4.50+
+warnings.filterwarnings("ignore", message=".*GPT2InferenceModel has generative capabilities.*")
+warnings.filterwarnings("ignore", message=".*doesn't directly inherit from GenerationMixin.*")
+warnings.filterwarnings("ignore", message=".*PreTrainedModel will NOT inherit from GenerationMixin.*")
+warnings.filterwarnings("ignore", message=".*this model will lose the ability to call generate.*")
+warnings.filterwarnings("ignore", message=".*trust_remote_code=True.*")
+warnings.filterwarnings("ignore", message=".*modify your model class such that it inherits from GenerationMixin.*")
+
+# Suppress other common TTS/transformers warnings
+warnings.filterwarnings("ignore", message=".*model_kwargs.*")
+warnings.filterwarnings("ignore", message=".*The attention mask and the pad token id were not set.*")
+warnings.filterwarnings("ignore", message=".*Using the model-agnostic default.*")
+
 logger = logging.getLogger(__name__)
 
 # Patch for PyTorch 2.6 weights_only issue
@@ -91,31 +104,61 @@ class CoquiVoiceSynthesizer:
             # Build a prioritized list of models based on requested language
             fallback_models = []
             lang = (self.config.language or "en").lower()
-            # For non-English targets, try multilingual XTTS first
-            if lang != "en":
-                # Prefer the newer hub-style alias first, then legacy id
-                fallback_models.append("coqui/XTTS-v2")
-                fallback_models.append("tts_models/multilingual/multi-dataset/xtts_v2")
-            # Always try the explicitly configured model next
-            fallback_models.append(self.config.model_name)
-            # Add robust alternates
+            
+            # Language-specific model prioritization
+            if lang == "hi":  # Hindi
+                # For Hindi, prioritize XTTS v2 which has excellent Hindi support
+                fallback_models.extend([
+                    "coqui/XTTS-v2",
+                    "tts_models/multilingual/multi-dataset/xtts_v2",
+                    "tts_models/multilingual/multi-dataset/your_tts",  # YourTTS also supports Hindi
+                ])
+            elif lang != "en":  # Other non-English languages
+                # For other languages, try XTTS first
+                fallback_models.extend([
+                    "coqui/XTTS-v2",
+                    "tts_models/multilingual/multi-dataset/xtts_v2",
+                    "tts_models/multilingual/multi-dataset/your_tts",
+                ])
+            
+            # Always try the explicitly configured model
+            if self.config.model_name not in fallback_models:
+                fallback_models.append(self.config.model_name)
+            
+            # Add robust English fallbacks
             fallback_models.extend([
                 "tts_models/en/ljspeech/fast_pitch",
                 "tts_models/en/vctk/vits",
-                # YourTTS is multilingual but quality varies; leave lower priority
-                "tts_models/multilingual/multi-dataset/your_tts",
-                # Ensure XTTS is attempted even for English if earlier attempts failed
-                "tts_models/multilingual/multi-dataset/xtts_v2",
+                "tts_models/en/ljspeech/tacotron2-DDC",
             ])
+            
+            # Ensure XTTS is attempted even for English if earlier attempts failed
+            if "tts_models/multilingual/multi-dataset/xtts_v2" not in fallback_models:
+                fallback_models.append("tts_models/multilingual/multi-dataset/xtts_v2")
+            
+            logger.info(f"Loading TTS model for language: {lang}")
+            logger.info(f"Model priority list: {fallback_models}")
             
             for model_name in fallback_models:
                 try:
                     logger.info(f"Attempting to load TTS model: {model_name}")
-                    self.tts = TTS(model_name).to(device)
+                    
+                    # Use trust_remote_code=True to avoid GenerationMixin warnings
+                    self.tts = TTS(model_name, trust_remote_code=True).to(device)
+                    
+                    # Verify the model supports the target language
+                    if hasattr(self.tts, 'languages') and self.tts.languages:
+                        available_langs = [str(l).lower() for l in self.tts.languages]
+                        if lang not in available_langs and lang != "en":
+                            logger.warning(f"Model {model_name} may not support language '{lang}'. Available: {available_langs}")
+                    
                     logger.info(f"✅ Successfully loaded TTS model: {model_name}")
+                    logger.info(f"Model device: {device}")
+                    
                     # Update config to reflect the actually loaded model
                     self.config.model_name = model_name
                     return
+                    
                 except Exception as e:
                     logger.warning(f"Failed to load model {model_name}: {e}")
                     continue
@@ -162,6 +205,22 @@ class CoquiVoiceSynthesizer:
             # For XTTS, prefer direct reference wav and pass language
             if "xtts" in model_name_lower:
                 logger.info("Generating audio with XTTS (multilingual)")
+                logger.info(f"Target language: {self.config.language}")
+                logger.info(f"Text length: {len(full_text)} characters")
+                
+                # Validate text encoding for non-English languages
+                if self.config.language != "en":
+                    try:
+                        # Ensure text is properly encoded for the target language
+                        if self.config.language == "hi":
+                            # For Hindi, ensure Devanagari script is properly handled
+                            import unicodedata
+                            # Normalize Unicode characters
+                            full_text = unicodedata.normalize('NFC', full_text)
+                            logger.info(f"Normalized Hindi text: {full_text[:50]}...")
+                    except Exception as e:
+                        logger.warning(f"Text normalization warning: {e}")
+                
                 speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
                 # Auto-discover a language-appropriate speaker WAV if none provided
                 if speaker_wav_arg is None:
@@ -169,6 +228,7 @@ class CoquiVoiceSynthesizer:
                     if auto_wav:
                         logger.info(f"Using discovered speaker_wav for language '{self.config.language}': {auto_wav}")
                         speaker_wav_arg = auto_wav
+                
                 # Ensure a valid speaker is passed for XTTS if no reference wav
                 requested_speaker = (
                     speaker if (speaker is not None and str(speaker).strip() != "") else self.config.speaker
@@ -180,6 +240,7 @@ class CoquiVoiceSynthesizer:
                     # Avoid passing progress_bar to suppress model_kwargs warnings
                     if speaker_wav_arg is not None:
                         # Reference voice provided: do not pass speaker token
+                        logger.info(f"XTTS synthesis with speaker_wav: {speaker_wav_arg}")
                         self.tts.tts_to_file(
                             text=full_text,
                             file_path=output_path,
@@ -189,6 +250,7 @@ class CoquiVoiceSynthesizer:
                     else:
                         # No reference: pass an explicit speaker token
                         chosen_speaker = speaker_value or self.config.speaker or "default"
+                        logger.info(f"XTTS synthesis with speaker: {chosen_speaker}")
                         self.tts.tts_to_file(
                             text=full_text,
                             file_path=output_path,
@@ -196,12 +258,46 @@ class CoquiVoiceSynthesizer:
                             language=self.config.language,
                         )
 
-                try:
-                    _xtts_call(xtts_speaker)
-                except Exception as e:
-                    # Retry strategy for XTTS when speaker is not accepted
-                    err_msg = str(e)
-                    logger.warning(f"XTTS initial synthesis failed: {err_msg}")
+                # Try multiple synthesis strategies
+                synthesis_success = False
+                synthesis_errors = []
+                
+                # Strategy 1: Try with discovered speaker WAV
+                if speaker_wav_arg:
+                    try:
+                        _xtts_call(None)
+                        synthesis_success = True
+                        logger.info("✅ XTTS synthesis successful with speaker_wav")
+                    except Exception as e:
+                        error_msg = str(e)
+                        synthesis_errors.append(f"Speaker WAV synthesis failed: {error_msg}")
+                        logger.warning(f"XTTS speaker_wav synthesis failed: {error_msg}")
+                
+                # Strategy 2: Try with selected speaker token
+                if not synthesis_success:
+                    try:
+                        _xtts_call(xtts_speaker)
+                        synthesis_success = True
+                        logger.info("✅ XTTS synthesis successful with speaker token")
+                    except Exception as e:
+                        error_msg = str(e)
+                        synthesis_errors.append(f"Speaker token synthesis failed: {error_msg}")
+                        logger.warning(f"XTTS speaker token synthesis failed: {error_msg}")
+                
+                # Strategy 3: Try with default speaker
+                if not synthesis_success:
+                    try:
+                        _xtts_call("default")
+                        synthesis_success = True
+                        logger.info("✅ XTTS synthesis successful with default speaker")
+                    except Exception as e:
+                        error_msg = str(e)
+                        synthesis_errors.append(f"Default speaker synthesis failed: {error_msg}")
+                        logger.warning(f"XTTS default speaker synthesis failed: {error_msg}")
+                
+                if not synthesis_success:
+                    logger.error(f"All XTTS synthesis strategies failed: {synthesis_errors}")
+                    raise Exception(f"XTTS synthesis failed: {'; '.join(synthesis_errors)}")
             else:
                 # Non-XTTS models: use speaker registry in voice_dir
                 current_speaker = speaker or self.config.speaker
@@ -245,51 +341,93 @@ class CoquiVoiceSynthesizer:
         """
         try:
             lang = (language or "").lower()
+            logger.info(f"Discovering speaker WAV for language: {lang}")
+            
             # Environment overrides
             env_map = {
                 "hi": os.getenv("HINDI_SPEAKER_WAV"),
+                "en": os.getenv("ENGLISH_SPEAKER_WAV"),
+                "es": os.getenv("SPANISH_SPEAKER_WAV"),
             }
             if lang in env_map and env_map[lang] and os.path.exists(env_map[lang]):
+                logger.info(f"Using environment variable speaker WAV: {env_map[lang]}")
                 return env_map[lang]
 
             candidates: List[str] = []
-            # Common directories
-            roots = [
-                os.path.join("tts-speaker", "male_hindi_speaker.wav"),
-                os.path.join("tts_speaker", "male_hindi_speaker.wav"),
-                os.path.join("tts_voices", "male_hindi_speaker.wav"),
+            
+            # Language-specific search patterns
+            if lang == "hi":  # Hindi
+                hindi_patterns = [
+                    "male_hindi_speaker.wav",
+                    "hindi_speaker.wav", 
+                    "hindi_male.wav",
+                    "hindi_voice.wav",
+                    "speaker_hindi.wav",
+                ]
+                for pattern in hindi_patterns:
+                    for folder in ["tts-speaker", "tts_speaker", "tts_voices", "voices"]:
+                        path = os.path.join(folder, pattern)
+                        if os.path.exists(path):
+                            candidates.append(path)
+            
+            # Common directories for any language
+            common_patterns = [
+                f"{lang}_speaker.wav",
+                f"speaker_{lang}.wav", 
+                f"{lang}_voice.wav",
+                "speaker.wav",
+                "voice.wav",
             ]
-            for p in roots:
-                if os.path.exists(p):
-                    candidates.append(p)
+            
+            for pattern in common_patterns:
+                for folder in ["tts-speaker", "tts_speaker", "tts_voices", "voices"]:
+                    path = os.path.join(folder, pattern)
+                    if os.path.exists(path):
+                        candidates.append(path)
 
             # Broader search for any wav under tts-speaker-like dirs
-            for folder in ["tts-speaker", "tts_speaker", "tts_voices"]:
+            for folder in ["tts-speaker", "tts_speaker", "tts_voices", "voices"]:
                 if os.path.isdir(folder):
                     try:
                         for name in os.listdir(folder):
                             if name.lower().endswith(".wav"):
                                 full = os.path.join(folder, name)
                                 candidates.append(full)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        logger.debug(f"Could not list directory {folder}: {e}")
 
-            # Rank: prefer names with 'hindi' then 'male'
+            # Remove duplicates and rank candidates
+            candidates = list(set(candidates))
+            
+            # Rank: prefer names with language code, then 'hindi', then 'male'
             def score(path: str) -> int:
                 name = os.path.basename(path).lower()
                 s = 0
-                if "hindi" in name:
+                if lang in name:
+                    s += 3
+                if "hindi" in name and lang == "hi":
                     s += 2
                 if "male" in name:
                     s += 1
                 return s
 
-            candidates = sorted(set(candidates), key=lambda p: (-score(p), p))
+            candidates = sorted(candidates, key=lambda p: (-score(p), p))
+            
+            logger.info(f"Found {len(candidates)} candidate speaker WAV files")
+            for i, c in enumerate(candidates[:5]):  # Log top 5 candidates
+                if os.path.exists(c):
+                    logger.info(f"  {i+1}. {c}")
+            
+            # Return the best candidate
             for c in candidates:
                 if os.path.exists(c):
+                    logger.info(f"Selected speaker WAV: {c}")
                     return c
-        except Exception:
-            pass
+                    
+        except Exception as e:
+            logger.warning(f"Error discovering speaker WAV: {e}")
+        
+        logger.info("No suitable speaker WAV found")
         return None
 
     def _get_builtin_speakers(self) -> List[str]:
