@@ -16,9 +16,11 @@ logger = logging.getLogger(__name__)
 class AnimationGenerator:
     """Handles professional quality video animation with unlimited length capability."""
     
-    def __init__(self):
+    def __init__(self, width: int = 768, height: int = 1024):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.fps = 15
+        self.width = width
+        self.height = height
     
     def animate_image(self, image_path: str, output_dir: str, num_frames: int = 150, prompt: str = "") -> str:
         """
@@ -117,12 +119,12 @@ class AnimationGenerator:
             # For FFmpeg 4.4, the zoompan filter does not support 't' (time) variable.
             # Use 'on' (output frame index) to drive motion and zoom.
             vf = (
-                "scale=1200:1600:force_original_aspect_ratio=decrease,"
-                "pad=1200:1600:(ow-iw)/2:(oh-ih)/2,"
+                f"scale={int(self.width*1.5)}:{int(self.height*1.5)}:force_original_aspect_ratio=decrease,"
+                f"pad={int(self.width*1.5)}:{int(self.height*1.5)}:(ow-iw)/2:(oh-ih)/2,"
                 f"zoompan=z=1+on*0.001:d={num_frames}:"
                 "x=iw/2-(iw/zoom/2)+sin(on*0.1)*20:"
                 "y=ih/2-(ih/zoom/2)+cos(on*0.1)*15:"
-                "s=768x1024"
+                f"s={self.width}x{self.height}"
             )
             cmd = [
                 'ffmpeg', '-y',
@@ -163,7 +165,7 @@ class AnimationGenerator:
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=1400:1800,crop=768:1024:w*sin(t*0.02)*0.15+w*0.15:h*cos(t*0.015)*0.1+h*0.1,unsharp=5:5:1.0:5:5:0.5',
+                '-vf', f'scale={int(self.width*1.8)}:{int(self.height*1.8)},crop={self.width}:{self.height}:w*sin(t*0.02)*0.15+w*0.15:h*cos(t*0.015)*0.1+h*0.1,unsharp=5:5:1.0:5:5:0.5',
                 '-r', str(self.fps),
                 '-frames:v', str(num_frames),
                 '-f', 'image2',
@@ -186,7 +188,7 @@ class AnimationGenerator:
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=1000:1300:force_original_aspect_ratio=decrease,pad=1000:1300:(ow-iw)/2:(oh-ih)/2,rotate=t*{rotation_speed}:fillcolor=none:eval=frame,crop=768:1024:(iw-768)/2:(ih-1024)/2,unsharp=5:5:0.8:5:5:0.4',
+                '-vf', f'scale={int(self.width*1.3)}:{int(self.height*1.3)}:force_original_aspect_ratio=decrease,pad={int(self.width*1.3)}:{int(self.height*1.3)}:(ow-iw)/2:(oh-ih)/2,rotate=t*{rotation_speed}:fillcolor=none:eval=frame,crop={self.width}:{self.height}:(iw-{self.width})/2:(ih-{self.height})/2,unsharp=5:5:0.8:5:5:0.4',
                 '-r', str(self.fps),
                 '-frames:v', str(num_frames),
                 '-f', 'image2',
@@ -207,7 +209,7 @@ class AnimationGenerator:
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=1100:1400,crop=768:1024:w*(0.5+sin(t*0.008)*0.2):h*(0.5+cos(t*0.006)*0.15),unsharp=5:5:1.2:5:5:0.6',
+                '-vf', f'scale={int(self.width*1.4)}:{int(self.height*1.4)},crop={self.width}:{self.height}:w*(0.5+sin(t*0.008)*0.2):h*(0.5+cos(t*0.006)*0.15),unsharp=5:5:1.2:5:5:0.6',
                 '-r', str(self.fps),
                 '-frames:v', str(num_frames),
                 '-f', 'image2',
@@ -230,7 +232,7 @@ class AnimationGenerator:
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=768:1024:force_original_aspect_ratio=decrease,pad=768:1024:(ow-iw)/2:(oh-ih)/2,scale=768*(1+sin(t*{pulse_speed})*0.03):1024*(1+sin(t*{pulse_speed})*0.03),crop=768:1024:(iw-768)/2:(ih-1024)/2',
+                '-vf', f'scale={self.width}:{self.height}:force_original_aspect_ratio=decrease,pad={self.width}:{self.height}:(ow-iw)/2:(oh-ih)/2,scale={self.width}*(1+sin(t*{pulse_speed})*0.03):{self.height}*(1+sin(t*{pulse_speed})*0.03),crop={self.width}:{self.height}:(iw-{self.width})/2:(ih-{self.height})/2',
                 '-r', str(self.fps),
                 '-frames:v', str(num_frames),
                 '-f', 'image2',
@@ -251,7 +253,7 @@ class AnimationGenerator:
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=900:1200,crop=768:1024:w*(0.5+sin(t*0.003)*0.1+cos(t*0.007)*0.05):h*(0.5+cos(t*0.004)*0.08+sin(t*0.009)*0.03),unsharp=5:5:0.9:5:5:0.3',
+                '-vf', f'scale={int(self.width*1.2)}:{int(self.height*1.2)},crop={self.width}:{self.height}:w*(0.5+sin(t*0.003)*0.1+cos(t*0.007)*0.05):h*(0.5+cos(t*0.004)*0.08+sin(t*0.009)*0.03),unsharp=5:5:0.9:5:5:0.3',
                 '-r', str(self.fps),
                 '-frames:v', str(num_frames),
                 '-f', 'image2',

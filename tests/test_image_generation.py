@@ -16,19 +16,30 @@ from core.image_generator import ImageGenerator
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def test_image_generation(prompt=None):
+def test_image_generation(prompt=None, negative_prompt=None, video_format="shorts"):
     """Test the image generation system."""
     
     print("🎨 Testing Stable Diffusion Image Generation")
     print("=" * 50)
     
+    # Set dimensions based on video format
+    if video_format.lower() == "shorts":
+        width, height = 768, 1024  # 9:16 aspect ratio
+        print(f"📐 Using YouTube Shorts format: {width}x{height} (9:16)")
+    elif video_format.lower() == "normal":
+        width, height = 1920, 1080  # 16:9 aspect ratio
+        print(f"📐 Using Normal video format: {width}x{height} (16:9)")
+    else:
+        width, height = 768, 1024  # Default to shorts
+        print(f"📐 Using default format: {width}x{height}")
+    
     # Create output directory
     output_dir = Path("test_output")
     output_dir.mkdir(exist_ok=True)
     
-    # Initialize image generator
+    # Initialize image generator with specified dimensions
     print("🚀 Initializing Image Generator...")
-    image_gen = ImageGenerator()
+    image_gen = ImageGenerator(width=width, height=height)
     
     # Check if SD is available
     if image_gen.is_sd_available():
@@ -39,17 +50,22 @@ def test_image_generation(prompt=None):
         print("⚠️ Stable Diffusion not available - will use placeholder images")
         print("💡 To enable SD, run: bash download_models.sh")
     
-    # Use provided prompt or default test prompt
+    # Use provided prompt or default test prompt (optimized to fit within 77 tokens)
     if prompt is None:
-        prompt = "(wide shot, cartoon brown monkey wearing red scarf, cartoon brown bear in blue vest, cartoon gray squirrel with green bow sleeping peacefully under tree:1.3), (calm jungle night with stars and grass:1.2), (soft blue moonlight, serene storybook illustration style:1.1)"
+        prompt = "(wide shot:1.2) single Indian girl with black braids, pink dress, sitting by pond under moonlight, lotus flowers, storybook style:1.3"
     
     test_prompts = [prompt]
+    test_negative_prompts = [negative_prompt] if negative_prompt else None
+
+
 
     print(f"\n🎬 Generating {len(test_prompts)} test images...")
     print(f"📝 Using prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
+    if negative_prompt:
+        print(f"🚫 Using negative prompt: {negative_prompt[:100]}{'...' if len(negative_prompt) > 100 else ''}")
     
     # Generate images
-    image_paths = image_gen.generate_multiple_images(test_prompts, str(output_dir))
+    image_paths = image_gen.generate_multiple_images(test_prompts, str(output_dir), negative_prompts=test_negative_prompts)
     
     # Report results
     print(f"\n✅ Generated {len(image_paths)} images:")
@@ -82,6 +98,9 @@ Examples:
   python test_image_generation.py
   python test_image_generation.py --prompt "a cute cartoon cat playing in a garden"
   python test_image_generation.py -p "cartoon style, colorful background, happy characters"
+  python test_image_generation.py --negative-prompt "dark, scary, realistic"
+  python test_image_generation.py --video-format normal --prompt "wide shot of cartoon characters"
+  python test_image_generation.py -f shorts -p "vertical cartoon scene" -n "crowded, busy background"
         """
     )
     
@@ -92,10 +111,24 @@ Examples:
         default=None
     )
     
+    parser.add_argument(
+        '-n', '--negative-prompt',
+        type=str,
+        help='Negative prompt to avoid certain elements (optional)',
+        default=None
+    )
+    
+    parser.add_argument(
+        '-f', '--video-format',
+        choices=['shorts', 'normal'],
+        default='shorts',
+        help='Video format: "shorts" for 9:16 YouTube Shorts, "normal" for 16:9 standard videos'
+    )
+    
     args = parser.parse_args()
     
-    # Run the test with the provided prompt
-    test_image_generation(args.prompt)
+    # Run the test with the provided prompt, negative prompt, and video format
+    test_image_generation(args.prompt, args.negative_prompt, args.video_format)
 
 if __name__ == "__main__":
     main()

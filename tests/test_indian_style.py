@@ -35,9 +35,10 @@ def test_compose_prompt_indian_style():
         ],
     }
 
-    prompt = CartoonShortsGenerator._compose_image_prompt(self_obj, scene)
+    prompt, negative_prompt = CartoonShortsGenerator._compose_image_prompt(self_obj, scene)
 
     print("Composed prompt:\n", prompt)
+    print("Negative prompt:\n", negative_prompt)
 
     assert 'Indian cartoon style' in prompt
     assert 'vibrant festive palette' in prompt
@@ -52,8 +53,9 @@ def test_compose_prompt_desi_alias():
         'visual_prompt': 'Bazaar with colorful stalls',
         'characters': []
     }
-    prompt = CartoonShortsGenerator._compose_image_prompt(self_obj, scene)
+    prompt, negative_prompt = CartoonShortsGenerator._compose_image_prompt(self_obj, scene)
     print("Composed prompt (desi):\n", prompt)
+    print("Negative prompt (desi):\n", negative_prompt)
     assert 'Indian cartoon style' in prompt
 
 
@@ -84,14 +86,14 @@ def test_generate_image_with_indian_style():
         ],
     }
 
-    prompt = CartoonShortsGenerator._compose_image_prompt(self_obj, scene)
+    prompt, negative_prompt = CartoonShortsGenerator._compose_image_prompt(self_obj, scene)
 
     out_dir = Path('test_output')
     out_dir.mkdir(exist_ok=True)
     out_path = out_dir / 'indian_style_garden_scene.png'
 
     img_gen = ImageGenerator()
-    result_path = img_gen.generate_cartoon_image(prompt, str(out_path))
+    result_path = img_gen.generate_cartoon_image(prompt, str(out_path), negative_prompt=negative_prompt)
 
     assert Path(result_path).exists(), "Expected generated image file to exist"
     size_bytes = Path(result_path).stat().st_size

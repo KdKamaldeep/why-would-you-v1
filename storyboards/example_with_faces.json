@@ -1,0 +1,52 @@
+{
+  "title": "The Lion's Smoothie Shop Adventure",
+  "description": "A brave lion opens a smoothie shop in the jungle with the help of his robot friend",
+  "scene_duration": 8,
+  "cast": [
+    {
+      "name": "Lion",
+      "role": "main character",
+      "face": "faces/sardar.png"
+    },
+    {
+      "name": "Robot",
+      "role": "helper",
+      "face": "faces/robot_face.jpg"
+    },
+    {
+      "name": "Princess",
+      "role": "customer"
+    },
+    {
+      "name": "Wizard",
+      "role": "magical advisor",
+      "face": "faces/wizard_face.jpg"
+    }
+  ],
+  "scenes": [
+    {
+      "title": "Lion's Dream",
+      "visual_prompt": "A lion standing in front of an empty shop space in the jungle, looking determined and hopeful",
+      "subtitle": "Once upon a time, a brave lion had a dream...",
+      "characters": ["Lion"]
+    },
+    {
+      "title": "Building the Shop",
+      "visual_prompt": "A lion and robot working together to build a colorful smoothie shop, using tools and teamwork",
+      "subtitle": "With the help of his robot friend, the lion built his shop...",
+      "characters": ["Lion", "Robot"]
+    },
+    {
+      "title": "First Customer",
+      "visual_prompt": "A princess visiting the lion's smoothie shop, looking excited and curious about the colorful drinks",
+      "subtitle": "The first customer was a beautiful princess...",
+      "characters": ["Lion", "Princess"]
+    },
+    {
+      "title": "Magical Enhancement",
+      "visual_prompt": "A wizard using magic to enhance the smoothie shop with sparkles and magical effects",
+      "subtitle": "A wise wizard appeared to add some magic...",
+      "characters": ["Lion", "Wizard"]
+    }
+  ]
+}

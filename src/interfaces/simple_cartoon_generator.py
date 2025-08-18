@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Simple Cartoon Generator - Easy-to-use script for generating cartoon videos
+Simple Cartoon Generator - Easy-to-use script for generating cartoon videos with face-based character generation
 """
 
 import os
 import sys
 import argparse
+import json
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -47,8 +48,36 @@ def check_requirements():
     print("✅ All requirements satisfied!")
     return True
 
-def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True):
-    """Generate a cartoon video with the given prompt."""
+def extract_character_faces_from_cast(cast_list):
+    """Extract character face mappings from the cast array in storyboard."""
+    character_faces = {}
+    
+    if not cast_list:
+        return character_faces
+    
+    for cast_member in cast_list:
+        if isinstance(cast_member, dict):
+            character_name = cast_member.get('name', '')
+            face_path = cast_member.get('face', '')  # New field for face image path
+            
+            if character_name and face_path:
+                if Path(face_path).exists():
+                    character_faces[character_name] = face_path
+                    print(f"✅ Character '{character_name}' will use face: {face_path}")
+                else:
+                    print(f"⚠️ Face image not found for character '{character_name}': {face_path}")
+            elif character_name:
+                print(f"ℹ️ Character '{character_name}' will use auto-generated face")
+        elif isinstance(cast_member, str):
+            print(f"ℹ️ Character '{cast_member}' will use auto-generated face")
+    
+    if character_faces:
+        print(f"✅ Found {len(character_faces)} characters with custom faces")
+    
+    return character_faces
+
+def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", character_faces=None):
+    """Generate a cartoon video with the given prompt and character faces."""
     try:
         # Import the main generator
         from ..core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
@@ -59,6 +88,11 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
         print(f"⏱️ Duration: {duration} seconds")
         print(f"🗣️ Language: {language}")
         print(f"🎯 Prompt enhancement: {'Enabled' if enable_prompt_enhancement else 'Disabled'}")
+        print(f"📐 Video format: {video_format}")
+        if character_faces:
+            print(f"👥 Character faces: {len(character_faces)} characters mapped")
+            for char, face in character_faces.items():
+                print(f"   - {char}: {face}")
         print("-" * 50)
         
         # Create video configuration
@@ -66,10 +100,12 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
             prompt=prompt,
             duration=duration,
             style=style,
+            video_format=video_format,
             output_path="output",
             add_subtitles=False,
             language=language,
-            enable_prompt_enhancement=enable_prompt_enhancement
+            enable_prompt_enhancement=enable_prompt_enhancement,
+            character_faces=character_faces or {}
         )
         
         # Initialize generator
@@ -97,14 +133,27 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
 def main():
     """Main function."""
     parser = argparse.ArgumentParser(
-        description="Generate cartoon videos with AI",
+        description="Generate cartoon videos with AI and face-based character generation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
+  # Basic generation
   python simple_cartoon_generator.py --prompt "A baby lion opens a smoothie shop"
-  python simple_cartoon_generator.py --prompt "A robot learns to dance" --style anime
-  python simple_cartoon_generator.py --prompt "Magic forest adventure" --duration 45
-  python simple_cartoon_generator.py --prompt "Animal friends adventure" --storyboard storyboards/tillu.json --no-reuse --style indian --language hi --no-prompt-enhancement
+  
+  # Custom style and duration
+  python simple_cartoon_generator.py --prompt "A robot learns to dance" --style anime --duration 45
+  
+  # With storyboard (includes character faces from cast)
+  python simple_cartoon_generator.py --prompt "Magic forest adventure" --storyboard storyboards/tillu.json
+
+Storyboard Cast Format (with face images):
+  {
+    "cast": [
+      {"name": "Lion", "role": "main character", "face": "faces/lion_face.jpg"},
+      {"name": "Robot", "role": "helper", "face": "faces/robot_face.jpg"},
+      {"name": "Princess", "role": "customer"}
+    ]
+  }
         """
     )
     
@@ -129,6 +178,13 @@ Examples:
     )
 
     parser.add_argument(
+        "--video-format", "-f",
+        choices=["shorts", "normal"],
+        default="shorts",
+        help="Video format: 'shorts' for YouTube Shorts (9:16) or 'normal' for standard video (16:9)"
+    )
+
+    parser.add_argument(
         "--language", "-l",
         default="en",
         help="Narration language (e.g., en, hi, es). For Hindi use 'hi'"
@@ -139,6 +195,8 @@ Examples:
         type=str,
         help="Path to a JSON file with custom storyboard scenes (title, description, scenes[])"
     )
+    
+
     
     parser.add_argument(
         "--no-reuse",
@@ -160,8 +218,8 @@ Examples:
     
     args = parser.parse_args()
     
-    print("🎨 Simple Cartoon Generator")
-    print("=" * 50)
+    print("🎨 Simple Cartoon Generator with Face-Based Characters")
+    print("=" * 60)
     
     # Check requirements
     if not check_requirements():
@@ -172,10 +230,11 @@ Examples:
         print("\n✅ All requirements are satisfied! You're ready to generate cartoons.")
         sys.exit(0)
     
+
+    
     # Generate cartoon
     if args.storyboard:
         try:
-            import json
             from ..core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
             with open(args.storyboard, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -183,8 +242,12 @@ Examples:
             title = data.get('title')
             description = data.get('description')
             scene_duration = data.get('scene_duration', 8)
-            # Normalize characters: map names in scenes to structured cast entries
+            
+            # Extract character faces from cast array
             cast_list = data.get('cast', []) or []
+            character_faces = extract_character_faces_from_cast(cast_list)
+            
+            # Normalize characters: map names in scenes to structured cast entries
             name_to_cast = {}
             for entry in cast_list:
                 if isinstance(entry, dict) and entry.get('name'):
@@ -214,6 +277,7 @@ Examples:
                 prompt=args.prompt,
                 duration=args.duration,
                 style=args.style,
+                video_format=args.video_format,
                 output_path="output",
                 title=title,
                 description=description,
@@ -222,7 +286,8 @@ Examples:
                 reuse_existing=(not args.no_reuse),
                 add_subtitles=False,
                 language=args.language,
-                enable_prompt_enhancement=(not args.no_prompt_enhancement)
+                enable_prompt_enhancement=(not args.no_prompt_enhancement),
+                character_faces=character_faces
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
@@ -230,7 +295,15 @@ Examples:
             print(f"❌ Failed to use storyboard: {e}")
             output_path = None
     else:
-        output_path = generate_cartoon(args.prompt, args.style, args.duration, args.language, not args.no_prompt_enhancement)
+        output_path = generate_cartoon(
+            args.prompt, 
+            args.style, 
+            args.duration, 
+            args.language, 
+            not args.no_prompt_enhancement, 
+            args.video_format,
+            {}  # No character faces for non-storyboard generation
+        )
     
     if output_path:
         print(f"\n🎊 Success! Your cartoon is ready at: {output_path}")

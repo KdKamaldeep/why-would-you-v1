@@ -57,6 +57,7 @@ class VideoConfig:
     prompt: str
     duration: int = 30
     fps: int = 15
+    video_format: str = "shorts"  # "shorts" for 9:16, "normal" for 16:9
     width: int = 768
     height: int = 1024  # Vertical format for Shorts
     output_path: str = "output"
@@ -79,6 +80,24 @@ class VideoConfig:
     scene_pause_duration: float = 0.0  # Default 0.0 second pause between scenes (no black screens)
     # Control image validation and automatic prompt adjustment
     enable_image_validation: bool = True  # Enable automatic blank image detection and prompt adjustment
+    # Character face mappings for face-based generation
+    character_faces: DictType[str, str] = None  # Maps character names to face image paths
+
+    def __post_init__(self):
+        """Set dimensions based on video format."""
+        if self.video_format.lower() == "shorts":
+            # YouTube Shorts: 9:16 aspect ratio
+            self.width = 768
+            self.height = 1024
+        elif self.video_format.lower() == "normal":
+            # Normal video: 16:9 aspect ratio
+            self.width = 1920
+            self.height = 1080
+        else:
+            # Default to shorts if invalid format
+            self.video_format = "shorts"
+            self.width = 768
+            self.height = 1024
 
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
@@ -100,12 +119,14 @@ class CartoonShortsGenerator:
                 model_path=model_path, 
                 lora_path=lora_path, 
                 lora_scale=0.85,
-                enable_prompt_enhancement=config.enable_prompt_enhancement
+                enable_prompt_enhancement=config.enable_prompt_enhancement,
+                width=config.width,
+                height=config.height
             )
         except TypeError:
             # Fallback for older ImageGenerator signature
             self.image_generator = ImageGenerator(model_path=model_path)
-        self.animation_generator = AnimationGenerator()
+        self.animation_generator = AnimationGenerator(width=config.width, height=config.height)
         # Initialize Coqui TTS voice synthesizer
         self.voice_synthesizer = CoquiVoiceSynthesizer(
             CoquiVoiceConfig(language=config.language)
@@ -126,7 +147,8 @@ class CartoonShortsGenerator:
         
         try:
             # Early exit if final video already exists and reuse is enabled
-            final_output = self.output_dir / "final_short.mp4"
+            output_filename = "final_short.mp4" if self.config.video_format == "shorts" else "final_video.mp4"
+            final_output = self.output_dir / output_filename
             if self.config.reuse_existing and final_output.exists():
                 logger.info(f"Final video already exists and reuse is enabled: {final_output}")
                 return str(final_output)
@@ -171,6 +193,18 @@ class CartoonShortsGenerator:
                 logger.info(f"Saved storyboard: {storyboard_path}")
             except Exception as e:
                 logger.warning(f"Failed to save storyboard: {e}")
+            
+            # Load cast information for character role enhancement
+            self.cast = script.get('cast', [])
+            if self.cast:
+                logger.info(f"🎭 Loaded cast information: {len(self.cast)} characters")
+                for character in self.cast:
+                    if isinstance(character, dict):
+                        name = character.get('name', 'Unknown')
+                        role = character.get('role', 'No role specified')
+                        logger.info(f"   • {name}: {role}")
+            else:
+                logger.info("ℹ️ No cast information found in script")
 
             # Step 2: Create audio clips at the beginning
             logger.info("Step 2: Creating audio clips from each scene's narration...")
@@ -227,15 +261,17 @@ class CartoonShortsGenerator:
                     logger.info(f"Skipping image generation (exists): {image_path}")
                     final_image_path = str(image_path)
                 else:
-                    prompt = self._compose_image_prompt(scene)
+                    prompt, negative_prompt = self._compose_image_prompt(scene)
                     logger.info(f"🖼️ Scene {i+1}: Generating image with prompt ({len(prompt)} characters)")
                     logger.info(f"🖼️ Scene {i+1}: Prompt preview: {prompt[:100]}...")
+                    if negative_prompt:
+                        logger.info(f"🖼️ Scene {i+1}: Using negative prompt ({len(negative_prompt)} characters)")
                     
                     # Use validation method if enabled, otherwise use standard generation
                     if self.config.enable_image_validation:
-                        final_image_path = self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3)
+                        final_image_path = self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3, negative_prompt=negative_prompt, character_faces=self.config.character_faces)
                     else:
-                        final_image_path = self.image_generator.generate_cartoon_image(prompt, str(image_path))
+                        final_image_path = self.image_generator.generate_cartoon_image(prompt, str(image_path), negative_prompt=negative_prompt, character_faces=self.config.character_faces)
                     logger.info(f"🖼️ Scene {i+1}: Image generation completed: {final_image_path}")
                 
                 image_paths.append(final_image_path)
@@ -567,30 +603,89 @@ class CartoonShortsGenerator:
         millisecs = int((seconds % 1) * 1000)
         return f"{hours:02d}:{minutes:02d}:{secs:02d},{millisecs:03d}"
 
-    def _compose_image_prompt(self, scene: Dict) -> str:
-        """Compose an image prompt using the visual_prompt from script with optional GPT-2 enhancement."""
+    def _compose_image_prompt(self, scene: Dict) -> tuple[str, str]:
+        """Compose an image prompt and negative prompt using the visual_prompt from script with intelligent aspect ratio adaptation and character role integration."""
         # Get the visual_prompt from the script (this is the key requirement)
-        visual_prompt = scene.get('visual_prompt', scene.get('description', ''))
+        visual_prompt = scene.get('visual_prompt', '')
         base_prompt = visual_prompt or "Cartoon scene"
+        
+        # Get the negative prompt from the script
+        negative_prompt = scene.get('negative_prompt', '')
 
-        # If prompt enhancement is enabled, enhance the visual_prompt specifically
-        if self.config.enable_prompt_enhancement and hasattr(self, 'image_generator') and self.image_generator.prompt_enhancer:
-            logger.info(f"🎯 Enhancing visual_prompt from script: {base_prompt}")
-            enhanced_prompt = self.image_generator.prompt_enhancer.enhance_prompt(
-                base_prompt,
-                enhancement_type="cartoon",
-                max_tokens=77  # Diffusion model token limit
-            )
+        # Enhance prompt with character role information if available
+        enhanced_prompt = self._enhance_prompt_with_character_roles(base_prompt, scene)
+
+        # Determine aspect ratio for intelligent prompt adaptation
+        is_16_9_format = self.config.width > self.config.height and self.config.width / self.config.height > 1.5
+        
+        # Disable prompt enhancement to preserve original prompt structure with weights
+        logger.info(f"🎯 Using enhanced visual_prompt with character roles: {enhanced_prompt}")
+        return enhanced_prompt, negative_prompt
+    
+    def _enhance_prompt_with_character_roles(self, base_prompt: str, scene: Dict) -> str:
+        """Enhance the visual prompt with character role information from the cast."""
+        try:
+            # Get characters mentioned in this scene
+            scene_characters = scene.get('characters', [])
+            if not scene_characters:
+                return base_prompt
+            
+            # Get cast information if available
+            cast_info = getattr(self, 'cast', [])
+            if not cast_info:
+                return base_prompt
+            
+            # Create a mapping of character names to their roles
+            character_roles = {}
+            for cast_member in cast_info:
+                if isinstance(cast_member, dict):
+                    name = cast_member.get('name', '')
+                    role = cast_member.get('role', '')
+                    if name and role:
+                        character_roles[name] = role
+            
+            if not character_roles:
+                return base_prompt
+            
+            # Find characters in this scene that have role information
+            enhanced_prompt = base_prompt
+            character_enhancements = []
+            
+            for character_name in scene_characters:
+                if character_name in character_roles:
+                    role = character_roles[character_name]
+                    # Add role information to the prompt
+                    character_enhancement = f"{character_name} ({role})"
+                    character_enhancements.append(character_enhancement)
+                    
+                    # Replace character name with enhanced version in the prompt
+                    # This helps the diffusion model understand the character's role
+                    if character_name.lower() in base_prompt.lower():
+                        # Replace the character name with role-enhanced version
+                        enhanced_prompt = enhanced_prompt.replace(
+                            character_name, 
+                            character_enhancement
+                        )
+                    else:
+                        # If character name not explicitly mentioned, add role info
+                        enhanced_prompt = f"{enhanced_prompt}, {character_enhancement}"
+            
+            if character_enhancements:
+                logger.info(f"🎭 Enhanced prompt with character roles: {character_enhancements}")
+            
             return enhanced_prompt
-        else:
-            logger.info(f"🎯 Using original visual_prompt from script: {base_prompt}")
+            
+        except Exception as e:
+            logger.warning(f"⚠️ Error enhancing prompt with character roles: {e}")
             return base_prompt
 
 def main():
     """Main CLI entry point."""
-    parser = argparse.ArgumentParser(description="Generate cartoon-style YouTube Shorts videos")
+    parser = argparse.ArgumentParser(description="Generate cartoon-style videos (YouTube Shorts or normal format)")
     parser.add_argument("--prompt", required=True, help="Story prompt (e.g., 'A baby lion opens a smoothie shop in the jungle')")
     parser.add_argument("--duration", type=int, default=30, help="Video duration in seconds")
+    parser.add_argument("--video-format", choices=["shorts", "normal"], default="shorts", 
+                       help="Video format: 'shorts' for 9:16 YouTube Shorts, 'normal' for 16:9 standard videos")
     parser.add_argument("--output", default="output", help="Output directory")
     parser.add_argument("--style", default="cartoon", help="Visual style")
     parser.add_argument("--voice", default="", help="Reference speaker WAV path for Coqui XTTS (optional)")
@@ -616,6 +711,7 @@ def main():
     config = VideoConfig(
         prompt=args.prompt,
         duration=args.duration,
+        video_format=args.video_format,
         output_path=args.output,
         style=args.style,
         voice_id=args.voice,
