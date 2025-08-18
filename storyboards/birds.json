@@ -40,7 +40,7 @@
     {
       "duration": 8,
       "description": "close-up of Lavanya laughing with wide eyes, Grandpa smiling warmly",
-      "visual_prompt": "((wide shot:1.2) 8-year-old Indian girl Lavanya, dark hair in ponytail:1.1, wearing blue jeans and bright T-shirt:1.1, 65-year-old Indian Grandpa with short gray hair and cotton shirt:1.1, smiling warmly:1.1 behind, evening courtyard background1.4, storybook style:1.3",
+      "visual_prompt": "(wide shot:1.2) 8-year-old Indian girl Lavanya, dark hair in ponytail:1.1, wearing blue jeans and bright T-shirt:1.1, 65-year-old Indian Grandpa with short gray hair and cotton shirt:1.1, smiling warmly:1.1 behind, evening courtyard background1.4, storybook style:1.3",
       "negative_prompt": "blurry, extra limbs, distorted, romantic",
       "narration": "‘So that’s why they look like a flying arrow!’ Lavanya laughed, her eyes wide with wonder. Grandpa nodded, ‘Yes, my little one, flying together makes them stronger and faster—just like a good family.’",
       "subtitle": "The Big Realization",
