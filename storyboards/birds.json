@@ -1,13 +1,13 @@
 {
   "title": "Why Would Birds Fly in a V Shape?",
-  "description": "A fun and magical story where Lavanya, a curious 8-year-old girl, learns from her Grandpa why birds fly together in a V shape. Blending wisdom, humor, and a touch of imagination, this story makes science feel like magic.",
+  "description": "A fun and magical story where Lavanya, a curious 8-year-old Indian girl, learns from her Grandpa why birds fly together in a V shape. Blending wisdom, humor, and a touch of imagination, this story makes science feel like magic.",
   "total_duration": 48,
   "scenes": [
     {
       "duration": 8,
       "description": "wide shot of Lavanya looking up at the evening sky, pointing at flying birds",
-      "visual_prompt": "(wide shot:1.2) 8-year-old Indian girl Lavanya, ponytail, bright frock with floral design, standing in open courtyard with mango tree, pointing at a flock of birds flying in V shape in the orange evening sky, storybook style:1.3",
-      "negative_prompt": "blurry, dark, distorted, creepy, extra limbs",
+      "visual_prompt": "(wide shot:1.2) 8-year-old Indian girl Lavanya, dark hair in ponytail:1.1, wearing bright floral dress:1.1, standing in an open backyard with a tree:1.1, pointing up at a flock of birds flying in a V shape in the orange evening sky, storybook style:1.3",
+      "negative_prompt": "blurry, dark, distorted, creepy, extra limbs, romantic",
       "narration": "One calm evening, Lavanya looked up at the glowing sky and gasped. A group of birds flew past her house—but not randomly! They were flying in a perfect V shape. ‘Grandpa, why do they do that?’ she asked curiously.",
       "subtitle": "The Flying Question",
       "motion_prompt": "girl pointing up, birds gliding in V shape",
@@ -16,9 +16,9 @@
     },
     {
       "duration": 7,
-      "description": "medium shot of Grandpa sitting on a charpai under the tree, explaining",
-      "visual_prompt": "(medium shot:1.2) 65-year-old Indian Grandpa, white kurta pajama, gray hair, sitting on woven charpai under mango tree, smiling kindly, raising hand to explain, storybook style:1.3",
-      "negative_prompt": "blurry, scary, distorted",
+      "description": "medium shot of Grandpa sitting on a wooden chair under a tree, explaining",
+      "visual_prompt": "(medium shot:1.2) 65-year-old Indian Grandpa, short gray hair:1.1, wearing white cotton shirt and trousers:1.1, sitting on a wooden chair under a tree:1.1, smiling kindly:1.1, raising one hand to explain, storybook style:1.3",
+      "negative_prompt": "blurry, scary, distorted, extra limbs, romantic",
       "narration": "Grandpa chuckled and said, ‘Ah, my dear, birds are very smart travelers. They fly in a V so that each bird helps the other. The front bird cuts the air, and the ones behind save energy!’",
       "subtitle": "Grandpa’s Wisdom",
       "motion_prompt": "grandpa talking, girl listening",
@@ -26,21 +26,22 @@
       "transition": "fade from sky to grandpa’s face"
     },
     {
-      "duration": 8,
-      "description": "funny imagination scene of birds as a cycling team, taking turns at the front",
-      "visual_prompt": "(cartoon style imagination:1.15) flock of colorful birds wearing tiny helmets like a cycling team, flying in V shape, one bird at front sweating while others cheer, storybook style:1.3",
-      "negative_prompt": "blurry, creepy, distorted",
-      "narration": "Lavanya giggled and imagined the birds like a cycling team—one bird pedaling hard at the front while the others rested. Then, they took turns leading, shouting, ‘Your turn, buddy!’",
-      "subtitle": "The Funny Imagination",
-      "motion_prompt": "birds swapping positions, cheering",
-      "sound_cues": ["comical bird voices", "crowd cheering softly"],
-      "transition": "wavy dissolve into imagination"
-    },
+	  "duration": 8,
+	  "description": "wide shot of funny imagination scene of birds as a cycling team, taking turns at the front in the sky",
+	  "visual_prompt": "(wide shot:1.2) cartoon style imagination:1.15, flock of colorful birds:1.1 wearing tiny cycling helmets:1.1, flying together in V shape in the blue sky:1.1, one bird at the front sweating:1.1 while others cheer playfully:1.1, storybook style:1.3",
+	  "negative_prompt": "blurry, creepy, distorted, extra limbs, romantic",
+	  "narration": "Lavanya giggled and imagined the birds like a cycling team—one bird pedaling hard at the front while the others rested. Then, they took turns leading, shouting, ‘Your turn, buddy!’",
+	  "subtitle": "The Funny Imagination",
+	  "motion_prompt": "birds swapping positions in the sky, cheering",
+	  "sound_cues": ["comical bird voices", "crowd cheering softly"],
+	  "transition": "wavy dissolve into imagination"
+	}
+,
     {
       "duration": 8,
       "description": "close-up of Lavanya laughing with wide eyes, Grandpa smiling warmly",
-      "visual_prompt": "(close-up:1.2) Lavanya with ponytail, laughing with wide eyes, grandpa with gentle smile, background of evening courtyard, storybook style:1.3",
-      "negative_prompt": "blurry, extra limbs, distorted",
+      "visual_prompt": "(close-up:1.2) 8-year-old Indian girl Lavanya, ponytail, wearing floral dress:1.1, laughing with wide eyes:1.1, 65-year-old Indian Grandpa with short gray hair and cotton shirt:1.1, smiling warmly:1.1, evening courtyard background, storybook style:1.3",
+      "negative_prompt": "blurry, extra limbs, distorted, romantic",
       "narration": "‘So that’s why they look like a flying arrow!’ Lavanya laughed, her eyes wide with wonder. Grandpa nodded, ‘Yes, my little one, flying together makes them stronger and faster—just like a good family.’",
       "subtitle": "The Big Realization",
       "motion_prompt": "girl laughing, grandpa nodding",
@@ -50,8 +51,8 @@
     {
       "duration": 9,
       "description": "wide shot of birds flying away in glowing sky, Lavanya waving happily",
-      "visual_prompt": "(wide shot:1.2) flock of birds in V formation flying away in golden-pink sky, Lavanya waving hand with a smile, Grandpa sitting on charpai watching peacefully, storybook style:1.3",
-      "negative_prompt": "blurry, scary, distorted, creepy",
+      "visual_prompt": "(wide shot:1.2) flock of birds in V formation flying away in golden-pink evening sky:1.1, 8-year-old Indian girl Lavanya with ponytail in cotton dress:1.1 waving hand with a smile:1.1, 65-year-old Indian Grandpa sitting on wooden chair:1.1 watching peacefully, storybook style:1.3",
+      "negative_prompt": "blurry, scary, distorted, creepy, romantic",
       "narration": "As the birds disappeared into the horizon, Lavanya waved goodbye with a big smile. She whispered, ‘Teamwork makes the dream fly!’ Grandpa chuckled again, ‘Indeed! Nature always has the best lessons.’",
       "subtitle": "The Lesson in the Sky",
       "motion_prompt": "birds flying away, girl waving",
