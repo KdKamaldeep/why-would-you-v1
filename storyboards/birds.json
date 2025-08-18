@@ -17,7 +17,7 @@
     {
       "duration": 7,
       "description": "medium shot of Grandpa sitting on a wooden chair under a tree, explaining",
-      "visual_prompt": "(medium shot:1.2) 65-year-old Indian Grandpa, short gray hair:1.1, wearing white cotton shirt and trousers:1.1, sitting on a wooden chair under a tree:1.1, smiling kindly:1.1, raising one hand to explain, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) 65-year-old Indian Grandpa, short gray hair:1.1, wearing white cotton shirt and trousers:1.1, sitting on a wooden chair under a tree:1.1, smiling kindly:1.1, storybook style:1.3",
       "negative_prompt": "blurry, scary, distorted, extra limbs, romantic",
       "narration": "Grandpa chuckled and said, ‘Ah, my dear, birds are very smart travelers. They fly in a V so that each bird helps the other. The front bird cuts the air, and the ones behind save energy!’",
       "subtitle": "Grandpa’s Wisdom",
