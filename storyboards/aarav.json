@@ -13,7 +13,7 @@
       "description": "wide shot of Aarav looking at the rainbow after rain",
       "visual_prompt": "storybook style illustration, wide shot of little Indian boy with short black hair, red t-shirt and shorts, standing on green grass, looking up at a big rainbow in the blue sky",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, violent",
-      "narration": "The rain stopped. A rainbow appeared in the sky. Aarav laughed, 'Why would the sky bring out candies after rain? Looks like a sweet shop up there!'",
+      "narration": "बारिश रुक गई। आसमान में इंद्रधनुष चमक गया। आरव हँसकर बोला, क्यों भाई आसमान, बारिश के बाद मिठाई की दुकान खोल दी है क्या।",
       "subtitle": "The Question",
       "characters": ["Aarav"],
       "motion_prompt": "boy standing on grass, looking at rainbow in sky"
@@ -23,7 +23,7 @@
       "description": "medium shot of a funny Sky Painter with big brush painting colors in sky",
       "visual_prompt": "storybook style illustration, magical funny sky painter with big paintbrush, splashing colors across sky, wearing colorful clothes",
       "negative_prompt": "blurry, dark, low resolution, scary, violent",
-      "narration": "Suddenly a funny painter appeared. He said, 'I am the Sky Painter! Why would I sit idle? After rain, I use my brush to color the sky.'",
+      "narration": "अचानक एक चित्रकार आया। उसने कहा, मैं हूँ स्काई पेंटर। क्यों भाई, मैं खाली बैठूँ। बारिश के बाद मैं आसमान को रंग देता हूँ।",
       "subtitle": "The Sky Painter",
       "characters": ["Sky Painter", "Aarav"],
       "motion_prompt": "magical painter brushing colors into sky"
@@ -33,7 +33,7 @@
       "description": "close-up of rainbow glowing brightly in the sky with a playful expression",
       "visual_prompt": "storybook style illustration, close-up of a colorful glowing rainbow in the sky with a soft smiling face, bright and cheerful",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, violent",
-      "narration": "The rainbow giggled, 'Why would the sky stay sad? I am its smile! I wipe the rain’s tears and bring back laughter with colors.'",
+      "narration": "इंद्रधनुष खिलखिलाया। बोला, क्यों भाई आसमान उदास रहे। मैं उसकी मुस्कान हूँ। बारिश के आँसू पोंछकर रंग और हँसी ले आता हूँ।",
       "subtitle": "The Rainbow Speaks",
       "characters": ["Rainbow"],
       "motion_prompt": "rainbow glowing softly, smiling expression"
@@ -43,7 +43,7 @@
       "description": "medium shot of Aarav joking with rainbow",
       "visual_prompt": "storybook style illustration, little boy talking to rainbow in sky, smiling, playful atmosphere",
       "negative_prompt": "blurry, dark, low resolution, scary, violent",
-      "narration": "Aarav laughed, 'So rain cries and rainbow tells jokes? Why would the sky turn into a comedy show? That’s hilarious!'",
+      "narration": "आरव हँस पड़ा। बोला, तो बारिश रोती है और इंद्रधनुष हँसी सुनाता है। क्यों भाई आसमान, अब तो कॉमेडी शो बन गए हो।",
       "subtitle": "The Joke",
       "characters": ["Aarav", "Rainbow"],
       "motion_prompt": "boy pointing at rainbow, laughing"
@@ -53,22 +53,21 @@
       "description": "wide shot of rainbow stretching across the sky with butterflies and birds",
       "visual_prompt": "storybook style illustration, glowing rainbow arch across sky, butterflies and birds flying around, meadow shining",
       "negative_prompt": "blurry, dark, low resolution, scary, violent",
-      "narration": "The Sky Painter said, 'Why would we leave the sky plain? Every rainbow is my way of making people smile after rain.'",
+      "narration": "स्काई पेंटर ने कहा, क्यों भाई आसमान खाली रहे। हर इंद्रधनुष मेरा तरीका है, ताकि लोग बारिश के बाद मुस्कुराएँ।",
       "subtitle": "The Secret",
       "characters": ["Sky Painter", "Rainbow"],
       "motion_prompt": "rainbow shining, butterflies flying"
     },
-   {
-	  "duration": 9,
-	  "description": "medium shot of Aarav waving happily at the rainbow",
-	  "visual_prompt": "storybook style illustration, little Indian boy waving at rainbow in the sky, smiling",
-	  "negative_prompt": "blurry, dark, low resolution, scary, violent",
-	  "narration": "Aarav waved, 'Thanks, Rainbow! Now I know—why would the sky smile after rain? To paint joy with colors!' If you like this video, please Like and Subscribe WHYWOULDYOU channel.",
-	  "subtitle": "The Smile",
-	  "characters": ["Aarav", "Rainbow"],
-	  "motion_prompt": "boy waving at rainbow in sky"
-	}
-
+    {
+      "duration": 9,
+      "description": "medium shot of Aarav waving happily at the rainbow",
+      "visual_prompt": "storybook style illustration, little Indian boy waving at rainbow in the sky, smiling",
+      "negative_prompt": "blurry, dark, low resolution, scary, violent",
+      "narration": "आरव ने हाथ हिलाया। बोला, धन्यवाद इंद्रधनुष। अब समझ आया, क्यों भाई आसमान बारिश के बाद मुस्कुराता है। अगर आपको यह वीडियो पसंद आए तो लाइक और सब्सक्राइब करें WHYWOULDYOU चैनल।",
+      "subtitle": "The Smile",
+      "characters": ["Aarav", "Rainbow"],
+      "motion_prompt": "boy waving at rainbow in sky"
+    }
   ],
   "tags": [
     "kids",
