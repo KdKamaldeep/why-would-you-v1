@@ -9,15 +9,15 @@
   ],
   "scenes": [
     {
-      "duration": 9,
-      "description": "wide shot of Aarav looking at the sky after rain",
-      "visual_prompt": "(wide shot:1.2) little Indian boy with short black hair, wearing red t-shirt and shorts, standing in meadow, looking at rainbow in sky after rain, storybook style:1.3",
-      "negative_prompt": "blurry, dark, low resolution, scary, violent",
-      "narration": "बारिश रुक गई। आसमान में इंद्रधनुष चमका। आरव हँसकर बोला, 'क्यों भाई आसमान, बारिश के बाद मिठाई की दुकान खोल दी है क्या?'",
-      "subtitle": "The Question",
-      "characters": ["Aarav"],
-      "motion_prompt": "boy looking at rainbow in sky"
-    },
+  "duration": 9,
+  "description": "wide shot of Aarav looking at the rainbow after rain",
+  "visual_prompt": "(wide shot:1.2) little Indian boy with short black hair, wearing red t-shirt and shorts, standing in a green meadow, looking up at a bright rainbow in the sky, storybook style:1.3",
+  "negative_prompt": "blurry, dark, low resolution, distorted, scary, violent",
+  "narration": "बारिश थम गई। आसमान में इंद्रधनुष चमका। आरव हँसकर बोला, 'क्यों भाई आसमान, बारिश के बाद मिठाई की दुकान खोल दी है क्या?'",
+  "subtitle": "The Question",
+  "characters": ["Aarav"],
+  "motion_prompt": "boy looking up at rainbow in the sky"
+},
     {
       "duration": 9,
       "description": "medium shot of a funny Sky Painter with big brush painting colors in sky",
