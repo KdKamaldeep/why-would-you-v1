@@ -1,0 +1,82 @@
+{
+  "title": "Aarav and the Rainbow Bridge",
+  "description": "Aarav, a curious boy, finds a glowing rainbow bridge after a summer rain and helps a group of lost butterflies return to their magical garden, with fun jokes along the way.",
+  "total_duration": 55,
+  "cast": [
+    {"name": "Aarav", "role": "curious little boy"},
+    {"name": "Rainbow Bridge", "role": "magical glowing bridge of colors"},
+    {"name": "Butterfly Queen", "role": "gentle guardian of butterflies"}
+  ],
+  "scenes": [
+    {
+      "duration": 9,
+      "description": "wide shot of Aarav standing near a meadow after rain, rainbow shining in the sky",
+      "visual_prompt": "(wide shot:1.2) little Indian boy with short black hair, wearing yellow shirt and blue shorts, standing in green meadow with rainbow glowing in sky after rain, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "बारिश रुकने के बाद आरव आकाश की ओर देख रहा था। वहाँ एक चमचमाता इंद्रधनुष था। आरव ने हँसते हुए कहा, 'अरे, यह तो लगता है जैसे आसमान ने रंग-बिरंगे लॉलीपॉप गिरा दिए हों!'",
+      "subtitle": "The Shining Rainbow",
+      "characters": ["Aarav"],
+      "motion_prompt": "boy looking at rainbow, raindrops sparkling in sunlight"
+    },
+    {
+      "duration": 9,
+      "description": "close-up of a rainbow bridge forming from the sky to the meadow",
+      "visual_prompt": "(close-up:1.2) magical rainbow bridge glowing with bright colors, forming from sky to ground, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "अचानक उसने देखा कि इंद्रधनुष ज़मीन पर उतरने लगा। धीरे-धीरे वह एक चमचमाता पुल बन गया। आरव ने आँखें मलकर कहा, 'वाह! अब तो मुझे स्कूल जाने के लिए बस नहीं, इंद्रधनुष पुल मिल जाएगा!'",
+      "subtitle": "The Rainbow Bridge",
+      "characters": ["Rainbow Bridge"],
+      "motion_prompt": "rainbow glowing and forming a bridge to meadow"
+    },
+    {
+      "duration": 9,
+      "description": "medium shot of Aarav stepping onto the rainbow bridge with wonder",
+      "visual_prompt": "(medium shot:1.2) little Indian boy with black hair, wearing yellow shirt, stepping carefully onto glowing rainbow bridge, sky shining, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आरव ने हिम्मत जुटाकर पुल पर पहला कदम रखा। हर कदम पर उसके पैरों के नीचे रंग चमकने लगे। उसने हँसते हुए कहा, 'अगर मेरी मम्मी यहाँ होतीं तो कहतीं— जूते गंदे मत कर!'",
+      "subtitle": "The First Step",
+      "characters": ["Aarav", "Rainbow Bridge"],
+      "motion_prompt": "boy stepping onto glowing rainbow bridge"
+    },
+    {
+      "duration": 9,
+      "description": "medium shot of Butterfly Queen appearing with sparkling wings",
+      "visual_prompt": "(medium shot:1.2) beautiful butterfly queen with rainbow-colored wings, glowing softly, hovering in front of boy on bridge, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "तभी एक तितली रानी अपने चमचमाते पंखों के साथ आई। उसने धीरे से कहा, 'क्या तुम हमारी मदद करोगे? हमारी तितलियाँ रास्ता भटक गई हैं।' आरव ने मुस्कुराकर जवाब दिया, 'बिल्कुल! लेकिन बदले में मुझे एक तितली वाली टोपी चाहिए!'",
+      "subtitle": "The Butterfly Queen",
+      "characters": ["Butterfly Queen", "Aarav"],
+      "motion_prompt": "butterfly queen fluttering in front of boy"
+    },
+    {
+      "duration": 10,
+      "description": "wide shot of Aarav walking on rainbow bridge surrounded by butterflies",
+      "visual_prompt": "(wide shot:1.2) little Indian boy with short black hair, walking on glowing rainbow bridge with dozens of colorful butterflies flying around him, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आरव पुल पर आगे बढ़ा। दर्जनों तितलियाँ उसके चारों ओर उड़ रही थीं। उसने मज़ाक में कहा, 'अरे! इतनी सारी तितलियाँ तो मेरी ड्रॉइंग कॉपी से भी ज्यादा रंगीन हैं!'",
+      "subtitle": "Journey of Colors",
+      "characters": ["Aarav", "Butterfly Queen"],
+      "motion_prompt": "boy walking on rainbow bridge, butterflies flying around"
+    },
+    {
+      "duration": 9,
+      "description": "medium shot of Aarav releasing butterflies into magical flower garden",
+      "visual_prompt": "(medium shot:1.2) little Indian boy with short black hair, standing on rainbow bridge, releasing colorful butterflies into glowing magical flower garden, storybook style:1.3",
+      "negative_prompt": "blurry, dark, low resolution, distorted, unnatural colors, scary, violent",
+      "narration": "आख़िरकार, वे एक जादुई फूलों के बगीचे में पहुँचे। आरव ने धीरे से तितलियों को उड़ने दिया। उसने हँसकर कहा, 'जाओ दोस्तों, और फूलों से पार्टी करो! बस मुझे भी एक गुलाब भेज देना।' फिर उसने हाथ हिलाते हुए कहा, 'अगर आपको यह कहानी पसंद आई, तो हँसते-हँसते सब्सक्राइब करना मत भूलना!'",
+      "subtitle": "Home in the Garden",
+      "characters": ["Aarav", "Butterfly Queen"],
+      "motion_prompt": "boy releasing butterflies into magical garden"
+    }
+  ],
+  "tags": [
+    "kids",
+    "magical",
+    "rainbow",
+    "friendship",
+    "storybook",
+    "adventure",
+    "nature",
+    "funny"
+  ]
+}
