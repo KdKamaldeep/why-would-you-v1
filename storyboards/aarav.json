@@ -29,15 +29,15 @@
       "motion_prompt": "magical painter brushing colors into sky"
     },
     {
-      "duration": 9,
-      "description": "close-up of rainbow arc laughing and talking",
-      "visual_prompt": "(close-up:1.2) colorful glowing rainbow arc with smiling playful face, shining in sky, storybook style:1.3",
-      "negative_prompt": "blurry, dark, low resolution, scary, violent",
-      "narration": "इंद्रधनुष हँसकर बोला, 'भाई, मैं तो आसमान की मुस्कान हूँ! बारिश के आँसू पोंछकर मैं हँसी ले आता हूँ।'",
-      "subtitle": "The Rainbow Speaks",
-      "characters": ["Rainbow"],
-      "motion_prompt": "rainbow glowing and smiling playfully"
-    },
+  "duration": 9,
+  "description": "close-up of rainbow glowing brightly in the sky with a playful expression",
+  "visual_prompt": "(close-up:1.2) colorful glowing rainbow in the sky, soft smiling face drawn in the middle, bright and cheerful, storybook style:1.3",
+  "negative_prompt": "blurry, dark, low resolution, distorted, scary, violent",
+  "narration": "इंद्रधनुष हँसकर बोला, 'भाई, मैं तो आसमान की मुस्कान हूँ! बारिश के आँसू पोंछकर मैं हँसी ले आता हूँ।'",
+  "subtitle": "The Rainbow Speaks",
+  "characters": ["Rainbow"],
+  "motion_prompt": "rainbow glowing softly, smiling expression"
+},
     {
       "duration": 9,
       "description": "medium shot of Aarav joking with rainbow",
