@@ -13,8 +13,7 @@
     {
   "duration": 7,
   "description": "wide shot of village in thunderstorm",
-  "visual_prompt": "(cartoon oak tree:1.3), thick trunk, wide leafy crown, (cartoon face on trunk:1.3), proud happy expression, standing in rain, storybook illustration:1.3
-",
+  "visual_prompt": "(cartoon straw hut:1.4), small cozy hut with straw roof and cartoon face, worried eyes, trembling, (cartoon tall green tree:1.2) with smiling face, (cartoon shiny metal tower:1.2) with cheerful face, all standing together in rain, (storybook illustration:1.3), bright colors, clean outlines",
   "negative_prompt": "blurry, scary, distorted, extra limbs, realistic human",
   "narration": "Narrator: एक बरसाती शाम को मेघपुर में आसमान गरजा और बिजली की चमक ने रात को रोशन कर दिया।",
   "voice": "hi-IN-SwaraNeural-cheerful-female",

@@ -1,0 +1,80 @@
+{
+  "title": "Why Would You Read a Book Instead of Scrolling Instagram?",
+  "description": "A fun kids’ story explaining why reading books is better than endless scrolling on Instagram.",
+  "total_duration": 45,
+  "cast": [
+    {"name": "Narrator", "role": "storyteller"},
+    {"name": "Girl", "role": "curious kid"},
+    {"name": "Mom", "role": "wise and caring mother"},
+    {"name": "Dragon", "role": "magical creature from book world"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "girl scrolling Instagram in bedroom",
+      "visual_prompt": "(wide shot:1.2) 12-year-old Indian girl(1.3), ponytail, wearing pajamas(1.2), lying on bed with glowing phone screen(1.2), stack of books on wooden table nearby(1.1), cozy bedroom with soft lamp(1.1), storybook illustration(1.3), bright colors, clean outlines",
+      "negative_prompt": "blurry, scary, distorted, extra limbs, text overlay, realistic human",
+      "narration": "Narrator: क्यों कोई इंस्टाग्राम पर स्क्रॉल करने की बजाय किताब पढ़ेगा? रात को एक लड़की बिस्तर पर लेटी थी, उसका कमरा फोन की रोशनी से जगमगा रहा था। उसके पास किताबें रखी थीं… लेकिन वो इंस्टाग्राम पर स्क्रॉल कर रही थी।",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
+      "subtitle": "The Question",
+      "characters": ["Narrator", "Girl"],
+      "motion_prompt": "phone screen glowing on her face"
+    },
+    {
+      "duration": 6,
+      "description": "mom enters room, talking to girl",
+      "visual_prompt": "(medium shot:1.2) Indian mother(1.3), cotton saree(1.2), gentle smile(1.2), standing beside bed, girl holding phone with annoyed face(1.1), cozy bedroom, storybook style(1.3)",
+      "negative_prompt": "blurry, scary, distorted, extra limbs, text overlay, realistic human",
+      "narration": "Mom: बेटा, फोन बंद करो। किताब पढ़ने का समय है।",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
+      "subtitle": "Mom’s Advice",
+      "characters": ["Mom", "Girl"],
+      "motion_prompt": "mother pointing gently at books"
+    },
+    {
+      "duration": 6,
+      "description": "girl complains about books",
+      "visual_prompt": "(medium shot:1.2) 12-year-old Indian girl(1.3), ponytail, pajamas(1.2), annoyed expression(1.2), hugging phone close to chest(1.1), books on table ignored, storybook style(1.3), bright colors",
+      "negative_prompt": "blurry, scary, distorted, extra limbs, text overlay, realistic human",
+      "narration": "Girl: लेकिन माँ… किताबें बहुत बोरिंग हैं। इंस्टा फास्ट है, मजेदार है!",
+      "voice": "hi-IN-AnanyaNeural-kid",
+      "subtitle": "The Complaint",
+      "characters": ["Girl"],
+      "motion_prompt": "girl frowning and hugging phone"
+    },
+    {
+      "duration": 8,
+      "description": "girl imagines herself in book world",
+      "visual_prompt": "(wide shot:1.2) magical fantasy world(1.2), same girl(1.3) riding friendly cartoon dragon(1.3), smiling with excitement(1.2), glowing open book in foreground(1.2), dreamy colorful sky(1.2), storybook illustration(1.3), bright magical atmosphere",
+      "negative_prompt": "blurry, scary, distorted, extra limbs, dark style, realistic human",
+      "narration": "Narrator: लेकिन जैसे ही उसने कल्पना की, किताब का पन्ना खुला और वो खुद को एक ड्रैगन की पीठ पर उड़ते हुए पाई!",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
+      "subtitle": "The Imagination",
+      "characters": ["Narrator", "Girl", "Dragon"],
+      "motion_prompt": "dragon flying in colorful sky"
+    },
+    {
+      "duration": 8,
+      "description": "contrast between scrolling and reading",
+      "visual_prompt": "(split-style frame:1.2) Left side: girl in dark room, scrolling phone, tired eyes, yawning(1.2). Right side: same girl reading colorful storybook(1.2), imagination sparks glowing around her(1.2), happy smile, bright cozy room(1.2), storybook style(1.3)",
+      "negative_prompt": "blurry, scary, distorted, extra limbs, realistic human, text overlay",
+      "narration": "Narrator: इंस्टा आपको कुछ सेकंड का मज़ा देता है… लेकिन किताबें आपकी याददाश्त, ध्यान और कल्पना को मजबूत बनाती हैं।",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
+      "subtitle": "The Contrast",
+      "characters": ["Narrator", "Girl"],
+      "motion_prompt": "left side dim, right side glowing with imagination"
+    },
+    {
+      "duration": 9,
+      "description": "girl finally picks up book",
+      "visual_prompt": "(close shot:1.2) 12-year-old Indian girl(1.3), ponytail, smiling happily(1.2), holding open book in hands(1.2), cozy warm bedroom(1.2), soft lamp light glowing(1.2), mother beside her with gentle smile(1.2), storybook illustration(1.3), bright cozy colors",
+      "negative_prompt": "blurry, scary, distorted, extra limbs, realistic human, text overlay",
+      "narration": "Narrator: लड़की ने फोन बंद किया और किताब उठाई। उसने सीखा कि कहानियाँ सिर्फ पढ़ी नहीं जातीं… उन्हें जिया जाता है।",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
+      "subtitle": "The Lesson",
+      "characters": ["Narrator", "Girl", "Mom"],
+      "motion_prompt": "girl smiling and opening book"
+    }
+  ],
+  "tags": ["kids", "education", "books", "storybook", "habits"]
+}
