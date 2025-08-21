@@ -81,7 +81,8 @@ class NarrationConverter:
         voice_files = {}
         
         if os.path.exists(self.voice_dir):
-            # Look for audio files in the voice directory
+            # Look for audio files in the voice directory, prioritizing WAV files
+            # Process WAV files first, then other formats
             audio_extensions = ['*.wav', '*.mp3', '*.flac', '*.m4a']
             
             for ext in audio_extensions:
@@ -90,14 +91,17 @@ class NarrationConverter:
                     file_name = os.path.basename(file_path)
                     name_without_ext = os.path.splitext(file_name)[0]
                     
-                    # Store both the full name and variations
-                    voice_files[name_without_ext] = file_path
+                    # Only store if we don't already have a WAV version of this voice
+                    if name_without_ext not in voice_files or voice_files[name_without_ext].lower().endswith('.wav'):
+                        voice_files[name_without_ext] = file_path
                     
                     # Also store without the last part (e.g., "hi-IN-SwaraNeural-female" for "hi-IN-SwaraNeural-cheerful-female")
                     parts = name_without_ext.split('-')
                     if len(parts) >= 4:
                         base_voice = '-'.join(parts[:-1])  # Remove the last part
-                        voice_files[base_voice] = file_path
+                        # Only store if we don't already have a WAV version of this base voice
+                        if base_voice not in voice_files or voice_files[base_voice].lower().endswith('.wav'):
+                            voice_files[base_voice] = file_path
         
         self._voice_files_cache = voice_files
         return voice_files

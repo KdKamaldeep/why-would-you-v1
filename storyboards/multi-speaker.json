@@ -13,7 +13,7 @@
     {
       "duration": 7,
       "description": "wide shot of village in thunderstorm",
-      "visual_prompt": "(wide shot:1.2) dark clouds, lightning in sky, small hut, tall tree, metal tower, storybook style:1.3",
+      "visual_prompt": "wide shot of a colorful storybook village in thunderstorm, small cartoon hut with big eyes, tall friendly tree with face, shiny cheerful tower, dark clouds above with lightning, bright children's storybook illustration, clean outlines, expressive characters",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, extra limbs",
       "narration": "Narrator: On a rainy evening in Meghpur, the sky rumbled with thunder and flashes of lightning lit up the night.",
       "voice": "hi-IN-SwaraNeural-cheerful-female",
@@ -24,7 +24,7 @@
     {
       "duration": 6,
       "description": "small hut looking scared",
-      "visual_prompt": "(medium shot:1.2) small hut with cartoon face, looking worried, rain falling, storybook style:1.3",
+      "visual_prompt": "medium shot of a cute little cartoon hut with a face and big worried eyes, trembling slightly, raindrops falling, colorful children's storybook illustration, soft lighting, detailed but simple, expressive emotion",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, extra limbs",
       "narration": "Hut: Uh-oh! The lightning is coming. I hope it doesn’t hit me!",
       "voice": "hi-IN-AnanyaNeural-kid",
@@ -35,7 +35,7 @@
     {
       "duration": 6,
       "description": "tall tree standing proudly",
-      "visual_prompt": "(medium shot:1.2) tall tree with friendly face, standing proud, storybook style:1.3",
+      "visual_prompt": "medium shot of a tall proud cartoon tree with a smiling friendly face, branches spread wide, standing confidently in rain, children's storybook illustration, bright colors, expressive emotion, clean outlines",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, extra limbs",
       "narration": "Tree: Don’t worry, little hut. Lightning usually looks for the tallest path to reach the ground. That might be me!",
       "voice": "hi-IN-ArjunNeural-male",
@@ -46,7 +46,7 @@
     {
       "duration": 6,
       "description": "metal tower speaking confidently",
-      "visual_prompt": "(medium shot:1.2) shiny metal tower with friendly face, standing tall, storybook style:1.3",
+      "visual_prompt": "medium shot of a shiny cartoon metal tower with a happy confident face, glowing softly, standing tall against cloudy sky, colorful children's storybook illustration, clear outlines, friendly expression",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, extra limbs",
       "narration": "Tower: Actually, lightning may strike me first. I’m taller, and I’m made of metal which carries electricity easily.",
       "voice": "hi-IN-SwaraNeural-cheerful-female",
@@ -57,7 +57,7 @@
     {
       "duration": 9,
       "description": "old cloud explaining",
-      "visual_prompt": "(medium shot:1.2) wise old cloud with kind eyes, speaking down to hut, tree, and tower, storybook style:1.3",
+      "visual_prompt": "medium shot of a large fluffy wise old cartoon cloud with kind eyes and gentle smile, floating above the hut, tree, and tower, speaking down to them, colorful children's storybook illustration, soft glow, expressive characters",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, extra limbs",
       "narration": "Cloud: Children, lightning is just electricity trying to reach the ground. It looks for the shortest and easiest path. Taller things are closer, and if they are good conductors, like metal, they attract lightning even more.",
       "voice": "hi-IN-SwaraNeural-cheerful-female",
@@ -68,7 +68,7 @@
     {
       "duration": 10,
       "description": "tower struck safely by lightning rod",
-      "visual_prompt": "(wide shot:1.2) tower with lightning rod struck by bolt, energy going safely into ground, hut and tree smiling, storybook style:1.3",
+      "visual_prompt": "wide shot of a cartoon tower with a lightning rod being struck by a bright bolt, golden energy flowing safely into the ground, hut and tree nearby smiling happily, colorful children's storybook illustration, clean lines, expressive faces, bright safe atmosphere",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, extra limbs",
       "narration": "Narrator: CRACK! A bright bolt shot down! It struck the tower’s lightning rod, which carried the energy safely into the earth. And from that day, the hut, the tree, and the tower understood why lightning loves tall objects… and how science keeps everyone safe.",
       "voice": "hi-IN-SwaraNeural-cheerful-female",
