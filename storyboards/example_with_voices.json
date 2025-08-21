@@ -26,7 +26,7 @@
       "visual_prompt": "(medium shot:1.2) wise old cloud with kind eyes, speaking down to hut, tree, and tower, storybook style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, extra limbs",
       "narration": "Cloud: Children, lightning is just electricity trying to reach the ground. It looks for the shortest and easiest path. Taller things are closer, and if they are good conductors, like metal, they attract lightning even more.",
-      "voice": "hi-IN-SwaraNeural-female",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
       "subtitle": "The Wise Cloud",
       "characters": ["Cloud"],
       "motion_prompt": "cloud glowing softly as it speaks"
@@ -48,7 +48,7 @@
       "visual_prompt": "storybook style illustration, wise cloud smiling down at the children with a gentle glow",
       "negative_prompt": "blurry, dark, low resolution, scary, violent",
       "narration": "Cloud [slow, wise]: Exactly! Lightning is nature's way of balancing electricity. It's beautiful and powerful, but also [pause] dangerous. Always stay safe during storms.",
-      "voice": "hi-IN-SwaraNeural-female",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
       "subtitle": "Final Wisdom",
       "characters": ["Cloud"],
       "motion_prompt": "cloud glowing gently with wisdom"
