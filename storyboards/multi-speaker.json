@@ -11,16 +11,17 @@
   ],
   "scenes": [
     {
-      "duration": 7,
-      "description": "wide shot of village in thunderstorm",
-      "visual_prompt": "(wide shot:1.2) cartoon hut with straw roof and big eyes, tall leafy tree with smile, shiny cheerful tower with face, dark clouds with lightning in sky, storybook style:1.3",
-      "negative_prompt": "blurry, dark, low resolution, distorted, scary, extra limbs",
-      "narration": "Narrator: एक बरसाती शाम को मेघपुर में आसमान गरजा और बिजली की चमक ने रात को रोशन कर दिया।",
-      "voice": "hi-IN-SwaraNeural-cheerful-female",
-      "subtitle": "Stormy Night",
-      "characters": ["Narrator"],
-      "motion_prompt": "lightning flashing in sky"
-    },
+  "duration": 7,
+  "description": "wide shot of village in thunderstorm",
+  "visual_prompt": "(wide shot:1.2) cartoon hut with straw roof and big eyes(1.3), tall green leafy tree with smiling face(1.3), shiny metal tower with cheerful face(1.3), all standing together in village, dark storm clouds above, bright lightning in sky, storybook illustration(1.3), clean outlines, bright colors",
+  "negative_prompt": "blurry, scary, distorted, extra limbs, realistic human",
+  "narration": "Narrator: एक बरसाती शाम को मेघपुर में आसमान गरजा और बिजली की चमक ने रात को रोशन कर दिया।",
+  "voice": "hi-IN-SwaraNeural-cheerful-female",
+  "subtitle": "Stormy Night",
+  "characters": ["Narrator", "Hut", "Tree", "Tower"],
+  "motion_prompt": "lightning flashing in sky"
+}
+,
     {
       "duration": 6,
       "description": "small hut looking scared",
