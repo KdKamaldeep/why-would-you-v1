@@ -35,7 +35,7 @@
     {
       "duration": 6,
       "description": "tall tree standing proudly",
-      "visual_prompt": "(medium shot:1.2) tall green tree with wide crown, smiling proud face, standing in rain, storybook style:1.3",
+      "visual_prompt": "(medium shot:1.2) tall green tree(1.1) with wide crown, smiling proud face, standing in rain, storybook style:1.3",
       "negative_prompt": "blurry, dark, low resolution, distorted, scary, extra limbs",
       "narration": "Tree: चिंता मत करो, छोटे घर। बिजली ज़मीन तक पहुँचने के लिए सबसे ऊँचा रास्ता ढूँढती है। शायद यह मेरे ऊपर गिरे!",
       "voice": "hi-IN-ArjunNeural-male",
