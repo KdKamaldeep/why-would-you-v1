@@ -227,16 +227,21 @@ class CartoonShortsGenerator:
                     voice_file = converter.resolve_voice_file(scene['voice'])
                     if voice_file:
                         logger.info(f"🎵 Scene {i+1}: Using voice file: {voice_file}")
+                        logger.info(f"🎵 Scene {i+1}: Voice property: '{scene['voice']}' -> resolved to: {voice_file}")
                     else:
                         logger.warning(f"🎵 Scene {i+1}: Voice file not found for '{scene['voice']}'")
+                else:
+                    logger.info(f"🎵 Scene {i+1}: No voice property found in scene")
                 
                 if not (self.config.reuse_existing and scene_audio.exists()):
                     logger.info(f"🎵 Scene {i+1}: Generating new audio clip...")
+                    final_voice_file = voice_file or self.config.voice_id or None
+                    logger.info(f"🎵 Scene {i+1}: Final voice_clone_audio parameter: {final_voice_file}")
                     generated_audio = self.voice_synthesizer.synthesize_voice(
                         [narration_text],
                         str(scene_audio),
                         speaker=None,
-                        voice_clone_audio=voice_file or self.config.voice_id or None,
+                        voice_clone_audio=final_voice_file,
                     )
                     # Use actual generated path (may switch extension on fallback)
                     scene_audio = Path(generated_audio)

@@ -121,16 +121,29 @@ class NarrationConverter:
         if voice_name in voice_files:
             return voice_files[voice_name]
         
-        # Try with common extensions
+        # Try with common extensions, prioritizing WAV files
         for ext in ['.wav', '.mp3', '.flac', '.m4a']:
             full_name = voice_name + ext
             if full_name in voice_files:
                 return voice_files[full_name]
         
         # Try partial matches (for cases like "hi-IN-SwaraNeural-female" matching "hi-IN-SwaraNeural-cheerful-female")
+        # Prioritize WAV files over MP3 files
+        candidates = []
         for file_name, file_path in voice_files.items():
             if voice_name in file_name or file_name.startswith(voice_name):
-                return file_path
+                # Score candidates: WAV files get higher priority
+                score = 0
+                if file_path.lower().endswith('.wav'):
+                    score = 2
+                elif file_path.lower().endswith('.mp3'):
+                    score = 1
+                candidates.append((score, file_path))
+        
+        if candidates:
+            # Sort by score (highest first) and return the best match
+            candidates.sort(key=lambda x: x[0], reverse=True)
+            return candidates[0][1]
         
         logger.warning(f"Voice file not found for voice name: {voice_name}")
         return None
