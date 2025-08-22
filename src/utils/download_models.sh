@@ -69,6 +69,74 @@ else
     fi
 fi
 
+# Realistic Vision v5.1 model (photorealistic style) - with VAE
+if [ -f "models/realistic-vision-v5.1.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping Realistic Vision v5.1 (already exists): models/realistic-vision-v5.1.safetensors"
+else
+    [ "$REDOWNLOAD" = true ] && rm -f "models/realistic-vision-v5.1.safetensors"
+    echo "⬇️  Downloading Realistic Vision v5.1 model (photorealistic style)..."
+    curl -L "https://huggingface.co/SG161222/Realistic_Vision_V5.1/resolve/main/Realistic_Vision_V5.1.safetensors" \
+         -o "models/realistic-vision-v5.1.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ Realistic Vision v5.1 model downloaded successfully"
+    else
+        echo "❌ Failed to download Realistic Vision v5.1 model"
+    fi
+fi
+
+# DreamShaper v8 model (realistic style)
+if [ -f "models/dreamshaper-v8.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping DreamShaper v8 (already exists): models/dreamshaper-v8.safetensors"
+else
+    [ "$REDOWNLOAD" = true ] && rm -f "models/dreamshaper-v8.safetensors"
+    echo "⬇️  Downloading DreamShaper v8 model (realistic style)..."
+    curl -L "https://huggingface.co/Lykon/dreamshaper-8/resolve/main/DreamShaper_8_pruned.safetensors" \
+         -o "models/dreamshaper-v8.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ DreamShaper v8 model downloaded successfully"
+    else
+        echo "❌ Failed to download DreamShaper v8 model"
+    fi
+fi
+
+# Realistic Vision v4 model (alternative photorealistic style) - more stable
+if [ -f "models/realistic-vision-v4.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping Realistic Vision v4 (already exists): models/realistic-vision-v4.safetensors"
+else
+    [ "$REDOWNLOAD" = true ] && rm -f "models/realistic-vision-v4.safetensors"
+    echo "⬇️  Downloading Realistic Vision v4 model (photorealistic style)..."
+    curl -L "https://huggingface.co/SG161222/Realistic_Vision_V4.0/resolve/main/Realistic_Vision_V4.0.safetensors" \
+         -o "models/realistic-vision-v4.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ Realistic Vision v4 model downloaded successfully"
+    else
+        echo "❌ Failed to download Realistic Vision v4 model"
+    fi
+fi
+
+# Deliberate v3 model (realistic style)
+if [ -f "models/deliberate-v3.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping Deliberate v3 (already exists): models/deliberate-v3.safetensors"
+else
+    [ "$REDOWNLOAD" = true ] && rm -f "models/deliberate-v3.safetensors"
+    echo "⬇️  Downloading Deliberate v3 model (realistic style)..."
+    curl -L "https://huggingface.co/XpucT/Deliberate/resolve/main/Deliberate_v3.safetensors" \
+         -o "models/deliberate-v3.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ Deliberate v3 model downloaded successfully"
+    else
+        echo "❌ Failed to download Deliberate v3 model"
+    fi
+fi
+
 # Enhanced Animation System - Professional Quality Video Generation
 echo "📹 Enhanced Animation System Ready"
 echo "🎬 Professional quality animations with unlimited length capability"
@@ -252,7 +320,11 @@ echo "  │   ├── 6 Advanced Animation Effects"
 echo "  │   └── Unlimited Length Capability"
 echo "  ├── 🎨 Stable Diffusion Models:"
 echo "  │   ├── Anything v5 (cartoon style): models/toonyou_beta6.safetensors"
-echo "  │   └── AnimaGine XL (anime style): models/meina_mix.safetensors"
+echo "  │   ├── AnimaGine XL (anime style): models/meina_mix.safetensors"
+echo "  │   ├── Realistic Vision v5.1 (photorealistic): models/realistic-vision-v5.1.safetensors"
+echo "  │   ├── Realistic Vision v4 (photorealistic): models/realistic-vision-v4.safetensors"
+echo "  │   ├── DreamShaper v8 (realistic): models/dreamshaper-v8.safetensors"
+echo "  │   └── Deliberate v3 (realistic): models/deliberate-v3.safetensors"
 echo "  ├── ⚡ LoRA Models:"
 echo "  │   └── SDXL Lightning LoRA: loras/sdxl_lightning_4step.safetensors"
 echo "  ├── 🎭 Face-Based Generation Models:"
@@ -273,15 +345,19 @@ echo "  ✅ Advanced FFmpeg Techniques"
 echo "  ✅ Face-Based Character Generation"
 echo "  ✅ ControlNet Face Control"
 echo "  ✅ IP-Adapter Image Prompting"
+echo "  ✅ Multiple Visual Styles (Cartoon, Anime, Realistic)"
 
 echo ""
 echo "🚀 Next Steps:"
 echo "  1. Install dependencies: pip install -r requirements.txt"
 echo "  2. Edit .env file and add your API keys"
 echo "  3. Test installation: python test_enhanced_animation.py"
-echo "  4. Generate unlimited cartoons: python simple_cartoon_generator.py --prompt 'Epic adventure' --duration 60"
-echo "  5. Test face-based generation: python test_face_integration.py"
-echo "  6. Generate with character faces: python simple_cartoon_generator.py --storyboard storyboards/independence.json"
+echo "  4. Test different styles:"
+echo "     • Cartoon: python scripts/scene_visual_test.py --style cartoon"
+echo "     • Realistic: python scripts/scene_visual_test.py --style realistic"
+echo "  5. Generate unlimited videos: python simple_cartoon_generator.py --prompt 'Epic adventure' --duration 60"
+echo "  6. Test face-based generation: python test_face_integration.py"
+echo "  7. Generate with character faces: python simple_cartoon_generator.py --storyboard storyboards/independence.json"
 
 echo ""
 echo "💡 Hardware Requirements:"

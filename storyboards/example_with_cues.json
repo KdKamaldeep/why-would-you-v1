@@ -1,0 +1,82 @@
+{
+  "title": "The Magical Forest Adventure",
+  "description": "A young explorer discovers a magical forest with talking animals and enchanted creatures",
+  "total_duration": 45,
+  "cast": [
+    {"name": "Alex", "role": "young explorer"},
+    {"name": "Owl", "role": "wise forest guardian"},
+    {"name": "Squirrel", "role": "excited forest friend"},
+    {"name": "Giant", "role": "gentle forest giant"}
+  ],
+  "scenes": [
+    {
+      "duration": 8,
+      "description": "Alex enters the magical forest",
+      "visual_prompt": "storybook style illustration, young explorer with backpack entering a glowing magical forest",
+      "negative_prompt": "blurry, dark, low resolution, scary, violent",
+      "narration": "Alex [excited] stepped into the magical forest. The trees seemed to whisper secrets.",
+      "subtitle": "The Forest Entrance",
+      "characters": ["Alex"],
+      "motion_prompt": "explorer walking into glowing forest"
+    },
+    {
+      "duration": 8,
+      "description": "A wise owl appears",
+      "visual_prompt": "storybook style illustration, wise old owl perched on a branch, looking down at Alex",
+      "negative_prompt": "blurry, dark, low resolution, scary, violent",
+      "narration": "Suddenly, a wise owl [slow, wise] appeared. Welcome, young explorer, it said.",
+      "subtitle": "The Wise Owl",
+      "characters": ["Alex", "Owl"],
+      "motion_prompt": "owl perched on branch, looking down"
+    },
+    {
+      "duration": 8,
+      "description": "An excited squirrel joins",
+      "visual_prompt": "storybook style illustration, excited squirrel jumping around Alex's feet",
+      "negative_prompt": "blurry, dark, low resolution, scary, violent",
+      "narration": "A little squirrel [excited] jumped around Alex's feet. Hello! Hello! it squeaked.",
+      "subtitle": "The Excited Squirrel",
+      "characters": ["Alex", "Squirrel"],
+      "motion_prompt": "squirrel jumping excitedly around explorer"
+    },
+    {
+      "duration": 8,
+      "description": "A gentle giant appears",
+      "visual_prompt": "storybook style illustration, gentle giant emerging from behind trees, smiling down",
+      "negative_prompt": "blurry, dark, low resolution, scary, violent",
+      "narration": "There was a [pause] moment of silence. Then a [giant] voice boomed: Welcome to our forest!",
+      "subtitle": "The Gentle Giant",
+      "characters": ["Alex", "Giant"],
+      "motion_prompt": "giant emerging from behind trees"
+    },
+    {
+      "duration": 8,
+      "description": "Alex responds to the giant",
+      "visual_prompt": "storybook style illustration, Alex looking up at the giant with wonder",
+      "negative_prompt": "blurry, dark, low resolution, scary, violent",
+      "narration": "Alex [nervous] looked up at the giant. Thank you for welcoming me, he said [low pitch, confident].",
+      "subtitle": "The Response",
+      "characters": ["Alex", "Giant"],
+      "motion_prompt": "explorer looking up at giant with wonder"
+    },
+    {
+      "duration": 5,
+      "description": "The forest celebrates",
+      "visual_prompt": "storybook style illustration, magical forest glowing with sparkles and light",
+      "negative_prompt": "blurry, dark, low resolution, scary, violent",
+      "narration": "The entire forest [magical] began to glow. It was the most [emphasis strong] beautiful sight Alex had ever seen.",
+      "subtitle": "The Celebration",
+      "characters": ["Alex", "Owl", "Squirrel", "Giant"],
+      "motion_prompt": "forest glowing with magical sparkles"
+    }
+  ],
+  "tags": [
+    "magical",
+    "forest",
+    "adventure",
+    "friendship",
+    "storybook",
+    "exploration",
+    "fantasy"
+  ]
+}

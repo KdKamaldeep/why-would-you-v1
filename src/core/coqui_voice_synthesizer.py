@@ -193,6 +193,10 @@ class CoquiVoiceSynthesizer:
             raise RuntimeError("Coqui TTS model not loaded")
         
         try:
+            # Log the voice_clone_audio parameter for debugging
+            logger.info(f"🎵 Voice synthesis called with voice_clone_audio: {voice_clone_audio}")
+            logger.info(f"🎵 Voice synthesis called with speaker: {speaker}")
+            
             # Ensure multilingual model for non-English languages
             if (self.config.language or "en").lower() != "en":
                 if "xtts" not in (getattr(self.config, 'model_name', '') or '').lower():
@@ -294,6 +298,10 @@ class CoquiVoiceSynthesizer:
                         logger.warning(f"Text normalization warning: {e}")
                 
                 speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
+                logger.info(f"🎵 XTTS: speaker_wav_arg set to: {speaker_wav_arg}")
+                logger.info(f"🎵 XTTS: voice_clone_audio was: {voice_clone_audio}")
+                logger.info(f"🎵 XTTS: voice_clone_audio exists: {voice_clone_audio and os.path.exists(voice_clone_audio) if voice_clone_audio else False}")
+                
                 # Auto-discover a language-appropriate speaker WAV if none provided
                 if speaker_wav_arg is None:
                     auto_wav = self._discover_speaker_wav(self.config.language)

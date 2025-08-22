@@ -82,6 +82,8 @@ class VideoConfig:
     enable_image_validation: bool = True  # Enable automatic blank image detection and prompt adjustment
     # Character face mappings for face-based generation
     character_faces: DictType[str, str] = None  # Maps character names to face image paths
+    # Model path for image generation
+    model_path: Optional[str] = None  # Path to specific model file
 
     def __post_init__(self):
         """Set dimensions based on video format."""
@@ -109,10 +111,15 @@ class CartoonShortsGenerator:
         
         # Initialize components using modular classes
         self.script_generator = ScriptGenerator(os.getenv('OPENAI_API_KEY', ''))
-        # Choose a more neutral/non-anime base when Indian style is requested
-        default_model = "models/toonyou_beta6.safetensors"
-        indian_pref_model = os.getenv("INDIAN_STYLE_MODEL", default_model)
-        model_path = indian_pref_model if (config.style or "").lower() in {"indian", "indian_cartoon", "desi", "bollywood"} else default_model
+        # Choose model path: config model_path takes priority, then style-based selection
+        if config.model_path:
+            model_path = config.model_path
+        else:
+            # Choose a more neutral/non-anime base when Indian style is requested
+            default_model = "models/toonyou_beta6.safetensors"
+            indian_pref_model = os.getenv("INDIAN_STYLE_MODEL", default_model)
+            model_path = indian_pref_model if (config.style or "").lower() in {"indian", "indian_cartoon", "desi", "bollywood"} else default_model
+        
         lora_path = os.getenv("INDIAN_STYLE_LORA", "") or None
         try:
             self.image_generator = ImageGenerator(
@@ -218,13 +225,30 @@ class CartoonShortsGenerator:
                 narration_text = scene.get('narration', '')
                 logger.info(f"🎵 Scene {i+1}: Processing narration ({len(narration_text)} characters)")
                 
+                # Get voice file from scene if available
+                voice_file = None
+                if 'voice' in scene:
+                    # Import narration converter to resolve voice files
+                    from ..utils.narration_converter import NarrationConverter
+                    converter = NarrationConverter()
+                    voice_file = converter.resolve_voice_file(scene['voice'])
+                    if voice_file:
+                        logger.info(f"🎵 Scene {i+1}: Using voice file: {voice_file}")
+                        logger.info(f"🎵 Scene {i+1}: Voice property: '{scene['voice']}' -> resolved to: {voice_file}")
+                    else:
+                        logger.warning(f"🎵 Scene {i+1}: Voice file not found for '{scene['voice']}'")
+                else:
+                    logger.info(f"🎵 Scene {i+1}: No voice property found in scene")
+                
                 if not (self.config.reuse_existing and scene_audio.exists()):
                     logger.info(f"🎵 Scene {i+1}: Generating new audio clip...")
+                    final_voice_file = voice_file or self.config.voice_id or None
+                    logger.info(f"🎵 Scene {i+1}: Final voice_clone_audio parameter: {final_voice_file}")
                     generated_audio = self.voice_synthesizer.synthesize_voice(
                         [narration_text],
                         str(scene_audio),
                         speaker=None,
-                        voice_clone_audio=self.config.voice_id or None,
+                        voice_clone_audio=final_voice_file,
                     )
                     # Use actual generated path (may switch extension on fallback)
                     scene_audio = Path(generated_audio)
@@ -458,11 +482,23 @@ class CartoonShortsGenerator:
                 total_chars = sum(len(line) for line in narration_lines)
                 logger.info(f"🎵 Fallback: Total characters to synthesize: {total_chars}")
                 
+                # For fallback, use the first available voice file from scenes
+                fallback_voice_file = None
+                if script.get('scenes'):
+                    from ..utils.narration_converter import NarrationConverter
+                    converter = NarrationConverter()
+                    for scene in script['scenes']:
+                        if 'voice' in scene:
+                            fallback_voice_file = converter.resolve_voice_file(scene['voice'])
+                            if fallback_voice_file:
+                                logger.info(f"🎵 Fallback: Using voice file from first scene: {fallback_voice_file}")
+                                break
+                
                 generated_audio = self.voice_synthesizer.synthesize_voice(
                     narration_lines,
                     str(narration_path),
                     speaker=None,
-                    voice_clone_audio=self.config.voice_id or None,
+                    voice_clone_audio=fallback_voice_file or self.config.voice_id or None,
                 )
                 narration_path = Path(generated_audio)
                 logger.info(f"🎵 Fallback: Single audio generation completed: {narration_path}")

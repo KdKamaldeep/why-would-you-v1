@@ -180,7 +180,9 @@ class ScriptGenerator:
                 "negative_prompt": scene.get("negative_prompt", "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures"),
                 "narration": scene.get("narration", scene.get("subtitle", "")),
                 "subtitle": scene.get("subtitle", scene.get("narration", "")) or f"Scene {idx+1}",
-                "characters": scene.get("characters", [])[:2]  # ensure at most two
+                "characters": scene.get("characters", [])[:2],  # ensure at most two
+                "voice": scene.get("voice"),  # preserve voice property for TTS
+                "motion_prompt": scene.get("motion_prompt")  # preserve motion prompt for animation
             })
 
         if not normalized_scenes:
