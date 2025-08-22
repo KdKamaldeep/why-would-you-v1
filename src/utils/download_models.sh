@@ -69,13 +69,13 @@ else
     fi
 fi
 
-# Realistic Vision v5.1 model (photorealistic style)
+# Realistic Vision v5.1 model (photorealistic style) - with VAE
 if [ -f "models/realistic-vision-v5.1.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
     echo "⏩ Skipping Realistic Vision v5.1 (already exists): models/realistic-vision-v5.1.safetensors"
 else
     [ "$REDOWNLOAD" = true ] && rm -f "models/realistic-vision-v5.1.safetensors"
     echo "⬇️  Downloading Realistic Vision v5.1 model (photorealistic style)..."
-    curl -L "https://huggingface.co/SG161222/Realistic_Vision_V5.1_noVAE/resolve/main/Realistic_Vision_V5.1_noVAE.safetensors" \
+    curl -L "https://huggingface.co/SG161222/Realistic_Vision_V5.1/resolve/main/Realistic_Vision_V5.1.safetensors" \
          -o "models/realistic-vision-v5.1.safetensors" \
          --progress-bar
 
@@ -100,6 +100,23 @@ else
         echo "✅ DreamShaper v8 model downloaded successfully"
     else
         echo "❌ Failed to download DreamShaper v8 model"
+    fi
+fi
+
+# Realistic Vision v4 model (alternative photorealistic style) - more stable
+if [ -f "models/realistic-vision-v4.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping Realistic Vision v4 (already exists): models/realistic-vision-v4.safetensors"
+else
+    [ "$REDOWNLOAD" = true ] && rm -f "models/realistic-vision-v4.safetensors"
+    echo "⬇️  Downloading Realistic Vision v4 model (photorealistic style)..."
+    curl -L "https://huggingface.co/SG161222/Realistic_Vision_V4.0/resolve/main/Realistic_Vision_V4.0.safetensors" \
+         -o "models/realistic-vision-v4.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ Realistic Vision v4 model downloaded successfully"
+    else
+        echo "❌ Failed to download Realistic Vision v4 model"
     fi
 fi
 
@@ -305,6 +322,7 @@ echo "  ├── 🎨 Stable Diffusion Models:"
 echo "  │   ├── Anything v5 (cartoon style): models/toonyou_beta6.safetensors"
 echo "  │   ├── AnimaGine XL (anime style): models/meina_mix.safetensors"
 echo "  │   ├── Realistic Vision v5.1 (photorealistic): models/realistic-vision-v5.1.safetensors"
+echo "  │   ├── Realistic Vision v4 (photorealistic): models/realistic-vision-v4.safetensors"
 echo "  │   ├── DreamShaper v8 (realistic): models/dreamshaper-v8.safetensors"
 echo "  │   └── Deliberate v3 (realistic): models/deliberate-v3.safetensors"
 echo "  ├── ⚡ LoRA Models:"
