@@ -82,6 +82,8 @@ class VideoConfig:
     enable_image_validation: bool = True  # Enable automatic blank image detection and prompt adjustment
     # Character face mappings for face-based generation
     character_faces: DictType[str, str] = None  # Maps character names to face image paths
+    # Model path for image generation
+    model_path: Optional[str] = None  # Path to specific model file
 
     def __post_init__(self):
         """Set dimensions based on video format."""
@@ -109,10 +111,15 @@ class CartoonShortsGenerator:
         
         # Initialize components using modular classes
         self.script_generator = ScriptGenerator(os.getenv('OPENAI_API_KEY', ''))
-        # Choose a more neutral/non-anime base when Indian style is requested
-        default_model = "models/toonyou_beta6.safetensors"
-        indian_pref_model = os.getenv("INDIAN_STYLE_MODEL", default_model)
-        model_path = indian_pref_model if (config.style or "").lower() in {"indian", "indian_cartoon", "desi", "bollywood"} else default_model
+        # Choose model path: config model_path takes priority, then style-based selection
+        if config.model_path:
+            model_path = config.model_path
+        else:
+            # Choose a more neutral/non-anime base when Indian style is requested
+            default_model = "models/toonyou_beta6.safetensors"
+            indian_pref_model = os.getenv("INDIAN_STYLE_MODEL", default_model)
+            model_path = indian_pref_model if (config.style or "").lower() in {"indian", "indian_cartoon", "desi", "bollywood"} else default_model
+        
         lora_path = os.getenv("INDIAN_STYLE_LORA", "") or None
         try:
             self.image_generator = ImageGenerator(

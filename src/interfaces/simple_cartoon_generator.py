@@ -48,6 +48,32 @@ def check_requirements():
     print("✅ All requirements satisfied!")
     return True
 
+def get_model_path_for_type(model_type: str) -> str | None:
+    """Get appropriate model path based on selected model type."""
+    if model_type == "cartoon":
+        # Cartoon models
+        cartoon_models = [
+            "models/toonyou_beta6.safetensors",
+            "models/anything-v4.5.safetensors", 
+            "models/counterfeit-v3.0.safetensors"
+        ]
+        for model in cartoon_models:
+            if Path(model).exists():
+                return model
+    else:  # realistic
+        # Realistic models
+        realistic_models = [
+            "models/realistic-vision-v4.safetensors",
+            "models/deliberate-v3.safetensors",
+            "models/realistic-vision-v5.1.safetensors",
+            "models/dreamshaper-v8.safetensors"
+        ]
+        for model in realistic_models:
+            if Path(model).exists():
+                return model
+    
+    return None
+
 def extract_character_faces_from_cast(cast_list):
     """Extract character face mappings from the cast array in storyboard."""
     character_faces = {}
@@ -76,7 +102,7 @@ def extract_character_faces_from_cast(cast_list):
     
     return character_faces
 
-def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", character_faces=None):
+def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", character_faces=None, model_type="cartoon"):
     """Generate a cartoon video with the given prompt and character faces."""
     try:
         # Import the main generator
@@ -89,11 +115,19 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
         print(f"🗣️ Language: {language}")
         print(f"🎯 Prompt enhancement: {'Enabled' if enable_prompt_enhancement else 'Disabled'}")
         print(f"📐 Video format: {video_format}")
+        print(f"🤖 Model type: {model_type}")
         if character_faces:
             print(f"👥 Character faces: {len(character_faces)} characters mapped")
             for char, face in character_faces.items():
                 print(f"   - {char}: {face}")
         print("-" * 50)
+        
+        # Get appropriate model for the selected type
+        model_path = get_model_path_for_type(model_type)
+        if model_path:
+            print(f"✅ Using {model_type} model: {model_path}")
+        else:
+            print(f"⚠️ No {model_type} model found, will use default model")
         
         # Create video configuration
         config = VideoConfig(
@@ -105,7 +139,8 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
             add_subtitles=False,
             language=language,
             enable_prompt_enhancement=enable_prompt_enhancement,
-            character_faces=character_faces or {}
+            character_faces=character_faces or {},
+            model_path=model_path
         )
         
         # Initialize generator
@@ -143,6 +178,9 @@ Examples:
   # Custom style and duration
   python simple_cartoon_generator.py --prompt "A robot learns to dance" --style anime --duration 45
   
+  # Realistic model generation
+  python simple_cartoon_generator.py --prompt "A photorealistic landscape" --model-type realistic
+  
   # With storyboard (includes character faces from cast)
   python simple_cartoon_generator.py --prompt "Magic forest adventure" --storyboard storyboards/tillu.json
 
@@ -168,6 +206,13 @@ Storyboard Cast Format (with face images):
         choices=["cartoon", "anime", "indian", "indian_cartoon", "desi", "bollywood"],
         default="cartoon",
         help="Visual style (cartoon, anime, indian). Use 'indian' for Indian children's-book style"
+    )
+    
+    parser.add_argument(
+        "--model-type", "-m",
+        choices=["cartoon", "realistic"],
+        default="cartoon",
+        help="Model type: cartoon (default) or realistic for photorealistic images"
     )
     
     parser.add_argument(
@@ -273,6 +318,13 @@ Storyboard Cast Format (with face images):
                 scene_copy['characters'] = structured_chars[:2]
                 normalized_scenes.append(scene_copy)
 
+            # Get appropriate model for the selected type
+            model_path = get_model_path_for_type(args.model_type)
+            if model_path:
+                print(f"✅ Using {args.model_type} model: {model_path}")
+            else:
+                print(f"⚠️ No {args.model_type} model found, will use default model")
+            
             config = VideoConfig(
                 prompt=args.prompt,
                 duration=args.duration,
@@ -287,7 +339,8 @@ Storyboard Cast Format (with face images):
                 add_subtitles=False,
                 language=args.language,
                 enable_prompt_enhancement=(not args.no_prompt_enhancement),
-                character_faces=character_faces
+                character_faces=character_faces,
+                model_path=model_path
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
@@ -302,7 +355,8 @@ Storyboard Cast Format (with face images):
             args.language, 
             not args.no_prompt_enhancement, 
             args.video_format,
-            {}  # No character faces for non-storyboard generation
+            {},  # No character faces for non-storyboard generation
+            args.model_type
         )
     
     if output_path:
