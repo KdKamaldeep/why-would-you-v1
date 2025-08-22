@@ -64,10 +64,10 @@ def get_model_path_for_style(style: str) -> str | None:
     else:  # realistic
         # Realistic models
         realistic_models = [
-            "models/realistic-vision-v5.1.safetensors",
             "models/realistic-vision-v4.safetensors",
-            "models/dreamshaper-v8.safetensors",
-            "models/deliberate-v3.safetensors"
+            "models/deliberate-v3.safetensors",
+            "models/realistic-vision-v5.1.safetensors",
+            "models/dreamshaper-v8.safetensors"
         ]
         for model in realistic_models:
             if Path(model).exists():
