@@ -45,7 +45,7 @@
     {
       "duration": 10,
       "description": "Ananya sees movement in the mirror behind",
-      "visual_prompt": "(close shot:1.2) frightened Indian woman looking in mirror, ghostly female figure faintly seen behind her in reflection, horror lighting, real indoor apartment, realistic horror illustration(1.3)",
+      "visual_prompt": "(close shot:1.2) scared Indian woman staring into bathroom mirror, faint white silhouette standing far in background reflection, dim overhead light, cracked mirror surface, haunted mood, realistic horror lighting, cinematic style(1.3)",
       "negative_prompt": "cartoon, anime, blurry, low detail, gore, fantasy",
       "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>और एक रात... जब अनन्या ने शीशे में देखा... <break time='300ms'/> उसे खुद के पीछे... <emphasis level='strong'>कोई सफेद परछाई दिखाई दी।</emphasis></voice></speak>",
       "voice": "hi-IN-SwaraNeural-cheerful-female",
@@ -78,7 +78,7 @@
     {
       "duration": 11,
       "description": "Ananya runs and hears footsteps chasing her",
-      "visual_prompt": "(medium shot:1.2) terrified Indian woman running down staircase in panic, shadow behind her, horror lighting, movement blur, realistic haunted apartment look(1.3)",
+      "visual_prompt": "(medium shot:1.2) frightened Indian woman in loose t-shirt and pajama, running down old wooden staircase, hands gripping railing, mouth slightly open in panic, dim flickering light, dark shadow visible at top of stairs, cinematic horror atmosphere, realistic lighting(1.3)",
       "negative_prompt": "cartoon, fantasy, too dark, messy, gore, surreal",
       "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>अनन्या ने पीछे देखा... <break time='200ms'/> लेकिन कोई नहीं था... <break time='300ms'/> पर किसी के तेज़ कदम... <emphasis level='strong'>उसके पीछे-पीछे आ रहे थे।</emphasis></voice></speak>",
       "voice": "hi-IN-SwaraNeural-cheerful-female",
