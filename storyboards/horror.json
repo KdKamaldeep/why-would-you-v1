@@ -1,10 +1,10 @@
 {
   "title": "The Tenant Upstairs",
-  "description": "A chilling tale of a man who hears strange sounds from the locked floor above his apartment... where no one has lived for 12 years.",
+  "description": "A chilling tale of a woman who hears strange sounds from the locked floor above her apartment... where no one has lived for 12 years.",
   "total_duration": 70,
   "cast": [
     { "name": "Narrator", "role": "storyteller" },
-    { "name": "Raj", "role": "new tenant" },
+    { "name": "Ananya", "role": "new tenant" },
     { "name": "Landlord", "role": "old building owner" },
     { "name": "Ghost", "role": "unknown presence upstairs" }
   ],
@@ -14,54 +14,54 @@
       "description": "intro showing a dimly lit apartment building in rain",
       "visual_prompt": "(wide shot:1.2) old wooden table in dark room, ancient glowing book placed open, ghostly mist rising from pages(1.2), dim candlelight on side(1.1), dark stormy window in background, bats flying outside, cinematic horror style, realistic lighting, ominous mood(1.3)",
       "negative_prompt": "cartoon, fantasy, bright, low resolution, extra limbs, unrealistic",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>मुंबई की भीगी रात... और एक पुरानी बिल्डिंग... जहाँ राज ने नया किराया मकान लिया था।</voice></speak>",
-      "voice": "hi-IN-ArjunNeural-male",
+      "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>मुंबई की भीगी रात... और एक पुरानी बिल्डिंग... जहाँ अनन्या ने नया किराये का मकान लिया था।</voice></speak>",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
       "subtitle": "Intro",
       "characters": ["Narrator"],
       "motion_prompt": "rain pouring, streetlight flickering"
     },
     {
       "duration": 9,
-      "description": "Raj hears dragging sound from above",
-      "visual_prompt": "(medium shot:1.2) 30-year-old Indian man, wearing casual clothes, standing inside dim apartment, ceiling above him creaking, eyes looking up in fear, realistic horror style(1.3)",
+      "description": "Ananya hears dragging sound from above",
+      "visual_prompt": "(medium shot:1.2) 28-year-old Indian woman, shoulder-length hair, wearing loose t-shirt and pyjamas, standing inside dim apartment, looking up in fear as ceiling creaks, realistic horror style(1.3)",
       "negative_prompt": "blurry, extra limbs, fantasy, colorful, distorted faces",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>हर रात, ठीक 2 बजे... ऊपर से आती थी फर्श पर खींचती किसी भारी चीज़ की आवाज़... <break time='300ms'/> लेकिन ऊपर तो कोई रहता ही नहीं...</voice></speak>",
-      "voice": "hi-IN-ArjunNeural-male",
+      "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>हर रात, ठीक 2 बजे... ऊपर से आती थी फर्श पर खींचती किसी भारी चीज़ की आवाज़... <break time='300ms'/> लेकिन ऊपर तो कोई रहता ही नहीं...</voice></speak>",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
       "subtitle": "First Encounter",
-      "characters": ["Narrator", "Raj"],
+      "characters": ["Narrator", "Ananya"],
       "motion_prompt": "ceiling slightly shaking, soft dragging sound implied"
     },
     {
       "duration": 10,
-      "description": "Raj questions the landlord",
+      "description": "Ananya questions the landlord",
       "visual_prompt": "(medium shot:1.2) old Indian man, white hair, wrinkled face, sitting in old wooden chair with cracked wall behind, dim natural light, tense atmosphere, realistic cinematic horror(1.3)",
       "negative_prompt": "blurry, fantasy, low detail, cartoon, happy expressions",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>राज ने मकान मालिक से पूछा... <break time='200ms'/> 'ऊपर कौन रहता है?' <break time='200ms'/> जवाब आया —</voice></speak> <speak><voice name='hi-IN-SunilNeural'>‘ऊपर का फ्लैट तो... <emphasis level='strong'>12 साल से बंद है।</emphasis> ताला भी नहीं खुला आज तक।’</voice></speak>",
+      "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>अनन्या ने मकान मालिक से पूछा... <break time='200ms'/> 'ऊपर कौन रहता है?' <break time='200ms'/> जवाब आया —</voice></speak> <speak><voice name='hi-IN-SunilNeural'>‘ऊपर का फ्लैट तो... <emphasis level='strong'>12 साल से बंद है।</emphasis> ताला भी नहीं खुला आज तक।’</voice></speak>",
       "voice": "hi-IN-SunilNeural",
       "subtitle": "The Warning",
-      "characters": ["Raj", "Landlord"],
+      "characters": ["Ananya", "Landlord"],
       "motion_prompt": "landlord staring blankly, low light flicker"
     },
     {
       "duration": 10,
-      "description": "Raj sees movement in the mirror behind",
-      "visual_prompt": "(close shot:1.2) terrified Indian man looking in mirror, ghostly figure in white seen faintly behind him in reflection, horror lighting, real indoor apartment, realistic horror illustration(1.3)",
+      "description": "Ananya sees movement in the mirror behind",
+      "visual_prompt": "(close shot:1.2) frightened Indian woman looking in mirror, ghostly female figure faintly seen behind her in reflection, horror lighting, real indoor apartment, realistic horror illustration(1.3)",
       "negative_prompt": "cartoon, anime, blurry, low detail, gore, fantasy",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>और एक रात... जब राज ने शीशे में देखा... <break time='300ms'/> उसे खुद के पीछे... <emphasis level='strong'>कोई सफेद परछाई दिखाई दी।</emphasis></voice></speak>",
-      "voice": "hi-IN-ArjunNeural-male",
+      "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>और एक रात... जब अनन्या ने शीशे में देखा... <break time='300ms'/> उसे खुद के पीछे... <emphasis level='strong'>कोई सफेद परछाई दिखाई दी।</emphasis></voice></speak>",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
       "subtitle": "The Reflection",
-      "characters": ["Raj", "Ghost"],
-      "motion_prompt": "ghostly figure flickering behind Raj"
+      "characters": ["Ananya", "Ghost"],
+      "motion_prompt": "ghostly figure flickering behind Ananya"
     },
     {
       "duration": 10,
-      "description": "Raj climbs upstairs with flashlight",
-      "visual_prompt": "(wide shot:1.2) scared Indian man holding flashlight, walking up old dusty staircase, broken railing, heavy shadows, abandoned top floor apartment door slightly open, horror mood(1.3)",
+      "description": "Ananya climbs upstairs with flashlight",
+      "visual_prompt": "(wide shot:1.2) scared Indian woman holding flashlight, walking up old dusty staircase, broken railing, heavy shadows, abandoned top floor apartment door slightly open, horror mood(1.3)",
       "negative_prompt": "bright, fantasy, cartoon, gore, blood",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>उस रात... राज चुपचाप सीढ़ियाँ चढ़ गया... <break time='300ms'/> ऊपर का दरवाज़ा... <emphasis level='moderate'>खुला हुआ था।</emphasis></voice></speak>",
-      "voice": "hi-IN-ArjunNeural-male",
+      "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>उस रात... अनन्या चुपचाप सीढ़ियाँ चढ़ गई... <break time='300ms'/> ऊपर का दरवाज़ा... <emphasis level='moderate'>खुला हुआ था।</emphasis></voice></speak>",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
       "subtitle": "Climbing Up",
-      "characters": ["Raj"],
+      "characters": ["Ananya"],
       "motion_prompt": "flashlight beam moving, door creaking"
     },
     {
@@ -69,35 +69,34 @@
       "description": "inside the haunted flat, whispering voices heard",
       "visual_prompt": "(wide shot:1.2) dark abandoned apartment room, broken furniture, shadow in corner, foggy air, faint light from window, eerie atmosphere, cinematic horror realism(1.3)",
       "negative_prompt": "cartoon, fantasy, gore, bright, cluttered, anime",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>भीतर... एक अजीब सी ठंडक थी... और कहीं से... <emphasis level='strong'>फुसफुसाहटें आने लगीं।</emphasis> <break time='300ms'/> '...तू नीचे क्यों आया...'</voice></speak>",
-      "voice": "hi-IN-ArjunNeural-male",
+      "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>भीतर... एक अजीब सी ठंडक थी... और कहीं से... <emphasis level='strong'>फुसफुसाहटें आने लगीं।</emphasis> <break time='300ms'/> '...तू ऊपर क्यों आई...'</voice></speak>",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
       "subtitle": "The Room",
-      "characters": ["Raj", "Ghost"],
+      "characters": ["Ananya", "Ghost"],
       "motion_prompt": "fog swirling, shadow shifting slightly"
     },
     {
       "duration": 11,
-      "description": "Raj runs and hears footsteps chasing him",
-      "visual_prompt": "(medium shot:1.2) terrified Indian man running down staircase in panic, shadow behind him, horror lighting, movement blur, realistic haunted apartment look(1.3)",
+      "description": "Ananya runs and hears footsteps chasing her",
+      "visual_prompt": "(medium shot:1.2) terrified Indian woman running down staircase in panic, shadow behind her, horror lighting, movement blur, realistic haunted apartment look(1.3)",
       "negative_prompt": "cartoon, fantasy, too dark, messy, gore, surreal",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>राज ने पीछे देखा... <break time='200ms'/> लेकिन कोई नहीं था... <break time='300ms'/> पर किसी के तेज़ कदम... <emphasis level='strong'>उसके पीछे-पीछे आ रहे थे।</emphasis></voice></speak>",
-      "voice": "hi-IN-ArjunNeural-male",
+      "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>अनन्या ने पीछे देखा... <break time='200ms'/> लेकिन कोई नहीं था... <break time='300ms'/> पर किसी के तेज़ कदम... <emphasis level='strong'>उसके पीछे-पीछे आ रहे थे।</emphasis></voice></speak>",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
       "subtitle": "The Chase",
-      "characters": ["Raj", "Ghost"],
+      "characters": ["Ananya", "Ghost"],
       "motion_prompt": "footsteps thudding, lights flickering"
     },
-	{
-	  "duration": 12,
-	  "description": "Raj locks his door but turns to see the ghost face-to-face",
-	  "visual_prompt": "(close-up shot:1.2) terrified Indian man frozen in fear, ghostly female figure inches from his face, pale cracked skin, hollow black eyes, long disheveled hair, faint smile, soft moonlight through window, horror cinematic realism(1.3)",
-	  "negative_prompt": "cartoon, fantasy, gore, blood, anime, messy lighting, extra limbs",
-	  "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>राज ने दरवाज़ा बंद किया... <break time='400ms'/> और जैसे ही पलटा... <break time='300ms'/> वो सामने थी। <emphasis level='strong'>सफ़ेद चेहरा... सूनी आँखें... और होठों पर हल्की सी मुस्कान।</emphasis> <break time='600ms'/> वो बोली... <emphasis level='strong'>'अब तू यहीं रहेगा।'</emphasis></voice></speak>",
-	  "voice": "hi-IN-ArjunNeural-male",
-	  "subtitle": "The Face of the Forgotten",
-	  "characters": ["Raj", "Ghost"],
-	  "motion_prompt": "ghost face slowly appearing close, Raj frozen in shock"
-	}
-
+    {
+      "duration": 12,
+      "description": "Ananya locks her door but turns to see the ghost face-to-face",
+      "visual_prompt": "(close-up shot:1.2) terrified Indian woman frozen in fear, ghostly female figure inches from her face, pale cracked skin, hollow black eyes, long disheveled hair, faint smile, soft moonlight through window, horror cinematic realism(1.3)",
+      "negative_prompt": "cartoon, fantasy, gore, blood, anime, messy lighting, extra limbs",
+      "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>अनन्या ने दरवाज़ा बंद किया... <break time='400ms'/> और जैसे ही पलटी... <break time='300ms'/> वो सामने थी। <emphasis level='strong'>सफ़ेद चेहरा... सूनी आँखें... और होठों पर हल्की सी मुस्कान।</emphasis> <break time='600ms'/> वो बोली... <emphasis level='strong'>'अब तू यहीं रहेगी।'</emphasis></voice></speak>",
+      "voice": "hi-IN-SwaraNeural-cheerful-female",
+      "subtitle": "The Face of the Forgotten",
+      "characters": ["Ananya", "Ghost"],
+      "motion_prompt": "ghost face slowly appearing close, Ananya frozen in shock"
+    }
   ],
-  "tags": ["horror", "ghost", "paranormal", "urban legend", "hindi", "realistic", "adult"]
+  "tags": ["horror", "ghost", "paranormal", "urban legend", "female lead", "realistic", "adult"]
 }
