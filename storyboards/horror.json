@@ -78,7 +78,7 @@
     {
       "duration": 11,
       "description": "Ananya runs and hears footsteps chasing her",
-      "visual_prompt": "(medium shot:1.2) frightened Indian woman in loose t-shirt and pajama, running down old wooden staircase, hands gripping railing, mouth slightly open in panic, dim flickering light, dark shadow visible at top of stairs, cinematic horror atmosphere, realistic lighting(1.3)",
+      "visual_prompt": "(medium shot:1.2) terrified Indian woman standing in front of closed door, ghostly female figure standing silently behind her in the shadows, pale face partially visible, hollow dark eyes, faint smile, soft eerie glow from hallway, cinematic horror style(1.3)",
       "negative_prompt": "cartoon, fantasy, too dark, messy, gore, surreal",
       "narration": "<speak><voice name='hi-IN-SwaraNeural-cheerful-female'>अनन्या ने पीछे देखा... <break time='200ms'/> लेकिन कोई नहीं था... <break time='300ms'/> पर किसी के तेज़ कदम... <emphasis level='strong'>उसके पीछे-पीछे आ रहे थे।</emphasis></voice></speak>",
       "voice": "hi-IN-SwaraNeural-cheerful-female",
