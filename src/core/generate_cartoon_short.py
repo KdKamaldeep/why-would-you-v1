@@ -89,6 +89,7 @@ class VideoConfig:
     motion_bucket_id: int = 127  # SVD motion intensity (0-255)
     fps_id: int = 6  # SVD FPS setting (0-7)
     cond_aug: float = 0.02  # SVD conditioning augmentation
+    svd_chunked_generation: bool = True  # Use chunked generation instead of looping for SVD
     # Audio settings
     skip_audio: bool = False  # Skip audio generation entirely
 
@@ -143,7 +144,8 @@ class CartoonShortsGenerator:
         self.animation_generator = AnimationGenerator(
             width=config.width, 
             height=config.height,
-            animator_type=config.animator_type
+            animator_type=config.animator_type,
+            svd_chunked_generation=config.svd_chunked_generation
         )
         # Initialize Coqui TTS voice synthesizer
         self.voice_synthesizer = CoquiVoiceSynthesizer(

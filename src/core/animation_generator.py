@@ -16,12 +16,13 @@ logger = logging.getLogger(__name__)
 class AnimationGenerator:
     """Handles professional quality video animation with unlimited length capability."""
     
-    def __init__(self, width: int = 768, height: int = 1024, animator_type: str = "ffmpeg"):
+    def __init__(self, width: int = 768, height: int = 1024, animator_type: str = "ffmpeg", svd_chunked_generation: bool = True):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.fps = 15
         self.width = width
         self.height = height
         self.animator_type = animator_type.lower()
+        self.svd_chunked_generation = svd_chunked_generation
         
         # Initialize SVD animator if needed
         self.svd_animator = None
@@ -73,14 +74,24 @@ class AnimationGenerator:
                         motion_bucket_id, fps_id, cond_aug, seed
                     )
                 else:
-                    # For longer sequences, we'll use SVD's 25 frames and loop/extend them
+                    # For longer sequences, choose between chunked generation and looping
                     logger.info(f"🎬 SVD limit: 25 frames, requested {num_frames} frames")
-                    logger.info(f"🎬 Will generate 25 SVD frames and loop them to match {num_frames} frames")
                     svd_frames_dir = self.svd_animator.animate_image(
                         image_path, str(frames_dir) + "_svd", 25, 
                         motion_bucket_id, fps_id, cond_aug, seed
                     )
-                    return self._extend_svd_animation_with_looping(svd_frames_dir, str(frames_dir), num_frames)
+                    
+                    if self.svd_chunked_generation:
+                        logger.info(f"🎬 Using chunked SVD generation for extended sequences")
+                        return self._extend_svd_animation_with_chunked_generation(
+                            svd_frames_dir, str(frames_dir), num_frames,
+                            motion_bucket_id, fps_id, cond_aug, seed
+                        )
+                    else:
+                        logger.info(f"🎬 Using SVD looping for extended sequences")
+                        return self._extend_svd_animation_with_looping(
+                            svd_frames_dir, str(frames_dir), num_frames
+                        )
             else:
                 # Use enhanced FFmpeg animation system
                 logger.info("📹 Using enhanced FFmpeg animation system")
@@ -241,6 +252,104 @@ class AnimationGenerator:
             
         except Exception as e:
             return self._create_cinematic_zoom_pan(image_path, output_dir, num_frames)
+    
+    def _extend_svd_animation_with_chunked_generation(self, svd_frames_dir: str, output_dir: str, target_frames: int,
+                                                    motion_bucket_id: int, fps_id: int, cond_aug: float, 
+                                                    seed: Optional[int] = None) -> str:
+        """Extend SVD animation using chunked generation - each chunk uses last frame from previous chunk."""
+        try:
+            import shutil
+            from PIL import Image
+            import numpy as np
+            import tempfile
+            
+            svd_dir = Path(svd_frames_dir)
+            output_path = Path(output_dir)
+            output_path.mkdir(parents=True, exist_ok=True)
+            
+            # Get initial SVD frames (first 25 frames)
+            svd_frames = sorted(svd_dir.glob("frame_*.png"))
+            if len(svd_frames) == 0:
+                raise Exception("No SVD frames found")
+            
+            svd_frame_count = len(svd_frames)
+            logger.info(f"🎬 Initial SVD generated {svd_frame_count} frames, need {target_frames} frames total")
+            
+            # Copy all initial SVD frames to output (these are the original 25 frames)
+            frame_index = 0
+            for frame_path in svd_frames:
+                dest_path = output_path / f"frame_{frame_index:04d}.png"
+                shutil.copy2(frame_path, dest_path)
+                frame_index += 1
+            
+            # Calculate additional frames needed beyond the initial 25
+            additional_frames_needed = target_frames - svd_frame_count
+            if additional_frames_needed <= 0:
+                logger.info(f"✅ No additional frames needed, using only initial {svd_frame_count} SVD frames")
+                return str(output_path)
+            
+            # Calculate chunks needed for additional frames only
+            frames_per_chunk = 25  # SVD limit
+            chunks_needed = (additional_frames_needed + frames_per_chunk - 1) // frames_per_chunk
+            logger.info(f"🎬 Need {additional_frames_needed} additional frames, will generate {chunks_needed} chunks")
+            
+            # Get the last frame from initial SVD generation as starting point for next chunk
+            last_frame_path = svd_frames[-1]
+            current_input_frame = last_frame_path
+            
+            # Generate additional chunks for the remaining frames
+            for chunk_idx in range(chunks_needed):
+                logger.info(f"🎬 Generating additional chunk {chunk_idx + 1}/{chunks_needed} using frame: {current_input_frame}")
+                
+                # Create temporary directory for this chunk
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    temp_output_dir = Path(temp_dir) / "chunk_frames"
+                    
+                    # Generate new SVD chunk using the last frame as input
+                    chunk_frames_dir = self.svd_animator.animate_image(
+                        str(current_input_frame), 
+                        str(temp_output_dir), 
+                        frames_per_chunk,
+                        motion_bucket_id, fps_id, cond_aug, 
+                        seed + chunk_idx if seed is not None else None  # Vary seed for each chunk
+                    )
+                    
+                    # Copy chunk frames to main output (skip first frame to avoid duplication)
+                    chunk_frames = sorted(Path(chunk_frames_dir).glob("frame_*.png"))
+                    if len(chunk_frames) > 0:
+                        # Skip first frame if it's too similar to the last frame from previous chunk
+                        start_idx = 1 if chunk_idx > 0 else 0
+                        
+                        for i in range(start_idx, len(chunk_frames)):
+                            if frame_index >= target_frames:
+                                break
+                            
+                            src_path = chunk_frames[i]
+                            dest_path = output_path / f"frame_{frame_index:04d}.png"
+                            shutil.copy2(src_path, dest_path)
+                            frame_index += 1
+                        
+                        # Update the last frame for next iteration
+                        current_input_frame = chunk_frames[-1]
+                        
+                        logger.info(f"✅ Additional chunk {chunk_idx + 1} completed: {len(chunk_frames) - start_idx} frames added")
+                    else:
+                        logger.warning(f"⚠️ Additional chunk {chunk_idx + 1} generated no frames, using fallback")
+                        # Fallback: create some frames from the last known frame
+                        for i in range(frames_per_chunk):
+                            if frame_index >= target_frames:
+                                break
+                            dest_path = output_path / f"frame_{frame_index:04d}.png"
+                            shutil.copy2(current_input_frame, dest_path)
+                            frame_index += 1
+            
+            logger.info(f"✅ Generated {frame_index} total frames: {svd_frame_count} initial + {additional_frames_needed} additional")
+            return str(output_path)
+            
+        except Exception as e:
+            logger.error(f"Error in chunked SVD generation: {e}")
+            # Fallback: create static frames
+            return self._create_static_frames(svd_frames_dir, output_dir, target_frames)
     
     def _extend_svd_animation_with_looping(self, svd_frames_dir: str, output_dir: str, target_frames: int) -> str:
         """Extend SVD animation (25 frames) to longer sequences using intelligent looping."""

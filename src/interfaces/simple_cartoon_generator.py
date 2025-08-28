@@ -102,7 +102,7 @@ def extract_character_faces_from_cast(cast_list):
     
     return character_faces
 
-def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", character_faces=None, model_type="cartoon", animator_type="ffmpeg", motion_bucket_id=127, fps_id=6, cond_aug=0.02):
+def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", character_faces=None, model_type="cartoon", animator_type="ffmpeg", motion_bucket_id=127, fps_id=6, cond_aug=0.02, svd_chunked_generation=True):
     """Generate a cartoon video with the given prompt and character faces."""
     try:
         # Import the main generator
@@ -166,7 +166,8 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
             animator_type=animator_type,
             motion_bucket_id=motion_bucket_id,
             fps_id=fps_id,
-            cond_aug=cond_aug
+            cond_aug=cond_aug,
+            svd_chunked_generation=svd_chunked_generation
         )
         
         # Initialize generator
@@ -212,6 +213,9 @@ Examples:
   
   # Process only the first scene from storyboard
   python simple_cartoon_generator.py --prompt "Magic forest adventure" --storyboard storyboards/tillu.json --scene 1
+  
+  # Use SVD looping instead of chunked generation for extended sequences
+  python simple_cartoon_generator.py --prompt "Adventure story" --animator svd --svd-looping
 
 Storyboard Cast Format (with face images):
   {
@@ -338,6 +342,12 @@ Storyboard Cast Format (with face images):
         help="Skip audio generation (create video without narration)"
     )
     
+    parser.add_argument(
+        "--svd-looping",
+        action="store_true",
+        help="Use SVD looping instead of chunked generation for extended sequences (default: chunked generation)"
+    )
+    
     args = parser.parse_args()
     
     # Log all arguments for debugging
@@ -360,6 +370,7 @@ Storyboard Cast Format (with face images):
     print(f"🎞️ FPS ID: {args.fps_id}")
     print(f"🔧 Cond Aug: {args.cond_aug}")
     print(f"🔇 Skip Audio: {args.skip_audio}")
+    print(f"🔄 SVD Looping: {args.svd_looping}")
     print("=" * 60)
     
     print("🎨 Simple Cartoon Generator with Face-Based Characters")
@@ -397,6 +408,7 @@ Storyboard Cast Format (with face images):
             print(f"🎞️ FPS ID: {args.fps_id}")
             print(f"🔧 Cond Aug: {args.cond_aug}")
             print(f"🔇 Skip Audio: {args.skip_audio}")
+            print(f"🔄 SVD Looping: {args.svd_looping}")
             print(f"🔄 No Reuse: {args.no_reuse}")
             print(f"✨ No Prompt Enhancement: {args.no_prompt_enhancement}")
             print("=" * 50)
@@ -476,6 +488,7 @@ Storyboard Cast Format (with face images):
                 motion_bucket_id=args.motion_bucket_id,
                 fps_id=args.fps_id,
                 cond_aug=args.cond_aug,
+                svd_chunked_generation=(not args.svd_looping),
                 skip_audio=args.skip_audio
             )
             generator = CartoonShortsGenerator(config)
@@ -496,7 +509,8 @@ Storyboard Cast Format (with face images):
             args.animator,
             args.motion_bucket_id,
             args.fps_id,
-            args.cond_aug
+            args.cond_aug,
+            not args.svd_looping  # Use chunked generation unless --svd-looping is specified
         )
     
     if output_path:
