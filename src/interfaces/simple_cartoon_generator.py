@@ -108,6 +108,28 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
         # Import the main generator
         from ..core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
         
+        # Log all function arguments
+        print("🔍 GENERATE_CARTOON FUNCTION ARGUMENTS:")
+        print("=" * 50)
+        print(f"📝 Prompt: {prompt}")
+        print(f"🎨 Style: {style}")
+        print(f"⏱️ Duration: {duration}")
+        print(f"🗣️ Language: {language}")
+        print(f"✨ Enable Prompt Enhancement: {enable_prompt_enhancement}")
+        print(f"📐 Video Format: {video_format}")
+        print(f"🤖 Model Type: {model_type}")
+        print(f"🎭 Animator Type: {animator_type}")
+        print(f"🏃 Motion Bucket ID: {motion_bucket_id}")
+        print(f"🎞️ FPS ID: {fps_id}")
+        print(f"🔧 Cond Aug: {cond_aug}")
+        if character_faces:
+            print(f"👥 Character faces: {len(character_faces)} characters mapped")
+            for char, face in character_faces.items():
+                print(f"   - {char}: {face}")
+        else:
+            print(f"👥 Character faces: None")
+        print("=" * 50)
+        
         print(f"🎬 Starting cartoon generation...")
         print(f"📝 Prompt: {prompt}")
         print(f"🎨 Style: {style}")
@@ -187,6 +209,9 @@ Examples:
   
   # With storyboard (includes character faces from cast)
   python simple_cartoon_generator.py --prompt "Magic forest adventure" --storyboard storyboards/tillu.json
+  
+  # Process only the first scene from storyboard
+  python simple_cartoon_generator.py --prompt "Magic forest adventure" --storyboard storyboards/tillu.json --scene 1
 
 Storyboard Cast Format (with face images):
   {
@@ -243,6 +268,12 @@ Storyboard Cast Format (with face images):
         "--storyboard",
         type=str,
         help="Path to a JSON file with custom storyboard scenes (title, description, scenes[])"
+    )
+    
+    parser.add_argument(
+        "--scene",
+        type=int,
+        help="Process only a specific scene number (1-based index). Use with --storyboard to process single scene."
     )
     
 
@@ -309,6 +340,28 @@ Storyboard Cast Format (with face images):
     
     args = parser.parse_args()
     
+    # Log all arguments for debugging
+    print("🔍 ARGUMENT LOGGING:")
+    print("=" * 60)
+    print(f"📝 Prompt: {args.prompt}")
+    print(f"🎨 Style: {args.style}")
+    print(f"🤖 Model Type: {args.model_type}")
+    print(f"⏱️ Duration: {args.duration} seconds")
+    print(f"📐 Video Format: {args.video_format}")
+    print(f"🗣️ Language: {args.language}")
+    print(f"📋 Storyboard: {args.storyboard}")
+    print(f"🎬 Scene: {args.scene if args.scene else 'All scenes'}")
+    print(f"🔄 No Reuse: {args.no_reuse}")
+    print(f"✨ No Prompt Enhancement: {args.no_prompt_enhancement}")
+    print(f"🔍 Check Only: {args.check_only}")
+    print(f"🎬 Animate: {args.animate}")
+    print(f"🎭 Animator: {args.animator}")
+    print(f"🏃 Motion Bucket ID: {args.motion_bucket_id}")
+    print(f"🎞️ FPS ID: {args.fps_id}")
+    print(f"🔧 Cond Aug: {args.cond_aug}")
+    print(f"🔇 Skip Audio: {args.skip_audio}")
+    print("=" * 60)
+    
     print("🎨 Simple Cartoon Generator with Face-Based Characters")
     print("=" * 60)
     
@@ -327,12 +380,44 @@ Storyboard Cast Format (with face images):
     if args.storyboard:
         try:
             from ..core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
+            
+            # Log storyboard processing arguments
+            print("🔍 STORYBOARD PROCESSING ARGUMENTS:")
+            print("=" * 50)
+            print(f"📋 Storyboard file: {args.storyboard}")
+            print(f"🎬 Scene: {args.scene if args.scene else 'All scenes'}")
+            print(f"📝 Prompt: {args.prompt}")
+            print(f"🎨 Style: {args.style}")
+            print(f"⏱️ Duration: {args.duration}")
+            print(f"📐 Video Format: {args.video_format}")
+            print(f"🗣️ Language: {args.language}")
+            print(f"🤖 Model Type: {args.model_type}")
+            print(f"🎭 Animator: {args.animator}")
+            print(f"🏃 Motion Bucket ID: {args.motion_bucket_id}")
+            print(f"🎞️ FPS ID: {args.fps_id}")
+            print(f"🔧 Cond Aug: {args.cond_aug}")
+            print(f"🔇 Skip Audio: {args.skip_audio}")
+            print(f"🔄 No Reuse: {args.no_reuse}")
+            print(f"✨ No Prompt Enhancement: {args.no_prompt_enhancement}")
+            print("=" * 50)
+            
             with open(args.storyboard, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            scenes = data.get('scenes', [])
+            all_scenes = data.get('scenes', [])
             title = data.get('title')
             description = data.get('description')
             scene_duration = data.get('scene_duration', 8)
+            
+            # Filter scenes based on --scene argument
+            if args.scene:
+                if args.scene < 1 or args.scene > len(all_scenes):
+                    print(f"❌ Scene {args.scene} not found. Available scenes: 1-{len(all_scenes)}")
+                    sys.exit(1)
+                scenes = [all_scenes[args.scene - 1]]  # Convert to 0-based index
+                print(f"🎬 Processing only scene {args.scene}: {scenes[0].get('description', 'No description')}")
+            else:
+                scenes = all_scenes
+                print(f"🎬 Processing all {len(scenes)} scenes from storyboard")
             
             # Extract character faces from cast array
             cast_list = data.get('cast', []) or []
