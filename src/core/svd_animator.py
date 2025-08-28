@@ -177,7 +177,7 @@ class SVDAnimator:
                     "filename_prefix": "svd_output",
                     "fps": self.fps,
                     "crf": 20,
-                    "codec": "libx264",
+                    "codec": "h264",
                     "video": True,
                     "format": "mp4"
                 }
