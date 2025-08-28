@@ -293,9 +293,6 @@ class AnimationGenerator:
             logger.error(f"Error extending SVD animation with looping: {e}")
             # Fallback: create static frames
             return self._create_static_frames(svd_frames_dir, output_dir, target_frames)
-            
-        except Exception as e:
-            return self._create_cinematic_zoom_pan(image_path, output_dir, num_frames)
     
     def _create_parallax_motion(self, image_path: str, output_dir: str, num_frames: int) -> str:
         """Create parallax scrolling with depth effect."""
