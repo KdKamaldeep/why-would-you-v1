@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class VideoConfig:
     """Configuration for video processing."""
-    fps: int = 15
+    fps: int = 10  # Reduced from 15 to 10 for slower playback
     width: int = 768
     height: int = 1024
     # Encoding options (optimize for smaller files)
@@ -31,7 +31,7 @@ class VideoProcessor:
     def __init__(self, config: VideoConfig):
         self.config = config
         
-    def frames_to_video(self, frames_dir: str, output_path: str, fps: int = 15) -> str:
+    def frames_to_video(self, frames_dir: str, output_path: str, fps: int = 10) -> str:  # Reduced default from 15 to 10
         """Convert frames directory to MP4 video."""
         try:
             cmd = [
@@ -256,7 +256,7 @@ class VideoProcessor:
             logger.error(f"Error concatenating audios: {e}")
             return audio_files[0] if audio_files else ''
     
-    def frames_to_multiple_videos(self, frame_dirs: List[str], output_dir: str, fps: int = 15) -> List[str]:
+    def frames_to_multiple_videos(self, frame_dirs: List[str], output_dir: str, fps: int = 10) -> List[str]:  # Reduced default from 15 to 10
         """Convert multiple frame directories to MP4 videos."""
         video_paths = []
         for i, frames_dir in enumerate(frame_dirs):

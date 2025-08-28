@@ -18,7 +18,7 @@ class AnimationGenerator:
     
     def __init__(self, width: int = 768, height: int = 1024, animator_type: str = "ffmpeg", svd_chunked_generation: bool = True, svd_overlap_frames: int = 6):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.fps = 15
+        self.fps = 10  # Reduced from 15 to 10 for slower playback
         self.width = width
         self.height = height
         self.animator_type = animator_type.lower()
@@ -261,6 +261,7 @@ class AnimationGenerator:
         
         This method implements overlapping chunk generation with 4-8 frame overlap between chunks
         to ensure smooth transitions and visual consistency across the entire sequence.
+        Includes quality degradation detection and recovery for long sequences.
         """
         try:
             import shutil
@@ -275,7 +276,7 @@ class AnimationGenerator:
             chunks_dir = output_path / "chunks_processing"
             chunks_dir.mkdir(exist_ok=True)
             
-            # Get initial SVD frames (first 25 frames)
+            # Get initial SVD frames (first 24 frames)
             svd_frames = sorted(svd_dir.glob("frame_*.png"))
             if len(svd_frames) == 0:
                 raise Exception("No SVD frames found")
@@ -283,14 +284,14 @@ class AnimationGenerator:
             svd_frame_count = len(svd_frames)
             logger.info(f"🎬 Initial SVD generated {svd_frame_count} frames, need {target_frames} frames total")
             
-            # Copy all initial SVD frames to output (these are the original 25 frames)
+            # Copy all initial SVD frames to output (these are the original 24 frames)
             frame_index = 0
             for frame_path in svd_frames:
                 dest_path = output_path / f"frame_{frame_index:04d}.png"
                 shutil.copy2(frame_path, dest_path)
                 frame_index += 1
             
-            # Calculate additional frames needed beyond the initial 25
+            # Calculate additional frames needed beyond the initial 24
             additional_frames_needed = target_frames - svd_frame_count
             if additional_frames_needed <= 0:
                 logger.info(f"✅ No additional frames needed, using only initial {svd_frame_count} SVD frames")
@@ -318,72 +319,98 @@ class AnimationGenerator:
             
             logger.info(f"🎬 Fixed parameters for consistency: seed={fixed_seed}, motion_bucket_id={fixed_motion_bucket_id}, fps_id={fixed_fps_id}, cond_aug={fixed_cond_aug}")
             
+            # Quality degradation detection
+            max_chunks_before_fallback = 6  # After 6 chunks, use fallback strategy
+            use_original_frames_for_long_sequences = chunks_needed > max_chunks_before_fallback
+            
+            if use_original_frames_for_long_sequences:
+                logger.info(f"🎬 Long sequence detected ({chunks_needed} chunks > {max_chunks_before_fallback}), using enhanced quality strategy")
+            
             # Get the last frame from initial SVD generation as starting point for next chunk
             last_frame_path = svd_frames[-1]
             current_input_frame = last_frame_path
+            
+            # Track quality metrics
+            consecutive_failures = 0
+            max_consecutive_failures = 3
             
             # Generate additional chunks with overlap
             for chunk_idx in range(chunks_needed):
                 logger.info(f"🎬 Generating overlapping chunk {chunk_idx + 1}/{chunks_needed}")
                 logger.info(f"🎬 Input frame: {current_input_frame}")
                 
+                # For long sequences, periodically use original frames to maintain quality
+                if use_original_frames_for_long_sequences and chunk_idx > 0 and chunk_idx % 3 == 0:
+                    # Use a frame from the original SVD sequence instead of the last generated frame
+                    original_frame_idx = min(chunk_idx * 2, len(svd_frames) - 1)
+                    current_input_frame = svd_frames[original_frame_idx]
+                    logger.info(f"🎬 Using original frame {original_frame_idx} for quality maintenance")
+                
                 # Create persistent directory for this chunk
                 chunk_output_dir = chunks_dir / f"chunk_{chunk_idx + 1}"
                 chunk_output_dir.mkdir(exist_ok=True)
                 
-                # Generate new SVD chunk using the last frame as input
-                # Use fixed seed + chunk_idx for reproducibility while maintaining variation
+                # Generate new SVD chunk using the current input frame
                 chunk_seed = fixed_seed + chunk_idx
-                chunk_frames_dir = self.svd_animator.animate_image(
-                    str(current_input_frame), 
-                    str(chunk_output_dir), 
-                    frames_per_chunk,  # Generate full 24 frames
-                    fixed_motion_bucket_id, fixed_fps_id, fixed_cond_aug, 
-                    chunk_seed
-                )
-                
-                # Copy chunk frames to main output with overlap handling
-                chunk_frames = sorted(Path(chunk_frames_dir).glob("frame_*.png"))
-                if len(chunk_frames) > 0:
-                    # For first chunk, skip first frame to avoid duplication
-                    # For subsequent chunks, use overlap frames for smooth transition
-                    if chunk_idx == 0:
-                        start_idx = 1  # Skip first frame to avoid duplication
-                    else:
-                        start_idx = overlap_frames  # Use overlap frames for smooth transition
+                try:
+                    chunk_frames_dir = self.svd_animator.animate_image(
+                        str(current_input_frame), 
+                        str(chunk_output_dir), 
+                        frames_per_chunk,  # Generate full 24 frames
+                        fixed_motion_bucket_id, fixed_fps_id, fixed_cond_aug, 
+                        chunk_seed
+                    )
                     
-                    frames_added = 0
-                    for i in range(start_idx, len(chunk_frames)):
-                        if frame_index >= target_frames:
-                            break
+                    # Copy chunk frames to main output with overlap handling
+                    chunk_frames = sorted(Path(chunk_frames_dir).glob("frame_*.png"))
+                    if len(chunk_frames) > 0:
+                        # For first chunk, skip first frame to avoid duplication
+                        # For subsequent chunks, use overlap frames for smooth transition
+                        if chunk_idx == 0:
+                            start_idx = 1  # Skip first frame to avoid duplication
+                        else:
+                            start_idx = overlap_frames  # Use overlap frames for smooth transition
                         
-                        src_path = chunk_frames[i]
-                        dest_path = output_path / f"frame_{frame_index:04d}.png"
-                        shutil.copy2(src_path, dest_path)
-                        frame_index += 1
-                        frames_added += 1
+                        frames_added = 0
+                        for i in range(start_idx, len(chunk_frames)):
+                            if frame_index >= target_frames:
+                                break
+                            
+                            src_path = chunk_frames[i]
+                            dest_path = output_path / f"frame_{frame_index:04d}.png"
+                            shutil.copy2(src_path, dest_path)
+                            frame_index += 1
+                            frames_added += 1
+                        
+                        # Update the last frame for next iteration
+                        current_input_frame = chunk_frames[-1]
+                        
+                        logger.info(f"✅ Overlapping chunk {chunk_idx + 1} completed: {frames_added} frames added (started from frame {start_idx})")
+                        consecutive_failures = 0  # Reset failure counter on success
+                    else:
+                        raise Exception("No frames generated")
+                        
+                except Exception as chunk_error:
+                    consecutive_failures += 1
+                    logger.warning(f"⚠️ Overlapping chunk {chunk_idx + 1} failed: {chunk_error}")
                     
-                    # Update the last frame for next iteration
-                    current_input_frame = chunk_frames[-1]
+                    if consecutive_failures >= max_consecutive_failures:
+                        logger.error(f"❌ Too many consecutive failures ({consecutive_failures}), switching to fallback strategy")
+                        # Use looping strategy for remaining frames
+                        remaining_frames = target_frames - frame_index
+                        if remaining_frames > 0:
+                            logger.info(f"🔄 Using looping strategy for remaining {remaining_frames} frames")
+                            return self._extend_svd_animation_with_looping(svd_frames_dir, output_dir, target_frames)
+                        break
                     
-                    logger.info(f"✅ Overlapping chunk {chunk_idx + 1} completed: {frames_added} frames added (started from frame {start_idx})")
-                else:
-                    logger.warning(f"⚠️ Overlapping chunk {chunk_idx + 1} generated no frames, using fallback")
-                    # Fallback: create some frames from the last known frame
+                    # Fallback: create some frames from the last known good frame
+                    logger.info(f"🔄 Using fallback for chunk {chunk_idx + 1}: duplicating last good frame")
                     for i in range(effective_frames_per_chunk):
                         if frame_index >= target_frames:
                             break
                         dest_path = output_path / f"frame_{frame_index:04d}.png"
                         shutil.copy2(current_input_frame, dest_path)
                         frame_index += 1
-            
-            # Clean up chunks processing directory
-            if chunks_dir.exists():
-                shutil.rmtree(chunks_dir)
-            
-            logger.info(f"✅ Generated {frame_index} total frames: {svd_frame_count} initial + {additional_frames_needed} additional")
-            logger.info(f"✅ Overlapping chunk generation completed with {overlap_frames}-frame overlap for visual consistency")
-            return str(output_path)
             
         except Exception as e:
             logger.error(f"Error in overlapping chunked SVD generation: {e}")

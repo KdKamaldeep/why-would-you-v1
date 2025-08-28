@@ -420,7 +420,7 @@ class FaceImageGenerator:
                 frames.append(np.array(frame))
             
             # Create video
-            clip = ImageSequenceClip(frames, fps=15)
+            clip = ImageSequenceClip(frames, fps=10)  # Reduced from 15 to 10 for slower playback
             clip.write_videofile(output_path, codec='libx264')
             
             logger.info(f"✅ Face swap video saved to: {output_path}")

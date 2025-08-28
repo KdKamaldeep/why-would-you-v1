@@ -26,7 +26,7 @@ class SVDAnimator:
     def __init__(self, model_path: Optional[str] = None, device: str = "cuda"):
         self.device = device
         self.model_path = model_path or self._get_default_model_path()
-        self.fps = 15
+        self.fps = 10  # Reduced from 15 to 10 for slower playback
         self.num_frames = 25  # Default SVD frame count
         self.model = None
         self._load_model()

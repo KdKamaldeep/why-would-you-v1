@@ -56,7 +56,7 @@ class VideoConfig:
     """Configuration for video generation."""
     prompt: str
     duration: int = 30
-    fps: int = 15
+    fps: int = 10  # Reduced from 15 to 10 for slower playback
     video_format: str = "shorts"  # "shorts" for 9:16, "normal" for 16:9
     width: int = 768
     height: int = 1024  # Vertical format for Shorts
