@@ -83,7 +83,10 @@ class VideoConfig:
     # Character face mappings for face-based generation
     character_faces: DictType[str, str] = None  # Maps character names to face image paths
     # Model path for image generation
-    model_path: Optional[str] = None  # Path to specific model file
+    model_path: Optional[str] = None
+    # SVD chunking configuration
+    svd_overlap_frames: int = 6  # Number of frames to overlap between SVD chunks (4-8 range)
+    svd_chunked_generation: bool = True  # Enable overlapping chunk generation for SVD
     # Animation settings
     animator_type: str = "ffmpeg"  # "ffmpeg" or "svd"
     motion_bucket_id: int = 127  # SVD motion intensity (0-255)
@@ -145,7 +148,8 @@ class CartoonShortsGenerator:
             width=config.width, 
             height=config.height,
             animator_type=config.animator_type,
-            svd_chunked_generation=config.svd_chunked_generation
+            svd_chunked_generation=config.svd_chunked_generation,
+            svd_overlap_frames=config.svd_overlap_frames
         )
         # Initialize Coqui TTS voice synthesizer
         self.voice_synthesizer = CoquiVoiceSynthesizer(
@@ -350,7 +354,7 @@ class CartoonShortsGenerator:
             # Check if using SVD and warn about frame limits
             if self.config.animator_type == "svd":
                 logger.info("🎬 SVD Animation Mode: Frame limits will be handled automatically")
-                logger.info("🎬 SVD generates 25 frames max, will loop to match audio duration")
+                logger.info("🎬 SVD generates 24 frames max, will use overlapping chunks for longer sequences")
             
             for i, audio_duration in enumerate(actual_scene_durations):
                 # Use actual audio duration to determine frame count
@@ -358,8 +362,8 @@ class CartoonShortsGenerator:
                 frames_per_scene.append(total_frames)
                 total_frames_needed += total_frames
                 
-                if self.config.animator_type == "svd" and total_frames > 25:
-                    logger.info(f"📊 Scene {i+1}: {audio_duration:.1f}s → {total_frames} frames (SVD will loop 25 frames)")
+                if self.config.animator_type == "svd" and total_frames > 24:
+                    logger.info(f"📊 Scene {i+1}: {audio_duration:.1f}s → {total_frames} frames (SVD will use overlapping chunks)")
                 else:
                     logger.info(f"📊 Scene {i+1}: {audio_duration:.1f}s → {total_frames} frames")
             

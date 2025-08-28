@@ -106,7 +106,7 @@ class SVDAnimator:
             logger.error(f"❌ Error downloading SVD model: {e}")
             raise
     
-    def animate_image(self, image_path: str, output_dir: str, num_frames: int = 25, 
+    def animate_image(self, image_path: str, output_dir: str, num_frames: int = 24, 
                      motion_bucket_id: int = 127, fps_id: int = 6, 
                      cond_aug: float = 0.02, seed: Optional[int] = None) -> str:
         """
@@ -115,7 +115,7 @@ class SVDAnimator:
         Args:
             image_path: Path to source image
             output_dir: Directory for output frames
-            num_frames: Number of frames to generate (SVD HARD LIMIT: 25 frames max)
+            num_frames: Number of frames to generate (SVD HARD LIMIT: 24 frames max for chunking)
             motion_bucket_id: Motion intensity (0-255, higher = more motion)
             fps_id: FPS setting (0-7, higher = faster motion)
             cond_aug: Conditioning augmentation (0.0-1.0)
@@ -125,17 +125,17 @@ class SVDAnimator:
             Path to generated frames directory
             
         Note:
-            SVD has a hard limit of 25 frames. For longer sequences, the AnimationGenerator
-            will automatically loop these 25 frames to match the required duration.
+            SVD has a hard limit of 24 frames for chunked generation. For longer sequences, 
+            the AnimationGenerator will use overlapping chunk generation for visual consistency.
         """
         try:
             logger.info(f"🎬 SVD Animating image: {image_path}")
             logger.info(f"📊 Target frames: {num_frames} (motion_bucket_id: {motion_bucket_id}, fps_id: {fps_id})")
             
-            # Enforce SVD frame limit
-            if num_frames > 25:
-                logger.warning(f"⚠️ SVD frame limit exceeded: {num_frames} > 25. Clamping to 25 frames.")
-                num_frames = 25
+            # Enforce SVD frame limit for chunking
+            if num_frames > 24:
+                logger.warning(f"⚠️ SVD frame limit exceeded: {num_frames} > 24. Clamping to 24 frames for chunking.")
+                num_frames = 24
             
             # Create output directory
             frames_dir = Path(output_dir)
@@ -164,17 +164,19 @@ class SVDAnimator:
             from diffusers.utils import load_image
             
             logger.info("🎬 Creating SVD animation using direct pipeline...")
+            logger.info(f"🎬 Parameters: motion_bucket_id={motion_bucket_id}, fps_id={fps_id}, cond_aug={cond_aug}, seed={seed}")
             
             # Load the input image
             image = load_image(image_path)
             
-            # Set random seed if provided
+            # Set random seed if provided for reproducibility
             if seed is not None:
                 torch.manual_seed(seed)
                 if torch.cuda.is_available():
                     torch.cuda.manual_seed(seed)
+                logger.info(f"🎬 Set random seed: {seed}")
             
-            # Generate video frames
+            # Generate video frames with consistent parameters
             video_frames = self.pipeline(
                 image,
                 decode_chunk_size=8,
