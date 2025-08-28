@@ -1,102 +1,113 @@
 {
-  "title": "The Tenant Upstairs",
-  "description": "A chilling tale of a woman who hears strange sounds from the locked floor above her apartment... where no one has lived for 12 years.",
-  "total_duration": 70,
+  "title": "The Locked Well",
+  "description": "A horrifying mystery unravels as a village girl hears voices from an old well—sealed since the night her sister disappeared.",
+  "total_duration": 86,
   "cast": [
     { "name": "Narrator", "role": "storyteller" },
-    { "name": "Ananya", "role": "new tenant" },
-    { "name": "Landlord", "role": "old building owner" },
-    { "name": "Ghost", "role": "unknown presence upstairs" }
+    { "name": "Meera", "role": "young village girl" },
+    { "name": "Mother", "role": "concerned parent" },
+    { "name": "Ghost", "role": "whispering voice from the well" }
   ],
   "scenes": [
     {
+      "duration": 6,
+      "description": "spooky animated channel intro",
+      "visual_prompt": "(split-style frame:1.2) left side dark forest with glowing eyes, right side glowing book opening with green mist, title words 'Why Would You?' forming in eerie light, cinematic horror style(1.3)",
+      "negative_prompt": "cartoon, gore, extra limbs, bright colors, unrealistic",
+      "narration": "[mysterious] कभी आपने सोचा है... वो बातें... जो हमें डराती भी हैं और खींचती भी?\nस्वागत है आपके अपने चैनल... Why Would You?",
+      "voice": "hi-IN-ArjunNeural-male",
+      "subtitle": "Channel Intro",
+      "characters": ["Narrator"],
+      "motion_prompt": "letters glowing, mist swirling"
+    },
+    {
       "duration": 8,
-      "description": "intro showing a dimly lit apartment building in rain",
-      "visual_prompt": "(wide shot:1.2) old wooden table in dark room, ancient glowing book placed open, ghostly mist rising from pages(1.2), dim candlelight on side(1.1), dark stormy window in background, bats flying outside, cinematic horror style, realistic lighting, ominous mood(1.3)",
-      "negative_prompt": "cartoon, fantasy, bright, low resolution, extra limbs, unrealistic",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>मुंबई की भीगी रात... और एक पुरानी बिल्डिंग... जहाँ अनन्या ने नया किराये का मकान लिया था।</voice></speak>",
+      "description": "opening shot of a rural house under moonlight with an old sealed well",
+      "visual_prompt": "(wide shot:1.2) rural Indian village at night(1.3), old brick well with heavy iron lid locked by rusted chains, full moon in background, fog rising from fields, haunted horror atmosphere(1.3), cinematic realistic lighting",
+      "negative_prompt": "cartoon, low detail, bright, surreal, fantasy, extra limbs, blood",
+      "narration": "[tense] चाँदनी रात में डूबा वो गाँव...\nऔर एक पुराना कुआँ... जिसकी साँकलें अब भी सिसकती हैं...\nजहाँ एक रात... कोई लौटकर नहीं आया।",
       "voice": "hi-IN-ArjunNeural-male",
       "subtitle": "Intro",
       "characters": ["Narrator"],
-      "motion_prompt": "rain pouring, streetlight flickering"
+      "motion_prompt": "fog drifting, crickets chirping faintly"
     },
     {
       "duration": 9,
-      "description": "Ananya hears dragging sound from above",
-      "visual_prompt": "(medium shot:1.2) 28-year-old Indian woman, shoulder-length hair, wearing loose t-shirt and pyjamas, standing inside dim apartment, looking up in fear as ceiling creaks, realistic horror style(1.3)",
-      "negative_prompt": "blurry, extra limbs, fantasy, colorful, distorted faces",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>हर रात, ठीक 2 बजे... ऊपर से आती थी फर्श पर खींचती किसी भारी चीज़ की आवाज़... <break time='300ms'/> लेकिन ऊपर तो कोई रहता ही नहीं...</voice></speak>",
+      "description": "Meera walking past the well and hearing her name",
+      "visual_prompt": "(medium shot:1.2) 19-year-old Indian village girl, long braid, wearing salwar kameez, stops beside old locked well at night, looking shocked, slight wind blowing, realistic horror style(1.3)",
+      "negative_prompt": "blurry, fantasy, gore, distorted, cartoon",
+      "narration": "[whispering] उस रात... जब हवाएं भी कुछ कहने लगीं...\nकुएँ के पास से गुज़रती मीरा ने सुना—\n'मीरा...' ",
       "voice": "hi-IN-ArjunNeural-male",
-      "subtitle": "First Encounter",
-      "characters": ["Narrator", "Ananya"],
-      "motion_prompt": "ceiling slightly shaking, soft dragging sound implied"
+      "subtitle": "First Whisper",
+      "characters": ["Meera", "Ghost"],
+      "motion_prompt": "wind rustling leaves, faint whisper echo"
     },
     {
       "duration": 10,
-      "description": "Ananya questions the landlord",
-      "visual_prompt": "(medium shot:1.2) old Indian man, white hair, wrinkled face, sitting in old wooden chair with cracked wall behind, dim natural light, tense atmosphere, realistic cinematic horror(1.3)",
-      "negative_prompt": "blurry, fantasy, low detail, cartoon, happy expressions",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>अनन्या ने मकान मालिक से पूछा... <break time='200ms'/> 'ऊपर कौन रहता है?' <break time='200ms'/> जवाब आया —</voice></speak> <speak><voice name='hi-IN-SunilNeural'>‘ऊपर का फ्लैट तो... <emphasis level='strong'>12 साल से बंद है।</emphasis> ताला भी नहीं खुला आज तक।’</voice></speak>",
+      "description": "Meera asks her mother about the well",
+      "visual_prompt": "(medium shot:1.2) older Indian woman with tired eyes, oil lamp beside her, sitting in mud courtyard, worried look, Meera asking question, realistic lighting(1.3)",
+      "negative_prompt": "cartoon, fantasy, extra limbs, overly dramatic, low resolution",
+      "narration": "मीरा [nervous] माँ से पूछती है...\n'मौसी उस रात कहाँ गई थी?'\n[mother serious] माँ की आँखों में उभरा वही डर...\n‘उस कुएँ का नाम न लो... वो रात अशुभ थी बेटा... बहुत अशुभ।’",
       "voice": "hi-IN-ArjunNeural-male",
       "subtitle": "The Warning",
-      "characters": ["Ananya", "Landlord"],
-      "motion_prompt": "landlord staring blankly, low light flicker"
+      "characters": ["Meera", "Mother"],
+      "motion_prompt": "lamp flickering, mother’s face tightening"
     },
     {
       "duration": 10,
-      "description": "Ananya sees movement in the mirror behind",
-      "visual_prompt": "(close shot:1.2) scared Indian woman staring into bathroom mirror, faint white silhouette standing far in background reflection, dim overhead light, cracked mirror surface, haunted mood, realistic horror lighting, cinematic style(1.3)",
-      "negative_prompt": "cartoon, anime, blurry, low detail, gore, fantasy",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>और एक रात... जब अनन्या ने शीशे में देखा... <break time='300ms'/> उसे खुद के पीछे... <emphasis level='strong'>कोई सफेद परछाई दिखाई दी।</emphasis></voice></speak>",
+      "description": "Meera peeks at night and sees the lock is open",
+      "visual_prompt": "(close-up:1.2) rusty iron lock hanging loosely from well chain, moonlight glinting off it, Meera's eyes wide in background, realistic horror lighting(1.3)",
+      "negative_prompt": "anime, extra limbs, cartoon, fantasy, low detail",
+      "narration": "[scary] आधी रात के सन्नाटे में...\nमीरा की नज़र पड़ी उस ताले पर...\nजो अब बंद नहीं था...\nलेकिन... उसे खोला किसने?",
       "voice": "hi-IN-ArjunNeural-male",
-      "subtitle": "The Reflection",
-      "characters": ["Ananya", "Ghost"],
-      "motion_prompt": "ghostly figure flickering behind Ananya"
-    },
-    {
-      "duration": 10,
-      "description": "Ananya climbs upstairs with flashlight",
-      "visual_prompt": "(wide shot:1.2) scared Indian woman holding flashlight, walking up old dusty staircase, broken railing, heavy shadows, abandoned top floor apartment door slightly open, horror mood(1.3)",
-      "negative_prompt": "bright, fantasy, cartoon, gore, blood",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>उस रात... अनन्या चुपचाप सीढ़ियाँ चढ़ गई... <break time='300ms'/> ऊपर का दरवाज़ा... <emphasis level='moderate'>खुला हुआ था।</emphasis></voice></speak>",
-      "voice": "hi-IN-ArjunNeural-male",
-      "subtitle": "Climbing Up",
-      "characters": ["Ananya"],
-      "motion_prompt": "flashlight beam moving, door creaking"
+      "subtitle": "The Unlocked Seal",
+      "characters": ["Meera"],
+      "motion_prompt": "lock slightly swinging, wind howling"
     },
     {
       "duration": 12,
-      "description": "inside the haunted flat, whispering voices heard",
-      "visual_prompt": "(wide shot:1.2) dark abandoned apartment room, broken furniture, shadow in corner, foggy air, faint light from window, eerie atmosphere, cinematic horror realism(1.3)",
-      "negative_prompt": "cartoon, fantasy, gore, bright, cluttered, anime",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>भीतर... एक अजीब सी ठंडक थी... और कहीं से... <emphasis level='strong'>फुसफुसाहटें आने लगीं।</emphasis> <break time='300ms'/> '...तू ऊपर क्यों आई...'</voice></speak>",
+      "description": "ghostly voice from the well calling out",
+      "visual_prompt": "(wide shot:1.2) deep inside old stone well, darkness within, faint outline of human face barely visible in shadow, fog rising, horror ambiance(1.3)",
+      "negative_prompt": "gore, blood, cartoon, colorful, overexposed, messy light",
+      "narration": "[ghostly] कुएँ की गहराइयों से फिर वही सरसराहट...\n'तू मुझे भूली नहीं न...'\nवो आवाज़... पुरानी थी... लेकिन मीरा के दिल को चीरती हुई।",
       "voice": "hi-IN-ArjunNeural-male",
-      "subtitle": "The Room",
-      "characters": ["Ananya", "Ghost"],
-      "motion_prompt": "fog swirling, shadow shifting slightly"
+      "subtitle": "The Voice Returns",
+      "characters": ["Ghost"],
+      "motion_prompt": "fog swirling, echo from within the well"
     },
     {
       "duration": 11,
-      "description": "Ananya runs and hears footsteps chasing her",
-      "visual_prompt": "(medium shot:1.2) Indian woman with long hair seen from behind, standing in front of closed apartment door, tall shadowy female figure emerging faintly in background hallway, fog in air, horror lighting, cinematic spooky atmosphere(1.3)",
-      "negative_prompt": "cartoon, fantasy, too dark, messy, gore, surreal",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>अनन्या ने पीछे देखा... <break time='200ms'/> लेकिन कोई नहीं था... <break time='300ms'/> पर किसी के तेज़ कदम... <emphasis level='strong'>उसके पीछे-पीछे आ रहे थे।</emphasis></voice></speak>",
+      "description": "Meera leans over and sees her sister's face",
+      "visual_prompt": "(overhead shot:1.2) Meera leaning dangerously over the well, faint ghostly female face with long hair visible in water reflection, horror mood(1.3)",
+      "negative_prompt": "bright, surreal, anime, cartoon, blood, gore",
+      "narration": "[tense] धीरे-धीरे झुकी मीरा...\nऔर पानी की सतह पर...\nएक चेहरा...\n[shocked] उसकी बहन का चेहरा... जो ग़ायब थी।",
       "voice": "hi-IN-ArjunNeural-male",
-      "subtitle": "The Chase",
-      "characters": ["Ananya", "Ghost"],
-      "motion_prompt": "footsteps thudding, lights flickering"
+      "subtitle": "The Reflection",
+      "characters": ["Meera", "Ghost"],
+      "motion_prompt": "ripples in water, wind blowing Meera’s dupatta"
     },
     {
-      "duration": 12,
-      "description": "Ananya locks her door but turns to see the ghost close",
-      "visual_prompt": "(over-the-shoulder shot:1.2) back of Indian woman in striped kurti, door locked in foreground, tall ghostly female figure standing at a distance in moonlit corner, long hair hanging, pale dress, shadowy face not visible, cinematic horror(1.3)",
-      "negative_prompt": "cartoon, fantasy, gore, blood, anime, messy lighting, extra limbs",
-      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>अनन्या ने दरवाज़ा बंद किया... <break time='400ms'/> और जैसे ही पलटी... <break time='300ms'/> वो सामने थी। <emphasis level='strong'>एक परछाई... जो देख रही थी।</emphasis> <break time='600ms'/> वो बोली... <emphasis level='strong'>'अब तू यहीं रहेगी।'</emphasis></voice></speak>",
+      "duration": 14,
+      "description": "Final confrontation, Meera hears 'Come down...'",
+      "visual_prompt": "(medium shot:1.2) Meera backing away in horror, shadowy female figure rising out of well in background, moonlight illuminating only the silhouette, realistic horror style(1.3)",
+      "negative_prompt": "cartoon, fantasy, low resolution, overexposed, extra limbs",
+      "narration": "[scary] कुएँ की कोर से उठी एक परछाई...\nधीरे-धीरे... जैसे अँधेरा आकार ले रहा हो...\n'नीचे आ जा...'\n[ghostly whisper] अब तू मेरी है।",
       "voice": "hi-IN-ArjunNeural-male",
-      "subtitle": "The Final Presence",
-      "characters": ["Ananya", "Ghost"],
-      "motion_prompt": "ghost standing still in distance, Ananya frozen"
+      "subtitle": "The Invitation",
+      "characters": ["Meera", "Ghost"],
+      "motion_prompt": "ghost slowly rising, Meera trembling, lantern flickering out"
+    },
+    {
+      "duration": 6,
+      "description": "outro with Why Would You branding",
+      "visual_prompt": "(wide shot:1.2) dark background, glowing neon green letters form 'Why Would You?', faint mist swirling, cinematic spooky outro style(1.3)",
+      "negative_prompt": "cartoon, extra limbs, gore, unrealistic, too bright",
+      "narration": "[dramatic] तो सोचिए... अगर आपको ऐसी आवाज़ सुनाई दे...\nक्या आप भी उस कुएँ के पास जाएंगे?\nऔर यही है सवाल...\nWhy Would You do it?\n[excited] अगर कहानी पसंद आई... तो लाइक और सब्सक्राइब ज़रूर करें।",
+      "voice": "hi-IN-ArjunNeural-male",
+      "subtitle": "Channel Outro",
+      "characters": ["Narrator"],
+      "motion_prompt": "letters glowing, mist rising and fading"
     }
   ],
-  "tags": ["horror", "ghost", "paranormal", "urban legend", "female lead", "realistic", "adult"]
+  "tags": ["horror", "ghost", "realistic", "female lead", "well", "paranormal", "rural", "Hindi", "WhyWouldYou", "YouTube"]
 }
