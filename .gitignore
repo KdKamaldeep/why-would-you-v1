@@ -120,6 +120,7 @@ Thumbs.db
 # Project specific
 output/
 models/
+loras/
 *.wav
 *.mp4
 *.avi
