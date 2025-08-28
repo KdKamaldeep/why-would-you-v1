@@ -425,6 +425,23 @@ class CartoonShortsGenerator:
                     continue
                 
                 logger.info(f"📹 Scene {i+1}: Converting {frames_per_scene[i]} frames to MP4...")
+                
+                # Validate frames directory exists and contains frames
+                if not frames_dir or frames_dir == "None":
+                    logger.error(f"❌ Invalid frames directory for scene {i+1}: {frames_dir}")
+                    raise ValueError(f"Invalid frames directory: {frames_dir}")
+                
+                frames_path = Path(frames_dir)
+                if not frames_path.exists():
+                    logger.error(f"❌ Frames directory does not exist for scene {i+1}: {frames_dir}")
+                    raise FileNotFoundError(f"Frames directory not found: {frames_dir}")
+                
+                frame_files = list(frames_path.glob("frame_*.png"))
+                if not frame_files:
+                    logger.error(f"❌ No frame files found in directory for scene {i+1}: {frames_dir}")
+                    raise FileNotFoundError(f"No frame files found in: {frames_dir}")
+                
+                logger.info(f"📹 Scene {i+1}: Found {len(frame_files)} frame files in {frames_dir}")
                 video_path = self.video_processor.frames_to_video(frames_dir, str(clip_path), fps=self.config.fps)
                 video_clips.append(video_path)
                 total_video_duration += expected_duration

@@ -60,6 +60,7 @@ class AnimationGenerator:
             logger.info(f"🎬 Animating image: {image_path}")
             logger.info(f"📊 Target frames: {num_frames} ({num_frames/self.fps:.1f}s @ {self.fps}fps)")
             logger.info(f"🎬 Animation type: {self.animator_type}")
+            logger.info(f"🎬 Output directory: {output_dir}")
             
             # Create output directory for frames
             frames_dir = Path(output_dir)
@@ -96,12 +97,16 @@ class AnimationGenerator:
             else:
                 # Use enhanced FFmpeg animation system
                 logger.info("📹 Using enhanced FFmpeg animation system")
-                return self._create_enhanced_animation(image_path, str(frames_dir), num_frames, prompt)
+                result = self._create_enhanced_animation(image_path, str(frames_dir), num_frames, prompt)
+                logger.info(f"🎬 Enhanced FFmpeg animation completed: {result}")
+                return result
             
         except Exception as e:
             logger.error(f"Error animating image: {e}")
             # Fallback to FFmpeg animation
-            return self._create_enhanced_animation(image_path, output_dir, num_frames, prompt)
+            result = self._create_enhanced_animation(image_path, output_dir, num_frames, prompt)
+            logger.info(f"🎬 Fallback animation completed: {result}")
+            return result
     
     def animate_multiple_images(self, image_paths: List[str], output_dir: str, num_frames: int = 150, prompts: List[str] = None) -> List[str]:
         """Animate multiple images with scene-specific prompts."""
@@ -411,6 +416,13 @@ class AnimationGenerator:
                         dest_path = output_path / f"frame_{frame_index:04d}.png"
                         shutil.copy2(current_input_frame, dest_path)
                         frame_index += 1
+            
+            # Clean up chunks directory on success
+            if chunks_dir.exists():
+                shutil.rmtree(chunks_dir)
+            
+            logger.info(f"✅ Overlapping chunked SVD generation completed: {target_frames} frames")
+            return str(output_path)
             
         except Exception as e:
             logger.error(f"Error in overlapping chunked SVD generation: {e}")
