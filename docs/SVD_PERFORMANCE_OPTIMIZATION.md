@@ -5,6 +5,11 @@ This guide helps optimize SVD (Stable Video Diffusion) performance for different
 
 ## Expected Performance by GPU
 
+### A40 (48GB VRAM) - **YOUR GPU**
+- **Expected**: 8-15 seconds for 25 frames
+- **Optimized**: 5-10 seconds
+- **Memory usage**: 12-20GB VRAM (plenty of headroom)
+
 ### A4000 (16GB VRAM)
 - **Expected**: 15-30 seconds for 25 frames
 - **Current**: ~60 seconds (needs optimization)
@@ -54,6 +59,16 @@ pip install torch==2.0+  # For model compilation
 ```
 
 ## Configuration Options
+
+### For A40 (48GB VRAM) - **YOUR CONFIGURATION**
+```python
+# Aggressive settings for A40 (48GB VRAM)
+enable_memory_efficient_attention = False  # Not needed with 48GB VRAM
+enable_xformers = True
+use_fp16 = True
+enable_model_cpu_offload = False  # A40 has massive VRAM
+decode_chunk_size = 8  # Higher for faster generation
+```
 
 ### For A4000 (16GB VRAM)
 ```python
@@ -182,6 +197,12 @@ pipeline.enable_custom_kernels()
 
 ## Expected Results After Optimization
 
+### A40 Performance Targets - **YOUR TARGETS**
+- **First run**: 15-25 seconds (model loading overhead)
+- **Subsequent runs**: 5-10 seconds
+- **Memory usage**: 12-20GB VRAM
+- **Throughput**: 2.5-5.0 frames/second
+
 ### A4000 Performance Targets
 - **First run**: 25-35 seconds (model loading overhead)
 - **Subsequent runs**: 15-20 seconds
@@ -218,9 +239,9 @@ watch -n 0.5 'nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits'
 
 ## Conclusion
 
-With these optimizations, your A4000 should achieve:
-- **15-20 seconds** for 25 frames (instead of 60+ seconds)
-- **1.25-1.67 frames/second** generation speed
+With these optimizations, your A40 should achieve:
+- **5-10 seconds** for 25 frames (instead of 60+ seconds)
+- **2.5-5.0 frames/second** generation speed
 - **Stable memory usage** without OOM errors
 - **Consistent performance** across multiple generations
 

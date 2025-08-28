@@ -32,11 +32,11 @@ class SVDAnimator:
         self.model = None
         self.pipeline = None
         
-        # Performance optimization settings
-        self.enable_memory_efficient_attention = True
+        # Performance optimization settings for A40 (48GB VRAM)
+        self.enable_memory_efficient_attention = False  # A40 has plenty of VRAM
         self.enable_xformers = True
         self.use_fp16 = True
-        self.enable_model_cpu_offload = False  # Set to True if you have memory issues
+        self.enable_model_cpu_offload = False  # A40 has 48GB VRAM - no need for offloading
         
         # Load model with optimizations
         self._load_model()
@@ -239,11 +239,11 @@ class SVDAnimator:
                     torch.cuda.manual_seed(seed)
                 logger.info(f"🎬 Set random seed: {seed}")
             
-            # Performance optimization: Use smaller decode_chunk_size for faster generation
-            # A4000 has good memory, so we can use a balanced approach
-            decode_chunk_size = 4  # Reduced from 8 for faster generation on A4000
+            # Performance optimization: Use higher decode_chunk_size for A40 (48GB VRAM)
+            # A40 has massive VRAM, so we can use aggressive settings
+            decode_chunk_size = 8  # Higher value for faster generation on A40
             
-            logger.info(f"🎬 Using decode_chunk_size={decode_chunk_size} for optimal A4000 performance")
+            logger.info(f"🎬 Using decode_chunk_size={decode_chunk_size} for optimal A40 performance")
             
             # Generate video frames with optimized parameters
             with torch.no_grad():  # Disable gradient computation for inference
