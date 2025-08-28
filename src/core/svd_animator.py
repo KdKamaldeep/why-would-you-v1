@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SVD (Stable Video Diffusion) Animator Module
+SVD (Stable Video Diffusion) Animator Module - Optimized for Performance
 Handles motion animation using SVD models directly without ComfyUI
 """
 
@@ -17,11 +17,12 @@ import shutil
 import numpy as np
 from PIL import Image
 import requests
+import gc
 
 logger = logging.getLogger(__name__)
 
 class SVDAnimator:
-    """Handles SVD-based motion animation for images using models directly."""
+    """Handles SVD-based motion animation for images using models directly with performance optimizations."""
     
     def __init__(self, model_path: Optional[str] = None, device: str = "cuda"):
         self.device = device
@@ -29,6 +30,15 @@ class SVDAnimator:
         self.fps = 10  # Reduced from 15 to 10 for slower playback
         self.num_frames = 25  # Default SVD frame count
         self.model = None
+        self.pipeline = None
+        
+        # Performance optimization settings
+        self.enable_memory_efficient_attention = True
+        self.enable_xformers = True
+        self.use_fp16 = True
+        self.enable_model_cpu_offload = False  # Set to True if you have memory issues
+        
+        # Load model with optimizations
         self._load_model()
         
     def _get_default_model_path(self) -> str:
@@ -49,12 +59,12 @@ class SVDAnimator:
         return "models/svd_xt_1_1.safetensors"
     
     def _load_model(self):
-        """Load SVD model directly using diffusers library."""
+        """Load SVD model with performance optimizations."""
         try:
             from diffusers import StableVideoDiffusionPipeline
             from diffusers.utils import load_image
             
-            logger.info(f"🔄 Loading SVD model: {self.model_path}")
+            logger.info(f"🔄 Loading SVD model with optimizations: {self.model_path}")
             
             # Check if model file exists
             if not Path(self.model_path).exists():
@@ -62,17 +72,62 @@ class SVDAnimator:
                 logger.info("📥 Attempting to download SVD model...")
                 self._download_svd_model()
             
-            # Load the pipeline
+            # Performance optimization: Clear GPU cache before loading
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                gc.collect()
+            
+            # Load the pipeline with optimizations
+            logger.info("🎯 Loading SVD pipeline with performance optimizations...")
+            
+            # Use fp16 for better performance on modern GPUs
+            torch_dtype = torch.float16 if self.use_fp16 else torch.float32
+            
             self.pipeline = StableVideoDiffusionPipeline.from_pretrained(
                 "stabilityai/stable-video-diffusion-img2vid-xt",
-                torch_dtype=torch.float16,
-                variant="fp16"
+                torch_dtype=torch_dtype,
+                variant="fp16" if self.use_fp16 else None
             )
             
+            # Apply performance optimizations
             if torch.cuda.is_available():
                 self.pipeline = self.pipeline.to("cuda")
+                
+                # Enable memory efficient attention if available
+                if self.enable_memory_efficient_attention:
+                    try:
+                        self.pipeline.enable_attention_slicing()
+                        logger.info("✅ Enabled attention slicing for memory efficiency")
+                    except Exception as e:
+                        logger.warning(f"⚠️ Could not enable attention slicing: {e}")
+                
+                # Enable xformers if available (significant speed boost)
+                if self.enable_xformers:
+                    try:
+                        self.pipeline.enable_xformers_memory_efficient_attention()
+                        logger.info("✅ Enabled xformers memory efficient attention")
+                    except ImportError:
+                        logger.warning("⚠️ xformers not available - install with: pip install xformers")
+                    except Exception as e:
+                        logger.warning(f"⚠️ Could not enable xformers: {e}")
+                
+                # Model CPU offload for memory-constrained systems
+                if self.enable_model_cpu_offload:
+                    try:
+                        self.pipeline.enable_model_cpu_offload()
+                        logger.info("✅ Enabled model CPU offload")
+                    except Exception as e:
+                        logger.warning(f"⚠️ Could not enable model CPU offload: {e}")
+                
+                # Compile model for additional speed boost (PyTorch 2.0+)
+                try:
+                    if hasattr(torch, 'compile'):
+                        self.pipeline.unet = torch.compile(self.pipeline.unet, mode="reduce-overhead")
+                        logger.info("✅ Compiled UNet for performance boost")
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not compile model: {e}")
             
-            logger.info("✅ SVD model loaded successfully")
+            logger.info("✅ SVD model loaded successfully with optimizations")
             
         except ImportError as e:
             logger.error(f"❌ diffusers library not available: {e}")
@@ -106,16 +161,16 @@ class SVDAnimator:
             logger.error(f"❌ Error downloading SVD model: {e}")
             raise
     
-    def animate_image(self, image_path: str, output_dir: str, num_frames: int = 24, 
-                     motion_bucket_id: int = 127, fps_id: int = 6, 
-                     cond_aug: float = 0.02, seed: Optional[int] = None) -> str:
+    def animate_image(self, image_path: str, output_dir: str, num_frames: int = 25,
+                     motion_bucket_id: int = 127, fps_id: int = 6, cond_aug: float = 0.02, 
+                     seed: Optional[int] = None) -> str:
         """
-        Animate an image using SVD motion animation directly.
+        Animate an image using SVD with performance optimizations.
         
         Args:
             image_path: Path to source image
             output_dir: Directory for output frames
-            num_frames: Number of frames to generate (SVD HARD LIMIT: 24 frames max for chunking)
+            num_frames: Number of frames to generate (max 25 for SVD)
             motion_bucket_id: Motion intensity (0-255, higher = more motion)
             fps_id: FPS setting (0-7, higher = faster motion)
             cond_aug: Conditioning augmentation (0.0-1.0)
@@ -123,30 +178,38 @@ class SVDAnimator:
             
         Returns:
             Path to generated frames directory
-            
-        Note:
-            SVD has a hard limit of 24 frames for chunked generation. For longer sequences, 
-            the AnimationGenerator will use overlapping chunk generation for visual consistency.
         """
         try:
-            logger.info(f"🎬 SVD Animating image: {image_path}")
-            logger.info(f"📊 Target frames: {num_frames} (motion_bucket_id: {motion_bucket_id}, fps_id: {fps_id})")
-            
-            # Enforce SVD frame limit for chunking
-            if num_frames > 24:
-                logger.warning(f"⚠️ SVD frame limit exceeded: {num_frames} > 24. Clamping to 24 frames for chunking.")
-                num_frames = 24
-            
-            # Create output directory
+            # Ensure output directory exists
             frames_dir = Path(output_dir)
             frames_dir.mkdir(parents=True, exist_ok=True)
             
-            # Use direct SVD pipeline for animation
+            # Validate input
+            if not Path(image_path).exists():
+                raise FileNotFoundError(f"Input image not found: {image_path}")
+            
+            # Clamp num_frames to SVD limit
+            num_frames = min(num_frames, 25)
+            
+            logger.info(f"🎬 Starting SVD animation: {num_frames} frames")
+            logger.info(f"🎬 Input: {image_path}")
+            logger.info(f"🎬 Output: {output_dir}")
+            
+            # Clear GPU cache before generation
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                gc.collect()
+            
+            # Use direct SVD pipeline if available
             if self.pipeline is not None:
-                return self._create_direct_svd_animation(
-                    image_path, str(frames_dir), num_frames, 
+                start_time = time.time()
+                result = self._create_direct_svd_animation(
+                    image_path, output_dir, num_frames,
                     motion_bucket_id, fps_id, cond_aug, seed
                 )
+                generation_time = time.time() - start_time
+                logger.info(f"✅ SVD generation completed in {generation_time:.1f}s ({num_frames/generation_time:.1f} fps)")
+                return result
             else:
                 logger.warning("⚠️ SVD pipeline not available, falling back to FFmpeg animation")
                 return self._create_ffmpeg_fallback(image_path, output_dir, num_frames)
@@ -159,11 +222,11 @@ class SVDAnimator:
     def _create_direct_svd_animation(self, image_path: str, output_dir: str, num_frames: int,
                                    motion_bucket_id: int, fps_id: int, cond_aug: float, 
                                    seed: Optional[int]) -> str:
-        """Create SVD animation using direct pipeline without ComfyUI."""
+        """Create SVD animation using optimized direct pipeline."""
         try:
             from diffusers.utils import load_image
             
-            logger.info("🎬 Creating SVD animation using direct pipeline...")
+            logger.info("🎬 Creating optimized SVD animation...")
             logger.info(f"🎬 Parameters: motion_bucket_id={motion_bucket_id}, fps_id={fps_id}, cond_aug={cond_aug}, seed={seed}")
             
             # Load the input image
@@ -176,27 +239,41 @@ class SVDAnimator:
                     torch.cuda.manual_seed(seed)
                 logger.info(f"🎬 Set random seed: {seed}")
             
-            # Generate video frames with consistent parameters
-            video_frames = self.pipeline(
-                image,
-                decode_chunk_size=8,
-                motion_bucket_id=motion_bucket_id,
-                fps=fps_id + 1,  # Convert fps_id to actual fps
-                noise_aug_strength=cond_aug,
-                num_frames=num_frames
-            ).frames[0]
+            # Performance optimization: Use smaller decode_chunk_size for faster generation
+            # A4000 has good memory, so we can use a balanced approach
+            decode_chunk_size = 4  # Reduced from 8 for faster generation on A4000
             
-            # Save frames
+            logger.info(f"🎬 Using decode_chunk_size={decode_chunk_size} for optimal A4000 performance")
+            
+            # Generate video frames with optimized parameters
+            with torch.no_grad():  # Disable gradient computation for inference
+                video_frames = self.pipeline(
+                    image,
+                    decode_chunk_size=decode_chunk_size,
+                    motion_bucket_id=motion_bucket_id,
+                    fps=fps_id + 1,  # Convert fps_id to actual fps
+                    noise_aug_strength=cond_aug,
+                    num_frames=num_frames
+                ).frames[0]
+            
+            # Save frames efficiently
             frames_dir = Path(output_dir)
+            frames_dir.mkdir(parents=True, exist_ok=True)
+            
             for i, frame in enumerate(video_frames):
                 frame_path = frames_dir / f"frame_{i:04d}.png"
                 frame.save(frame_path)
             
-            logger.info(f"✅ SVD animation completed: {output_dir}")
+            # Clear GPU cache after generation
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                gc.collect()
+            
+            logger.info(f"✅ Optimized SVD animation completed: {output_dir}")
             return output_dir
             
         except Exception as e:
-            logger.error(f"Error in direct SVD animation: {e}")
+            logger.error(f"Error in optimized SVD animation: {e}")
             return self._create_ffmpeg_fallback(image_path, output_dir, num_frames)
     
     def _create_ffmpeg_fallback(self, image_path: str, output_dir: str, num_frames: int) -> str:
