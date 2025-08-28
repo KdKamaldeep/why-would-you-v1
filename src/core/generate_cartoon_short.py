@@ -260,7 +260,7 @@ class CartoonShortsGenerator:
                     converter = NarrationConverter()
                     voice_file = converter.resolve_voice_file(scene['voice'])
                     if voice_file:
-                        logger.info(f"🎵 Scene {i+1}: Using voice file: {voice_file}")
+                            logger.info(f"�� Scene {i+1}: Using voice file: {voice_file}")
                         logger.info(f"🎵 Scene {i+1}: Voice property: '{scene['voice']}' -> resolved to: {voice_file}")
                     else:
                         logger.warning(f"🎵 Scene {i+1}: Voice file not found for '{scene['voice']}'")
@@ -590,41 +590,41 @@ class CartoonShortsGenerator:
             final_clips = video_clips
             logger.info("✅ Videos already created with correct duration matching audio clips")
             logger.info(f"📊 Fallback: Using {len(final_clips)} video clips")
-            
-            # Use single narration track for final compilation
-            scene_audio_paths = [str(narration_path)]
-            logger.info(f"🎵 Fallback: Using single audio track: {narration_path}")
-            
-            # Step 7: Create subtitles (optional)
-            subtitles_path = self.output_dir / "subtitles.srt"
-            if self.config.add_subtitles:
-                logger.info("Step 7: Creating subtitles...")
-                if self.config.reuse_existing and subtitles_path.exists():
-                    logger.info(f"Skipping subtitles (exists): {subtitles_path}")
+                
+                # Use single narration track for final compilation
+                scene_audio_paths = [str(narration_path)]
+                logger.info(f"🎵 Fallback: Using single audio track: {narration_path}")
+                
+                # Step 7: Create subtitles (optional)
+                subtitles_path = self.output_dir / "subtitles.srt"
+                if self.config.add_subtitles:
+                    logger.info("Step 7: Creating subtitles...")
+                    if self.config.reuse_existing and subtitles_path.exists():
+                        logger.info(f"Skipping subtitles (exists): {subtitles_path}")
+                    else:
+                        self.video_processor.create_subtitles_srt(script, str(subtitles_path))
                 else:
-                    self.video_processor.create_subtitles_srt(script, str(subtitles_path))
-            else:
-                logger.info("Step 7: Subtitles disabled; skipping SRT generation and overlay")
-            
-            # Step 8: Select background music
-            logger.info("Step 8: Adding background music...")
-            background_music = self._get_background_music()
-            
-            # Step 9: Compile final video
-            logger.info("Step 9: Compiling final video...")
-            self.video_processor.compile_final_video(
-                final_clips,
-                scene_audio_paths,  # Pass audio paths directly - compile_final_video will handle concatenation
-                background_music,
-                str(subtitles_path) if self.config.add_subtitles else None,
-                str(final_output)
-            )
-            
-            # Step 10: Generate metadata
-            self._generate_metadata(script, str(final_output))
-            
-            logger.info(f"Video generation completed: {final_output}")
-            return str(final_output)
+                    logger.info("Step 7: Subtitles disabled; skipping SRT generation and overlay")
+                
+                # Step 8: Select background music
+                logger.info("Step 8: Adding background music...")
+                background_music = self._get_background_music()
+                
+                # Step 9: Compile final video
+                logger.info("Step 9: Compiling final video...")
+                self.video_processor.compile_final_video(
+                    final_clips,
+                    scene_audio_paths,  # Pass audio paths directly - compile_final_video will handle concatenation
+                    background_music,
+                    str(subtitles_path) if self.config.add_subtitles else None,
+                    str(final_output)
+                )
+                
+                # Step 10: Generate metadata
+                self._generate_metadata(script, str(final_output))
+                
+                logger.info(f"Video generation completed: {final_output}")
+                return str(final_output)
             
         except Exception as e:
             logger.error(f"Error in video generation: {e}")
