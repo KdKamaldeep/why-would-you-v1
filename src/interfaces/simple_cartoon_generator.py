@@ -102,7 +102,7 @@ def extract_character_faces_from_cast(cast_list):
     
     return character_faces
 
-def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", character_faces=None, model_type="cartoon"):
+def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", character_faces=None, model_type="cartoon", animator_type="ffmpeg", motion_bucket_id=127, fps_id=6, cond_aug=0.02):
     """Generate a cartoon video with the given prompt and character faces."""
     try:
         # Import the main generator
@@ -140,7 +140,11 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
             language=language,
             enable_prompt_enhancement=enable_prompt_enhancement,
             character_faces=character_faces or {},
-            model_path=model_path
+            model_path=model_path,
+            animator_type=animator_type,
+            motion_bucket_id=motion_bucket_id,
+            fps_id=fps_id,
+            cond_aug=cond_aug
         )
         
         # Initialize generator
@@ -261,6 +265,42 @@ Storyboard Cast Format (with face images):
         help="Only check requirements, don't generate video"
     )
     
+    parser.add_argument(
+        "--animate",
+        action="store_true",
+        help="Enable animation (default: enabled)"
+    )
+    
+    parser.add_argument(
+        "--animator",
+        choices=["ffmpeg", "svd"],
+        default="ffmpeg",
+        help="Animation method: 'ffmpeg' for zoom/pan effects, 'svd' for motion animation"
+    )
+    
+    parser.add_argument(
+        "--motion-bucket-id",
+        type=int,
+        default=127,
+        choices=[0, 63, 127, 191, 255],
+        help="SVD motion intensity: 0=very low, 63=low, 127=medium, 191=high, 255=very high"
+    )
+    
+    parser.add_argument(
+        "--fps-id",
+        type=int,
+        default=6,
+        choices=[0, 1, 2, 3, 4, 5, 6],
+        help="SVD FPS setting: 0=very slow, 2=normal, 6=maximum"
+    )
+    
+    parser.add_argument(
+        "--cond-aug",
+        type=float,
+        default=0.02,
+        help="SVD conditioning augmentation (0.0-1.0, default: 0.02)"
+    )
+    
     args = parser.parse_args()
     
     print("🎨 Simple Cartoon Generator with Face-Based Characters")
@@ -340,7 +380,11 @@ Storyboard Cast Format (with face images):
                 language=args.language,
                 enable_prompt_enhancement=(not args.no_prompt_enhancement),
                 character_faces=character_faces,
-                model_path=model_path
+                model_path=model_path,
+                animator_type=args.animator,
+                motion_bucket_id=args.motion_bucket_id,
+                fps_id=args.fps_id,
+                cond_aug=args.cond_aug
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
@@ -356,7 +400,11 @@ Storyboard Cast Format (with face images):
             not args.no_prompt_enhancement, 
             args.video_format,
             {},  # No character faces for non-storyboard generation
-            args.model_type
+            args.model_type,
+            args.animator,
+            args.motion_bucket_id,
+            args.fps_id,
+            args.cond_aug
         )
     
     if output_path:

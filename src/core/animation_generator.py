@@ -16,13 +16,28 @@ logger = logging.getLogger(__name__)
 class AnimationGenerator:
     """Handles professional quality video animation with unlimited length capability."""
     
-    def __init__(self, width: int = 768, height: int = 1024):
+    def __init__(self, width: int = 768, height: int = 1024, animator_type: str = "ffmpeg"):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.fps = 15
         self.width = width
         self.height = height
+        self.animator_type = animator_type.lower()
+        
+        # Initialize SVD animator if needed
+        self.svd_animator = None
+        if self.animator_type == "svd":
+            try:
+                from .svd_animator import SVDAnimator
+                self.svd_animator = SVDAnimator()
+                logger.info("✅ SVD Animator initialized")
+            except ImportError as e:
+                logger.warning(f"⚠️ SVD Animator not available: {e}")
+                self.animator_type = "ffmpeg"
+                logger.info("🔄 Falling back to FFmpeg animation")
     
-    def animate_image(self, image_path: str, output_dir: str, num_frames: int = 150, prompt: str = "") -> str:
+    def animate_image(self, image_path: str, output_dir: str, num_frames: int = 150, prompt: str = "", 
+                     motion_bucket_id: int = 127, fps_id: int = 6, cond_aug: float = 0.02, 
+                     seed: Optional[int] = None) -> str:
         """
         Animate an image with professional quality and unlimited length capability.
         
@@ -31,6 +46,10 @@ class AnimationGenerator:
             output_dir: Directory for output frames
             num_frames: Number of frames to generate (unlimited!)
             prompt: Animation prompt for guidance
+            motion_bucket_id: Motion intensity for SVD (0-255, higher = more motion)
+            fps_id: FPS setting for SVD (0-7, higher = faster motion)
+            cond_aug: Conditioning augmentation for SVD (0.0-1.0)
+            seed: Random seed for reproducibility
             
         Returns:
             Path to generated frames directory
@@ -38,17 +57,38 @@ class AnimationGenerator:
         try:
             logger.info(f"🎬 Animating image: {image_path}")
             logger.info(f"📊 Target frames: {num_frames} ({num_frames/self.fps:.1f}s @ {self.fps}fps)")
+            logger.info(f"🎬 Animation type: {self.animator_type}")
             
             # Create output directory for frames
             frames_dir = Path(output_dir)
             frames_dir.mkdir(parents=True, exist_ok=True)
             
-            # Use enhanced FFmpeg animation system
-            logger.info("📹 Using enhanced FFmpeg animation system")
-            return self._create_enhanced_animation(image_path, str(frames_dir), num_frames, prompt)
+            # Choose animation method based on animator type
+            if self.animator_type == "svd" and self.svd_animator:
+                logger.info("🎬 Using SVD motion animation")
+                # SVD has a hard limit of 25 frames - we need to work within this constraint
+                if num_frames <= 25:
+                    return self.svd_animator.animate_image(
+                        image_path, str(frames_dir), num_frames, 
+                        motion_bucket_id, fps_id, cond_aug, seed
+                    )
+                else:
+                    # For longer sequences, we'll use SVD's 25 frames and loop/extend them
+                    logger.info(f"🎬 SVD limit: 25 frames, requested {num_frames} frames")
+                    logger.info(f"🎬 Will generate 25 SVD frames and loop them to match {num_frames} frames")
+                    svd_frames_dir = self.svd_animator.animate_image(
+                        image_path, str(frames_dir) + "_svd", 25, 
+                        motion_bucket_id, fps_id, cond_aug, seed
+                    )
+                    return self._extend_svd_animation_with_looping(svd_frames_dir, str(frames_dir), num_frames)
+            else:
+                # Use enhanced FFmpeg animation system
+                logger.info("📹 Using enhanced FFmpeg animation system")
+                return self._create_enhanced_animation(image_path, str(frames_dir), num_frames, prompt)
             
         except Exception as e:
             logger.error(f"Error animating image: {e}")
+            # Fallback to FFmpeg animation
             return self._create_enhanced_animation(image_path, output_dir, num_frames, prompt)
     
     def animate_multiple_images(self, image_paths: List[str], output_dir: str, num_frames: int = 150, prompts: List[str] = None) -> List[str]:
@@ -198,6 +238,61 @@ class AnimationGenerator:
             subprocess.run(cmd, check=True, capture_output=True)
             logger.info(f"✅ Created organic rotation animation: {output_dir}")
             return output_dir
+    
+    def _extend_svd_animation_with_looping(self, svd_frames_dir: str, output_dir: str, target_frames: int) -> str:
+        """Extend SVD animation (25 frames) to longer sequences using intelligent looping."""
+        try:
+            import shutil
+            from PIL import Image
+            import numpy as np
+            
+            svd_dir = Path(svd_frames_dir)
+            output_path = Path(output_dir)
+            output_path.mkdir(parents=True, exist_ok=True)
+            
+            # Get SVD frames
+            svd_frames = sorted(svd_dir.glob("frame_*.png"))
+            if len(svd_frames) == 0:
+                raise Exception("No SVD frames found")
+            
+            svd_frame_count = len(svd_frames)
+            logger.info(f"🎬 SVD generated {svd_frame_count} frames, need {target_frames} frames")
+            
+            # Load SVD frames
+            svd_images = []
+            for frame_path in svd_frames:
+                img = Image.open(frame_path)
+                svd_images.append(np.array(img))
+            
+            # Calculate how many times to loop the SVD sequence
+            loops_needed = target_frames // svd_frame_count
+            remaining_frames = target_frames % svd_frame_count
+            
+            logger.info(f"🎬 Will loop SVD sequence {loops_needed} times + {remaining_frames} additional frames")
+            
+            frame_index = 0
+            
+            # Generate the required number of frames
+            for i in range(target_frames):
+                # Calculate which SVD frame to use (with looping)
+                svd_frame_index = i % svd_frame_count
+                
+                # Get the corresponding SVD frame
+                svd_frame = svd_images[svd_frame_index]
+                frame_img = Image.fromarray(svd_frame)
+                
+                # Save the frame
+                frame_path = output_path / f"frame_{frame_index:04d}.png"
+                frame_img.save(frame_path)
+                frame_index += 1
+            
+            logger.info(f"✅ Generated {target_frames} frames using SVD looping")
+            return str(output_path)
+            
+        except Exception as e:
+            logger.error(f"Error extending SVD animation with looping: {e}")
+            # Fallback: create static frames
+            return self._create_static_frames(svd_frames_dir, output_dir, target_frames)
             
         except Exception as e:
             return self._create_cinematic_zoom_pan(image_path, output_dir, num_frames)

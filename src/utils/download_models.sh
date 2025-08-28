@@ -142,6 +142,60 @@ echo "📹 Enhanced Animation System Ready"
 echo "🎬 Professional quality animations with unlimited length capability"
 echo "💡 No additional model downloads required - uses advanced FFmpeg techniques"
 
+# SVD (Stable Video Diffusion) Models for Motion Animation
+echo "📋 Downloading SVD (Stable Video Diffusion) Models..."
+
+# SVD XT 1.1 (recommended for motion animation)
+if [ -f "models/svd_xt_1_1.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping SVD XT 1.1 (already exists): models/svd_xt_1_1.safetensors"
+else
+    [ "$REDOWNLOAD" = true ] && rm -f "models/svd_xt_1_1.safetensors"
+    echo "⬇️  Downloading SVD XT 1.1 model (motion animation)..."
+    curl -L "https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt-1-1/resolve/main/svd_xt_1_1.safetensors" \
+         -o "models/svd_xt_1_1.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ SVD XT 1.1 model downloaded successfully"
+    else
+        echo "❌ Failed to download SVD XT 1.1 model"
+    fi
+fi
+
+# SVD XT (alternative for motion animation)
+if [ -f "models/svd_xt.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping SVD XT (already exists): models/svd_xt.safetensors"
+else
+    [ "$REDOWNLOAD" = true ] && rm -f "models/svd_xt.safetensors"
+    echo "⬇️  Downloading SVD XT model (motion animation)..."
+    curl -L "https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt/resolve/main/svd_xt.safetensors" \
+         -o "models/svd_xt.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ SVD XT model downloaded successfully"
+    else
+        echo "❌ Failed to download SVD XT model"
+    fi
+fi
+
+# SVD (original for motion animation)
+if [ -f "models/svd.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ Skipping SVD (already exists): models/svd.safetensors"
+else
+    [ "$REDOWNLOAD" = true ] && rm -f "models/svd.safetensors"
+    echo "⬇️  Downloading SVD model (motion animation)..."
+    curl -L "https://huggingface.co/stabilityai/stable-video-diffusion-img2vid/resolve/main/svd.safetensors" \
+         -o "models/svd.safetensors" \
+         --progress-bar
+
+    if [ $? -eq 0 ]; then
+        echo "✅ SVD model downloaded successfully"
+    else
+        echo "❌ Failed to download SVD model"
+    fi
+fi
+
 # LoRA Models for cartoon style
 echo "📋 Downloading LoRA Models..."
 
@@ -318,6 +372,10 @@ echo "  ├── 📹 Enhanced Animation System:"
 echo "  │   ├── Professional FFmpeg Techniques"
 echo "  │   ├── 6 Advanced Animation Effects"
 echo "  │   └── Unlimited Length Capability"
+echo "  ├── 🎬 SVD Motion Animation Models:"
+echo "  │   ├── SVD XT 1.1 (recommended): models/svd_xt_1_1.safetensors"
+echo "  │   ├── SVD XT (alternative): models/svd_xt.safetensors"
+echo "  │   └── SVD (original): models/svd.safetensors"
 echo "  ├── 🎨 Stable Diffusion Models:"
 echo "  │   ├── Anything v5 (cartoon style): models/toonyou_beta6.safetensors"
 echo "  │   ├── AnimaGine XL (anime style): models/meina_mix.safetensors"
@@ -339,6 +397,7 @@ echo ""
 echo "🎬 PROFESSIONAL FEATURES ENABLED:"
 echo "  ✅ Unlimited Length Video Generation"
 echo "  ✅ 6 Professional Animation Effects"
+echo "  ✅ SVD Motion Animation (AI-powered motion, 25-frame limit)"
 echo "  ✅ Cinematic Quality Output"
 echo "  ✅ Smart Frame Management"
 echo "  ✅ Advanced FFmpeg Techniques"
@@ -356,8 +415,11 @@ echo "  4. Test different styles:"
 echo "     • Cartoon: python scripts/scene_visual_test.py --style cartoon"
 echo "     • Realistic: python scripts/scene_visual_test.py --style realistic"
 echo "  5. Generate unlimited videos: python simple_cartoon_generator.py --prompt 'Epic adventure' --duration 60"
-echo "  6. Test face-based generation: python test_face_integration.py"
-echo "  7. Generate with character faces: python simple_cartoon_generator.py --storyboard storyboards/independence.json"
+echo "  6. Test SVD motion animation:"
+echo "     • FFmpeg animation: python3 -m src.interfaces.simple_cartoon_generator --animator ffmpeg --prompt 'test'"
+echo "     • SVD animation: python3 -m src.interfaces.simple_cartoon_generator --animator svd --prompt 'test'"
+echo "  7. Test face-based generation: python test_face_integration.py"
+echo "  8. Generate with character faces: python simple_cartoon_generator.py --storyboard storyboards/independence.json"
 
 echo ""
 echo "💡 Hardware Requirements:"

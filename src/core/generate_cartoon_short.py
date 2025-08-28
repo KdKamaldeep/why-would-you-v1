@@ -84,6 +84,11 @@ class VideoConfig:
     character_faces: DictType[str, str] = None  # Maps character names to face image paths
     # Model path for image generation
     model_path: Optional[str] = None  # Path to specific model file
+    # Animation settings
+    animator_type: str = "ffmpeg"  # "ffmpeg" or "svd"
+    motion_bucket_id: int = 127  # SVD motion intensity (0-255)
+    fps_id: int = 6  # SVD FPS setting (0-7)
+    cond_aug: float = 0.02  # SVD conditioning augmentation
 
     def __post_init__(self):
         """Set dimensions based on video format."""
@@ -133,7 +138,11 @@ class CartoonShortsGenerator:
         except TypeError:
             # Fallback for older ImageGenerator signature
             self.image_generator = ImageGenerator(model_path=model_path)
-        self.animation_generator = AnimationGenerator(width=config.width, height=config.height)
+        self.animation_generator = AnimationGenerator(
+            width=config.width, 
+            height=config.height,
+            animator_type=config.animator_type
+        )
         # Initialize Coqui TTS voice synthesizer
         self.voice_synthesizer = CoquiVoiceSynthesizer(
             CoquiVoiceConfig(language=config.language)
@@ -310,12 +319,22 @@ class CartoonShortsGenerator:
             frames_per_scene = []
             total_frames_needed = 0
             logger.info("📊 Calculating frames per scene based on audio durations...")
+            
+            # Check if using SVD and warn about frame limits
+            if self.config.animator_type == "svd":
+                logger.info("🎬 SVD Animation Mode: Frame limits will be handled automatically")
+                logger.info("🎬 SVD generates 25 frames max, will loop to match audio duration")
+            
             for i, audio_duration in enumerate(actual_scene_durations):
                 # Use actual audio duration to determine frame count
                 total_frames = max(30, int(audio_duration * self.config.fps))
                 frames_per_scene.append(total_frames)
                 total_frames_needed += total_frames
-                logger.info(f"📊 Scene {i+1}: {audio_duration:.1f}s → {total_frames} frames")
+                
+                if self.config.animator_type == "svd" and total_frames > 25:
+                    logger.info(f"📊 Scene {i+1}: {audio_duration:.1f}s → {total_frames} frames (SVD will loop 25 frames)")
+                else:
+                    logger.info(f"📊 Scene {i+1}: {audio_duration:.1f}s → {total_frames} frames")
             
             logger.info(f"📊 Audio clip lengths: {actual_scene_durations} seconds")
             logger.info(f"📊 Frames per scene: {frames_per_scene}")
@@ -347,7 +366,11 @@ class CartoonShortsGenerator:
                     image_path,
                     str(frames_dir),
                     num_frames=expected_frames,
-                    prompt=scene_prompts[i] if i < len(scene_prompts) else ""
+                    prompt=scene_prompts[i] if i < len(scene_prompts) else "",
+                    motion_bucket_id=self.config.motion_bucket_id,
+                    fps_id=self.config.fps_id,
+                    cond_aug=self.config.cond_aug,
+                    seed=None  # Use random seed for variety
                 )
                 frame_dirs.append(dir_path)
                 logger.info(f"🎬 Scene {i+1}: Animation completed: {dir_path}")
