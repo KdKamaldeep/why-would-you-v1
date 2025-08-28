@@ -261,11 +261,14 @@ class AnimationGenerator:
             import shutil
             from PIL import Image
             import numpy as np
-            import tempfile
             
             svd_dir = Path(svd_frames_dir)
             output_path = Path(output_dir)
             output_path.mkdir(parents=True, exist_ok=True)
+            
+            # Create a persistent directory for chunk processing
+            chunks_dir = output_path / "chunks_processing"
+            chunks_dir.mkdir(exist_ok=True)
             
             # Get initial SVD frames (first 25 frames)
             svd_frames = sorted(svd_dir.glob("frame_*.png"))
@@ -286,6 +289,9 @@ class AnimationGenerator:
             additional_frames_needed = target_frames - svd_frame_count
             if additional_frames_needed <= 0:
                 logger.info(f"✅ No additional frames needed, using only initial {svd_frame_count} SVD frames")
+                # Clean up chunks directory
+                if chunks_dir.exists():
+                    shutil.rmtree(chunks_dir)
                 return str(output_path)
             
             # Calculate chunks needed for additional frames only
@@ -301,53 +307,63 @@ class AnimationGenerator:
             for chunk_idx in range(chunks_needed):
                 logger.info(f"🎬 Generating additional chunk {chunk_idx + 1}/{chunks_needed} using frame: {current_input_frame}")
                 
-                # Create temporary directory for this chunk
-                with tempfile.TemporaryDirectory() as temp_dir:
-                    temp_output_dir = Path(temp_dir) / "chunk_frames"
+                # Create persistent directory for this chunk
+                chunk_output_dir = chunks_dir / f"chunk_{chunk_idx + 1}"
+                chunk_output_dir.mkdir(exist_ok=True)
+                
+                # Generate new SVD chunk using the last frame as input
+                chunk_frames_dir = self.svd_animator.animate_image(
+                    str(current_input_frame), 
+                    str(chunk_output_dir), 
+                    frames_per_chunk,
+                    motion_bucket_id, fps_id, cond_aug, 
+                    seed + chunk_idx if seed is not None else None  # Vary seed for each chunk
+                )
+                
+                # Copy chunk frames to main output (skip first frame to avoid duplication)
+                chunk_frames = sorted(Path(chunk_frames_dir).glob("frame_*.png"))
+                if len(chunk_frames) > 0:
+                    # Skip first frame if it's too similar to the last frame from previous chunk
+                    start_idx = 1 if chunk_idx > 0 else 0
                     
-                    # Generate new SVD chunk using the last frame as input
-                    chunk_frames_dir = self.svd_animator.animate_image(
-                        str(current_input_frame), 
-                        str(temp_output_dir), 
-                        frames_per_chunk,
-                        motion_bucket_id, fps_id, cond_aug, 
-                        seed + chunk_idx if seed is not None else None  # Vary seed for each chunk
-                    )
+                    for i in range(start_idx, len(chunk_frames)):
+                        if frame_index >= target_frames:
+                            break
+                        
+                        src_path = chunk_frames[i]
+                        dest_path = output_path / f"frame_{frame_index:04d}.png"
+                        shutil.copy2(src_path, dest_path)
+                        frame_index += 1
                     
-                    # Copy chunk frames to main output (skip first frame to avoid duplication)
-                    chunk_frames = sorted(Path(chunk_frames_dir).glob("frame_*.png"))
-                    if len(chunk_frames) > 0:
-                        # Skip first frame if it's too similar to the last frame from previous chunk
-                        start_idx = 1 if chunk_idx > 0 else 0
-                        
-                        for i in range(start_idx, len(chunk_frames)):
-                            if frame_index >= target_frames:
-                                break
-                            
-                            src_path = chunk_frames[i]
-                            dest_path = output_path / f"frame_{frame_index:04d}.png"
-                            shutil.copy2(src_path, dest_path)
-                            frame_index += 1
-                        
-                        # Update the last frame for next iteration
-                        current_input_frame = chunk_frames[-1]
-                        
-                        logger.info(f"✅ Additional chunk {chunk_idx + 1} completed: {len(chunk_frames) - start_idx} frames added")
-                    else:
-                        logger.warning(f"⚠️ Additional chunk {chunk_idx + 1} generated no frames, using fallback")
-                        # Fallback: create some frames from the last known frame
-                        for i in range(frames_per_chunk):
-                            if frame_index >= target_frames:
-                                break
-                            dest_path = output_path / f"frame_{frame_index:04d}.png"
-                            shutil.copy2(current_input_frame, dest_path)
-                            frame_index += 1
+                    # Update the last frame for next iteration
+                    current_input_frame = chunk_frames[-1]
+                    
+                    logger.info(f"✅ Additional chunk {chunk_idx + 1} completed: {len(chunk_frames) - start_idx} frames added")
+                else:
+                    logger.warning(f"⚠️ Additional chunk {chunk_idx + 1} generated no frames, using fallback")
+                    # Fallback: create some frames from the last known frame
+                    for i in range(frames_per_chunk):
+                        if frame_index >= target_frames:
+                            break
+                        dest_path = output_path / f"frame_{frame_index:04d}.png"
+                        shutil.copy2(current_input_frame, dest_path)
+                        frame_index += 1
+            
+            # Clean up chunks processing directory
+            if chunks_dir.exists():
+                shutil.rmtree(chunks_dir)
             
             logger.info(f"✅ Generated {frame_index} total frames: {svd_frame_count} initial + {additional_frames_needed} additional")
             return str(output_path)
             
         except Exception as e:
             logger.error(f"Error in chunked SVD generation: {e}")
+            # Clean up chunks directory on error
+            try:
+                if chunks_dir.exists():
+                    shutil.rmtree(chunks_dir)
+            except Exception:
+                pass
             # Fallback: create static frames
             return self._create_static_frames(svd_frames_dir, output_dir, target_frames)
     
