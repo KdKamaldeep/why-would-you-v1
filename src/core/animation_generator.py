@@ -238,6 +238,9 @@ class AnimationGenerator:
             subprocess.run(cmd, check=True, capture_output=True)
             logger.info(f"✅ Created organic rotation animation: {output_dir}")
             return output_dir
+            
+        except Exception as e:
+            return self._create_cinematic_zoom_pan(image_path, output_dir, num_frames)
     
     def _extend_svd_animation_with_looping(self, svd_frames_dir: str, output_dir: str, target_frames: int) -> str:
         """Extend SVD animation (25 frames) to longer sequences using intelligent looping."""
