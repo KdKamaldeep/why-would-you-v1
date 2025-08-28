@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SVD (Stable Video Diffusion) Animator Module
-Handles motion animation using SVD models for realistic video generation
+Handles motion animation using SVD models directly without ComfyUI
 """
 
 import os
@@ -14,17 +14,22 @@ from typing import Optional, List
 import json
 import tempfile
 import shutil
+import numpy as np
+from PIL import Image
+import requests
 
 logger = logging.getLogger(__name__)
 
 class SVDAnimator:
-    """Handles SVD-based motion animation for images."""
+    """Handles SVD-based motion animation for images using models directly."""
     
     def __init__(self, model_path: Optional[str] = None, device: str = "cuda"):
         self.device = device
         self.model_path = model_path or self._get_default_model_path()
         self.fps = 15
         self.num_frames = 25  # Default SVD frame count
+        self.model = None
+        self._load_model()
         
     def _get_default_model_path(self) -> str:
         """Get the default SVD model path."""
@@ -43,55 +48,69 @@ class SVDAnimator:
         # Return a default path for download
         return "models/svd_xt_1_1.safetensors"
     
-    def _ensure_svd_model_in_comfyui(self):
-        """Ensure SVD model is available in ComfyUI's checkpoints directory."""
+    def _load_model(self):
+        """Load SVD model directly using diffusers library."""
         try:
-            # Check if ComfyUI directory exists
-            comfyui_dir = Path("ComfyUI")
-            if not comfyui_dir.exists():
-                logger.warning("⚠️ ComfyUI directory not found. Please install ComfyUI first.")
-                return
+            from diffusers import StableVideoDiffusionPipeline
+            from diffusers.utils import load_image
             
-            # Create ComfyUI checkpoints directory
-            comfyui_checkpoints_dir = comfyui_dir / "models" / "checkpoints"
-            comfyui_checkpoints_dir.mkdir(parents=True, exist_ok=True)
+            logger.info(f"🔄 Loading SVD model: {self.model_path}")
             
-            # Check for SVD model in our models directory
-            svd_model_path = None
-            possible_svd_models = [
-                "models/svd_xt_1_1.safetensors",
-                "models/svd_xt.safetensors",
-                "models/svd.safetensors"
-            ]
+            # Check if model file exists
+            if not Path(self.model_path).exists():
+                logger.warning(f"⚠️ SVD model not found at {self.model_path}")
+                logger.info("📥 Attempting to download SVD model...")
+                self._download_svd_model()
             
-            for model_path in possible_svd_models:
-                if Path(model_path).exists():
-                    svd_model_path = Path(model_path)
-                    break
+            # Load the pipeline
+            self.pipeline = StableVideoDiffusionPipeline.from_pretrained(
+                "stabilityai/stable-video-diffusion-img2vid-xt",
+                torch_dtype=torch.float16,
+                variant="fp16"
+            )
             
-            if not svd_model_path:
-                logger.warning("⚠️ SVD model not found. Please run the download script first.")
-                return
+            if torch.cuda.is_available():
+                self.pipeline = self.pipeline.to("cuda")
             
-            # Check if model already exists in ComfyUI
-            comfyui_model_path = comfyui_checkpoints_dir / svd_model_path.name
-            if not comfyui_model_path.exists():
-                logger.info(f"📁 Copying SVD model to ComfyUI: {svd_model_path.name}")
-                shutil.copy2(svd_model_path, comfyui_model_path)
-                logger.info(f"✅ SVD model copied to ComfyUI: {comfyui_model_path}")
-            else:
-                logger.info(f"✅ SVD model already available in ComfyUI: {comfyui_model_path}")
-                
+            logger.info("✅ SVD model loaded successfully")
+            
+        except ImportError as e:
+            logger.error(f"❌ diffusers library not available: {e}")
+            logger.info("💡 Install with: pip install diffusers transformers accelerate")
+            self.pipeline = None
         except Exception as e:
-            logger.warning(f"⚠️ Error ensuring SVD model in ComfyUI: {e}")
+            logger.error(f"❌ Error loading SVD model: {e}")
+            self.pipeline = None
     
-
+    def _download_svd_model(self):
+        """Download SVD model if not available."""
+        try:
+            from huggingface_hub import snapshot_download
+            
+            logger.info("📥 Downloading SVD model from Hugging Face...")
+            
+            # Create models directory
+            models_dir = Path("models")
+            models_dir.mkdir(exist_ok=True)
+            
+            # Download the model
+            snapshot_download(
+                repo_id="stabilityai/stable-video-diffusion-img2vid-xt",
+                local_dir="models/svd_xt_1_1",
+                local_dir_use_symlinks=False
+            )
+            
+            logger.info("✅ SVD model downloaded successfully")
+            
+        except Exception as e:
+            logger.error(f"❌ Error downloading SVD model: {e}")
+            raise
     
     def animate_image(self, image_path: str, output_dir: str, num_frames: int = 25, 
                      motion_bucket_id: int = 127, fps_id: int = 6, 
                      cond_aug: float = 0.02, seed: Optional[int] = None) -> str:
         """
-        Animate an image using SVD motion animation.
+        Animate an image using SVD motion animation directly.
         
         Args:
             image_path: Path to source image
@@ -122,266 +141,118 @@ class SVDAnimator:
             frames_dir = Path(output_dir)
             frames_dir.mkdir(parents=True, exist_ok=True)
             
-            # Use ComfyUI SVD workflow for animation
-            return self._create_svd_animation(
-                image_path, str(frames_dir), num_frames, 
-                motion_bucket_id, fps_id, cond_aug, seed
-            )
+            # Use direct SVD pipeline for animation
+            if self.pipeline is not None:
+                return self._create_direct_svd_animation(
+                    image_path, str(frames_dir), num_frames, 
+                    motion_bucket_id, fps_id, cond_aug, seed
+                )
+            else:
+                logger.warning("⚠️ SVD pipeline not available, falling back to FFmpeg animation")
+                return self._create_ffmpeg_fallback(image_path, output_dir, num_frames)
             
         except Exception as e:
             logger.error(f"Error in SVD animation: {e}")
-            # Fallback to static frames
-            return self._create_static_frames(image_path, output_dir, num_frames)
+            # Fallback to FFmpeg animation
+            return self._create_ffmpeg_fallback(image_path, output_dir, num_frames)
     
-    def _create_svd_animation(self, image_path: str, output_dir: str, num_frames: int,
-                             motion_bucket_id: int, fps_id: int, cond_aug: float, 
-                             seed: Optional[int]) -> str:
-        """Create SVD animation using ComfyUI workflow."""
+    def _create_direct_svd_animation(self, image_path: str, output_dir: str, num_frames: int,
+                                   motion_bucket_id: int, fps_id: int, cond_aug: float, 
+                                   seed: Optional[int]) -> str:
+        """Create SVD animation using direct pipeline without ComfyUI."""
         try:
-            # Copy image to ComfyUI input directory
-            comfyui_input_dir = Path("ComfyUI/input")
-            comfyui_input_dir.mkdir(parents=True, exist_ok=True)
+            from diffusers.utils import load_image
             
-            # Get just the filename from the original path
-            image_filename = Path(image_path).name
-            comfyui_image_path = comfyui_input_dir / image_filename
+            logger.info("🎬 Creating SVD animation using direct pipeline...")
             
-            # Copy the image if it doesn't exist or is different
-            if not comfyui_image_path.exists() or comfyui_image_path.stat().st_mtime < Path(image_path).stat().st_mtime:
-                shutil.copy2(image_path, comfyui_image_path)
-                logger.info(f"📁 Copied image to ComfyUI input: {comfyui_image_path}")
+            # Load the input image
+            image = load_image(image_path)
             
-            # Ensure SVD model is available in ComfyUI
-            self._ensure_svd_model_in_comfyui()
+            # Set random seed if provided
+            if seed is not None:
+                torch.manual_seed(seed)
+                if torch.cuda.is_available():
+                    torch.cuda.manual_seed(seed)
             
-            # Create temporary workflow file
-            workflow = self._create_svd_workflow(
-                str(comfyui_image_path), num_frames, motion_bucket_id, fps_id, cond_aug, seed
-            )
+            # Generate video frames
+            video_frames = self.pipeline(
+                image,
+                decode_chunk_size=8,
+                motion_bucket_id=motion_bucket_id,
+                fps=fps_id + 1,  # Convert fps_id to actual fps
+                noise_aug_strength=cond_aug,
+                num_frames=num_frames
+            ).frames[0]
             
-            # Run ComfyUI workflow
-            output_video = self._run_comfyui_workflow(workflow, output_dir)
-            
-            # Extract frames from video
-            self._extract_frames_from_video(output_video, output_dir, num_frames)
+            # Save frames
+            frames_dir = Path(output_dir)
+            for i, frame in enumerate(video_frames):
+                frame_path = frames_dir / f"frame_{i:04d}.png"
+                frame.save(frame_path)
             
             logger.info(f"✅ SVD animation completed: {output_dir}")
             return output_dir
             
         except Exception as e:
-            logger.error(f"Error creating SVD animation: {e}")
-            return self._create_static_frames(image_path, output_dir, num_frames)
+            logger.error(f"Error in direct SVD animation: {e}")
+            return self._create_ffmpeg_fallback(image_path, output_dir, num_frames)
     
-    def _create_svd_workflow(self, image_path: str, num_frames: int, 
-                           motion_bucket_id: int, fps_id: int, cond_aug: float, 
-                           seed: Optional[int]) -> dict:
-        """Create ComfyUI workflow for SVD animation."""
-        
-        # Generate random seed if not provided
-        if seed is None:
-            import random
-            seed = random.randint(1, 1000000)
-        
-        workflow = {
-            "1": {
-                "class_type": "LoadImage",
-                "inputs": {
-                    "image": Path(image_path).name,
-                    "choose file to upload": "image"
-                }
-            },
-            "2": {
-                "class_type": "SVD_img2vid_Conditioning",
-                "inputs": {
-                    "clip_vision": ["1", 1],
-                    "vae": ["1", 2],
-                    "width": 768,
-                    "height": 1024,
-                    "video_frames": num_frames,
-                    "motion_bucket_id": motion_bucket_id,
-                    "fps_id": fps_id,
-                    "cond_aug": cond_aug
-                }
-            },
-            "3": {
-                "class_type": "CheckpointLoaderSimple",
-                "inputs": {
-                    "ckpt_name": "svd_xt_1_1.safetensors"
-                }
-            },
-            "4": {
-                "class_type": "KSampler",
-                "inputs": {
-                    "seed": seed,
-                    "steps": 20,
-                    "cfg": 1.0,
-                    "sampler_name": "euler",
-                    "scheduler": "normal",
-                    "denoise": 1.0,
-                    "model": ["3", 0],
-                    "positive": ["2", 0],
-                    "negative": ["2", 1],
-                    "latent_image": ["2", 2]
-                }
-            },
-            "5": {
-                "class_type": "VAEDecode",
-                "inputs": {
-                    "samples": ["4", 0],
-                    "vae": ["3", 2]
-                }
-            },
-            "6": {
-                "class_type": "SaveVideo",
-                "inputs": {
-                    "images": ["5", 0],
-                    "filename_prefix": "svd_output",
-                    "fps": self.fps,
-                    "crf": 20,
-                    "codec": "h264",
-                    "video": True,
-                    "format": "mp4"
-                }
-            }
-        }
-        
-        return workflow
-    
-    def _run_comfyui_workflow(self, workflow: dict, output_dir: str) -> str:
-        """Run ComfyUI workflow and return output video path."""
+    def _create_ffmpeg_fallback(self, image_path: str, output_dir: str, num_frames: int) -> str:
+        """Create fallback animation using FFmpeg when SVD is not available."""
         try:
-            # Create temporary workflow file
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-                json.dump(workflow, f, indent=2)
-                workflow_path = f.name
+            logger.info("📹 Creating FFmpeg fallback animation...")
             
-            # Run ComfyUI API
-            import requests
+            # Create output directory
+            frames_dir = Path(output_dir)
+            frames_dir.mkdir(parents=True, exist_ok=True)
             
-            # Check if ComfyUI is running
-            try:
-                # Test connection to ComfyUI
-                test_response = requests.get("http://127.0.0.1:8188/system_stats", timeout=5)
-                if test_response.status_code != 200:
-                    raise Exception("ComfyUI not responding properly")
-            except Exception as e:
-                logger.warning(f"⚠️ ComfyUI not available: {e}")
-                logger.info("🔄 Falling back to FFmpeg animation")
-                raise Exception("ComfyUI not running - use --animator ffmpeg instead")
-            
-            # Queue the workflow
-            queue_response = requests.post(
-                "http://127.0.0.1:8188/prompt",
-                json={"prompt": workflow}
+            # Use zoompan effect for smooth animation
+            vf = (
+                f"scale={768*1.2}:{1024*1.2}:force_original_aspect_ratio=decrease,"
+                f"pad={768*1.2}:{1024*1.2}:(ow-iw)/2:(oh-ih)/2,"
+                f"zoompan=z=1+on*0.002:d={num_frames}:"
+                "x=iw/2-(iw/zoom/2)+sin(on*0.1)*30:"
+                "y=ih/2-(ih/zoom/2)+cos(on*0.1)*20:"
+                f"s=768x1024"
             )
-            
-            if queue_response.status_code != 200:
-                raise Exception(f"Failed to queue workflow: {queue_response.text}")
-            
-            prompt_id = queue_response.json()["prompt_id"]
-            
-            # Wait for completion
-            while True:
-                history_response = requests.get(f"http://127.0.0.1:8188/history/{prompt_id}")
-                if history_response.status_code == 200:
-                    history = history_response.json()
-                    if prompt_id in history:
-                        # Workflow completed
-                        outputs = history[prompt_id]["outputs"]
-                        if "6" in outputs:  # SaveVideo node
-                            video_info = outputs["6"]["images"][0]
-                            video_path = video_info["filename"]
-                            return video_path
-                        break
-                
-                import time
-                time.sleep(1)
-            
-            raise Exception("Workflow did not complete successfully")
-            
-        except Exception as e:
-            logger.error(f"Error running ComfyUI workflow: {e}")
-            # Fallback: create a simple video using FFmpeg
-            return self._create_fallback_video(workflow, output_dir)
-        finally:
-            # Clean up temporary file
-            if 'workflow_path' in locals():
-                os.unlink(workflow_path)
-    
-    def _create_fallback_video(self, workflow: dict, output_dir: str) -> str:
-        """Create a fallback video when ComfyUI is not available."""
-        try:
-            # Extract image path from workflow
-            image_path = None
-            for node_id, node in workflow.items():
-                if node.get("class_type") == "LoadImage":
-                    image_path = node["inputs"].get("image")
-                    break
-            
-            if not image_path:
-                raise Exception("Could not find image path in workflow")
-            
-            # Create a simple zoom animation as fallback
-            output_video = os.path.join(output_dir, "fallback_video.mp4")
             
             cmd = [
                 'ffmpeg', '-y',
                 '-loop', '1',
                 '-i', image_path,
-                '-vf', f'scale=768:1024,zoompan=z=1+0.001*on:d=25:x=iw/2-(iw/zoom/2):y=ih/2-(ih/zoom/2):s=768x1024',
+                '-vf', vf,
                 '-r', str(self.fps),
-                '-frames:v', '25',
-                '-c:v', 'libx264',
-                '-crf', '20',
-                output_video
-            ]
-            
-            subprocess.run(cmd, check=True, capture_output=True)
-            return output_video
-            
-        except Exception as e:
-            logger.error(f"Error creating fallback video: {e}")
-            raise
-    
-    def _extract_frames_from_video(self, video_path: str, output_dir: str, num_frames: int):
-        """Extract frames from video to individual PNG files."""
-        try:
-            cmd = [
-                'ffmpeg', '-y',
-                '-i', video_path,
-                '-vf', f'fps={self.fps}',
                 '-frames:v', str(num_frames),
                 '-f', 'image2',
-                os.path.join(output_dir, 'frame_%04d.png')
+                f'{output_dir}/frame_%04d.png'
             ]
             
             subprocess.run(cmd, check=True, capture_output=True)
-            logger.info(f"✅ Extracted {num_frames} frames from video")
+            logger.info(f"✅ FFmpeg fallback animation completed: {output_dir}")
+            return output_dir
             
         except Exception as e:
-            logger.error(f"Error extracting frames: {e}")
-            # Create static frames as fallback
-            self._create_static_frames(video_path, output_dir, num_frames)
+            logger.error(f"Error in FFmpeg fallback: {e}")
+            return self._create_static_frames(image_path, output_dir, num_frames)
     
     def _create_static_frames(self, image_path: str, output_dir: str, num_frames: int) -> str:
-        """Create static frames as fallback when animation fails."""
+        """Create static frames as final fallback."""
         try:
-            from PIL import Image
+            logger.info("🖼️ Creating static frames as fallback...")
             
-            # Load the image
-            img = Image.open(image_path)
-            img = img.resize((768, 1024), Image.Resampling.LANCZOS)
-            
-            # Create frames directory
             frames_dir = Path(output_dir)
             frames_dir.mkdir(parents=True, exist_ok=True)
             
-            # Save the same image multiple times
+            # Load and resize image
+            image = Image.open(image_path)
+            image = image.resize((768, 1024), Image.Resampling.LANCZOS)
+            
+            # Save multiple copies as frames
             for i in range(num_frames):
                 frame_path = frames_dir / f"frame_{i:04d}.png"
-                img.save(frame_path)
+                image.save(frame_path)
             
-            logger.info(f"✅ Created {num_frames} static frames as fallback")
+            logger.info(f"✅ Static frames created: {output_dir}")
             return output_dir
             
         except Exception as e:

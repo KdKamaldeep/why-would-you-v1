@@ -146,14 +146,14 @@ python -m src.interfaces.batch_generate
 - **Realistic movement** with 25-frame sequences
 - **Automatic looping** for longer videos
 - **Configurable motion intensity** (0-255)
-- **Requires ComfyUI** for full functionality
+- **Direct model integration** - No ComfyUI required!
 
 ### **Usage Examples:**
 ```bash
 # FFmpeg animation (default)
 python3 -m src.interfaces.simple_cartoon_generator --prompt "Adventure story" --animator ffmpeg
 
-# SVD motion animation (requires ComfyUI)
+# SVD motion animation (direct - no ComfyUI needed!)
 python3 -m src.interfaces.simple_cartoon_generator --prompt "Adventure story" --animator svd
 ```
 
@@ -337,20 +337,17 @@ python3 -m src.interfaces.simple_cartoon_generator \
   --scene 1
 ```
 
-### **SVD Animation (Requires ComfyUI):**
+### **SVD Animation (Direct - No ComfyUI Required!):**
 ```bash
-# First, run ComfyUI
-git clone https://github.com/comfyanonymous/ComfyUI.git
-cd ComfyUI
-pip install -r requirements.txt
-python main.py --listen 127.0.0.1 --port 8188
-
-# Then use SVD animation
+# Direct SVD animation - no ComfyUI needed!
 python3 -m src.interfaces.simple_cartoon_generator \
   --prompt "Adventure story" \
   --animator svd \
   --motion-bucket-id 127 \
   --fps-id 6
+
+# Test SVD implementation
+python test_direct_svd.py
 ```
 
 ### **Custom Duration:**
