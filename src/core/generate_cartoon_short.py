@@ -248,43 +248,43 @@ class CartoonShortsGenerator:
                 
                 # Generate audio clips from each scene's narration
                 for i, scene in enumerate(script['scenes']):
-                scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
-                narration_text = scene.get('narration', '')
-                logger.info(f"🎵 Scene {i+1}: Processing narration ({len(narration_text)} characters)")
-                
-                # Get voice file from scene if available
-                voice_file = None
-                if 'voice' in scene:
-                    # Import narration converter to resolve voice files
-                    from ..utils.narration_converter import NarrationConverter
-                    converter = NarrationConverter()
-                    voice_file = converter.resolve_voice_file(scene['voice'])
-                    if voice_file:
-                            logger.info(f"�� Scene {i+1}: Using voice file: {voice_file}")
-                        logger.info(f"🎵 Scene {i+1}: Voice property: '{scene['voice']}' -> resolved to: {voice_file}")
+                    scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
+                    narration_text = scene.get('narration', '')
+                    logger.info(f"🎵 Scene {i+1}: Processing narration ({len(narration_text)} characters)")
+                    
+                    # Get voice file from scene if available
+                    voice_file = None
+                    if 'voice' in scene:
+                        # Import narration converter to resolve voice files
+                        from ..utils.narration_converter import NarrationConverter
+                        converter = NarrationConverter()
+                        voice_file = converter.resolve_voice_file(scene['voice'])
+                        if voice_file:
+                            logger.info(f"🎵 Scene {i+1}: Using voice file: {voice_file}")
+                            logger.info(f"🎵 Scene {i+1}: Voice property: '{scene['voice']}' -> resolved to: {voice_file}")
+                        else:
+                            logger.warning(f"🎵 Scene {i+1}: Voice file not found for '{scene['voice']}'")
                     else:
-                        logger.warning(f"🎵 Scene {i+1}: Voice file not found for '{scene['voice']}'")
-                else:
-                    logger.info(f"🎵 Scene {i+1}: No voice property found in scene")
-                
-                if not (self.config.reuse_existing and scene_audio.exists()):
-                    logger.info(f"🎵 Scene {i+1}: Generating new audio clip...")
-                    final_voice_file = voice_file or self.config.voice_id or None
-                    logger.info(f"🎵 Scene {i+1}: Final voice_clone_audio parameter: {final_voice_file}")
-                    generated_audio = self.voice_synthesizer.synthesize_voice(
-                        [narration_text],
-                        str(scene_audio),
-                        speaker=None,
-                        voice_clone_audio=final_voice_file,
-                    )
-                    # Use actual generated path (may switch extension on fallback)
-                    scene_audio = Path(generated_audio)
-                    logger.info(f"🎵 Scene {i+1}: Audio generation completed: {scene_audio}")
-                else:
-                    logger.info(f"🎵 Scene {i+1}: Reusing existing audio: {scene_audio}")
-                
-                scene_audio_paths.append(str(scene_audio))
-                logger.info(f"Scene {i+1}: Audio clip ready: {scene_audio}")
+                        logger.info(f"🎵 Scene {i+1}: No voice property found in scene")
+                    
+                    if not (self.config.reuse_existing and scene_audio.exists()):
+                        logger.info(f"🎵 Scene {i+1}: Generating new audio clip...")
+                        final_voice_file = voice_file or self.config.voice_id or None
+                        logger.info(f"🎵 Scene {i+1}: Final voice_clone_audio parameter: {final_voice_file}")
+                        generated_audio = self.voice_synthesizer.synthesize_voice(
+                            [narration_text],
+                            str(scene_audio),
+                            speaker=None,
+                            voice_clone_audio=final_voice_file,
+                        )
+                        # Use actual generated path (may switch extension on fallback)
+                        scene_audio = Path(generated_audio)
+                        logger.info(f"🎵 Scene {i+1}: Audio generation completed: {scene_audio}")
+                    else:
+                        logger.info(f"🎵 Scene {i+1}: Reusing existing audio: {scene_audio}")
+                    
+                    scene_audio_paths.append(str(scene_audio))
+                    logger.info(f"Scene {i+1}: Audio clip ready: {scene_audio}")
             
             # Detect length of each audio clip
             if not self.config.skip_audio:
@@ -534,62 +534,62 @@ class CartoonShortsGenerator:
                 logger.info(f"🎵 Fallback: Creating single narration track: {narration_path}")
                 
                 if not (self.config.reuse_existing and narration_path.exists()):
-                narration_lines = [scene.get('narration', '') for scene in script.get('scenes', [])]
-                logger.info(f"🎵 Fallback: Generating single audio for {len(narration_lines)} scenes...")
-                total_chars = sum(len(line) for line in narration_lines)
-                logger.info(f"🎵 Fallback: Total characters to synthesize: {total_chars}")
+                    narration_lines = [scene.get('narration', '') for scene in script.get('scenes', [])]
+                    logger.info(f"🎵 Fallback: Generating single audio for {len(narration_lines)} scenes...")
+                    total_chars = sum(len(line) for line in narration_lines)
+                    logger.info(f"🎵 Fallback: Total characters to synthesize: {total_chars}")
+                    
+                    # For fallback, use the first available voice file from scenes
+                    fallback_voice_file = None
+                    if script.get('scenes'):
+                        from ..utils.narration_converter import NarrationConverter
+                        converter = NarrationConverter()
+                        for scene in script['scenes']:
+                            if 'voice' in scene:
+                                fallback_voice_file = converter.resolve_voice_file(scene['voice'])
+                                if fallback_voice_file:
+                                    logger.info(f"🎵 Fallback: Using voice file from first scene: {fallback_voice_file}")
+                                    break
+                    
+                    generated_audio = self.voice_synthesizer.synthesize_voice(
+                        narration_lines,
+                        str(narration_path),
+                        speaker=None,
+                        voice_clone_audio=fallback_voice_file or self.config.voice_id or None,
+                    )
+                    narration_path = Path(generated_audio)
+                    logger.info(f"🎵 Fallback: Single audio generation completed: {narration_path}")
+                else:
+                    logger.info(f"🎵 Fallback: Reusing existing single audio: {narration_path}")
                 
-                # For fallback, use the first available voice file from scenes
-                fallback_voice_file = None
-                if script.get('scenes'):
-                    from ..utils.narration_converter import NarrationConverter
-                    converter = NarrationConverter()
-                    for scene in script['scenes']:
-                        if 'voice' in scene:
-                            fallback_voice_file = converter.resolve_voice_file(scene['voice'])
-                            if fallback_voice_file:
-                                logger.info(f"🎵 Fallback: Using voice file from first scene: {fallback_voice_file}")
-                                break
+                # Detect actual duration of the single track
+                logger.info("📏 Fallback: Detecting single track duration...")
+                actual_duration = self.video_processor.get_audio_duration(str(narration_path))
+                script['total_duration'] = actual_duration
+                self.config.duration = max(self.config.duration, actual_duration)
                 
-                generated_audio = self.voice_synthesizer.synthesize_voice(
-                    narration_lines,
-                    str(narration_path),
-                    speaker=None,
-                    voice_clone_audio=fallback_voice_file or self.config.voice_id or None,
-                )
-                narration_path = Path(generated_audio)
-                logger.info(f"🎵 Fallback: Single audio generation completed: {narration_path}")
-            else:
-                logger.info(f"🎵 Fallback: Reusing existing single audio: {narration_path}")
-            
-            # Detect actual duration of the single track
-            logger.info("📏 Fallback: Detecting single track duration...")
-            actual_duration = self.video_processor.get_audio_duration(str(narration_path))
-            script['total_duration'] = actual_duration
-            self.config.duration = max(self.config.duration, actual_duration)
-            
-            # For single track, we need to extend videos to match the actual audio duration
-            logger.info(f"✅ Single track duration detected: {actual_duration:.1f}s")
-            
-            # Store the actual audio duration for video adjustment
-            actual_scene_durations = [actual_duration / len(script['scenes'])] * len(script['scenes'])
-            logger.info(f"📊 Fallback: Distributed duration per scene: {actual_scene_durations}")
-            
-            # Update script durations to match actual audio
-            scene_count = len(script['scenes'])
-            if scene_count > 0:
-                per_scene_duration = actual_duration / scene_count
-                logger.info(f"🔄 Distributing single track duration ({actual_duration:.1f}s) across {scene_count} scenes")
-                for i, scene in enumerate(script['scenes']):
-                    original_duration = scene.get('duration', 8)
-                    scene['original_duration'] = original_duration
-                    scene['duration'] = per_scene_duration
-                    logger.info(f"  Scene {i+1}: {original_duration:.1f}s → {per_scene_duration:.1f}s")
-            
-            # Videos are already created with correct duration matching audio clips
-            final_clips = video_clips
-            logger.info("✅ Videos already created with correct duration matching audio clips")
-            logger.info(f"📊 Fallback: Using {len(final_clips)} video clips")
+                # For single track, we need to extend videos to match the actual audio duration
+                logger.info(f"✅ Single track duration detected: {actual_duration:.1f}s")
+                
+                # Store the actual audio duration for video adjustment
+                actual_scene_durations = [actual_duration / len(script['scenes'])] * len(script['scenes'])
+                logger.info(f"📊 Fallback: Distributed duration per scene: {actual_scene_durations}")
+                
+                # Update script durations to match actual audio
+                scene_count = len(script['scenes'])
+                if scene_count > 0:
+                    per_scene_duration = actual_duration / scene_count
+                    logger.info(f"🔄 Distributing single track duration ({actual_duration:.1f}s) across {scene_count} scenes")
+                    for i, scene in enumerate(script['scenes']):
+                        original_duration = scene.get('duration', 8)
+                        scene['original_duration'] = original_duration
+                        scene['duration'] = per_scene_duration
+                        logger.info(f"  Scene {i+1}: {original_duration:.1f}s → {per_scene_duration:.1f}s")
+                
+                # Videos are already created with correct duration matching audio clips
+                final_clips = video_clips
+                logger.info("✅ Videos already created with correct duration matching audio clips")
+                logger.info(f"📊 Fallback: Using {len(final_clips)} video clips")
                 
                 # Use single narration track for final compilation
                 scene_audio_paths = [str(narration_path)]
