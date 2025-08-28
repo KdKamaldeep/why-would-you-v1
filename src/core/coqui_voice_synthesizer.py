@@ -208,8 +208,8 @@ class CoquiVoiceSynthesizer:
                         "Language is non-English (%s) but current model is not XTTS; attempting to switch to XTTS",
                         self.config.language,
                     )
-                                # Prefer local XTTS-v2
-            self.config.model_name = "models/tts/XTTS-v2"
+                    # Prefer local XTTS-v2
+                    self.config.model_name = "models/tts/XTTS-v2"
                     try:
                         self._load_model()
                         logger.info("Switched TTS model to XTTS for multilingual synthesis")
