@@ -46,46 +46,46 @@ class SVDAnimator:
     def _ensure_svd_model_in_comfyui(self):
         """Ensure SVD model is available in ComfyUI's checkpoints directory."""
         try:
-            # For remote ComfyUI instances, we assume models are already available
-            # The remote server should have the SVD models installed
-            logger.info("🌐 Using remote ComfyUI instance - assuming SVD models are available")
+            # Check if ComfyUI directory exists
+            comfyui_dir = Path("ComfyUI")
+            if not comfyui_dir.exists():
+                logger.warning("⚠️ ComfyUI directory not found. Please install ComfyUI first.")
+                return
             
-            # We can optionally check if the model exists by querying the remote ComfyUI
-            # but for now, we'll assume it's available and let the workflow fail if not
-            logger.info("✅ Assuming SVD model (svd_xt_1_1.safetensors) is available on remote ComfyUI")
+            # Create ComfyUI checkpoints directory
+            comfyui_checkpoints_dir = comfyui_dir / "models" / "checkpoints"
+            comfyui_checkpoints_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Check for SVD model in our models directory
+            svd_model_path = None
+            possible_svd_models = [
+                "models/svd_xt_1_1.safetensors",
+                "models/svd_xt.safetensors",
+                "models/svd.safetensors"
+            ]
+            
+            for model_path in possible_svd_models:
+                if Path(model_path).exists():
+                    svd_model_path = Path(model_path)
+                    break
+            
+            if not svd_model_path:
+                logger.warning("⚠️ SVD model not found. Please run the download script first.")
+                return
+            
+            # Check if model already exists in ComfyUI
+            comfyui_model_path = comfyui_checkpoints_dir / svd_model_path.name
+            if not comfyui_model_path.exists():
+                logger.info(f"📁 Copying SVD model to ComfyUI: {svd_model_path.name}")
+                shutil.copy2(svd_model_path, comfyui_model_path)
+                logger.info(f"✅ SVD model copied to ComfyUI: {comfyui_model_path}")
+            else:
+                logger.info(f"✅ SVD model already available in ComfyUI: {comfyui_model_path}")
                 
         except Exception as e:
-            logger.warning(f"⚠️ Error checking SVD model availability: {e}")
+            logger.warning(f"⚠️ Error ensuring SVD model in ComfyUI: {e}")
     
-    def _upload_image_to_comfyui(self, image_path: str) -> str:
-        """Upload image to remote ComfyUI instance and return the uploaded filename."""
-        try:
-            import requests
-            
-            comfyui_url = "https://h1r5beho4u7n0u-3000.proxy.runpod.net"
-            
-            # Prepare the file for upload
-            with open(image_path, 'rb') as f:
-                files = {'image': (Path(image_path).name, f, 'image/png')}
-                
-                # Upload to ComfyUI
-                upload_response = requests.post(
-                    f"{comfyui_url}/upload/image",
-                    files=files,
-                    timeout=30
-                )
-                
-                if upload_response.status_code == 200:
-                    uploaded_name = Path(image_path).name
-                    logger.info(f"✅ Image uploaded to ComfyUI: {uploaded_name}")
-                    return uploaded_name
-                else:
-                    raise Exception(f"Failed to upload image: {upload_response.text}")
-                    
-        except Exception as e:
-            logger.error(f"Error uploading image to ComfyUI: {e}")
-            # Fallback: return the original filename and hope it works
-            return Path(image_path).name
+
     
     def animate_image(self, image_path: str, output_dir: str, num_frames: int = 25, 
                      motion_bucket_id: int = 127, fps_id: int = 6, 
@@ -138,15 +138,25 @@ class SVDAnimator:
                              seed: Optional[int]) -> str:
         """Create SVD animation using ComfyUI workflow."""
         try:
-            # For remote ComfyUI, we need to upload the image
-            uploaded_image_name = self._upload_image_to_comfyui(image_path)
+            # Copy image to ComfyUI input directory
+            comfyui_input_dir = Path("ComfyUI/input")
+            comfyui_input_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Get just the filename from the original path
+            image_filename = Path(image_path).name
+            comfyui_image_path = comfyui_input_dir / image_filename
+            
+            # Copy the image if it doesn't exist or is different
+            if not comfyui_image_path.exists() or comfyui_image_path.stat().st_mtime < Path(image_path).stat().st_mtime:
+                shutil.copy2(image_path, comfyui_image_path)
+                logger.info(f"📁 Copied image to ComfyUI input: {comfyui_image_path}")
             
             # Ensure SVD model is available in ComfyUI
             self._ensure_svd_model_in_comfyui()
             
             # Create temporary workflow file
             workflow = self._create_svd_workflow(
-                uploaded_image_name, num_frames, motion_bucket_id, fps_id, cond_aug, seed
+                str(comfyui_image_path), num_frames, motion_bucket_id, fps_id, cond_aug, seed
             )
             
             # Run ComfyUI workflow
@@ -176,7 +186,7 @@ class SVDAnimator:
             "1": {
                 "class_type": "LoadImage",
                 "inputs": {
-                    "image": image_path,  # This should be the uploaded filename
+                    "image": Path(image_path).name,
                     "choose file to upload": "image"
                 }
             },
@@ -248,60 +258,44 @@ class SVDAnimator:
             # Run ComfyUI API
             import requests
             
-            # ComfyUI URL - using RunPod proxy
-            comfyui_url = "https://h1r5beho4u7n0u-3000.proxy.runpod.net"
-            
             # Check if ComfyUI is running
             try:
                 # Test connection to ComfyUI
-                test_response = requests.get(f"{comfyui_url}/system_stats", timeout=10)
+                test_response = requests.get("http://127.0.0.1:8188/system_stats", timeout=5)
                 if test_response.status_code != 200:
                     raise Exception("ComfyUI not responding properly")
-                logger.info(f"✅ Connected to ComfyUI at: {comfyui_url}")
             except Exception as e:
-                logger.warning(f"⚠️ ComfyUI not available at {comfyui_url}: {e}")
+                logger.warning(f"⚠️ ComfyUI not available: {e}")
                 logger.info("🔄 Falling back to FFmpeg animation")
-                raise Exception(f"ComfyUI not running at {comfyui_url} - use --animator ffmpeg instead")
+                raise Exception("ComfyUI not running - use --animator ffmpeg instead")
             
             # Queue the workflow
             queue_response = requests.post(
-                f"{comfyui_url}/prompt",
-                json={"prompt": workflow},
-                timeout=30
+                "http://127.0.0.1:8188/prompt",
+                json={"prompt": workflow}
             )
             
             if queue_response.status_code != 200:
                 raise Exception(f"Failed to queue workflow: {queue_response.text}")
             
             prompt_id = queue_response.json()["prompt_id"]
-            logger.info(f"🎬 Workflow queued with ID: {prompt_id}")
             
             # Wait for completion
-            max_wait_time = 300  # 5 minutes timeout
-            start_time = time.time()
-            
             while True:
-                if time.time() - start_time > max_wait_time:
-                    raise Exception(f"Workflow timeout after {max_wait_time} seconds")
-                
-                try:
-                    history_response = requests.get(f"{comfyui_url}/history/{prompt_id}", timeout=10)
-                    if history_response.status_code == 200:
-                        history = history_response.json()
-                        if prompt_id in history:
-                            # Workflow completed
-                            outputs = history[prompt_id]["outputs"]
-                            if "6" in outputs:  # SaveVideo node
-                                video_info = outputs["6"]["images"][0]
-                                video_path = video_info["filename"]
-                                logger.info(f"✅ Workflow completed successfully")
-                                return video_path
-                            break
-                except Exception as e:
-                    logger.warning(f"⚠️ Error checking workflow status: {e}")
+                history_response = requests.get(f"http://127.0.0.1:8188/history/{prompt_id}")
+                if history_response.status_code == 200:
+                    history = history_response.json()
+                    if prompt_id in history:
+                        # Workflow completed
+                        outputs = history[prompt_id]["outputs"]
+                        if "6" in outputs:  # SaveVideo node
+                            video_info = outputs["6"]["images"][0]
+                            video_path = video_info["filename"]
+                            return video_path
+                        break
                 
                 import time
-                time.sleep(2)  # Check every 2 seconds
+                time.sleep(1)
             
             raise Exception("Workflow did not complete successfully")
             
