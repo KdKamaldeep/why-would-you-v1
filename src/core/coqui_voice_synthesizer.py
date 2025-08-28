@@ -60,8 +60,8 @@ _patch_torch_load()
 
 class CoquiVoiceConfig(BaseModel):
     """Configuration for Coqui TTS voice synthesis"""
-    # Prefer a small, reliable English model by default; will switch to XTTS for multilingual
-    model_name: str = "tts_models/en/ljspeech/tacotron2-DDC"
+    # Prefer local XTTS v2 model by default; will fall back to online models if needed
+    model_name: str = "models/tts/XTTS-v2"
     gpu: bool = True
     voice_dir: str = "tts_voices/"
     speaker: str = "default"
@@ -106,14 +106,16 @@ class CoquiVoiceSynthesizer:
             if lang == "hi":  # Hindi
                 # For Hindi, prioritize XTTS v2 which has excellent Hindi support
                 fallback_models.extend([
-                    "coqui/XTTS-v2",
+                    "models/tts/XTTS-v2",  # Local XTTS v2 model
+                    "coqui/XTTS-v2",  # Online fallback
                     "tts_models/multilingual/multi-dataset/xtts_v2",
                     "tts_models/multilingual/multi-dataset/your_tts",  # YourTTS also supports Hindi
                 ])
             elif lang != "en":  # Other non-English languages
                 # For other languages, try XTTS first
                 fallback_models.extend([
-                    "coqui/XTTS-v2",
+                    "models/tts/XTTS-v2",  # Local XTTS v2 model
+                    "coqui/XTTS-v2",  # Online fallback
                     "tts_models/multilingual/multi-dataset/xtts_v2",
                     "tts_models/multilingual/multi-dataset/your_tts",
                 ])
@@ -130,6 +132,8 @@ class CoquiVoiceSynthesizer:
             ])
             
             # Ensure XTTS is attempted even for English if earlier attempts failed
+            if "models/tts/XTTS-v2" not in fallback_models:
+                fallback_models.append("models/tts/XTTS-v2")  # Local XTTS v2 model
             if "tts_models/multilingual/multi-dataset/xtts_v2" not in fallback_models:
                 fallback_models.append("tts_models/multilingual/multi-dataset/xtts_v2")
             
@@ -204,8 +208,8 @@ class CoquiVoiceSynthesizer:
                         "Language is non-English (%s) but current model is not XTTS; attempting to switch to XTTS",
                         self.config.language,
                     )
-                    # Prefer official XTTS-v2
-                    self.config.model_name = "tts_models/multilingual/multi-dataset/xtts_v2"
+                                # Prefer local XTTS-v2
+            self.config.model_name = "models/tts/XTTS-v2"
                     try:
                         self._load_model()
                         logger.info("Switched TTS model to XTTS for multilingual synthesis")
