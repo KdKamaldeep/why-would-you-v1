@@ -89,6 +89,8 @@ class VideoConfig:
     motion_bucket_id: int = 127  # SVD motion intensity (0-255)
     fps_id: int = 6  # SVD FPS setting (0-7)
     cond_aug: float = 0.02  # SVD conditioning augmentation
+    # Audio settings
+    skip_audio: bool = False  # Skip audio generation entirely
 
     def __post_init__(self):
         """Set dimensions based on video format."""
@@ -223,13 +225,29 @@ class CartoonShortsGenerator:
                 logger.info("ℹ️ No cast information found in script")
 
             # Step 2: Create audio clips at the beginning
-            logger.info("Step 2: Creating audio clips from each scene's narration...")
-            logger.info(f"📊 Total scenes to process: {len(script['scenes'])}")
-            scene_audio_paths = []
-            actual_scene_durations = []  # Track actual audio durations
-            
-            # Generate audio clips from each scene's narration
-            for i, scene in enumerate(script['scenes']):
+            if self.config.skip_audio:
+                logger.info("Step 2: Skipping audio generation (--skip-audio flag set)")
+                logger.info(f"📊 Total scenes to process: {len(script['scenes'])}")
+                scene_audio_paths = []
+                actual_scene_durations = []
+                
+                # Create dummy audio durations based on scene durations
+                for i, scene in enumerate(script['scenes']):
+                    scene_duration = scene.get('duration', self.config.scene_duration)
+                    actual_scene_durations.append(scene_duration)
+                    scene_audio_paths.append("")  # Empty string for no audio
+                    logger.info(f"Scene {i+1}: Using scene duration {scene_duration}s (no audio)")
+                
+                logger.info(f"✅ Skipped audio generation for {len(script['scenes'])} scenes")
+                logger.info(f"📊 Using scene durations: {actual_scene_durations}")
+            else:
+                logger.info("Step 2: Creating audio clips from each scene's narration...")
+                logger.info(f"📊 Total scenes to process: {len(script['scenes'])}")
+                scene_audio_paths = []
+                actual_scene_durations = []  # Track actual audio durations
+                
+                # Generate audio clips from each scene's narration
+                for i, scene in enumerate(script['scenes']):
                 scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
                 narration_text = scene.get('narration', '')
                 logger.info(f"🎵 Scene {i+1}: Processing narration ({len(narration_text)} characters)")
@@ -269,18 +287,25 @@ class CartoonShortsGenerator:
                 logger.info(f"Scene {i+1}: Audio clip ready: {scene_audio}")
             
             # Detect length of each audio clip
-            logger.info("📏 Detecting length of each audio clip...")
-            total_audio_duration = 0
-            for i, scene_audio in enumerate(scene_audio_paths):
-                logger.info(f"📏 Scene {i+1}: Analyzing audio duration...")
-                actual_duration = self.video_processor.get_audio_duration(scene_audio)
-                actual_scene_durations.append(actual_duration)
-                total_audio_duration += actual_duration
-                logger.info(f"Scene {i+1}: Audio clip length: {actual_duration:.1f}s")
-            
-            logger.info(f"✅ Generated {len(scene_audio_paths)} audio clips for narration")
-            logger.info(f"📊 Total audio duration: {total_audio_duration:.1f}s")
-            logger.info(f"📊 Average audio duration per scene: {total_audio_duration/len(actual_scene_durations):.1f}s")
+            if not self.config.skip_audio:
+                logger.info("📏 Detecting length of each audio clip...")
+                total_audio_duration = 0
+                for i, scene_audio in enumerate(scene_audio_paths):
+                    logger.info(f"📏 Scene {i+1}: Analyzing audio duration...")
+                    actual_duration = self.video_processor.get_audio_duration(scene_audio)
+                    actual_scene_durations.append(actual_duration)
+                    total_audio_duration += actual_duration
+                    logger.info(f"Scene {i+1}: Audio clip length: {actual_duration:.1f}s")
+                
+                logger.info(f"✅ Generated {len(scene_audio_paths)} audio clips for narration")
+                logger.info(f"📊 Total audio duration: {total_audio_duration:.1f}s")
+                logger.info(f"📊 Average audio duration per scene: {total_audio_duration/len(actual_scene_durations):.1f}s")
+            else:
+                # Calculate total duration from scene durations
+                total_audio_duration = sum(actual_scene_durations)
+                logger.info(f"✅ Skipped audio generation")
+                logger.info(f"📊 Total scene duration: {total_audio_duration:.1f}s")
+                logger.info(f"📊 Average scene duration: {total_audio_duration/len(actual_scene_durations):.1f}s")
             
             # Step 3: Generate cartoon images for scenes
             logger.info("Step 3: Generating cartoon images...")
@@ -492,14 +517,23 @@ class CartoonShortsGenerator:
             return str(final_output)
             
         except Exception as e:
-            logger.warning(f"Per-scene audio detection failed; falling back to single track: {e}")
-            logger.info("🔄 Switching to single-track audio generation mode...")
-            
-            # Fallback: Generate single narration track
-            narration_path = self.output_dir / "narration_single.m4a"
-            logger.info(f"🎵 Fallback: Creating single narration track: {narration_path}")
-            
-            if not (self.config.reuse_existing and narration_path.exists()):
+            if self.config.skip_audio:
+                logger.info("🔄 Audio generation skipped, using scene durations for video timing")
+                # Use scene durations for video timing when audio is skipped
+                actual_scene_durations = [scene.get('duration', self.config.scene_duration) for scene in script['scenes']]
+                total_audio_duration = sum(actual_scene_durations)
+                scene_audio_paths = [""] * len(script['scenes'])  # Empty audio paths
+                logger.info(f"📊 Using scene durations: {actual_scene_durations}")
+                logger.info(f"📊 Total scene duration: {total_audio_duration:.1f}s")
+            else:
+                logger.warning(f"Per-scene audio detection failed; falling back to single track: {e}")
+                logger.info("🔄 Switching to single-track audio generation mode...")
+                
+                # Fallback: Generate single narration track
+                narration_path = self.output_dir / "narration_single.m4a"
+                logger.info(f"🎵 Fallback: Creating single narration track: {narration_path}")
+                
+                if not (self.config.reuse_existing and narration_path.exists()):
                 narration_lines = [scene.get('narration', '') for scene in script.get('scenes', [])]
                 logger.info(f"🎵 Fallback: Generating single audio for {len(narration_lines)} scenes...")
                 total_chars = sum(len(line) for line in narration_lines)

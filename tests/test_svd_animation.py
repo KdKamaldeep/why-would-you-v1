@@ -40,8 +40,6 @@ def test_sd_image_generation():
         logger.info(f"📝 Generating image with prompt: {prompt}")
         image_path = image_generator.generate_cartoon_image(
             prompt=prompt,
-            style="realistic",
-            model_type="realistic",
             output_path="test_output/sd_test_image.png"
         )
         

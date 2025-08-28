@@ -301,6 +301,12 @@ Storyboard Cast Format (with face images):
         help="SVD conditioning augmentation (0.0-1.0, default: 0.02)"
     )
     
+    parser.add_argument(
+        "--skip-audio",
+        action="store_true",
+        help="Skip audio generation (create video without narration)"
+    )
+    
     args = parser.parse_args()
     
     print("🎨 Simple Cartoon Generator with Face-Based Characters")
@@ -384,7 +390,8 @@ Storyboard Cast Format (with face images):
                 animator_type=args.animator,
                 motion_bucket_id=args.motion_bucket_id,
                 fps_id=args.fps_id,
-                cond_aug=args.cond_aug
+                cond_aug=args.cond_aug,
+                skip_audio=args.skip_audio
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
