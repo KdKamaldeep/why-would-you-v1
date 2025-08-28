@@ -1,16 +1,17 @@
 # 🎬 Cartoon Shorts Generator - Professional Edition
 
-A complete AI-powered system for generating professional-quality cartoon videos with unlimited length capability.
+A complete AI-powered system for generating professional-quality cartoon videos with unlimited length capability and advanced animation options.
 
 ## 🚀 **Features**
 
-- 🎨 **Stable Diffusion Image Generation** - Professional cartoon-style images
+- 🎨 **Stable Diffusion Image Generation** - Professional cartoon-style images with Realistic Vision v4 support
 - 🎭 **Face-Based Character Generation** - Use existing faces for character consistency
-- 🎬 **FFmpeg Animation System** - 6 professional animation effects
+- 🎬 **Dual Animation System** - FFmpeg effects + SVD motion animation
 - 📝 **GPT-4 Story Generation** - Intelligent script creation
-- 🎤 **ElevenLabs Voice Generation** - Natural narration
+- 🎤 **Coqui TTS Voice Generation** - Local XTTS v2 model with multilingual support
 - ⚡ **Unlimited Length** - Generate videos of any duration
 - 🎯 **Professional Quality** - Hollywood-grade output
+- 🌍 **Multilingual Support** - Hindi, English, and other languages
 
 ## 📁 **Project Structure**
 
@@ -21,8 +22,9 @@ WhyWouldYou-v1/
 │   │   ├── generate_cartoon_short.py
 │   │   ├── image_generator.py
 │   │   ├── animation_generator.py
+│   │   ├── svd_animator.py      # SVD motion animation
+│   │   ├── coqui_voice_synthesizer.py
 │   │   ├── script_generator.py
-│   │   ├── voice_generator.py
 │   │   └── video_processor.py
 │   │
 │   ├── interfaces/              # User interfaces
@@ -103,6 +105,19 @@ cp config.env .env
 # Simple generation
 python main.py "A dragon learns to bake cookies"
 
+# Advanced generation with all features
+python3 -m src.interfaces.simple_cartoon_generator \
+  --prompt "Animal friends adventure" \
+  --storyboard storyboards/horror.json \
+  --no-reuse \
+  --model-type realistic \
+  --style indian \
+  --video-format "shorts" \
+  --animate \
+  --animator ffmpeg \
+  --language hi \
+  --scene 1
+
 # Face-based character generation (using storyboard)
 python -m src.interfaces.simple_cartoon_generator --prompt "A brave lion opens a smoothie shop" --storyboard storyboards/example.json
 
@@ -115,13 +130,32 @@ python -m src.interfaces.batch_generate
 
 ## 🎬 **Animation System**
 
-### **6 Professional Effects:**
+### **Dual Animation Options:**
+
+#### **1. FFmpeg Animation (Default)**
+**6 Professional Effects:**
 1. **Cinematic Zoom-Pan** - Smooth camera movements
 2. **Smooth Slide Animation** - Organic motion
 3. **Organic Rotation** - Natural spinning effects
 4. **Parallax Motion** - Depth and perspective
 5. **Breathing Effect** - Subtle pulsing
 6. **Drift Animation** - Gentle floating motion
+
+#### **2. SVD Motion Animation (Advanced)**
+- **AI-powered motion** using Stable Video Diffusion
+- **Realistic movement** with 25-frame sequences
+- **Automatic looping** for longer videos
+- **Configurable motion intensity** (0-255)
+- **Requires ComfyUI** for full functionality
+
+### **Usage Examples:**
+```bash
+# FFmpeg animation (default)
+python3 -m src.interfaces.simple_cartoon_generator --prompt "Adventure story" --animator ffmpeg
+
+# SVD motion animation (requires ComfyUI)
+python3 -m src.interfaces.simple_cartoon_generator --prompt "Adventure story" --animator svd
+```
 
 ### **Unlimited Length Capability:**
 - No 24-frame limits like AnimateDiff
@@ -138,9 +172,23 @@ python -m src.interfaces.batch_generate
 - Memory-optimized processing
 
 ### **Model Support:**
-- Anything v5 (cartoon style)
-- AnimaGine XL (anime style)
-- SDXL Lightning LoRA (fast generation)
+- **Realistic Vision v4** (realistic style) - Default for realistic generation
+- **Anything v5** (cartoon style)
+- **AnimaGine XL** (anime style)
+- **DreamShaper v8** (artistic style)
+- **Deliberate v3** (detailed style)
+
+### **Model Selection:**
+```bash
+# Realistic style
+python3 -m src.interfaces.simple_cartoon_generator --model-type realistic
+
+# Cartoon style
+python3 -m src.interfaces.simple_cartoon_generator --model-type cartoon
+
+# Anime style
+python3 -m src.interfaces.simple_cartoon_generator --model-type anime
+```
 
 ## 📝 **Story Generation**
 
@@ -152,18 +200,38 @@ python -m src.interfaces.batch_generate
 
 ## 🎤 **Voice Generation**
 
-### **ElevenLabs Integration:**
-- Natural-sounding narration
-- Multiple voice options
-- Professional audio quality
-- Automatic timing sync
+### **Coqui TTS Integration:**
+- **Local XTTS v2 model** - No API keys required
+- **Multilingual support** - Hindi, English, Spanish, and more
+- **Natural-sounding narration** with voice cloning
+- **Professional audio quality** with automatic timing sync
+- **Automatic speaker discovery** for language-appropriate voices
+
+### **Language Support:**
+```bash
+# Hindi narration
+python3 -m src.interfaces.simple_cartoon_generator --language hi
+
+# English narration
+python3 -m src.interfaces.simple_cartoon_generator --language en
+
+# Spanish narration
+python3 -m src.interfaces.simple_cartoon_generator --language es
+```
+
+### **Voice Cloning:**
+- Use custom audio files for voice cloning
+- Automatic speaker WAV discovery
+- Multiple voice options per language
 
 ## ⚙️ **Configuration**
 
 ### **Environment Variables (.env):**
 ```env
 OPENAI_API_KEY=your_openai_api_key_here
-ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+# Optional: Custom speaker WAV files
+HINDI_SPEAKER_WAV=path/to/hindi_speaker.wav
+ENGLISH_SPEAKER_WAV=path/to/english_speaker.wav
 ```
 
 ### **Video Settings:**
@@ -194,7 +262,29 @@ python test_subtitle_functionality.py
 python reinstall_dependencies.py
 ```
 
-## 🔧 **Recent Fixes**
+## 🔧 **Recent Updates & Fixes**
+
+### **SVD Motion Animation (New)**
+- **Feature**: Added SVD (Stable Video Diffusion) motion animation
+- **Implementation**: AI-powered motion using ComfyUI workflows
+- **Usage**: `--animator svd` for realistic motion animation
+- **Status**: ✅ **Implemented**
+
+### **Local TTS Integration (Updated)**
+- **Feature**: Replaced ElevenLabs with local Coqui TTS XTTS v2 model
+- **Benefits**: No API keys required, multilingual support, voice cloning
+- **Languages**: Hindi, English, Spanish, and more
+- **Status**: ✅ **Implemented**
+
+### **Realistic Vision v4 Support (New)**
+- **Feature**: Added Realistic Vision v4 model for realistic image generation
+- **Usage**: `--model-type realistic` for photorealistic images
+- **Status**: ✅ **Implemented**
+
+### **Enhanced Animation System (Updated)**
+- **Feature**: Dual animation system with FFmpeg and SVD options
+- **Benefits**: More animation choices, better quality, unlimited length
+- **Status**: ✅ **Implemented**
 
 ### **Attention Mask Issue (Fixed)**
 - **Problem**: "The attention mask is not set and cannot be inferred from input because pad token is same as eos token"
@@ -232,6 +322,37 @@ python reinstall_dependencies.py
 python main.py "Space pirates discover treasure"
 ```
 
+### **Advanced Generation with All Features:**
+```bash
+python3 -m src.interfaces.simple_cartoon_generator \
+  --prompt "Animal friends adventure" \
+  --storyboard storyboards/horror.json \
+  --no-reuse \
+  --model-type realistic \
+  --style indian \
+  --video-format "shorts" \
+  --animate \
+  --animator ffmpeg \
+  --language hi \
+  --scene 1
+```
+
+### **SVD Animation (Requires ComfyUI):**
+```bash
+# First, run ComfyUI
+git clone https://github.com/comfyanonymous/ComfyUI.git
+cd ComfyUI
+pip install -r requirements.txt
+python main.py --listen 127.0.0.1 --port 8188
+
+# Then use SVD animation
+python3 -m src.interfaces.simple_cartoon_generator \
+  --prompt "Adventure story" \
+  --animator svd \
+  --motion-bucket-id 127 \
+  --fps-id 6
+```
+
 ### **Custom Duration:**
 ```python
 from src.core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
@@ -256,10 +377,12 @@ python -m src.interfaces.batch_generate
 
 Your system generates:
 - ✅ **Professional cartoon videos** with unlimited length
-- ✅ **High-quality animations** using advanced FFmpeg techniques
+- ✅ **High-quality animations** using FFmpeg and SVD techniques
 - ✅ **Intelligent storytelling** powered by GPT-4
-- ✅ **Natural narration** with ElevenLabs voices
+- ✅ **Natural multilingual narration** with local XTTS v2 model
 - ✅ **Cinematic effects** for engaging content
+- ✅ **Realistic images** with Realistic Vision v4 support
+- ✅ **Multiple video formats** (Shorts, Normal, Custom)
 
 ## 🚀 **Ready to Create Professional Cartoons!**
 

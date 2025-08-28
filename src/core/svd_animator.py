@@ -176,7 +176,10 @@ class SVDAnimator:
                     "images": ["5", 0],
                     "filename_prefix": "svd_output",
                     "fps": self.fps,
-                    "crf": 20
+                    "crf": 20,
+                    "codec": "libx264",
+                    "video": True,
+                    "format": "mp4"
                 }
             }
         }
@@ -193,6 +196,17 @@ class SVDAnimator:
             
             # Run ComfyUI API
             import requests
+            
+            # Check if ComfyUI is running
+            try:
+                # Test connection to ComfyUI
+                test_response = requests.get("http://127.0.0.1:8188/system_stats", timeout=5)
+                if test_response.status_code != 200:
+                    raise Exception("ComfyUI not responding properly")
+            except Exception as e:
+                logger.warning(f"⚠️ ComfyUI not available: {e}")
+                logger.info("🔄 Falling back to FFmpeg animation")
+                raise Exception("ComfyUI not running - use --animator ffmpeg instead")
             
             # Queue the workflow
             queue_response = requests.post(
