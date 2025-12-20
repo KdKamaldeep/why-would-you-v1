@@ -83,7 +83,7 @@ def main():
         help="Random seed for reproducibility (optional)"
     )
     parser.add_argument(
-        "--negative-prompt",
+        "--negative-prompt", "--negative",
         type=str,
         default=None,
         help="Negative prompt (default: excludes non-realistic styles like cartoon, anime, etc.)"
@@ -128,11 +128,16 @@ def main():
         
         # Generate video
         logger.info("🎬 Starting video generation...")
+        # Use custom negative prompt if provided, otherwise use generator's default
+        custom_negative_prompt = args.negative_prompt if args.negative_prompt else None
+        if custom_negative_prompt:
+            logger.info(f"🚫 Using custom negative prompt: {custom_negative_prompt[:100]}{'...' if len(custom_negative_prompt) > 100 else ''}")
+        
         output_file = generator.generate_video(
             prompt=args.prompt,
             output_path=str(output_path),
             seed=args.seed,
-            negative_prompt=None  # Use generator's default
+            negative_prompt=custom_negative_prompt
         )
         
         logger.info("=" * 60)
