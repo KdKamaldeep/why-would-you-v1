@@ -10,7 +10,7 @@ python -m src.interfaces.simple_cartoon_generator --help
 python -m scripts.test_video_generation   -p "Sunset over mountains, time-lapse, fast moving clouds, cinematic drone flyover, parallax, film look, high detail"   --negative "text, watermark, subtitles, blurry, low quality, static"   --num-frames 81 --fps 12 --steps 30 --guidance 5 --audio-text "As the sun sinks behind the mountains, clouds race across the sky, painting the horizon in gold and fire.
 " --output outputs/my_test.mp4
 
-# With custom WAN settings
+# With custom WAN settings with 30 steps cause bit slowness
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
   --storyboard storyboards/test_2_scenes.json \
@@ -18,6 +18,17 @@ python -m src.interfaces.simple_cartoon_generator \
   --wan-fps 12 \
   --wan-steps 30 \
   --wan-guidance 5
+  
+# With custom WAN settings with 12 steps cause bit slowness
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Sunset over mountains" \
+  --storyboard storyboards/test_2_scenes.json \
+  --wan-num-frames 81 \
+  --wan-fps 12 \
+  --wan-steps 30 \
+  --wan-guidance 5
+  
+    
 
 # With Hindi narration
 python -m src.interfaces.simple_cartoon_generator \

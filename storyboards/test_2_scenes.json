@@ -1,51 +1,51 @@
 {
-  "title": "A Surprising Water Fact",
-  "description": "A short cinematic video revealing an interesting and lesser-known fact about water",
+  "title": "A Green Fact About Farmers",
+  "description": "A short cinematic video explaining how farmers help the Earth stay green and balanced",
   "total_duration": 20,
   "scenes": [
     {
       "duration": 5,
-      "description": "Flowing river in early morning light",
-      "visual_prompt": "Flowing river at sunrise, soft golden light reflecting on water surface, gentle ripples moving downstream, slow cinematic forward push, light mist rising from water, vertical composition, realistic natural atmosphere",
+      "description": "Farmer working in green fields at sunrise",
+      "visual_prompt": "Farmer walking through lush green crop fields at sunrise, soft golden sunlight, gentle breeze moving crops, slow cinematic forward push, light morning mist, vertical composition, realistic rural atmosphere",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward push, gentle water flow",
+      "motion_hint": "slow forward push, crops moving in wind",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Did you know most of the water on Earth is older than the planet itself?",
-      "subtitle": "A surprising water fact 💧"
+      "narration": "Did you know farmers play a key role in keeping the Earth green?",
+      "subtitle": "A green fact 🌱"
     },
     {
       "duration": 5,
-      "description": "Water droplets floating in sunlight",
-      "visual_prompt": "Close-up of floating water droplets illuminated by sunlight, slow motion feel, subtle rotation and drift, shallow depth of field, soft light rays, vertical framing, ultra realistic",
+      "description": "Healthy crops growing under sunlight",
+      "visual_prompt": "Healthy crops growing under bright sunlight, leaves gently swaying, slow side pan across green plants, visible sunlight rays, vertical framing, realistic agricultural environment",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow drifting motion, subtle rotation",
+      "motion_hint": "slow side pan, gentle leaf movement",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Scientists believe much of Earth’s water came from ancient cosmic sources.",
-      "subtitle": "Water from space"
+      "narration": "Crops absorb carbon dioxide and release oxygen into the air.",
+      "subtitle": "Plants clean the air"
     },
     {
       "duration": 5,
-      "description": "Rain falling on Earth landscape",
-      "visual_prompt": "Gentle rain falling over Earth landscape, droplets hitting soil and leaves, slow cinematic side pan, soft natural lighting, realistic environmental motion, vertical composition",
+      "description": "Farmer tending soil and crops",
+      "visual_prompt": "Farmer tending soil and crops by hand, close-up of healthy soil and roots, slow push-in camera, soft natural light, subtle dust particles, vertical composition, realistic farming detail",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow side pan, falling rain",
+      "motion_hint": "slow push-in, subtle soil movement",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Some water molecules may have existed before the Sun was formed.",
-      "subtitle": "Older than the Sun"
+      "narration": "Good farming practices help store carbon safely in the soil.",
+      "subtitle": "Soil stores carbon"
     },
     {
       "duration": 5,
-      "description": "Wide view of ocean at sunset",
-      "visual_prompt": "Wide cinematic view of ocean at sunset, slow rolling waves, warm orange and blue tones, slow pull-back camera, gentle wind movement on water surface, vertical framing, realistic atmosphere",
+      "description": "Wide view of green farmland landscape",
+      "visual_prompt": "Wide cinematic view of green farmland stretching to the horizon, clear sky, gentle wind across fields, slow pull-back camera, peaceful rural atmosphere, vertical framing, realistic environment",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow pull-back, rolling waves",
+      "motion_hint": "slow pull-back, wind across fields",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Every drop you see today could be billions of years old.",
-      "subtitle": "An ancient journey 🌍"
+      "narration": "By growing food, farmers also help protect the climate.",
+      "subtitle": "Farmers protect the planet 🌍"
     }
   ]
 }
