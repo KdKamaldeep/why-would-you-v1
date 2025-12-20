@@ -16,7 +16,7 @@ Rules to follow:
    - Include magical, storybook style, soft hand-painted, natural proportions.
    - Warm evening light where relevant.
    - Weight the foreground 1.4, midground 1.1, background 0.9.
-   - Keep token count ≤77 for Stable Diffusion.
+   - WAN supports longer prompts, so detailed descriptions are fine (no token limit).
 
 3. Scenes:
    - Ensure continuity: objects, events, and actions carry over logically.
@@ -37,5 +37,5 @@ Additional Notes:
 - Emphasize the main character in the foreground.
 - Magical or glowing items should be described clearly.
 - Objects and environment must support the story narrative.
-- Keep descriptive but concise to avoid SD token truncation.
+- WAN supports longer prompts, so include detailed descriptions for better results.
 - Include any props or interactive elements in foreground or midground with proper weights.
