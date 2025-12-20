@@ -1,18 +1,51 @@
 {
-  "title": "The Forest That Moves",
-  "description": "A mysterious fantasy short about a forest that changes its paths at night",
-  "total_duration": 18,
+  "title": "Realm Beyond the Veil",
+  "description": "A cinematic fantasy short exploring mystical characters and enchanted places beyond the human world",
+  "total_duration": 24,
   "scenes": [
     {
       "duration": 6,
-      "description": "Dark enchanted forest at night with glowing fog and slow forward camera movement",
-      "visual_prompt": "Enchanted fantasy forest at night, glowing mist drifting slowly between trees, magical particles floating in air, slow forward dolly camera movement, subtle parallax depth between foreground and background trees, cinematic fantasy lighting, volumetric fog, ultra realistic",
+      "description": "A floating fantasy island above glowing clouds at dawn",
+      "visual_prompt": "Massive floating fantasy island above glowing clouds at dawn, ancient stone ruins covered in moss, waterfalls flowing into the sky, soft golden sunrise light, slow forward camera dolly, gentle cloud movement, subtle parallax depth, cinematic fantasy atmosphere, ultra realistic",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward camera dolly, fog drifting left to right, subtle environmental motion",
+      "motion_hint": "slow forward dolly, clouds drifting upward, waterfalls flowing",
       "motion_strength": 0.65,
       "fps_hint": 24,
-      "narration": "They say this forest sleeps during the day… but wakes up at night.",
-      "subtitle": "The forest awakens at night 🌲✨"
+      "narration": "Beyond the skies we know, there exists a realm untouched by time.",
+      "subtitle": "A realm beyond the skies ☁️✨"
+    },
+    {
+      "duration": 6,
+      "description": "A mysterious fantasy warrior standing in a glowing forest",
+      "visual_prompt": "Fantasy warrior wearing enchanted armor standing in a glowing forest, faint magical runes on armor, mist drifting between ancient trees, slow cinematic camera orbit, soft moonlight filtering through branches, subtle armor reflections, ultra realistic fantasy lighting",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow camera orbit around character, fog drifting sideways",
+      "motion_strength": 0.7,
+      "fps_hint": 24,
+      "narration": "Guardians rise when ancient magic stirs once more.",
+      "subtitle": "The guardian awakens 🛡️🌲"
+    },
+    {
+      "duration": 6,
+      "description": "An enchanted fantasy city glowing at night",
+      "visual_prompt": "Enchanted fantasy city at night built with glowing crystals and towering spires, magical lights floating in the air, rivers of light flowing through streets, slow aerial camera glide, deep parallax between buildings, cinematic night lighting, ultra realistic fantasy environment",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow aerial glide, floating lights moving gently",
+      "motion_strength": 0.75,
+      "fps_hint": 24,
+      "narration": "Cities of light flourish where magic flows freely.",
+      "subtitle": "A city of magic and light 🌌🏰"
+    },
+    {
+      "duration": 6,
+      "description": "A powerful fantasy sorceress casting magic on a mountain peak",
+      "visual_prompt": "Powerful fantasy sorceress standing on a mountain peak under a star-filled sky, glowing magical energy swirling around her hands, flowing cloak moving in the wind, slow cinematic push-in camera, swirling particles and energy trails, dramatic fantasy lighting, ultra realistic",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow push-in camera, magical energy swirling, cloak flowing",
+      "motion_strength": 0.8,
+      "fps_hint": 24,
+      "narration": "And when destiny calls, magic answers.",
+      "subtitle": "Magic answers the call ✨🔮"
     }
   ]
 }
