@@ -75,9 +75,9 @@ class VideoConfig:
     enable_prompt_enhancement: bool = True
     # Control pause between scenes (in seconds)
     scene_pause_duration: float = 0.0  # Default 0.0 second pause between scenes (no black screens)
-    # WAN T2V settings (will be overridden in __post_init__ based on video_format)
-    wan_width: int = 832  # WAN video width (default, overridden for shorts/normal)
-    wan_height: int = 480  # WAN video height (default, overridden for shorts/normal)
+    # WAN T2V settings
+    wan_width: int = 832  # WAN video width
+    wan_height: int = 480  # WAN video height
     wan_num_frames: int = 49  # WAN number of frames to generate
     wan_fps: int = 12  # WAN output FPS
     wan_steps: int = 30  # WAN inference steps
@@ -101,34 +101,19 @@ class VideoConfig:
         """Set dimensions based on video format."""
         if self.video_format.lower() == "shorts":
             # YouTube Shorts: 9:16 aspect ratio
-            # WAN requires dimensions divisible by 16, so we use 1088x1920 (closest to 1080x1920)
-            # 1088 = 16 * 68, 1920 = 16 * 120
-            self.width = 1088
-            self.height = 1920
-            # Set WAN dimensions (must be divisible by 16)
-            self.wan_width = 1088  # 16 * 68 (closest to 1080)
-            self.wan_height = 1920  # 16 * 120
-            # Final reel output dimensions (can be 1080x1920, will be resized in post-processing)
-            self.reel_width = 1080
-            self.reel_height = 1920
+            # Note: WAN uses fixed dimensions, but we'll crop/resize in post-processing
+            self.width = 768
+            self.height = 1024
         elif self.video_format.lower() == "normal":
             # Normal video: 16:9 aspect ratio
-            # WAN requires dimensions divisible by 16
-            # 1920 = 16 * 120, 1088 = 16 * 68 (closest to 1080)
+            # Note: WAN uses fixed dimensions, but we'll crop/resize in post-processing
             self.width = 1920
-            self.height = 1088  # 16 * 68 (closest to 1080)
-            # Set WAN dimensions (must be divisible by 16)
-            self.wan_width = 1920  # 16 * 120
-            self.wan_height = 1088  # 16 * 68
+            self.height = 1080
         else:
             # Default to shorts if invalid format
             self.video_format = "shorts"
-            self.width = 1088  # 16 * 68 (divisible by 16, closest to 1080)
-            self.height = 1920  # 16 * 120
-            self.wan_width = 1088
-            self.wan_height = 1920
-            self.reel_width = 1080
-            self.reel_height = 1920
+            self.width = 768
+            self.height = 1024
 
 class CartoonShortsGenerator:
     """Main class that orchestrates the entire video generation process."""
