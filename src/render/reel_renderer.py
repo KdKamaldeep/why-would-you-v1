@@ -184,12 +184,93 @@ def mix_audio(
     logger.info(f"🎵 Mixing audio: voice={voice_wav is not None}, music={music_path is not None}")
     logger.info(f"🔊 Volume levels: voice={voice_vol}, music={music_vol}")
     
+    # Get durations to determine if video needs looping
+    video_duration = None
+    narration_duration = None
+    
+    try:
+        probe_cmd = [
+            'ffprobe', '-v', 'error',
+            '-show_entries', 'format=duration',
+            '-of', 'default=nw=1:nk=1',
+            str(video_path)
+        ]
+        result = subprocess.run(probe_cmd, check=True, capture_output=True, text=True)
+        video_duration = float(result.stdout.strip())
+    except Exception:
+        pass
+    
+    has_voice = voice_wav and Path(voice_wav).exists()
+    if has_voice:
+        try:
+            probe_cmd = [
+                'ffprobe', '-v', 'error',
+                '-show_entries', 'format=duration',
+                '-of', 'default=nw=1:nk=1',
+                voice_wav
+            ]
+            result = subprocess.run(probe_cmd, check=True, capture_output=True, text=True)
+            narration_duration = float(result.stdout.strip())
+        except Exception:
+            pass
+    
+    # If narration is longer than video, loop the video to match
+    if video_duration and narration_duration and narration_duration > video_duration:
+        logger.info(f"📹 Video ({video_duration:.2f}s) is shorter than narration ({narration_duration:.2f}s)")
+        logger.info(f"🔄 Looping video to match narration length...")
+        
+        # Calculate how many loops needed
+        loops_needed = int(narration_duration / video_duration) + 1
+        logger.info(f"   Looping video {loops_needed} times to cover {narration_duration:.2f}s")
+        
+        # Create a concat file with the video repeated
+        loop_concat_file = str(output_path.parent / "_loop_concat.txt")
+        with open(loop_concat_file, 'w') as f:
+            for _ in range(loops_needed):
+                f.write(f"file '{video_path}'\n")
+        
+        # Create looped video
+        looped_video = str(output_path.parent / "_temp_looped.mp4")
+        loop_cmd = [
+            'ffmpeg', '-y',
+            '-f', 'concat',
+            '-safe', '0',
+            '-i', loop_concat_file,
+            '-c', 'copy',
+            '-movflags', '+faststart',
+            looped_video
+        ]
+        run_ffmpeg(loop_cmd, verbose=verbose)
+        
+        # Trim to exact narration duration
+        final_looped_video = str(output_path.parent / "_temp_final_looped.mp4")
+        trim_cmd = [
+            'ffmpeg', '-y',
+            '-i', looped_video,
+            '-t', f"{narration_duration:.3f}",
+            '-c', 'copy',
+            final_looped_video
+        ]
+        run_ffmpeg(trim_cmd, verbose=verbose)
+        
+        # Replace video_path with looped version
+        video_path = Path(final_looped_video)
+        logger.info(f"✅ Video extended to {narration_duration:.2f}s to match narration")
+        
+        # Clean up intermediate files
+        try:
+            if Path(looped_video).exists():
+                os.remove(looped_video)
+            if Path(loop_concat_file).exists():
+                os.remove(loop_concat_file)
+        except Exception as e:
+            logger.warning(f"Could not clean up loop files: {e}")
+    
     # Build FFmpeg command
     cmd = ['ffmpeg', '-y', '-i', str(video_path)]
     input_count = 1  # Video is input 0
     
     # Add voice audio if provided
-    has_voice = voice_wav and Path(voice_wav).exists()
     if has_voice:
         cmd.extend(['-i', voice_wav])
         input_count += 1
@@ -212,7 +293,7 @@ def mix_audio(
         filter_complex = (
             f"[{voice_input_idx}:a]volume={voice_vol}[v];"
             f"[{music_input_idx}:a]volume={music_vol}[m];"
-            f"[v][m]amix=inputs=2:dropout_transition=2[a]"
+            f"[v][m]amix=inputs=2:dropout_transition=2:duration=longest[a]"
         )
         cmd.extend(['-filter_complex', filter_complex])
         cmd.extend(['-map', '0:v', '-map', '[a]'])
@@ -233,6 +314,12 @@ def mix_audio(
         cmd.extend(['-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000'])
         cmd.extend(['-map', '0:v', '-map', '1:a'])
     
+    # Use narration duration if available, otherwise video duration
+    target_duration = narration_duration if narration_duration else video_duration
+    duration_args = []
+    if target_duration:
+        duration_args = ['-t', f"{target_duration:.3f}"]
+    
     # Output settings
     cmd.extend([
         '-c:v', 'libx264',
@@ -243,7 +330,7 @@ def mix_audio(
         '-c:a', 'aac',
         '-b:a', '192k',
         '-ar', '48000',  # 48kHz for platform compatibility
-        '-shortest',  # Match shortest stream
+    ] + duration_args + [
         '-movflags', '+faststart',
         str(output_path)
     ])

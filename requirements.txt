@@ -8,6 +8,7 @@ accelerate>=0.33.0
 safetensors>=0.4.0
 huggingface_hub>=0.30.1
 ftfy>=6.1.1  # Required for WAN pipeline text processing
+xformers>=0.0.22  # Optimized attention mechanisms for transformers
 imageio
 imageio-ffmpeg
 
@@ -18,6 +19,7 @@ mediapipe>=0.10.0
 
 # Audio processing - Updated for better multilingual support
 TTS==0.22.0
+torchcodec>=0.8.0  # Required for XTTS models (media loading/decoding)
 librosa>=0.10.0
 soundfile>=0.12.0
 # Additional audio processing for better language support

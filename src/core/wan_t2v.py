@@ -184,7 +184,8 @@ class WanT2VGenerator:
                       prompt: str, 
                       output_path: str,
                       seed: Optional[int] = None,
-                      negative_prompt: Optional[str] = None) -> str:
+                      negative_prompt: Optional[str] = None,
+                      duration: Optional[float] = None) -> str:
         """
         Generate a video from a text prompt.
         
@@ -193,6 +194,8 @@ class WanT2VGenerator:
             output_path: Path to save the output MP4 file
             seed: Random seed for reproducibility (optional)
             negative_prompt: Override default negative prompt (optional)
+            duration: Target duration in seconds. If provided, num_frames will be calculated from this.
+                      If None, uses the default num_frames from initialization.
             
         Returns:
             Path to the generated video file
@@ -200,11 +203,20 @@ class WanT2VGenerator:
         if self.pipeline is None:
             raise RuntimeError("WAN pipeline not available. Cannot generate video.")
         
+        # Calculate num_frames from duration if provided
+        num_frames_to_use = self.num_frames
+        if duration is not None and duration > 0:
+            # Calculate frames needed: duration * fps, rounded up to ensure we cover the full duration
+            num_frames_to_use = int(duration * self.fps) + 1
+            logger.info(f"📏 Target duration: {duration:.2f}s")
+            logger.info(f"🎞️ Calculated frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.2f}s)")
+        else:
+            logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
+        
         try:
             logger.info(f"🎬 Generating video with WAN 2.1 T2V...")
             logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
             logger.info(f"📐 Dimensions: {self.width}x{self.height}")
-            logger.info(f"🎞️ Frames: {self.num_frames} @ {self.fps}fps (~{self.num_frames/self.fps:.1f}s)")
             logger.info(f"⚙️ Steps: {self.num_inference_steps}, Guidance: {self.guidance_scale}")
             
             # Use provided negative prompt or default
@@ -231,7 +243,7 @@ class WanT2VGenerator:
                 negative_prompt=neg_prompt,
                 height=self.height,
                 width=self.width,
-                num_frames=self.num_frames,
+                num_frames=num_frames_to_use,  # Use calculated frames based on duration
                 num_inference_steps=self.num_inference_steps,
                 guidance_scale=self.guidance_scale
             )
