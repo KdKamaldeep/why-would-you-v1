@@ -13,6 +13,7 @@ import tempfile
 import warnings
 import numpy as np
 from typing import List, Optional, Dict, Any
+from pathlib import Path
 import torch
 from pydantic import BaseModel
 
@@ -58,6 +59,24 @@ def _patch_torch_load():
 # Apply the patch when module is imported
 _patch_torch_load()
 
+
+def _get_default_tts_model_path() -> str:
+    """Get default TTS model path, preferring /workspace if available."""
+    # Check for /workspace first (RunPod attached disk)
+    workspace_model = Path("/workspace/models/tts/XTTS-v2")
+    local_model = Path("models/tts/XTTS-v2")
+    if workspace_model.exists():
+        return str(workspace_model)
+    elif local_model.exists():
+        return str(local_model)
+    else:
+        # Default to workspace if it exists, otherwise local
+        if Path("/workspace").exists():
+            return str(workspace_model)
+        else:
+            return str(local_model)
+
+
 class CoquiVoiceConfig(BaseModel):
     """Configuration for Coqui TTS voice synthesis"""
     # Prefer local XTTS v2 model by default; will fall back to online models if needed
@@ -78,7 +97,14 @@ class CoquiVoiceSynthesizer:
         Args:
             config: Configuration for voice synthesis
         """
-        self.config = config or CoquiVoiceConfig()
+        if config is None:
+            # Create config with workspace-aware default model path
+            default_model = _get_default_tts_model_path()
+            config = CoquiVoiceConfig(model_name=default_model)
+        elif config.model_name is None or config.model_name == "models/tts/XTTS-v2":
+            # Update model path if using default
+            config.model_name = _get_default_tts_model_path()
+        self.config = config
         
         # Create voice directory if it doesn't exist
         os.makedirs(self.config.voice_dir, exist_ok=True)
@@ -102,19 +128,29 @@ class CoquiVoiceSynthesizer:
             fallback_models = []
             lang = (self.config.language or "en").lower()
             
+            # Check for workspace model path first (RunPod with attached disk)
+            workspace_model = str(Path("/workspace/models/tts/XTTS-v2"))
+            local_model = "models/tts/XTTS-v2"
+            
             # Language-specific model prioritization
             if lang == "hi":  # Hindi
                 # For Hindi, prioritize XTTS v2 which has excellent Hindi support
+                # Try workspace path first if it exists
+                if Path("/workspace").exists():
+                    fallback_models.extend([workspace_model])
                 fallback_models.extend([
-                    "models/tts/XTTS-v2",  # Local XTTS v2 model
+                    local_model,  # Local XTTS v2 model
                     "coqui/XTTS-v2",  # Online fallback
                     "tts_models/multilingual/multi-dataset/xtts_v2",
                     "tts_models/multilingual/multi-dataset/your_tts",  # YourTTS also supports Hindi
                 ])
             elif lang != "en":  # Other non-English languages
                 # For other languages, try XTTS first
+                # Try workspace path first if it exists
+                if Path("/workspace").exists():
+                    fallback_models.extend([workspace_model])
                 fallback_models.extend([
-                    "models/tts/XTTS-v2",  # Local XTTS v2 model
+                    local_model,  # Local XTTS v2 model
                     "coqui/XTTS-v2",  # Online fallback
                     "tts_models/multilingual/multi-dataset/xtts_v2",
                     "tts_models/multilingual/multi-dataset/your_tts",
@@ -208,8 +244,8 @@ class CoquiVoiceSynthesizer:
                         "Language is non-English (%s) but current model is not XTTS; attempting to switch to XTTS",
                         self.config.language,
                     )
-                    # Prefer local XTTS-v2
-                    self.config.model_name = "models/tts/XTTS-v2"
+                    # Prefer local XTTS-v2 (workspace path if available)
+                    self.config.model_name = _get_default_tts_model_path()
                     try:
                         self._load_model()
                         logger.info("Switched TTS model to XTTS for multilingual synthesis")

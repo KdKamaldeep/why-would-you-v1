@@ -42,6 +42,16 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         
         model_id = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
         
+        # Configure Hugging Face cache directory to use /workspace if available
+        # This is important for RunPod and similar environments with attached disks
+        cache_dir = get_cache_dir()
+        if cache_dir:
+            logger.info(f"📁 Using Hugging Face cache directory: {cache_dir}")
+        else:
+            # Use default cache
+            default_cache = Path.home() / ".cache" / "huggingface"
+            logger.info(f"📁 Using default Hugging Face cache: {default_cache}")
+        
         logger.info(f"🔄 Loading WAN 2.1 T2V model: {model_id}")
         logger.info(f"💻 Device: {device}")
         
@@ -67,7 +77,8 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
             subfolder="vae",
-            torch_dtype=vae_dtype
+            torch_dtype=vae_dtype,
+            cache_dir=cache_dir
         )
         
         # Load pipeline
@@ -75,7 +86,8 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         _wan_pipeline = WanPipeline.from_pretrained(
             model_id,
             vae=_wan_vae,
-            torch_dtype=torch_dtype
+            torch_dtype=torch_dtype,
+            cache_dir=cache_dir
         )
         
         # Move to device
