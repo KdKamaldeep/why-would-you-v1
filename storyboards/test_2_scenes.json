@@ -1,51 +1,51 @@
 {
-  "title": "A Christmas Fact About Santa Claus",
-  "description": "A short cinematic video revealing the true historical origin of Santa Claus",
-  "total_duration": 20,
+  "title": "A Shocking History Fact",
+  "description": "A short cinematic video revealing an unbelievable truth from ancient history",
+  "total_duration": 28,
   "scenes": [
     {
-      "duration": 5,
-      "description": "Snowy Christmas village at night",
-      "visual_prompt": "Snowy Christmas village at night, warm glowing lights from houses, gentle snowfall, slow cinematic forward push, festive decorations, cozy winter atmosphere, vertical composition, realistic holiday scene",
+      "duration": 7,
+      "description": "Ancient city at dawn",
+      "visual_prompt": "Ancient stone city at dawn, soft golden sunlight, light mist between buildings, slow cinematic forward push, epic historical atmosphere, realistic textures, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward push, falling snow",
+      "motion_hint": "slow forward push, drifting mist",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Did you know Santa Claus is inspired by a real person?",
-      "subtitle": "A Christmas fact 🎄"
+      "narration": "Did you know that thousands of years ago, people didn’t rely on modern medicine at all?",
+      "subtitle": "A surprising history fact 🏺"
     },
     {
-      "duration": 5,
-      "description": "Saint Nicholas helping people",
-      "visual_prompt": "Historical depiction of Saint Nicholas in simple robes, quietly helping people at night, giving gifts, warm candlelight, slow side pan, soft shadows, peaceful atmosphere, vertical framing, realistic historical style",
+      "duration": 7,
+      "description": "Ancient healers using honey",
+      "visual_prompt": "Ancient healers applying honey to wounds by torchlight, clay pots of honey, warm amber lighting, slow side pan, realistic historical scene, vertical framing",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow side pan, gentle candle flicker",
+      "motion_hint": "slow side pan, torch flicker",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Santa is based on Saint Nicholas, a kind bishop who lived over sixteen hundred years ago.",
-      "subtitle": "Inspired by Saint Nicholas"
+      "narration": "In ancient Egypt, healers used honey to clean wounds and protect them from dangerous infections.",
+      "subtitle": "Ancient medicine 🍯"
     },
     {
-      "duration": 5,
-      "description": "Acts of kindness and gift giving",
-      "visual_prompt": "Warm scene of gifts being left quietly for children, glowing candlelight, soft shadows, slow push-in camera, peaceful nighttime mood, festive but subtle, vertical composition",
+      "duration": 7,
+      "description": "Preserved ancient artifacts",
+      "visual_prompt": "Ancient artifacts preserved in dry tomb conditions, soft golden highlights, slow push-in camera, mysterious and respectful mood, realistic textures, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow push-in, candlelight flicker",
+      "motion_hint": "slow push-in",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "He was known for secretly helping the poor and giving gifts to children.",
-      "subtitle": "The spirit of giving 🎁"
+      "narration": "Even more incredible, honey never spoils. Jars found in ancient tombs are still edible today.",
+      "subtitle": "Nature’s miracle ✨"
     },
     {
-      "duration": 5,
-      "description": "Modern Santa silhouette under moonlight",
-      "visual_prompt": "Silhouette of Santa Claus with a sack under moonlit snowy sky, gentle snowfall, soft glowing moon, slow pull-back camera, magical yet realistic Christmas atmosphere, vertical framing",
+      "duration": 7,
+      "description": "Modern honey glowing in light",
+      "visual_prompt": "Close-up of golden honey glowing in soft light, slow pull-back camera, calm and awe-inspiring mood, realistic macro style, vertical framing",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow pull-back, falling snow",
+      "motion_hint": "slow pull-back",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "That tradition of kindness became the Santa Claus we celebrate at Christmas today.",
-      "subtitle": "A tradition of kindness 🎅"
+      "narration": "Sometimes, the most advanced science is wisdom that humanity discovered long ago.",
+      "subtitle": "History still amazes us ⏳"
     }
   ]
 }
