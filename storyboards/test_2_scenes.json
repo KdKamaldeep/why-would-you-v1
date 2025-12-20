@@ -24,6 +24,28 @@
       "fps_hint": 24,
       "narration": "When ancient magic begins to stir, guardians rise once more.\n\nThey stand among glowing trees, watching in silence… listening to the forest breathe.\n\nPatient. Unmoving. Ever alert.",
       "subtitle": "The guardian awakens 🛡️🌲"
+    },
+    {
+      "duration": 6,
+      "description": "An enchanted fantasy city glowing at night",
+      "visual_prompt": "Enchanted fantasy city at night built with glowing crystals and towering spires, magical lights floating in the air, rivers of light flowing through streets, slow aerial camera glide, deep parallax between buildings, cinematic night lighting, ultra realistic fantasy environment",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow aerial glide, floating lights moving gently",
+      "motion_strength": 0.75,
+      "fps_hint": 24,
+      "narration": "Deep within the realm, cities of light awaken after dusk.\n\nCrystals glow softly in the darkness, and rivers of magic flow through towering streets… guiding those who still believe.\n\nThis is a place built not by hands— but by magic itself.",
+      "subtitle": "A city of magic and light 🌌🏰"
+    },
+    {
+      "duration": 6,
+      "description": "A powerful fantasy sorceress casting magic on a mountain peak",
+      "visual_prompt": "Powerful fantasy sorceress standing on a mountain peak under a star-filled sky, glowing magical energy swirling around her hands, flowing cloak moving in the wind, slow cinematic push-in camera, swirling particles and energy trails, dramatic fantasy lighting, ultra realistic",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow push-in camera, magical energy swirling, cloak flowing",
+      "motion_strength": 0.8,
+      "fps_hint": 24,
+      "narration": "And when destiny finally calls, magic answers.\n\nAt the edge of the world, power gathers beneath the stars… waiting to be released.\n\nBecause in this realm, nothing sleeps forever.",
+      "subtitle": "Magic answers the call ✨🔮"
     }
   ]
 }

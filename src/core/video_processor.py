@@ -423,7 +423,7 @@ class VideoProcessor:
             if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
                 raise RuntimeError(f"Failed to create temp video: {temp_video} is missing or empty")
             
-            # Probe temp video duration to cap final output length safely
+            # Probe temp video duration
             try:
                 probe_cmd = [
                     'ffprobe', '-v', 'error',
@@ -441,6 +441,74 @@ class VideoProcessor:
             if isinstance(narration_audio, list):
                 merged_narration = 'merged_narration.aac'
                 narration_audio = self.concat_audios(narration_audio, merged_narration)
+            
+            # Probe narration audio duration
+            narration_duration = None
+            if narration_audio and os.path.exists(narration_audio):
+                try:
+                    probe_cmd = [
+                        'ffprobe', '-v', 'error',
+                        '-show_entries', 'format=duration',
+                        '-of', 'default=nw=1:nk=1',
+                        narration_audio
+                    ]
+                    result = subprocess.run(probe_cmd, check=True, capture_output=True)
+                    narration_duration_str = result.stdout.decode('utf-8', errors='ignore').strip()
+                    narration_duration = float(narration_duration_str)
+                except Exception:
+                    narration_duration = None
+            
+            # If narration is longer than video, loop the video to match narration length
+            if video_duration and narration_duration and narration_duration > video_duration:
+                logger.info(f"📹 Video ({video_duration:.2f}s) is shorter than narration ({narration_duration:.2f}s)")
+                logger.info(f"🔄 Looping video to match narration length...")
+                
+                # Calculate how many loops needed
+                loops_needed = int(narration_duration / video_duration) + 1
+                logger.info(f"   Looping video {loops_needed} times to cover {narration_duration:.2f}s")
+                
+                # Create a concat file with the video repeated
+                loop_concat_file = "loop_concat_list.txt"
+                with open(loop_concat_file, 'w') as f:
+                    for _ in range(loops_needed):
+                        f.write(f"file '{temp_video}'\n")
+                
+                # Create looped video
+                looped_video = "temp_video_looped.mp4"
+                loop_cmd = [
+                    'ffmpeg', '-y',
+                    '-f', 'concat',
+                    '-safe', '0',
+                    '-i', loop_concat_file,
+                    '-c', 'copy',
+                    '-movflags', '+faststart',
+                    looped_video
+                ]
+                subprocess.run(loop_cmd, check=True, capture_output=True)
+                
+                # Trim to exact narration duration
+                final_looped_video = "temp_video_final.mp4"
+                trim_cmd = [
+                    'ffmpeg', '-y',
+                    '-i', looped_video,
+                    '-t', f"{narration_duration:.3f}",
+                    '-c', 'copy',
+                    final_looped_video
+                ]
+                subprocess.run(trim_cmd, check=True, capture_output=True)
+                
+                # Replace temp_video with looped version
+                try:
+                    os.remove(temp_video)
+                    os.rename(final_looped_video, temp_video)
+                    os.remove(looped_video)
+                    os.remove(loop_concat_file)
+                except Exception as e:
+                    logger.warning(f"Could not clean up loop files: {e}")
+                
+                # Update video duration to match narration
+                video_duration = narration_duration
+                logger.info(f"✅ Video extended to {video_duration:.2f}s to match narration")
 
             # Prepare audio inputs
             audio_inputs = ['-i', narration_audio]
@@ -483,10 +551,12 @@ class VideoProcessor:
                 cmd.extend(['-tune', 'film'])  # film is valid for libx264
             elif self.config.codec == 'libx265':
                 cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
-            # Cap final muxing to video duration to prevent runaway outputs
-            if video_duration is not None and video_duration > 0:
-                cmd.extend(['-t', f"{video_duration:.3f}"])
-            # Do NOT use -shortest; we want full video length regardless of audio length
+            # Use narration duration if available, otherwise video duration
+            # This ensures video matches narration length (video was already extended if needed)
+            target_duration = narration_duration if narration_duration else video_duration
+            if target_duration is not None and target_duration > 0:
+                cmd.extend(['-t', f"{target_duration:.3f}"])
+            # Do NOT use -shortest; we want full narration length
             if self.config.codec == 'libx265':
                 cmd.extend(['-tag:v', 'hvc1'])
             if self.config.faststart:
