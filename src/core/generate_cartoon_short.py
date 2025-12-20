@@ -420,7 +420,7 @@ class CartoonShortsGenerator:
                             actual_duration = target_audio_duration
                             logger.info(f"✅ Scene {i+1}: Video synced to audio ({actual_duration:.2f}s)")
                         else:
-                            logger.info(f"✅ Scene {i+1}: Video duration ({wan_video_duration:.2f}s) already matches audio ({target_audio_duration:.2f}s)")
+                            logger.info(f"✅ Scene {i+1}: Video duration ({actual_duration:.2f}s) already matches audio ({target_audio_duration:.2f}s)")
                     
                     video_clips.append(video_path)
                     total_video_duration += actual_duration
