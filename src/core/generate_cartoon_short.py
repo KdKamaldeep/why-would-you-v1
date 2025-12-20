@@ -437,14 +437,25 @@ class CartoonShortsGenerator:
             
             # Compile stitched video (keep existing output)
             stitched_output = self.output_dir / "stitched.mp4"
-            self.video_processor.compile_final_video(
-                final_clips,
-                final_audio_paths,  # Pass audio paths with pauses included
-                background_music,
-                str(subtitles_path) if self.config.add_subtitles else None,
-                str(stitched_output)
-            )
-            logger.info(f"✅ Stitched video created: {stitched_output}")
+            try:
+                self.video_processor.compile_final_video(
+                    final_clips,
+                    final_audio_paths,  # Pass audio paths with pauses included
+                    background_music,
+                    str(subtitles_path) if self.config.add_subtitles else None,
+                    str(stitched_output)
+                )
+                logger.info(f"✅ Stitched video created: {stitched_output}")
+            except Exception as e:
+                logger.error(f"❌ Failed to create stitched video: {e}")
+                # Clean up corrupted file if it exists
+                if stitched_output.exists():
+                    try:
+                        stitched_output.unlink()
+                        logger.info("🧹 Removed corrupted stitched video file")
+                    except Exception:
+                        pass
+                raise
             
             # Step 8: Create platform-ready reel (if enabled)
             if self.config.create_reel:

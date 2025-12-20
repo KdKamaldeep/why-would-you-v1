@@ -1,23 +1,23 @@
 {
-  "title": "Sunset Over Mountains - Test Storyboard",
-  "description": "A simple test storyboard with 2 scenes showing a beautiful sunset over mountains",
+  "title": "Morning Expectations vs Reality",
+  "description": "A funny conversation between two girls about how mornings are imagined vs how they actually happen",
   "total_duration": 16,
   "scenes": [
     {
       "duration": 8,
-      "description": "Wide shot of mountains during sunset with fast moving clouds",
-      "visual_prompt": "Wide shot of majestic mountain range during golden hour sunset, fast moving dramatic clouds across the sky, cinematic lighting, realistic, photorealistic, natural colors, vibrant sky",
-      "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly",
-      "narration": "The sun begins to set over the majestic mountain range, painting the sky in brilliant shades of orange and gold.",
-      "subtitle": "Sunset Begins"
+      "description": "Girl confidently planning a perfect morning routine",
+      "visual_prompt": "A young girl sitting confidently with a notebook and coffee mug, imagining a perfect morning routine, bright indoor lighting, expressive face, cinematic look, realistic, shallow depth of field",
+      "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, illustration, distorted, deformed",
+      "narration": "Girl one says, Tomorrow morning I will wake up early, exercise, drink warm water, meditate, and start my day fresh.",
+      "subtitle": "Girl 1: Tomorrow I’ll be productive 💪"
     },
     {
       "duration": 8,
-      "description": "Close-up of sun setting behind mountain peaks with parallax effect",
-      "visual_prompt": "Close-up view of sun setting behind mountain peaks, dramatic clouds moving with parallax effect, cinematic drone flyover perspective, realistic, photorealistic, golden hour lighting, film look, high detail",
-      "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly",
-      "narration": "As the golden orb descends behind the peaks, the clouds dance across the horizon in a spectacular display of nature's beauty.",
-      "subtitle": "Golden Hour"
+      "description": "Second girl reacting with brutal reality humor",
+      "visual_prompt": "Another young girl lying on a couch with messy hair, holding phone, laughing sarcastically, casual indoor setting, realistic, cinematic lighting, film look",
+      "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, illustration, distorted, deformed",
+      "narration": "Girl two replies, Yes… and tomorrow you will also wake up late, scroll reels for one hour, and skip breakfast.",
+      "subtitle": "Girl 2: Reality has entered the chat 😴📱"
     }
   ]
 }

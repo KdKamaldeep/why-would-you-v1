@@ -398,10 +398,18 @@ class VideoProcessor:
                 '-safe', '0',
                 '-i', concat_file,
                 '-c', 'copy',
+                '-movflags', '+faststart',  # Ensure moov atom is at front
                 temp_video
             ]
             
-            subprocess.run(cmd, check=True, capture_output=True)
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
+                error_msg = result.stderr if result.stderr else "Unknown error"
+                raise RuntimeError(f"Failed to concatenate videos. FFmpeg error: {error_msg}")
+            
+            # Verify temp video was created successfully
+            if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
+                raise RuntimeError(f"Failed to create temp video: {temp_video} is missing or empty")
             
             # Probe temp video duration to cap final output length safely
             try:
@@ -469,16 +477,56 @@ class VideoProcessor:
                 cmd.extend(['-movflags', '+faststart'])
             cmd.append(output_path)
             
-            subprocess.run(cmd, check=True, capture_output=True)
+            # Run FFmpeg command and check for errors
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            
+            # Verify output file was created successfully
+            if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
+                error_msg = result.stderr if result.stderr else "Unknown FFmpeg error"
+                raise RuntimeError(f"FFmpeg failed to create output file: {output_path}. Error: {error_msg}")
             
             # Cleanup
-            os.remove(concat_file)
-            os.remove(temp_video)
+            try:
+                os.remove(concat_file)
+            except Exception:
+                pass
+            try:
+                os.remove(temp_video)
+            except Exception:
+                pass
             
             logger.info(f"Compiled final video: {output_path}")
             return output_path
             
+        except subprocess.CalledProcessError as e:
+            error_output = e.stderr if isinstance(e.stderr, str) else (e.stderr.decode('utf-8', errors='ignore') if e.stderr else str(e))
+            logger.error(f"❌ Error compiling final video: FFmpeg command failed with exit code {e.returncode}")
+            logger.error(f"FFmpeg stderr: {error_output}")
+            if hasattr(e, 'stdout') and e.stdout:
+                stdout_str = e.stdout if isinstance(e.stdout, str) else e.stdout.decode('utf-8', errors='ignore')
+                logger.error(f"FFmpeg stdout: {stdout_str}")
+            # Clean up partial files
+            try:
+                if os.path.exists("temp_video.mp4"):
+                    os.remove("temp_video.mp4")
+                if os.path.exists(output_path):
+                    os.remove(output_path)
+                if os.path.exists("concat_list.txt"):
+                    os.remove("concat_list.txt")
+            except Exception:
+                pass
+            raise RuntimeError(f"Failed to compile final video. FFmpeg error: {error_output}")
         except Exception as e:
             logger.error(f"Error compiling final video: {e}")
-            return clips[0] if clips else ""
+            import traceback
+            logger.error(traceback.format_exc())
+            # Clean up partial files
+            try:
+                if os.path.exists("temp_video.mp4"):
+                    os.remove("temp_video.mp4")
+                if os.path.exists(output_path):
+                    os.remove(output_path)
+            except Exception:
+                pass
+            raise
 
