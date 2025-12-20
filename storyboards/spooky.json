@@ -1,0 +1,91 @@
+{
+  "title": "Why Would You Hear Footsteps in an Empty House?",
+  "description": "A spooky yet fun story explaining strange sounds at night and how our imagination can play tricks on us.",
+  "total_duration": 55,
+  "cast": [
+    {"name": "Narrator", "role": "storyteller"},
+    {"name": "Arjun", "role": "curious boy"},
+    {"name": "Grandma", "role": "wise elder with spooky tales"},
+    {"name": "Shadow", "role": "mysterious spooky figure"}
+  ],
+  "scenes": [
+    {
+      "duration": 7,
+      "description": "channel spooky intro with question",
+      "visual_prompt": "(wide shot:1.2) fantasy storybook world(1.3), glowing ancient book on pedestal emitting ghostly mist(1.2), floating glowing letters 'Why Would You?' above it(1.2), glowing green subtitle text 'Why Would You Hear Footsteps in an Empty House?' hovering(1.3), dark cloudy night sky with bats flying, eerie lighting, cartoon spooky storybook style(1.3)",
+      "negative_prompt": "blurry, distorted, gore, too scary, messy text, realistic human, extra limbs",
+      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>क्या आपने कभी... <break time='400ms'/> एक खाली घर में... <emphasis level='moderate'>कदमों की आवाज़ सुनी है?</emphasis> <break time='600ms'/> क्यों ये कहानी... एक डरावने सवाल से शुरू होती है? <break time='300ms'/> ताकि हम सच्चाई का सामना करें... और रहस्य धीरे-धीरे सामने आए।</voice></speak>",
+      "voice": "hi-IN-ArjunNeural-male",
+      "subtitle": "Channel Intro",
+      "characters": ["Narrator"],
+      "motion_prompt": "ghostly letters floating above glowing book"
+    },
+    {
+      "duration": 8,
+      "description": "boy hears footsteps in his house at night",
+      "visual_prompt": "(wide shot:1.2) young Indian boy about 11 years old, short hair, wearing striped pajamas, holding a flickering lantern, standing alone in a narrow dark wooden hallway, spooky shadows on walls, old creaky floorboards, fearful expression, cartoon spooky storybook style(1.3)",
+      "negative_prompt": "too realistic horror, gore, scary faces, blurry, extra limbs",
+      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>रात के सन्नाटे में... <break time='300ms'/> क्यों सुनाई देती है पदचाप... <emphasis level='moderate'>जब कोई होता ही नहीं?</emphasis></voice></speak> <speak><voice name='hi-IN-ArjunNeural-male'>अर्जुन ने सुनी… <break time='200ms'/> धीमी, डरावनी चाल… जैसे कोई... धीरे-धीरे पास आ रहा हो।</voice></speak>",
+      "voice": "hi-IN-ArjunNeural-male",
+      "subtitle": "The Question",
+      "characters": ["Narrator", "Arjun"],
+      "motion_prompt": "lantern flickering, floorboards creaking"
+    },
+    {
+      "duration": 7,
+      "description": "grandmother appears with spooky story",
+      "visual_prompt": "(medium shot:1.2) elderly Indian woman with gray bun, wearing a simple cotton sari, holding a soft glowing candle, standing beside a curious young Indian boy in striped pajamas, both inside a shadowy hallway, warm spooky lighting, cartoon spooky storybook style(1.3)",
+      "negative_prompt": "blurry, too scary, distorted, extra limbs, gore",
+      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>दादी ने धीमे स्वर में कहा... <break time='300ms'/> 'बेटा, डर मत... <emphasis level='moderate'>यह घर पुराना है...</emphasis> कभी हवा, <break time='200ms'/> कभी लकड़ी की आवाज़... <break time='200ms'/> यूँ ही डर बना देती है।'</voice></speak>",
+      "voice": "hi-IN-ArjunNeural-male",
+      "subtitle": "Grandma’s Explanation",
+      "characters": ["Grandma", "Arjun"],
+      "motion_prompt": "candle flame flickering in darkness"
+    },
+    {
+      "duration": 6,
+      "description": "boy scared but curious",
+      "visual_prompt": "(medium shot:1.2) 11-year-old Indian boy with scared wide eyes, tightly hugging glowing lantern, standing in a dim spooky hallway, looking at a dark shadow moving slowly on the far wall, tense atmosphere, cartoon spooky style(1.3)",
+      "negative_prompt": "blurry, gore, distorted faces, extra limbs",
+      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>अर्जुन की आवाज़ काँप उठी... <break time='200ms'/> 'लेकिन दादी... <break time='300ms'/> <emphasis level='strong'>वो परछाई कौन है?</emphasis>'</voice></speak>",
+      "voice": "hi-IN-ArjunNeural-male",
+      "subtitle": "The Doubt",
+      "characters": ["Arjun"],
+      "motion_prompt": "spooky shadow moving slightly on wall"
+    },
+    {
+      "duration": 9,
+      "description": "shadow turns into harmless tree branch",
+      "visual_prompt": "(wide shot:1.2) shadow on interior wall revealed to be tree branch swaying outside window, gentle moonlight filtering through, 11-year-old Indian boy peeking through slightly opened window, surprised but calm face, cartoon spooky storybook style(1.3)",
+      "negative_prompt": "blurry, too realistic horror, gore, distorted features, extra limbs",
+      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>अर्जुन ने हिम्मत जुटाई... <break time='200ms'/> और धीरे से खिड़की खोली।</voice></speak> <speak><voice name='hi-IN-ArjunNeural-male'>चौंकाने वाली बात यह थी... <break time='400ms'/> वो परछाई... <emphasis level='moderate'>एक पेड़ की शाखा थी</emphasis> जो हवा में हिल रही थी।</voice></speak>",
+      "voice": "hi-IN-ArjunNeural-male",
+      "subtitle": "The Reveal",
+      "characters": ["Narrator", "Arjun", "Shadow"],
+      "motion_prompt": "tree branch swaying in moonlight"
+    },
+    {
+      "duration": 9,
+      "description": "lesson of imagination vs reality",
+      "visual_prompt": "(two panel scene:1.3), left panel: scared Indian boy in striped pajamas holding lantern in dark hallway, large shadow looming behind him; right panel: same boy smiling peacefully near open window, tree clearly visible outside in moonlight, peaceful vibe, cartoon spooky storybook style(1.3)",
+      "negative_prompt": "blurry, distorted faces, extra limbs, gore, horror",
+      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>कभी-कभी हमारा दिमाग... <break time='300ms'/> <emphasis level='moderate'>खाली जगहों में भी डर भर देता है।</emphasis> <break time='400ms'/> लेकिन सच तो... <emphasis level='moderate'>बहुत साधारण होता है।</emphasis> <break time='500ms'/> अगर आपको यह कहानी पसंद आई हो, <emphasis level='moderate'>तो कृपया इस चैनल को सब्सक्राइब करें।</emphasis></voice></speak>",
+      "voice": "hi-IN-ArjunNeural-male",
+      "subtitle": "The Lesson",
+      "characters": ["Narrator", "Arjun"],
+      "motion_prompt": "left panel dark, right panel glowing with moonlight"
+    },
+    {
+      "duration": 9,
+      "description": "boy smiles, grandma pats his head",
+      "visual_prompt": "(close shot:1.2) smiling Indian boy in striped pajamas with lantern at his side, elderly Indian woman beside him gently patting his head, candlelight glowing between them, warm and cozy spooky atmosphere, cartoon storybook style(1.3)",
+      "negative_prompt": "blurry, distorted, gore, realistic human, harsh shadows, extra limbs",
+      "narration": "<speak><voice name='hi-IN-ArjunNeural-male'>अर्जुन ने मुस्कुराते हुए कहा...</voice></speak> <speak><voice name='hi-IN-ArjunNeural-male'>‘अब समझ आया... <break time='300ms'/> डर से भागने की नहीं, <emphasis level='strong'>उससे बात करने की ज़रूरत है।</emphasis>’</voice></speak>",
+      "voice": "hi-IN-ArjunNeural-male",
+      "subtitle": "The Ending",
+      "characters": ["Narrator", "Arjun", "Grandma"],
+      "motion_prompt": "Grandma gently patting boy’s head"
+    }
+  ],
+  "tags": ["kids", "spooky", "mystery", "imagination", "storytelling"]
+}

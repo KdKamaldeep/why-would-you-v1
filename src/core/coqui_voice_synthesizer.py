@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 """
-Coqui TTS Voice Synthesizer - Bark Model
+Coqui TTS Voice Synthesizer
 
-This module provides voice synthesis using Coqui TTS with the Bark model.
-Bark is a multi-lingual TTS model that can generate conversational speech,
-music, and sound effects.
-
-Based on: https://docs.coqui.ai/en/dev/models/bark.html
+This module provides voice synthesis using Coqui TTS models
+(XTTS-v2 for multilingual, and Tacotron/VITS variants for English).
 """
 
 import os
+import re
 import logging
 import tempfile
 import warnings
 import numpy as np
 from typing import List, Optional, Dict, Any
+from pathlib import Path
 import torch
 from pydantic import BaseModel
 
@@ -60,10 +59,28 @@ def _patch_torch_load():
 # Apply the patch when module is imported
 _patch_torch_load()
 
+
+def _get_default_tts_model_path() -> str:
+    """Get default TTS model path, preferring /workspace if available."""
+    # Check for /workspace first (RunPod attached disk)
+    workspace_model = Path("/workspace/models/tts/XTTS-v2")
+    local_model = Path("models/tts/XTTS-v2")
+    if workspace_model.exists():
+        return str(workspace_model)
+    elif local_model.exists():
+        return str(local_model)
+    else:
+        # Default to workspace if it exists, otherwise local
+        if Path("/workspace").exists():
+            return str(workspace_model)
+        else:
+            return str(local_model)
+
+
 class CoquiVoiceConfig(BaseModel):
     """Configuration for Coqui TTS voice synthesis"""
-    # Prefer a small, reliable English model by default; will switch to XTTS for multilingual
-    model_name: str = "tts_models/en/ljspeech/tacotron2-DDC"
+    # Prefer local XTTS v2 model by default; will fall back to online models if needed
+    model_name: str = "models/tts/XTTS-v2"
     gpu: bool = True
     voice_dir: str = "tts_voices/"
     speaker: str = "default"
@@ -80,7 +97,14 @@ class CoquiVoiceSynthesizer:
         Args:
             config: Configuration for voice synthesis
         """
-        self.config = config or CoquiVoiceConfig()
+        if config is None:
+            # Create config with workspace-aware default model path
+            default_model = _get_default_tts_model_path()
+            config = CoquiVoiceConfig(model_name=default_model)
+        elif config.model_name is None or config.model_name == "models/tts/XTTS-v2":
+            # Update model path if using default
+            config.model_name = _get_default_tts_model_path()
+        self.config = config
         
         # Create voice directory if it doesn't exist
         os.makedirs(self.config.voice_dir, exist_ok=True)
@@ -104,18 +128,30 @@ class CoquiVoiceSynthesizer:
             fallback_models = []
             lang = (self.config.language or "en").lower()
             
+            # Check for workspace model path first (RunPod with attached disk)
+            workspace_model = str(Path("/workspace/models/tts/XTTS-v2"))
+            local_model = "models/tts/XTTS-v2"
+            
             # Language-specific model prioritization
             if lang == "hi":  # Hindi
                 # For Hindi, prioritize XTTS v2 which has excellent Hindi support
+                # Try workspace path first if it exists
+                if Path("/workspace").exists():
+                    fallback_models.extend([workspace_model])
                 fallback_models.extend([
-                    "coqui/XTTS-v2",
+                    local_model,  # Local XTTS v2 model
+                    "coqui/XTTS-v2",  # Online fallback
                     "tts_models/multilingual/multi-dataset/xtts_v2",
                     "tts_models/multilingual/multi-dataset/your_tts",  # YourTTS also supports Hindi
                 ])
             elif lang != "en":  # Other non-English languages
                 # For other languages, try XTTS first
+                # Try workspace path first if it exists
+                if Path("/workspace").exists():
+                    fallback_models.extend([workspace_model])
                 fallback_models.extend([
-                    "coqui/XTTS-v2",
+                    local_model,  # Local XTTS v2 model
+                    "coqui/XTTS-v2",  # Online fallback
                     "tts_models/multilingual/multi-dataset/xtts_v2",
                     "tts_models/multilingual/multi-dataset/your_tts",
                 ])
@@ -132,6 +168,8 @@ class CoquiVoiceSynthesizer:
             ])
             
             # Ensure XTTS is attempted even for English if earlier attempts failed
+            if "models/tts/XTTS-v2" not in fallback_models:
+                fallback_models.append("models/tts/XTTS-v2")  # Local XTTS v2 model
             if "tts_models/multilingual/multi-dataset/xtts_v2" not in fallback_models:
                 fallback_models.append("tts_models/multilingual/multi-dataset/xtts_v2")
             
@@ -195,6 +233,25 @@ class CoquiVoiceSynthesizer:
             raise RuntimeError("Coqui TTS model not loaded")
         
         try:
+            # Log the voice_clone_audio parameter for debugging
+            logger.info(f"🎵 Voice synthesis called with voice_clone_audio: {voice_clone_audio}")
+            logger.info(f"🎵 Voice synthesis called with speaker: {speaker}")
+            
+            # Ensure multilingual model for non-English languages
+            if (self.config.language or "en").lower() != "en":
+                if "xtts" not in (getattr(self.config, 'model_name', '') or '').lower():
+                    logger.info(
+                        "Language is non-English (%s) but current model is not XTTS; attempting to switch to XTTS",
+                        self.config.language,
+                    )
+                    # Prefer local XTTS-v2 (workspace path if available)
+                    self.config.model_name = _get_default_tts_model_path()
+                    try:
+                        self._load_model()
+                        logger.info("Switched TTS model to XTTS for multilingual synthesis")
+                    except Exception as e:
+                        logger.warning(f"Failed to switch to XTTS automatically: {e}")
+
             # Clean and deduplicate narration lines
             cleaned_lines = []
             seen_texts = set()
@@ -214,8 +271,9 @@ class CoquiVoiceSynthesizer:
                 else:
                     cleaned_lines = ["Hello, this is a test message."]
             
-            # Join cleaned lines with proper spacing
+            # Join cleaned lines with proper spacing and sanitize
             full_text = " ".join(cleaned_lines)
+            full_text = self._sanitize_text(full_text)
             logger.info(f"Original lines: {len(narration_lines)}, Cleaned lines: {len(cleaned_lines)}")
             logger.info(f"Synthesizing voice for text: {full_text[:100]}...")
             
@@ -267,16 +325,23 @@ class CoquiVoiceSynthesizer:
                 if self.config.language != "en":
                     try:
                         # Ensure text is properly encoded for the target language
+                        import unicodedata
+                        # NFC is best for XTTS tokenization; also strip Latin noise for Hindi
+                        full_text = unicodedata.normalize('NFC', full_text)
                         if self.config.language == "hi":
-                            # For Hindi, ensure Devanagari script is properly handled
-                            import unicodedata
-                            # Normalize Unicode characters
-                            full_text = unicodedata.normalize('NFC', full_text)
-                            logger.info(f"Normalized Hindi text: {full_text[:50]}...")
+                            # Remove stray Latin letters or unsupported chars that cause gibberish
+                            # Keep Devanagari, punctuation and spaces
+                            full_text = re.sub(r"[^\u0900-\u097F\s\.,!?\-–—'\"]+", " ", full_text)
+                            full_text = re.sub(r"\s+", " ", full_text).strip()
+                        logger.info(f"Normalized {self.config.language} text: {full_text[:50]}...")
                     except Exception as e:
                         logger.warning(f"Text normalization warning: {e}")
                 
                 speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
+                logger.info(f"🎵 XTTS: speaker_wav_arg set to: {speaker_wav_arg}")
+                logger.info(f"🎵 XTTS: voice_clone_audio was: {voice_clone_audio}")
+                logger.info(f"🎵 XTTS: voice_clone_audio exists: {voice_clone_audio and os.path.exists(voice_clone_audio) if voice_clone_audio else False}")
+                
                 # Auto-discover a language-appropriate speaker WAV if none provided
                 if speaker_wav_arg is None:
                     auto_wav = self._discover_speaker_wav(self.config.language)
@@ -411,23 +476,24 @@ class CoquiVoiceSynthesizer:
                     speaker_audio_path = os.path.join(speaker_dir, "speaker.wav")
                     shutil.copy2(voice_clone_audio, speaker_audio_path)
                     current_speaker = speaker_name
-                
-                # Try synthesis with fallback for kernel size issues
+
+                # First attempt: whole text
                 synthesis_success = False
                 try:
                     logger.info(f"Generating audio with speaker: {current_speaker}")
-                    # Avoid passing progress_bar to suppress model_kwargs warnings
-                    self.tts.tts_to_file(
+                    self._safe_tts_to_file_non_xtts(
                         text=full_text,
                         file_path=output_path,
-                        voice_dir=self.config.voice_dir
+                        speaker=current_speaker
                     )
                     synthesis_success = True
                 except Exception as e:
                     error_msg = str(e)
-                    if "kernel size" in error_msg.lower():
-                        logger.warning(f"Kernel size error detected, trying with extended text: {error_msg}")
-                        # Try with extended text for kernel size issues
+                    logger.warning(f"Whole-text synthesis failed: {error_msg}")
+                    
+                # Fallback 1: retry with extended text for kernel size issues
+                if not synthesis_success:
+                    try:
                         if self.config.language == "hi":
                             extended_parts = [
                                 full_text,
@@ -444,22 +510,33 @@ class CoquiVoiceSynthesizer:
                                 "Thank you and best wishes."
                             ]
                             extended_text = ". ".join(extended_parts) + "."
-                        
+
                         logger.info(f"Non-XTTS retrying with extended text length: {len(extended_text)} characters")
-                        try:
-                            self.tts.tts_to_file(
-                                text=extended_text,
-                                file_path=output_path,
-                                voice_dir=self.config.voice_dir
-                            )
-                            synthesis_success = True
-                            logger.info("✅ Non-XTTS synthesis successful with extended text")
-                        except Exception as e2:
-                            logger.error(f"Extended text synthesis also failed: {e2}")
-                            raise e2
-                    else:
-                        raise e
-                
+                        self._safe_tts_to_file_non_xtts(
+                            text=extended_text,
+                            file_path=output_path,
+                            speaker=current_speaker
+                        )
+                        synthesis_success = True
+                        logger.info("✅ Non-XTTS synthesis successful with extended text")
+                    except Exception as e2:
+                        logger.warning(f"Extended-text synthesis failed: {e2}")
+
+                # Fallback 2: split into sentences and concatenate
+                if not synthesis_success:
+                    try:
+                        logger.info("Falling back to sentence-by-sentence synthesis and concatenation")
+                        self._synthesize_non_xtts_by_sentences(
+                            text=full_text,
+                            output_path=output_path,
+                            speaker=current_speaker
+                        )
+                        synthesis_success = True
+                        logger.info("✅ Non-XTTS synthesis successful by concatenating sentences")
+                    except Exception as e3:
+                        logger.error(f"Sentence-by-sentence synthesis failed: {e3}")
+                        raise e3
+
                 if not synthesis_success:
                     raise Exception("Non-XTTS synthesis failed")
             
@@ -744,6 +821,117 @@ class CoquiVoiceSynthesizer:
             logger.info("Coqui TTS cleanup completed")
         except Exception as e:
             logger.warning(f"Cleanup warning: {e}")
+
+    # -------------------------
+    # Helpers: text + synthesis
+    # -------------------------
+    def _sanitize_text(self, text: str) -> str:
+        """Sanitize input text to avoid decoder issues.
+
+        - Normalize whitespace
+        - Remove stray, unmatched quotes at the end
+        - Ensure sentences end with proper punctuation
+        - Fix common unmatched single-quote cases like: He said, 'Hello!
+        """
+        if not text:
+            return text
+
+        # Normalize whitespace
+        txt = re.sub(r"\s+", " ", text).strip()
+
+        # Replace fancy quotes with straight quotes for stability
+        txt = txt.replace("“", '"').replace("”", '"').replace("’", "'").replace("‘", "'")
+
+        # Remove isolated single or double quote tokens
+        txt = re.sub(r'\s+\'\s+', ' ', txt)
+        txt = re.sub(r'\s+"+\s+', ' ', txt)
+
+        # If text ends with a lone quote, drop it
+        txt = re.sub(r"([.!?])['\"]?$", r"\1", txt)
+        txt = re.sub(r"(^|\s)['\"]($|\s)", r" ", txt).strip()
+
+        # Note: We avoid aggressive quote-matching heuristics to prevent regex errors.
+
+        return txt
+
+    def _split_sentences(self, text: str) -> List[str]:
+        """Split text into sentences conservatively and clean stray quotes."""
+        if not text:
+            return []
+        # Primary split on punctuation followed by whitespace
+        parts = re.split(r"(?<=[.!?])\s+", text)
+        cleaned: List[str] = []
+        for p in parts:
+            s = p.strip()
+            if not s:
+                continue
+            # Remove trailing lone quotes
+            s = re.sub(r"^['\"]+(.*)$", r"\1", s)
+            s = re.sub(r"^(.*)['\"]+$", r"\1", s)
+            # Ensure terminal punctuation
+            if not re.search(r"[.!?]$", s):
+                s = s + "."
+            cleaned.append(s)
+        return cleaned
+
+    def _safe_tts_to_file_non_xtts(self, text: str, file_path: str, speaker: Optional[str]) -> None:
+        """Call tts_to_file for non-XTTS models, passing speaker if supported."""
+        try:
+            # Some models accept speaker token
+            self.tts.tts_to_file(
+                text=text,
+                file_path=file_path,
+                voice_dir=self.config.voice_dir,
+                speaker=speaker,
+            )
+        except TypeError:
+            # Older single-speaker models may not accept speaker kwarg
+            self.tts.tts_to_file(
+                text=text,
+                file_path=file_path,
+                voice_dir=self.config.voice_dir,
+            )
+
+    def _synthesize_non_xtts_by_sentences(self, text: str, output_path: str, speaker: Optional[str]) -> None:
+        """Synthesize sentence by sentence and concatenate to a single WAV."""
+        import tempfile
+        import wave
+
+        sentences = self._split_sentences(text)
+        if not sentences:
+            raise RuntimeError("No sentences to synthesize")
+
+        temp_paths: List[str] = []
+        try:
+            for idx, sent in enumerate(sentences):
+                tmp_path = os.path.join(tempfile.gettempdir(), f"coqui_sent_{os.getpid()}_{idx}.wav")
+                self._safe_tts_to_file_non_xtts(sent, tmp_path, speaker)
+                if not os.path.exists(tmp_path):
+                    raise RuntimeError(f"Failed to synthesize sentence {idx+1}")
+                temp_paths.append(tmp_path)
+
+            # Concatenate WAV files
+            with wave.open(output_path, 'wb') as out_wav:
+                # Initialize with params from first file
+                with wave.open(temp_paths[0], 'rb') as first:
+                    out_wav.setparams(first.getparams())
+                    out_wav.writeframes(first.readframes(first.getnframes()))
+
+                # Append the rest
+                for p in temp_paths[1:]:
+                    with wave.open(p, 'rb') as w:
+                        # If params mismatch, log and still try to append raw frames
+                        if w.getparams() != out_wav.getparams():
+                            logger.warning("WAV parameter mismatch during concatenation; attempting raw append")
+                        out_wav.writeframes(w.readframes(w.getnframes()))
+        finally:
+            # Cleanup temp files
+            for p in temp_paths:
+                try:
+                    if os.path.exists(p):
+                        os.remove(p)
+                except Exception:
+                    pass
 
 # Example usage function
 def test_coqui_voice():

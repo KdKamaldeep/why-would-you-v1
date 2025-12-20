@@ -47,7 +47,7 @@ class ScriptGenerator:
         Requirements:
         - Create exactly 3 scenes, each approximately {scene_duration} seconds long
         - Make it engaging and entertaining for social media
-        - Include VERY detailed visual descriptions for accurate cartoon-style image generation
+        - Include VERY detailed visual descriptions for accurate video generation
         - Add humor, emotion, and personality
         - Optimized for video format (supports both 9:16 and 16:9)
         - Include clear, engaging narration text for each scene (aim for 15-25 words per scene for proper timing)
@@ -67,8 +67,8 @@ class ScriptGenerator:
                 {{
                     "duration": {scene_duration},
                     "description": "Detailed description of what happens in this scene",
-                    "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
-                    "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
+                    "visual_prompt": "VERY detailed realistic description for video generation: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific and realistic.",
+                    "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly, dark, scary, violent, adult content, nsfw",
                     "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
                     "subtitle": "Concise subtitle text that matches the narration",
                     "characters": [
@@ -93,8 +93,8 @@ class ScriptGenerator:
                 {{
                     "duration": {scene_duration},
                     "description": "Detailed description of what happens in this scene", 
-                    "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
-                    "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
+                    "visual_prompt": "VERY detailed realistic description for video generation: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific and realistic.",
+                    "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly, dark, scary, violent, adult content, nsfw",
                     "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
                     "subtitle": "Concise subtitle text that matches the narration",
                     "characters": [
@@ -105,8 +105,8 @@ class ScriptGenerator:
                 {{
                     "duration": {scene_duration},
                     "description": "Detailed description of what happens in this scene",
-                    "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
-                    "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
+                    "visual_prompt": "VERY detailed realistic description for video generation: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific and realistic.",
+                    "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly, dark, scary, violent, adult content, nsfw",
                     "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
                     "subtitle": "Concise subtitle text that matches the narration",
                     "characters": [
@@ -115,7 +115,7 @@ class ScriptGenerator:
                     ]
                 }}
             ],
-            "tags": ["cartoon", "story", "fun"]
+            "tags": ["video", "story", "reel"]
         }}
         
         IMPORTANT: 
@@ -177,10 +177,12 @@ class ScriptGenerator:
                 "duration": duration,
                 "description": scene.get("description", visual_prompt),
                 "visual_prompt": visual_prompt,
-                "negative_prompt": scene.get("negative_prompt", "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures"),
+                "negative_prompt": scene.get("negative_prompt", "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly, dark, scary, violent, adult content, nsfw"),
                 "narration": scene.get("narration", scene.get("subtitle", "")),
                 "subtitle": scene.get("subtitle", scene.get("narration", "")) or f"Scene {idx+1}",
-                "characters": scene.get("characters", [])[:2]  # ensure at most two
+                "characters": scene.get("characters", [])[:2],  # ensure at most two
+                "voice": scene.get("voice"),  # preserve voice property for TTS
+                "motion_prompt": scene.get("motion_prompt")  # preserve motion prompt for animation
             })
 
         if not normalized_scenes:
@@ -192,7 +194,7 @@ class ScriptGenerator:
             "description": description,
             "total_duration": total_duration,
             "scenes": normalized_scenes,
-            "tags": ["cartoon", "storybook", "adventure"]
+            "tags": ["video", "story", "adventure"]
         }
         logger.info(f"Built script from {len(normalized_scenes)} custom scenes (total {total_duration}s)")
         return script
@@ -221,10 +223,10 @@ class ScriptGenerator:
                 "duration": scene_duration,
                 "description": f"Scene 1: Introduction to {prompt}",
                 "visual_prompt": (
-                    f"Two friends begin an adventure about {prompt}. Vertical cartoon style, vibrant, clean lines, "
+                    f"Two friends begin an adventure about {prompt}. Realistic style, cinematic, natural lighting, "
                     f"background setting related to the story."
                 ),
-                "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
+                "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly, dark, scary, violent, adult content, nsfw",
                 "narration": f"Alex and Riley spot the start of an unexpected adventure: {prompt}.",
                 "subtitle": "A New Adventure",
                 "characters": [character_a, character_b]
@@ -236,7 +238,7 @@ class ScriptGenerator:
                     f"Alex and Riley face a fun challenge tied to {prompt}. Expressive faces, dynamic poses, "
                     f"colorful environment, whimsical props."
                 ),
-                "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
+                "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly, dark, scary, violent, adult content, nsfw",
                 "narration": f"Together they improvise, using wit and teamwork to move forward.",
                 "subtitle": "Teamwork!",
                 "characters": [
@@ -251,7 +253,7 @@ class ScriptGenerator:
                     f"Cheerful resolution of {prompt} with Alex and Riley celebrating. Warm lighting, confetti or sparkles, "
                     f"joyful expressions, tidy composition."
                 ),
-                "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
+                "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly, dark, scary, violent, adult content, nsfw",
                 "narration": f"In the end, they succeed—and share a laugh, already dreaming of the next adventure.",
                 "subtitle": "We Did It!",
                 "characters": [
@@ -263,8 +265,8 @@ class ScriptGenerator:
 
         return {
             "title": f"Story: {prompt}",
-            "description": f"A fun cartoon story about {prompt}",
+            "description": f"A compelling story about {prompt}",
             "total_duration": scene_duration * 3,
             "scenes": scenes,
-            "tags": [prompt, "cartoon", "story", "fun"]
+            "tags": [prompt, "video", "story", "reel"]
         }
