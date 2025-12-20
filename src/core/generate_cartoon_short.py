@@ -499,11 +499,11 @@ class CartoonShortsGenerator:
             # Compile stitched video (keep existing output)
             stitched_output = self.output_dir / "stitched.mp4"
             try:
-            self.video_processor.compile_final_video(
-                final_clips,
-                final_audio_paths,  # Pass audio paths with pauses included
-                background_music,
-                str(subtitles_path) if self.config.add_subtitles else None,
+                self.video_processor.compile_final_video(
+                    final_clips,
+                    final_audio_paths,  # Pass audio paths with pauses included
+                    background_music,
+                    str(subtitles_path) if self.config.add_subtitles else None,
                     str(stitched_output)
                 )
                 logger.info(f"✅ Stitched video created: {stitched_output}")
@@ -625,10 +625,10 @@ class CartoonShortsGenerator:
                 
                 # Check if narration file exists, otherwise calculate expected duration from WAN settings
                 if narration_path.exists():
-                logger.info("📏 Fallback: Detecting single track duration...")
-                actual_duration = self.video_processor.get_audio_duration(str(narration_path))
-                script['total_duration'] = actual_duration
-                self.config.duration = max(self.config.duration, actual_duration)
+                    logger.info("📏 Fallback: Detecting single track duration...")
+                    actual_duration = self.video_processor.get_audio_duration(str(narration_path))
+                    script['total_duration'] = actual_duration
+                    self.config.duration = max(self.config.duration, actual_duration)
                 else:
                     # Use WAN video duration if audio file doesn't exist (WAN generates fixed duration)
                     logger.warning(f"⚠️ Narration file not found: {narration_path}")
