@@ -65,16 +65,32 @@ def _get_default_tts_model_path() -> str:
     # Check for /workspace first (RunPod attached disk)
     workspace_model = Path("/workspace/models/tts/XTTS-v2")
     local_model = Path("models/tts/XTTS-v2")
-    if workspace_model.exists():
+    
+    # Check if the model directory actually exists and has model files
+    def is_valid_model_path(path: Path) -> bool:
+        """Check if path is a valid TTS model directory."""
+        if not path.exists():
+            return False
+        # Check for common model files/directories
+        return any([
+            (path / "config.json").exists(),
+            (path / "model.pth").exists(),
+            (path / "vocab.json").exists(),
+            any(path.glob("*.pth")),
+            any(path.glob("*.pt")),
+        ])
+    
+    if is_valid_model_path(workspace_model):
         return str(workspace_model)
-    elif local_model.exists():
+    elif is_valid_model_path(local_model):
         return str(local_model)
     else:
-        # Default to workspace if it exists, otherwise local
+        # If workspace exists but model not there, return workspace path (will download)
         if Path("/workspace").exists():
             return str(workspace_model)
         else:
-            return str(local_model)
+            # Use online model identifier if local doesn't exist
+            return "coqui/XTTS-v2"
 
 
 class CoquiVoiceConfig(BaseModel):
@@ -118,70 +134,75 @@ class CoquiVoiceSynthesizer:
         logger.info(f"Voice directory: {self.config.voice_dir}")
     
     def _load_model(self):
-        """Load the Coqui TTS model with fallback options"""
+        """Load the Coqui TTS model - prioritize XTTS-v2 from workspace cache, download if needed"""
         try:
             from TTS.api import TTS
 
             device = "cuda" if self.config.gpu and torch.cuda.is_available() else "cpu"
-            
-            # Build a prioritized list of models based on requested language
-            fallback_models = []
             lang = (self.config.language or "en").lower()
             
-            # Check for workspace model path first (RunPod with attached disk)
-            workspace_model = str(Path("/workspace/models/tts/XTTS-v2"))
-            local_model = "models/tts/XTTS-v2"
+            # Build prioritized list - ONLY XTTS-v2 models, no fallback to other models
+            model_priority = []
             
-            # Language-specific model prioritization
-            if lang == "hi":  # Hindi
-                # For Hindi, prioritize XTTS v2 which has excellent Hindi support
-                # Try workspace path first if it exists
-                if Path("/workspace").exists():
-                    fallback_models.extend([workspace_model])
-                fallback_models.extend([
-                    local_model,  # Local XTTS v2 model
-                    "coqui/XTTS-v2",  # Online fallback
-                    "tts_models/multilingual/multi-dataset/xtts_v2",
-                    "tts_models/multilingual/multi-dataset/your_tts",  # YourTTS also supports Hindi
-                ])
-            elif lang != "en":  # Other non-English languages
-                # For other languages, try XTTS first
-                # Try workspace path first if it exists
-                if Path("/workspace").exists():
-                    fallback_models.extend([workspace_model])
-                fallback_models.extend([
-                    local_model,  # Local XTTS v2 model
-                    "coqui/XTTS-v2",  # Online fallback
-                    "tts_models/multilingual/multi-dataset/xtts_v2",
-                    "tts_models/multilingual/multi-dataset/your_tts",
-                ])
+            # 1. First priority: Workspace cache if it exists
+            workspace_model_path = Path("/workspace/models/tts/XTTS-v2")
+            if workspace_model_path.exists():
+                model_priority.append(str(workspace_model_path))
+                logger.info(f"Found workspace cache: {workspace_model_path}")
             
-            # Always try the explicitly configured model
-            if self.config.model_name not in fallback_models:
-                fallback_models.append(self.config.model_name)
+            # 2. Second priority: Local cache
+            local_model_path = Path("models/tts/XTTS-v2")
+            if local_model_path.exists():
+                model_priority.append(str(local_model_path))
+                logger.info(f"Found local cache: {local_model_path}")
             
-            # Add robust English fallbacks
-            fallback_models.extend([
-                "tts_models/en/ljspeech/fast_pitch",
-                "tts_models/en/vctk/vits",
-                "tts_models/en/ljspeech/tacotron2-DDC",
+            # 3. Third priority: Download XTTS-v2 (will download on first use)
+            # Try different XTTS-v2 model identifiers
+            model_priority.extend([
+                "coqui/XTTS-v2",  # Coqui's XTTS-v2
+                "tts_models/multilingual/multi-dataset/xtts_v2",  # HuggingFace XTTS-v2
             ])
             
-            # Ensure XTTS is attempted even for English if earlier attempts failed
-            if "models/tts/XTTS-v2" not in fallback_models:
-                fallback_models.append("models/tts/XTTS-v2")  # Local XTTS v2 model
-            if "tts_models/multilingual/multi-dataset/xtts_v2" not in fallback_models:
-                fallback_models.append("tts_models/multilingual/multi-dataset/xtts_v2")
-            
             logger.info(f"Loading TTS model for language: {lang}")
-            logger.info(f"Model priority list: {fallback_models}")
+            logger.info(f"Model priority list: {model_priority}")
             
-            for model_name in fallback_models:
+            last_error = None
+            for model_name in model_priority:
                 try:
                     logger.info(f"Attempting to load TTS model: {model_name}")
                     
-                    # Load TTS model without trust_remote_code (not supported in this version)
-                    self.tts = TTS(model_name).to(device)
+                    # For local paths, verify they exist before trying to load
+                    model_path = Path(model_name)
+                    if model_path.exists() and model_path.is_dir():
+                        # It's a local directory path - verify it's a valid model
+                        if not any([
+                            (model_path / "config.json").exists(),
+                            (model_path / "model.pth").exists(),
+                            any(model_path.glob("*.pth")),
+                        ]):
+                            logger.warning(f"Path exists but doesn't appear to be a valid model, skipping: {model_name}")
+                            continue
+                    elif "/" in model_name and not model_name.startswith("tts_models") and not model_name.startswith("coqui"):
+                        # It's a local path that doesn't exist - skip it
+                        logger.warning(f"Local path does not exist, skipping: {model_name}")
+                        continue
+                    
+                    # Load TTS model - this will download if not cached
+                    # For local paths, TTS might need the path in a specific format
+                    try:
+                        self.tts = TTS(model_name).to(device)
+                    except (ValueError, TypeError) as e:
+                        # If local path fails with unpacking error, try as model identifier
+                        if "unpack" in str(e).lower() or "expected" in str(e).lower():
+                            logger.warning(f"Local path format issue, trying as model identifier: {e}")
+                            # Try using the model identifier instead
+                            if "workspace" in model_name.lower() or "models/tts" in model_name.lower():
+                                logger.info("Retrying with online model identifier for download")
+                                self.tts = TTS("coqui/XTTS-v2").to(device)
+                            else:
+                                raise
+                        else:
+                            raise
                     
                     # Verify the model supports the target language
                     if hasattr(self.tts, 'languages') and self.tts.languages:
@@ -197,11 +218,14 @@ class CoquiVoiceSynthesizer:
                     return
                     
                 except Exception as e:
+                    last_error = e
                     logger.warning(f"Failed to load model {model_name}: {e}")
                     continue
             
-            # If we get here, all models failed
-            raise Exception("All TTS models failed to load")
+            # If we get here, all XTTS-v2 models failed
+            error_msg = f"All XTTS-v2 models failed to load. Last error: {last_error}"
+            logger.error(error_msg)
+            raise Exception(error_msg)
 
         except ImportError:
             logger.error("❌ Coqui TTS not installed. Install with: pip install TTS")
