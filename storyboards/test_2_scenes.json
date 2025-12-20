@@ -6,7 +6,7 @@
     {
       "duration": 5,
       "description": "Ancient ruins at sunrise",
-      "visual_prompt": "Ancient stone ruins at sunrise, soft golden light, light mist drifting, slow cinematic push forward, realistic historical atmosphere",
+      "visual_prompt": "Ancient stone ruins at sunrise, soft golden light, light mist drifting slowly across the ground, subtle dust particles in the air, slow cinematic push forward, gentle parallax between foreground stones and background ruins, warm atmospheric haze, realistic historical atmosphere",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
       "motion_hint": "slow forward push, drifting mist",
       "motion_strength": 0.6,
@@ -17,7 +17,7 @@
     {
       "duration": 5,
       "description": "Planned ancient city ruins",
-      "visual_prompt": "Ancient Indus Valley city ruins, straight streets, early drainage systems, slow aerial glide, realistic archaeological environment",
+      "visual_prompt": "Ancient Indus Valley city ruins, straight streets and stone foundations, early drainage channels visible, slow aerial glide forward, subtle vertical parallax between streets and buildings, light wind moving loose sand, soft sunlight casting long shadows, realistic archaeological environment",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
       "motion_hint": "slow aerial glide",
       "motion_strength": 0.65,
@@ -28,7 +28,7 @@
     {
       "duration": 5,
       "description": "Ancient artifacts and seals",
-      "visual_prompt": "Ancient Indus Valley artifacts, seals and pottery, soft museum lighting, slow side pan, high detail realism",
+      "visual_prompt": "Ancient Indus Valley artifacts, seals and pottery displayed in sequence, soft museum-style lighting, slow side pan with slight push-in, shallow depth-of-field shift between objects, floating dust motes visible in light rays, high detail realism",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
       "motion_hint": "slow side pan",
       "motion_strength": 0.6,
@@ -39,7 +39,7 @@
     {
       "duration": 5,
       "description": "Ancient ruins at sunset",
-      "visual_prompt": "Wide cinematic view of ancient ruins at sunset, warm fading light, slow pull-back camera, realistic historical tone",
+      "visual_prompt": "Wide cinematic view of ancient ruins at sunset, warm fading orange light, slow pull-back camera revealing landscape scale, gentle wind moving dry grass, long shadows stretching across stone structures, subtle atmospheric haze, realistic historical tone",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
       "motion_hint": "slow pull-back",
       "motion_strength": 0.6,
