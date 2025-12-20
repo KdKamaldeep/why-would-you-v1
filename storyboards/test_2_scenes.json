@@ -1,51 +1,51 @@
 {
-  "title": "A Shocking History Fact",
-  "description": "A cinematic short revealing an unbelievable truth from ancient history",
+  "title": "A Mind-Blowing History Fact",
+  "description": "A cinematic short revealing an unbelievable truth from ancient engineering",
   "total_duration": 28,
   "scenes": [
     {
       "duration": 7,
-      "description": "Ancient city awakening at dawn",
-      "visual_prompt": "Ancient stone city at dawn, foreground stone pillars partially framing the view, soft cloth banners hanging close to camera gently swaying, soft leaves entering frame edges, golden sunlight spreading across rooftops, light mist drifting between buildings, distant birds flying, slow cinematic forward push, deep perspective, realistic historical atmosphere, vertical composition",
+      "description": "Ancient desert landscape with ruins",
+      "visual_prompt": "Ancient desert ruins at sunrise, foreground broken stone pillars partially occluding view, wind-blown sand moving across ground, heat haze in distance, soft golden sunlight, slow cinematic forward push, deep perspective, realistic historical atmosphere, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward push, foreground fabric sway, drifting mist, birds gliding",
+      "motion_hint": "slow forward push, drifting sand, heat shimmer",
       "motion_strength": 0.7,
       "fps_hint": 24,
-      "narration": "Did you know that thousands of years ago, people didn’t rely on modern medicine at all?",
-      "subtitle": "A surprising history fact 🏺"
+      "narration": "Did you know ancient civilizations built refrigerators thousands of years ago?",
+      "subtitle": "An unbelievable history fact ❄️"
     },
     {
       "duration": 7,
-      "description": "Ancient healers using honey by torchlight",
-      "visual_prompt": "Ancient healers applying honey to wounds by torchlight, foreground hanging fabric partially obscuring edges of frame, flickering flames casting moving shadows, thin smoke rising upward, stone pillar close to camera creating depth, hands moving slowly and carefully, warm amber lighting, slow side pan, realistic ancient medical scene, vertical framing",
+      "description": "Ancient ice storage structure",
+      "visual_prompt": "Ancient underground ice storage chamber, foreground stone arch framing the scene, cool blue light filtering inside, faint mist from cold air, slow side pan, thick stone walls with frost textures, realistic ancient engineering, vertical framing",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow side pan, torch flicker, rising smoke, subtle fabric movement",
+      "motion_hint": "slow side pan, cold air mist, subtle light shimmer",
       "motion_strength": 0.7,
       "fps_hint": 24,
-      "narration": "In ancient Egypt, healers used honey to clean wounds and protect them from dangerous infections.",
-      "subtitle": "Ancient medicine 🍯"
+      "narration": "In ancient Persia, people stored ice underground to keep food cold during extreme heat.",
+      "subtitle": "Ancient engineering 🧱"
     },
     {
       "duration": 7,
-      "description": "Preserved honey jars inside ancient tomb",
-      "visual_prompt": "Ancient tomb interior with preserved honey jars, foreground broken stone slabs and hanging roots framing the shot, floating dust particles illuminated by narrow light beams, faint air movement causing dust to swirl, slow push-in camera, mysterious and respectful mood, realistic textures, vertical composition",
+      "description": "Ice preserved inside structure",
+      "visual_prompt": "Large blocks of ice preserved inside ancient chamber, foreground hanging fabric edges gently moving, light beams illuminating frost particles, slow push-in camera, cool atmospheric mood, realistic textures, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow push-in, drifting dust, subtle foreground shadow movement",
+      "motion_hint": "slow push-in, drifting frost particles, fabric movement",
       "motion_strength": 0.65,
       "fps_hint": 24,
-      "narration": "Even more incredible, honey never spoils. Jars found in ancient tombs are still edible today.",
-      "subtitle": "Nature’s miracle ✨"
+      "narration": "These structures, called Yakhchals, used wind and insulation to keep ice frozen year-round.",
+      "subtitle": "Ahead of their time ✨"
     },
     {
       "duration": 7,
-      "description": "Modern honey glowing in soft light",
-      "visual_prompt": "Close-up of golden honey slowly dripping from a wooden spoon, foreground blurred leaves and jar rim partially occluding frame edges, light reflecting and refracting inside the liquid, gentle camera pull-back, soft bokeh highlights in background, calm and awe-inspiring mood, realistic macro style, vertical framing",
+      "description": "Modern cooling symbolism",
+      "visual_prompt": "Symbolic modern scene of cold water slowly flowing over stone, foreground blurred leaves partially occluding frame, gentle ripples, soft cool lighting, slow pull-back camera, calm and reflective mood, realistic style, vertical framing",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow pull-back, honey dripping, foreground blur movement, light shimmer",
+      "motion_hint": "slow pull-back, water ripples, leaf movement",
       "motion_strength": 0.65,
       "fps_hint": 24,
-      "narration": "Sometimes, the most advanced science is wisdom that humanity discovered long ago.",
-      "subtitle": "History still amazes us ⏳"
+      "narration": "Long before electricity, humans mastered the science of staying cool.",
+      "subtitle": "History was smarter than we think ⏳"
     }
   ]
 }
