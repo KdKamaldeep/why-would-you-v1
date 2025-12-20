@@ -329,10 +329,36 @@ class CartoonShortsGenerator:
                 logger.info(f"🎬 Scene {i+1}: Processing video generation...")
                 
                 if self.config.reuse_existing and clip_path.exists():
-                    logger.info(f"Skipping video generation (exists): {clip_path}")
-                    video_clips.append(str(clip_path))
-                    # Get actual duration of existing video (WAN generates fixed duration)
-                    existing_duration = self.video_processor.get_video_duration(str(clip_path))
+                    logger.info(f"⏭️  Reusing existing video: {clip_path}")
+                    existing_video_path = str(clip_path)
+                    existing_duration = self.video_processor.get_video_duration(existing_video_path)
+                    
+                    # If audio exists, check if video needs syncing
+                    if not self.config.skip_audio and i < len(actual_scene_durations):
+                        target_audio_duration = actual_scene_durations[i]
+                        duration_diff = abs(existing_duration - target_audio_duration)
+                        if duration_diff > 0.1:
+                            logger.info(f"🔄 Scene {i+1}: Existing video ({existing_duration:.2f}s) doesn't match audio ({target_audio_duration:.2f}s), syncing...")
+                            synced_video_path = str(clip_path).replace('.mp4', '_synced.mp4')
+                            if existing_duration < target_audio_duration:
+                                self.video_processor.extend_video_duration(
+                                    existing_video_path,
+                                    target_audio_duration,
+                                    synced_video_path
+                                )
+                            else:
+                                cmd = [
+                                    'ffmpeg', '-y',
+                                    '-i', existing_video_path,
+                                    '-t', str(target_audio_duration),
+                                    '-c', 'copy',
+                                    synced_video_path
+                                ]
+                                subprocess.run(cmd, check=True, capture_output=True, text=True)
+                            existing_video_path = synced_video_path
+                            existing_duration = target_audio_duration
+                    
+                    video_clips.append(existing_video_path)
                     total_video_duration += existing_duration
                     continue
                 
@@ -351,12 +377,47 @@ class CartoonShortsGenerator:
                         seed=self.config.wan_seed,
                         negative_prompt=negative_prompt or None
                     )
-                    video_clips.append(video_path)
                     
                     # WAN generates videos with fixed duration: num_frames / fps
-                    actual_duration = self.config.wan_num_frames / self.config.wan_fps
+                    wan_video_duration = self.config.wan_num_frames / self.config.wan_fps
+                    actual_duration = wan_video_duration
+                    
+                    # Adjust video duration to match audio duration if audio exists
+                    if not self.config.skip_audio and i < len(actual_scene_durations):
+                        target_audio_duration = actual_scene_durations[i]
+                        duration_diff = abs(wan_video_duration - target_audio_duration)
+                        if duration_diff > 0.1:  # If difference > 0.1s, sync them
+                            logger.info(f"🎬 Scene {i+1}: Syncing video ({wan_video_duration:.2f}s) to audio ({target_audio_duration:.2f}s)")
+                            synced_video_path = str(clip_path).replace('.mp4', '_synced.mp4')
+                            
+                            if wan_video_duration < target_audio_duration:
+                                # Video is shorter than audio - extend by looping
+                                self.video_processor.extend_video_duration(
+                                    str(video_path),
+                                    target_audio_duration,
+                                    synced_video_path
+                                )
+                            else:
+                                # Video is longer than audio - trim to match
+                                cmd = [
+                                    'ffmpeg', '-y',
+                                    '-i', str(video_path),
+                                    '-t', str(target_audio_duration),
+                                    '-c', 'copy',
+                                    synced_video_path
+                                ]
+                                subprocess.run(cmd, check=True, capture_output=True, text=True)
+                                logger.info(f"🎬 Scene {i+1}: Trimmed video from {wan_video_duration:.2f}s to {target_audio_duration:.2f}s")
+                            
+                            video_path = synced_video_path
+                            actual_duration = target_audio_duration
+                            logger.info(f"✅ Scene {i+1}: Video synced to audio ({actual_duration:.2f}s)")
+                        else:
+                            logger.info(f"✅ Scene {i+1}: Video duration ({wan_video_duration:.2f}s) already matches audio ({target_audio_duration:.2f}s)")
+                    
+                    video_clips.append(video_path)
                     total_video_duration += actual_duration
-                    logger.info(f"🎬 Scene {i+1}: Video generated: {video_path} ({actual_duration:.1f}s)")
+                    logger.info(f"🎬 Scene {i+1}: Video ready: {video_path} ({actual_duration:.1f}s)")
                 except Exception as e:
                     logger.error(f"❌ Error generating video for scene {i+1}: {e}")
                     raise
@@ -438,11 +499,11 @@ class CartoonShortsGenerator:
             # Compile stitched video (keep existing output)
             stitched_output = self.output_dir / "stitched.mp4"
             try:
-                self.video_processor.compile_final_video(
-                    final_clips,
-                    final_audio_paths,  # Pass audio paths with pauses included
-                    background_music,
-                    str(subtitles_path) if self.config.add_subtitles else None,
+            self.video_processor.compile_final_video(
+                final_clips,
+                final_audio_paths,  # Pass audio paths with pauses included
+                background_music,
+                str(subtitles_path) if self.config.add_subtitles else None,
                     str(stitched_output)
                 )
                 logger.info(f"✅ Stitched video created: {stitched_output}")
@@ -564,10 +625,10 @@ class CartoonShortsGenerator:
                 
                 # Check if narration file exists, otherwise calculate expected duration from WAN settings
                 if narration_path.exists():
-                    logger.info("📏 Fallback: Detecting single track duration...")
-                    actual_duration = self.video_processor.get_audio_duration(str(narration_path))
-                    script['total_duration'] = actual_duration
-                    self.config.duration = max(self.config.duration, actual_duration)
+                logger.info("📏 Fallback: Detecting single track duration...")
+                actual_duration = self.video_processor.get_audio_duration(str(narration_path))
+                script['total_duration'] = actual_duration
+                self.config.duration = max(self.config.duration, actual_duration)
                 else:
                     # Use WAN video duration if audio file doesn't exist (WAN generates fixed duration)
                     logger.warning(f"⚠️ Narration file not found: {narration_path}")

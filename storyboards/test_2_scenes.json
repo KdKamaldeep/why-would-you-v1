@@ -24,28 +24,6 @@
       "fps_hint": 24,
       "narration": "Guardians rise when ancient magic stirs once more.",
       "subtitle": "The guardian awakens 🛡️🌲"
-    },
-    {
-      "duration": 6,
-      "description": "An enchanted fantasy city glowing at night",
-      "visual_prompt": "Enchanted fantasy city at night built with glowing crystals and towering spires, magical lights floating in the air, rivers of light flowing through streets, slow aerial camera glide, deep parallax between buildings, cinematic night lighting, ultra realistic fantasy environment",
-      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow aerial glide, floating lights moving gently",
-      "motion_strength": 0.75,
-      "fps_hint": 24,
-      "narration": "Cities of light flourish where magic flows freely.",
-      "subtitle": "A city of magic and light 🌌🏰"
-    },
-    {
-      "duration": 6,
-      "description": "A powerful fantasy sorceress casting magic on a mountain peak",
-      "visual_prompt": "Powerful fantasy sorceress standing on a mountain peak under a star-filled sky, glowing magical energy swirling around her hands, flowing cloak moving in the wind, slow cinematic push-in camera, swirling particles and energy trails, dramatic fantasy lighting, ultra realistic",
-      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow push-in camera, magical energy swirling, cloak flowing",
-      "motion_strength": 0.8,
-      "fps_hint": 24,
-      "narration": "And when destiny calls, magic answers.",
-      "subtitle": "Magic answers the call ✨🔮"
     }
   ]
 }

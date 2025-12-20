@@ -53,10 +53,10 @@ else
         huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers \
             --local-dir "$TARGET_WAN_DIR" \
             --local-dir-use-symlinks False
-        if [ $? -eq 0 ]; then
+    if [ $? -eq 0 ]; then
             echo "✅ WAN 2.1 model downloaded to $TARGET_WAN_DIR"
             USE_PYTHON_FALLBACK=0
-        else
+    else
             echo "❌ huggingface-cli download failed, attempting Python fallback"
             USE_PYTHON_FALLBACK=1
         fi
@@ -91,7 +91,7 @@ except Exception as e:
     print("[INFO] Model download failed, but it will be downloaded automatically on first use:", e)
     sys.exit(0)
 PY
-            if [ $? -eq 0 ]; then
+    if [ $? -eq 0 ]; then
                 echo "✅ WAN 2.1 model pre-downloaded (or will download on first use)"
             fi
         else

@@ -790,7 +790,7 @@ class ImageGenerator:
             enhanced_prompt = self.prompt_enhancer.enhance_prompt(
                 adjustment_prompt,
                 enhancement_type="realistic_detailed",
-                max_tokens=77  # Keep within diffusion model limits
+                max_tokens=77  # GPT-2 generation limit (not prompt length limit - WAN supports longer prompts)
             )
             
             # Add specific cartoon enhancement keywords if not present
@@ -807,8 +807,8 @@ class ImageGenerator:
                 additional_enhancement = ", ".join(missing_keywords[:3])  # Limit to 3 keywords
                 enhanced_prompt = f"{enhanced_prompt}, {additional_enhancement}"
                 
-                # Ensure we stay within token limits
-                enhanced_prompt = self.prompt_enhancer._limit_tokens(enhanced_prompt, 77)
+                # Token limiting disabled - WAN supports longer prompts than SD/SVD
+                # enhanced_prompt = self.prompt_enhancer._limit_tokens(enhanced_prompt, 77)
             
             logger.info(f"🎯 Enhanced prompt: {enhanced_prompt}")
             return enhanced_prompt

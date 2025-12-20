@@ -222,8 +222,8 @@ class ProfessionalPromptEnhancer:
         # Add quality boosters
         enhanced = self._add_quality_boosters(enhanced, style)
         
-        # Ensure proper token limit
-        enhanced = self._limit_tokens(enhanced, max_tokens=77)
+        # No token limiting - WAN supports longer prompts than SD/SVD
+        # enhanced = self._limit_tokens(enhanced, max_tokens=77)  # Disabled for WAN
         
         return enhanced
     
@@ -364,30 +364,14 @@ class ProfessionalPromptEnhancer:
         return base_negative
     
     def _limit_tokens(self, prompt: str, max_tokens: int = 77) -> str:
-        """Limit prompt to maximum token count."""
-        if not self.tokenizer:
-            # Simple character-based estimation
-            estimated_tokens = len(prompt.split()) * 1.3
-            if estimated_tokens > max_tokens:
-                words = prompt.split()
-                return " ".join(words[:int(max_tokens/1.3)])
-            return prompt
+        """
+        Limit prompt to maximum token count (DEPRECATED - disabled for WAN).
         
-        try:
-            tokens = self.tokenizer.encode(prompt)
-            if len(tokens) <= max_tokens:
-                return prompt
-            
-            # Truncate to max_tokens
-            truncated_tokens = tokens[:max_tokens]
-            truncated_prompt = self.tokenizer.decode(truncated_tokens, skip_special_tokens=True)
-            
-            logger.info(f"🎯 Prompt truncated from {len(tokens)} to {len(truncated_tokens)} tokens")
-            return truncated_prompt
-            
-        except Exception as e:
-            logger.warning(f"⚠️ Token limiting failed: {e}")
-            return prompt
+        WAN supports longer prompts than SD/SVD, so token limiting is no longer applied.
+        This method now returns the prompt unchanged.
+        """
+        # Token limiting disabled for WAN - it supports longer prompts than SD/SVD
+        return prompt
     
     def enhance_multiple_prompts(self, prompts: List[str], style: str = "realistic") -> List[Tuple[str, str]]:
         """
