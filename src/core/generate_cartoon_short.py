@@ -82,7 +82,7 @@ class VideoConfig:
     wan_fps: int = 12  # WAN output FPS
     wan_steps: int = 30  # WAN inference steps
     wan_guidance: float = 6.0  # WAN guidance scale
-    wan_negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed"  # WAN negative prompt for realistic videos
+    wan_negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly"  # WAN negative prompt for realistic videos (excludes non-realistic styles)
     wan_seed: Optional[int] = None  # WAN random seed (optional)
     # Audio settings
     skip_audio: bool = False  # Skip audio generation entirely
@@ -691,68 +691,10 @@ class CartoonShortsGenerator:
         # Get the negative prompt from the script, or use default
         negative_prompt = scene.get('negative_prompt', self.config.wan_negative_prompt)
 
-        # Enhance prompt with character role information if available
-        enhanced_prompt = self._enhance_prompt_with_character_roles(base_prompt, scene)
-        
-        logger.info(f"🎯 Using enhanced visual_prompt with character roles: {enhanced_prompt}")
-        return enhanced_prompt, negative_prompt
+        # Use raw prompt without enhancement
+        logger.info(f"🎯 Using raw visual_prompt: {base_prompt}")
+        return base_prompt, negative_prompt
     
-    def _enhance_prompt_with_character_roles(self, base_prompt: str, scene: Dict) -> str:
-        """Enhance the visual prompt with character role information from the cast."""
-        try:
-            # Get characters mentioned in this scene
-            scene_characters = scene.get('characters', [])
-            if not scene_characters:
-                return base_prompt
-            
-            # Get cast information if available
-            cast_info = getattr(self, 'cast', [])
-            if not cast_info:
-                return base_prompt
-            
-            # Create a mapping of character names to their roles
-            character_roles = {}
-            for cast_member in cast_info:
-                if isinstance(cast_member, dict):
-                    name = cast_member.get('name', '')
-                    role = cast_member.get('role', '')
-                    if name and role:
-                        character_roles[name] = role
-            
-            if not character_roles:
-                return base_prompt
-            
-            # Find characters in this scene that have role information
-            enhanced_prompt = base_prompt
-            character_enhancements = []
-            
-            for character_name in scene_characters:
-                if character_name in character_roles:
-                    role = character_roles[character_name]
-                    # Add role information to the prompt
-                    character_enhancement = f"{character_name} ({role})"
-                    character_enhancements.append(character_enhancement)
-                    
-                    # Replace character name with enhanced version in the prompt
-                    # This helps the diffusion model understand the character's role
-                    if character_name.lower() in base_prompt.lower():
-                        # Replace the character name with role-enhanced version
-                        enhanced_prompt = enhanced_prompt.replace(
-                            character_name, 
-                            character_enhancement
-                        )
-                    else:
-                        # If character name not explicitly mentioned, add role info
-                        enhanced_prompt = f"{enhanced_prompt}, {character_enhancement}"
-            
-            if character_enhancements:
-                logger.info(f"🎭 Enhanced prompt with character roles: {character_enhancements}")
-            
-            return enhanced_prompt
-            
-        except Exception as e:
-            logger.warning(f"⚠️ Error enhancing prompt with character roles: {e}")
-            return base_prompt
 
 def main():
     """Main CLI entry point."""
@@ -805,7 +747,7 @@ def main():
         style=args.style,
         voice_id=args.voice,
         language=args.language,
-        enable_prompt_enhancement=not args.no_prompt_enhancement,
+        enable_prompt_enhancement=False,  # Prompt enhancement disabled
         scene_pause_duration=args.scene_pause,
         create_reel=create_reel,
         vertical_mode=args.vertical_mode,

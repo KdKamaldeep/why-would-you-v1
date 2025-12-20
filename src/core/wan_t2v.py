@@ -150,7 +150,7 @@ class WanT2VGenerator:
                  fps: int = 12,
                  num_inference_steps: int = 30,
                  guidance_scale: float = 6.0,
-                 negative_prompt: str = "text, subtitles, watermark, blurry, low quality",
+                 negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly",
                  device: str = None):
         """
         Initialize the WAN T2V generator.

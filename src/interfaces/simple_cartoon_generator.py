@@ -53,7 +53,7 @@ def get_model_path_for_type(model_type: str) -> str | None:
     # It downloads automatically on first use to Hugging Face cache
     return None
 
-def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False):
+def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=False, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False):
     """Generate a video reel with the given prompt."""
     try:
         # Import the main generator
@@ -80,7 +80,7 @@ def generate_cartoon(prompt, style="realistic", duration=30, language="en", enab
         print(f"🎨 Style: {style}")
         print(f"⏱️ Duration: {duration} seconds")
         print(f"🗣️ Language: {language}")
-        print(f"🎯 Prompt enhancement: {'Enabled' if enable_prompt_enhancement else 'Disabled'}")
+        # Prompt enhancement disabled
         print(f"📐 Video format: {video_format}")
         print(f"🎬 WAN settings: {wan_width}x{wan_height}, {wan_num_frames} frames @ {wan_fps}fps")
         if create_reel:
@@ -447,7 +447,7 @@ Storyboard Cast Format (with face images):
                 print(f"🎲 Seed: {args.seed}")
             print(f"🔇 Skip Audio: {args.skip_audio}")
             print(f"🔄 No Reuse: {args.no_reuse}")
-            print(f"✨ No Prompt Enhancement: {args.no_prompt_enhancement}")
+            # Prompt enhancement disabled
             print("=" * 50)
             
             with open(args.storyboard, 'r', encoding='utf-8') as f:
@@ -511,7 +511,7 @@ Storyboard Cast Format (with face images):
                 reuse_existing=(not args.no_reuse),
                 add_subtitles=False,
                 language=args.language,
-                enable_prompt_enhancement=(not args.no_prompt_enhancement),
+                enable_prompt_enhancement=False,  # Prompt enhancement disabled
                 wan_width=args.wan_width,
                 wan_height=args.wan_height,
                 wan_num_frames=args.wan_num_frames,
