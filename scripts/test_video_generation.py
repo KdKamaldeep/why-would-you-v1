@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 """
 Simple script to test WAN 2.1 text-to-video generation with a prompt.
+Can optionally add audio narration using Coqui TTS.
+
 Usage:
+    # Video only
     python -m scripts.test_video_generation --prompt "A cat walks on the grass"
-    python -m scripts.test_video_generation -p "A dog running in a park"
+    
+    # Video with audio
+    python -m scripts.test_video_generation -p "A dog running in a park" \\
+      --audio-text "This is a dog running through the park on a sunny day."
+    
+    # With voice cloning
+    python -m scripts.test_video_generation -p "Sunset over mountains" \\
+      --audio-text "Beautiful sunset scene" --voice-file path/to/reference.wav
 """
 
 import argparse
@@ -15,6 +25,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.core.wan_t2v import WanT2VGenerator
+from src.core.coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
+import subprocess
 
 # Configure logging
 logging.basicConfig(
@@ -105,6 +117,11 @@ def main():
     logger.info(f"⚙️ Steps: {args.steps}, Guidance: {args.guidance}")
     if args.seed:
         logger.info(f"🎲 Seed: {args.seed}")
+    if args.audio_text:
+        logger.info(f"🎵 Audio text: {args.audio_text[:100]}{'...' if len(args.audio_text) > 100 else ''}")
+        logger.info(f"🌐 Audio language: {args.language}")
+        if args.voice_file:
+            logger.info(f"🎤 Voice file: {args.voice_file}")
     logger.info("=" * 60)
     
     try:
@@ -143,7 +160,73 @@ def main():
         logger.info("=" * 60)
         logger.info("✅ Video generation completed successfully!")
         logger.info(f"📹 Output file: {output_file}")
-        logger.info("=" * 60)
+        
+        # Add audio if audio text is provided
+        if args.audio_text:
+            logger.info("=" * 60)
+            logger.info("🎵 Generating audio from text...")
+            logger.info(f"📝 Audio text: {args.audio_text}")
+            
+            try:
+                # Generate audio
+                audio_output = Path(output_path).parent / f"{output_path.stem}_audio.wav"
+                logger.info(f"🎤 Generating speech audio...")
+                
+                voice_config = CoquiVoiceConfig(language=args.language)
+                voice_synthesizer = CoquiVoiceSynthesizer(voice_config)
+                
+                generated_audio = voice_synthesizer.synthesize_voice(
+                    [args.audio_text],
+                    str(audio_output),
+                    speaker=None,
+                    voice_clone_audio=args.voice_file
+                )
+                
+                logger.info(f"✅ Audio generated: {generated_audio}")
+                
+                # Mix audio with video
+                logger.info("🎬 Mixing audio with video...")
+                final_output = Path(output_path).parent / f"{output_path.stem}_with_audio.mp4"
+                
+                # Use FFmpeg to add audio to video
+                cmd = [
+                    'ffmpeg', '-y',
+                    '-i', str(output_file),  # Video input
+                    '-i', generated_audio,   # Audio input
+                    '-c:v', 'copy',          # Copy video codec (no re-encoding)
+                    '-c:a', 'aac',           # Encode audio as AAC
+                    '-b:a', '192k',          # Audio bitrate
+                    '-shortest',             # Use shortest stream duration
+                    str(final_output)
+                ]
+                
+                try:
+                    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                    logger.info(f"✅ Audio mixed with video: {final_output}")
+                except subprocess.CalledProcessError as e:
+                    logger.error(f"❌ FFmpeg error: {e}")
+                    logger.error(f"FFmpeg stderr: {e.stderr}")
+                    raise
+                
+                # Clean up temporary audio file
+                try:
+                    Path(generated_audio).unlink()
+                    logger.info("🧹 Cleaned up temporary audio file")
+                except Exception as e:
+                    logger.warning(f"Could not clean up audio file: {e}")
+                
+                logger.info("=" * 60)
+                logger.info("✅ Final video with audio: {}".format(final_output))
+                logger.info("=" * 60)
+                
+            except Exception as e:
+                logger.error(f"❌ Error generating/mixing audio: {e}")
+                import traceback
+                logger.error(traceback.format_exc())
+                logger.info(f"📹 Video without audio is available at: {output_file}")
+                return 1
+        else:
+            logger.info("=" * 60)
         
         return 0
         
