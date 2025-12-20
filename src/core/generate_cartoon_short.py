@@ -168,16 +168,18 @@ class CartoonShortsGenerator:
                 return str(final_output)
             # Step 1: Generate story
             script_path = self.output_dir / "script.json"
-            if self.config.reuse_existing and script_path.exists():
-                logger.info(f"Reusing existing script: {script_path}")
-                with open(script_path, 'r', encoding='utf-8') as f:
-                    script = json.load(f)
-                try:
-                    self.config.duration = int(script.get('total_duration', self.config.duration))
-                except Exception:
-                    pass
-            elif self.config.custom_scenes and len(self.config.custom_scenes) > 0:
+            # Prioritize custom_scenes (from storyboard) over reusing existing script
+            if self.config.custom_scenes and len(self.config.custom_scenes) > 0:
                 logger.info("Step 1: Using custom storyboard scenes provided by user...")
+                logger.info(f"📋 Found {len(self.config.custom_scenes)} custom scenes from storyboard")
+                # Delete old script.json if it exists to force using storyboard
+                if script_path.exists():
+                    logger.info(f"🗑️ Removing old script.json to use storyboard instead")
+                    try:
+                        script_path.unlink()
+                    except Exception as e:
+                        logger.warning(f"Could not remove old script.json: {e}")
+                
                 script = self.script_generator.generate_script_from_custom(
                     title=self.config.title or f"Story: {self.config.prompt}",
                     description=self.config.description or f"An adventure about: {self.config.prompt}",
@@ -193,6 +195,15 @@ class CartoonShortsGenerator:
                 # Save script for reuse
                 with open(script_path, 'w', encoding='utf-8') as f:
                     json.dump(script, f, indent=2)
+                logger.info(f"✅ Generated script from storyboard with {len(script.get('scenes', []))} scenes")
+            elif self.config.reuse_existing and script_path.exists():
+                logger.info(f"Reusing existing script: {script_path}")
+                with open(script_path, 'r', encoding='utf-8') as f:
+                    script = json.load(f)
+                try:
+                    self.config.duration = int(script.get('total_duration', self.config.duration))
+                except Exception:
+                    pass
             else:
                 logger.info("Step 1: Generating 3-scene story...")
                 script = self.script_generator.generate_script(self.config.prompt, self.config.duration, language=self.config.language)
