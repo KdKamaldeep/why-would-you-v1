@@ -1,5 +1,8 @@
 ssh-keygen -t rsa -b 4096 -C "kdkamaldeep2@gmail.com" && cat ~/.ssh/id_rsa.pub
 
+pip install -U torchcodec
+pip install -U xformers
+
 python -m src.interfaces.simple_cartoon_generator --prompt "Girl sitting in bar talking about drinks"
 python -m src.interfaces.simple_cartoon_generator --help
 
