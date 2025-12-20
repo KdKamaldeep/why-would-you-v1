@@ -18,6 +18,23 @@ _wan_pipeline = None
 _wan_vae = None
 
 
+def get_cache_dir() -> Optional[str]:
+    """
+    Get the appropriate cache directory for Hugging Face models.
+    Prefers /workspace if available (for RunPod and similar environments with attached disks).
+    
+    Returns:
+        Cache directory path as string, or None to use default
+    """
+    workspace_cache = Path("/workspace/.cache/huggingface")
+    if Path("/workspace").exists():
+        workspace_cache.mkdir(parents=True, exist_ok=True)
+        # Set HF_HOME environment variable as well
+        os.environ["HF_HOME"] = str(workspace_cache)
+        return str(workspace_cache)
+    return None
+
+
 def get_wan_pipeline(device: str = None, force_reload: bool = False):
     """
     Get or initialize the global WAN pipeline (singleton pattern).
