@@ -1,50 +1,50 @@
 {
   "title": "Realm Beyond the Veil",
   "description": "A cinematic fantasy short exploring mystical characters and enchanted places beyond the human world",
-  "total_duration": 24,
+  "total_duration": 48,
   "scenes": [
     {
-      "duration": 6,
+      "duration": 12,
       "description": "A floating fantasy island above glowing clouds at dawn",
       "visual_prompt": "Massive floating fantasy island above glowing clouds at dawn, ancient stone ruins covered in moss, waterfalls flowing into the sky, soft golden sunrise light, slow forward camera dolly, gentle cloud movement, subtle parallax depth, cinematic fantasy atmosphere, ultra realistic",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
       "motion_hint": "slow forward dolly, clouds drifting upward, waterfalls flowing",
       "motion_strength": 0.65,
       "fps_hint": 24,
-      "narration": "Beyond the skies we know, there exists a realm untouched by time.\n\nA place suspended above the clouds… where ancient stones remember forgotten ages, and waterfalls fall endlessly into the open sky.\n\nHere, the world feels quiet— as if it is waiting.",
+      "narration": "Beyond the skies we know, there exists a realm untouched by time. A world suspended above the clouds, where ancient stones remember forgotten ages, and waterfalls fall endlessly into the open sky.",
       "subtitle": "A realm beyond the skies ☁️✨"
     },
     {
-      "duration": 6,
+      "duration": 12,
       "description": "A mysterious fantasy warrior standing in a glowing forest",
       "visual_prompt": "Fantasy warrior wearing enchanted armor standing in a glowing forest, faint magical runes on armor, mist drifting between ancient trees, slow cinematic camera orbit, soft moonlight filtering through branches, subtle armor reflections, ultra realistic fantasy lighting",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
       "motion_hint": "slow camera orbit around character, fog drifting sideways",
       "motion_strength": 0.7,
       "fps_hint": 24,
-      "narration": "When ancient magic begins to stir, guardians rise once more.\n\nThey stand among glowing trees, watching in silence… listening to the forest breathe.\n\nPatient. Unmoving. Ever alert.",
+      "narration": "When ancient magic begins to stir, guardians rise once more. They stand among glowing trees, silent and watchful, listening to the forest breathe, protecting secrets older than memory itself.",
       "subtitle": "The guardian awakens 🛡️🌲"
     },
     {
-      "duration": 6,
+      "duration": 12,
       "description": "An enchanted fantasy city glowing at night",
       "visual_prompt": "Enchanted fantasy city at night built with glowing crystals and towering spires, magical lights floating in the air, rivers of light flowing through streets, slow aerial camera glide, deep parallax between buildings, cinematic night lighting, ultra realistic fantasy environment",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
       "motion_hint": "slow aerial glide, floating lights moving gently",
       "motion_strength": 0.75,
       "fps_hint": 24,
-      "narration": "Deep within the realm, cities of light awaken after dusk.\n\nCrystals glow softly in the darkness, and rivers of magic flow through towering streets… guiding those who still believe.\n\nThis is a place built not by hands— but by magic itself.",
+      "narration": "As night falls, cities of crystal light awaken. Towers glow softly in the darkness, and rivers of magic flow through silent streets, guiding those who still believe in wonder.",
       "subtitle": "A city of magic and light 🌌🏰"
     },
     {
-      "duration": 6,
+      "duration": 12,
       "description": "A powerful fantasy sorceress casting magic on a mountain peak",
       "visual_prompt": "Powerful fantasy sorceress standing on a mountain peak under a star-filled sky, glowing magical energy swirling around her hands, flowing cloak moving in the wind, slow cinematic push-in camera, swirling particles and energy trails, dramatic fantasy lighting, ultra realistic",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
       "motion_hint": "slow push-in camera, magical energy swirling, cloak flowing",
       "motion_strength": 0.8,
       "fps_hint": 24,
-      "narration": "And when destiny finally calls, magic answers.\n\nAt the edge of the world, power gathers beneath the stars… waiting to be released.\n\nBecause in this realm, nothing sleeps forever.",
+      "narration": "And when destiny finally calls, magic answers. At the edge of the world, power gathers beneath the stars, waiting patiently to awaken what was never meant to sleep forever.",
       "subtitle": "Magic answers the call ✨🔮"
     }
   ]
