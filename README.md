@@ -106,6 +106,22 @@ python -m src.interfaces.simple_cartoon_generator \
   --no-reel
 ```
 
+### **Pipeline Health Check**
+
+Run a lightweight readiness check to confirm WAN (text-to-video), Coqui TTS, and FFmpeg
+are installed before kicking off generation:
+
+```bash
+python scripts/pipeline_health_check.py
+```
+
+The script only verifies imports and binary availability, so it will not trigger large
+model downloads. If something is missing, the output includes a hint such as:
+
+- FFmpeg: `sudo apt install ffmpeg` (or use your OS package manager)
+- WAN diffusers: `pip install diffusers==0.30.2 accelerate torch torchvision`
+- Coqui XTTS: `pip install TTS==0.22.0` and download `models/tts/XTTS-v2`
+
 ### **Reel Rendering Features:**
 - ✅ **Platform-ready format**: 1080×1920, 30fps, H.264/AAC
 - ✅ **Smart audio mixing**: Voice + optional background music
