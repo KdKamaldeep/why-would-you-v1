@@ -357,6 +357,81 @@ Storyboard Cast Format (with face images):
         help="Skip audio generation (create video without narration)"
     )
     
+    # Reel rendering arguments
+    parser.add_argument(
+        "--format",
+        choices=["reel", "normal"],
+        default="reel",
+        help="Output format: 'reel' for platform-ready vertical reel (default), 'normal' for standard output"
+    )
+    
+    parser.add_argument(
+        "--vertical",
+        action="store_true",
+        help="Enable vertical reel output (same as --format reel)"
+    )
+    
+    parser.add_argument(
+        "--no-reel",
+        action="store_true",
+        help="Disable reel creation (use stitched video only)"
+    )
+    
+    parser.add_argument(
+        "--vertical-mode",
+        choices=["pad", "crop"],
+        default="pad",
+        help="Vertical mode: 'pad' (safe, no cropping) or 'crop' (fills frame)"
+    )
+    
+    parser.add_argument(
+        "--out-width",
+        type=int,
+        default=1080,
+        help="Output reel width (default: 1080)"
+    )
+    
+    parser.add_argument(
+        "--out-height",
+        type=int,
+        default=1920,
+        help="Output reel height (default: 1920)"
+    )
+    
+    parser.add_argument(
+        "--out-fps",
+        type=int,
+        default=30,
+        help="Output reel FPS (default: 30)"
+    )
+    
+    parser.add_argument(
+        "--music",
+        type=str,
+        default=None,
+        help="Path to background music file (optional)"
+    )
+    
+    parser.add_argument(
+        "--music-volume",
+        type=float,
+        default=0.12,
+        help="Background music volume (default: 0.12)"
+    )
+    
+    parser.add_argument(
+        "--voice-volume",
+        type=float,
+        default=1.0,
+        help="Voice volume (default: 1.0)"
+    )
+    
+    parser.add_argument(
+        "--verbose-ffmpeg",
+        action="store_true",
+        help="Print FFmpeg commands for debugging"
+    )
+    
     args = parser.parse_args()
     
     # Log all arguments for debugging
@@ -378,8 +453,10 @@ Storyboard Cast Format (with face images):
     if args.seed:
         print(f"🎲 Seed: {args.seed}")
     print(f"🔇 Skip Audio: {args.skip_audio}")
-    print(f"🎬 Reel: {'Enabled' if not args.no_reel and (args.format == 'reel' or args.vertical) else 'Disabled'}")
-    if not args.no_reel and (args.format == 'reel' or args.vertical):
+    # Determine if reel should be created
+    create_reel = not args.no_reel and (args.format == 'reel' or args.vertical)
+    print(f"🎬 Reel: {'Enabled' if create_reel else 'Disabled'}")
+    if create_reel:
         print(f"📐 Reel: {args.out_width}x{args.out_height} @ {args.out_fps}fps, mode={args.vertical_mode}")
         if args.music:
             print(f"🎵 Music: {args.music} (vol={args.music_volume})")
