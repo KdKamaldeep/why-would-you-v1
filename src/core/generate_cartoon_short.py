@@ -371,26 +371,33 @@ class CartoonShortsGenerator:
                 
                 # Generate video with WAN
                 try:
+                    # Calculate target duration from narration if available
+                    target_duration = None
+                    if not self.config.skip_audio and i < len(actual_scene_durations):
+                        target_duration = actual_scene_durations[i]
+                        logger.info(f"🎬 Scene {i+1}: Using narration duration ({target_duration:.2f}s) to calculate frames")
+                    
                     video_path = self.wan_generator.generate_video(
                         prompt=prompt,
                         output_path=str(clip_path),
                         seed=self.config.wan_seed,
-                        negative_prompt=negative_prompt or None
+                        negative_prompt=negative_prompt or None,
+                        duration=target_duration  # Pass narration duration to calculate frames
                     )
                     
-                    # WAN generates videos with fixed duration: num_frames / fps
-                    wan_video_duration = self.config.wan_num_frames / self.config.wan_fps
-                    actual_duration = wan_video_duration
+                    # Get actual video duration
+                    actual_duration = self.video_processor.get_video_duration(str(video_path))
+                    logger.info(f"✅ Scene {i+1}: Video generated ({actual_duration:.2f}s)")
                     
-                    # Adjust video duration to match audio duration if audio exists
+                    # If we have narration and video doesn't match exactly, sync them
                     if not self.config.skip_audio and i < len(actual_scene_durations):
                         target_audio_duration = actual_scene_durations[i]
-                        duration_diff = abs(wan_video_duration - target_audio_duration)
+                        duration_diff = abs(actual_duration - target_audio_duration)
                         if duration_diff > 0.1:  # If difference > 0.1s, sync them
-                            logger.info(f"🎬 Scene {i+1}: Syncing video ({wan_video_duration:.2f}s) to audio ({target_audio_duration:.2f}s)")
+                            logger.info(f"🎬 Scene {i+1}: Syncing video ({actual_duration:.2f}s) to audio ({target_audio_duration:.2f}s)")
                             synced_video_path = str(clip_path).replace('.mp4', '_synced.mp4')
                             
-                            if wan_video_duration < target_audio_duration:
+                            if actual_duration < target_audio_duration:
                                 # Video is shorter than audio - extend by looping
                                 self.video_processor.extend_video_duration(
                                     str(video_path),
@@ -407,7 +414,7 @@ class CartoonShortsGenerator:
                                     synced_video_path
                                 ]
                                 subprocess.run(cmd, check=True, capture_output=True, text=True)
-                                logger.info(f"🎬 Scene {i+1}: Trimmed video from {wan_video_duration:.2f}s to {target_audio_duration:.2f}s")
+                                logger.info(f"🎬 Scene {i+1}: Trimmed video from {actual_duration:.2f}s to {target_audio_duration:.2f}s")
                             
                             video_path = synced_video_path
                             actual_duration = target_audio_duration
