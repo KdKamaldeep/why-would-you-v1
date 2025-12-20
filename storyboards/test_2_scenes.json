@@ -1,18 +1,51 @@
 {
-  "title": "Realm Beyond the Veil",
-  "description": "A cinematic fantasy short exploring mystical characters and enchanted places beyond the human world",
-  "total_duration": 48,
+  "title": "A Hidden History Fact",
+  "description": "A short cinematic video revealing a surprising historical fact",
+  "total_duration": 20,
   "scenes": [
     {
-      "duration": 12,
-      "description": "A floating fantasy island above glowing clouds at dawn",
-      "visual_prompt": "Massive floating fantasy island above glowing clouds at dawn, ancient stone ruins covered in moss, waterfalls flowing into the sky, soft golden sunrise light, slow forward camera dolly, gentle cloud movement, subtle parallax depth, cinematic fantasy atmosphere, ultra realistic",
+      "duration": 5,
+      "description": "Ancient ruins at sunrise",
+      "visual_prompt": "Ancient stone ruins at sunrise, soft golden light, light mist drifting, slow cinematic push forward, realistic historical atmosphere",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward dolly, clouds drifting upward, waterfalls flowing",
+      "motion_hint": "slow forward push, drifting mist",
+      "motion_strength": 0.6,
+      "fps_hint": 24,
+      "narration": "Did you know some of the world’s oldest cities existed over five thousand years ago?",
+      "subtitle": "A hidden history fact 🏺"
+    },
+    {
+      "duration": 5,
+      "description": "Planned ancient city ruins",
+      "visual_prompt": "Ancient Indus Valley city ruins, straight streets, early drainage systems, slow aerial glide, realistic archaeological environment",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow aerial glide",
       "motion_strength": 0.65,
       "fps_hint": 24,
-      "narration": "Beyond the skies we know, there exists a realm untouched by time. A world suspended above the clouds, where ancient stones remember forgotten ages, and waterfalls fall endlessly into the open sky.",
-      "subtitle": "A realm beyond the skies ☁️✨"
+      "narration": "They were carefully planned, with straight roads and advanced drainage systems.",
+      "subtitle": "Advanced city planning"
+    },
+    {
+      "duration": 5,
+      "description": "Ancient artifacts and seals",
+      "visual_prompt": "Ancient Indus Valley artifacts, seals and pottery, soft museum lighting, slow side pan, high detail realism",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow side pan",
+      "motion_strength": 0.6,
+      "fps_hint": 24,
+      "narration": "Standardized bricks and precise weights show how organized this society was.",
+      "subtitle": "Ahead of its time"
+    },
+    {
+      "duration": 5,
+      "description": "Ancient ruins at sunset",
+      "visual_prompt": "Wide cinematic view of ancient ruins at sunset, warm fading light, slow pull-back camera, realistic historical tone",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow pull-back",
+      "motion_strength": 0.6,
+      "fps_hint": 24,
+      "narration": "Yet the civilization vanished, leaving historians searching for answers even today.",
+      "subtitle": "An unsolved mystery"
     }
   ]
 }
