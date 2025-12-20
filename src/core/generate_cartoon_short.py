@@ -82,7 +82,7 @@ class VideoConfig:
     wan_fps: int = 12  # WAN output FPS
     wan_steps: int = 30  # WAN inference steps
     wan_guidance: float = 6.0  # WAN guidance scale
-    wan_negative_prompt: str = "text, subtitles, watermark, blurry, low quality"  # WAN negative prompt
+    wan_negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed"  # WAN negative prompt for realistic videos
     wan_seed: Optional[int] = None  # WAN random seed (optional)
     # Audio settings
     skip_audio: bool = False  # Skip audio generation entirely
@@ -320,8 +320,8 @@ class CartoonShortsGenerator:
                 if self.config.reuse_existing and clip_path.exists():
                     logger.info(f"Skipping video generation (exists): {clip_path}")
                     video_clips.append(str(clip_path))
-                    # Get actual duration of existing video
-                    existing_duration = self.video_processor.get_audio_duration(str(clip_path))
+                    # Get actual duration of existing video (WAN generates fixed duration)
+                    existing_duration = self.video_processor.get_video_duration(str(clip_path))
                     total_video_duration += existing_duration
                     continue
                 
@@ -342,8 +342,8 @@ class CartoonShortsGenerator:
                     )
                     video_clips.append(video_path)
                     
-                    # Get actual duration of generated video
-                    actual_duration = self.video_processor.get_audio_duration(video_path)
+                    # WAN generates videos with fixed duration: num_frames / fps
+                    actual_duration = self.config.wan_num_frames / self.config.wan_fps
                     total_video_duration += actual_duration
                     logger.info(f"🎬 Scene {i+1}: Video generated: {video_path} ({actual_duration:.1f}s)")
                 except Exception as e:
@@ -540,11 +540,19 @@ class CartoonShortsGenerator:
                 else:
                     logger.info(f"🎵 Fallback: Reusing existing single audio: {narration_path}")
                 
-                # Detect actual duration of the single track
-                logger.info("📏 Fallback: Detecting single track duration...")
-                actual_duration = self.video_processor.get_audio_duration(str(narration_path))
-                script['total_duration'] = actual_duration
-                self.config.duration = max(self.config.duration, actual_duration)
+                # Check if narration file exists, otherwise calculate expected duration from WAN settings
+                if narration_path.exists():
+                    logger.info("📏 Fallback: Detecting single track duration...")
+                    actual_duration = self.video_processor.get_audio_duration(str(narration_path))
+                    script['total_duration'] = actual_duration
+                    self.config.duration = max(self.config.duration, actual_duration)
+                else:
+                    # Use WAN video duration if audio file doesn't exist (WAN generates fixed duration)
+                    logger.warning(f"⚠️ Narration file not found: {narration_path}")
+                    logger.info("📏 Using WAN video duration instead (audio will be handled separately)")
+                    actual_duration = (self.config.wan_num_frames / self.config.wan_fps) * len(script['scenes'])
+                    script['total_duration'] = actual_duration
+                    self.config.duration = max(self.config.duration, actual_duration)
                 
                 # For single track, we need to extend videos to match the actual audio duration
                 logger.info(f"✅ Single track duration detected: {actual_duration:.1f}s")

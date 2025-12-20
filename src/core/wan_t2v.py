@@ -162,7 +162,7 @@ class WanT2VGenerator:
             fps: Frames per second for output video (default: 12)
             num_inference_steps: Number of denoising steps (default: 30)
             guidance_scale: Guidance scale for prompt adherence (default: 6.0)
-            negative_prompt: Negative prompt (default: "text, subtitles, watermark, blurry, low quality")
+            negative_prompt: Negative prompt (default excludes cartoon/anime/illustration for realistic videos)
             device: Device to run on ('cuda' or 'cpu'). Auto-detected if None.
         """
         self.width = width

@@ -53,7 +53,7 @@ def get_model_path_for_type(model_type: str) -> str | None:
     # It downloads automatically on first use to Hugging Face cache
     return None
 
-def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False):
+def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False):
     """Generate a video reel with the given prompt."""
     try:
         # Import the main generator
@@ -296,8 +296,8 @@ Storyboard Cast Format (with face images):
     parser.add_argument(
         "--negative-prompt",
         type=str,
-        default="text, subtitles, watermark, blurry, low quality",
-        help="Negative prompt for video generation (default: 'text, subtitles, watermark, blurry, low quality')"
+        default="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed",
+        help="Negative prompt for video generation (default excludes cartoon/anime/illustration for realistic videos)"
     )
     
     parser.add_argument(

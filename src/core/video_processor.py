@@ -198,6 +198,11 @@ class VideoProcessor:
 
     def get_audio_duration(self, audio_file: str) -> float:
         """Get the duration of an audio file in seconds using FFmpeg."""
+        import os
+        if not os.path.exists(audio_file):
+            logger.warning(f"Audio file does not exist: {audio_file}, returning default duration")
+            return 8.0
+        
         logger.info(f"Getting audio duration for {audio_file}")
         try:
             cmd = [
