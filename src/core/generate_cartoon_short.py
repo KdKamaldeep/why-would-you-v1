@@ -754,7 +754,7 @@ def main():
     parser.add_argument("--video-format", choices=["shorts", "normal"], default="shorts", 
                        help="Video format: 'shorts' for 9:16 YouTube Shorts, 'normal' for 16:9 standard videos")
     parser.add_argument("--output", default="output", help="Output directory")
-    parser.add_argument("--style", default="cartoon", help="Visual style")
+    parser.add_argument("--style", default="realistic", help="Visual style (realistic, anime, etc.)")
     parser.add_argument("--voice", default="", help="Reference speaker WAV path for Coqui XTTS (optional)")
     parser.add_argument("--language", default="en", help="Language for narration")
     parser.add_argument("--no-prompt-enhancement", action="store_true", help="Disable GPT-2 prompt enhancement")

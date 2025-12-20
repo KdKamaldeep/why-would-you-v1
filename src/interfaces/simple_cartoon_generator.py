@@ -43,61 +43,18 @@ def check_requirements():
     return True
 
 def get_model_path_for_type(model_type: str) -> str | None:
-    """Get appropriate model path based on selected model type."""
-    if model_type == "cartoon":
-        # Cartoon models
-        cartoon_models = [
-            "models/toonyou_beta6.safetensors",
-            "models/anything-v4.5.safetensors", 
-            "models/counterfeit-v3.0.safetensors"
-        ]
-        for model in cartoon_models:
-            if Path(model).exists():
-                return model
-    else:  # realistic
-        # Realistic models
-        realistic_models = [
-            "models/realistic-vision-v4.safetensors",
-            "models/deliberate-v3.safetensors",
-            "models/realistic-vision-v5.1.safetensors",
-            "models/dreamshaper-v8.safetensors"
-        ]
-        for model in realistic_models:
-            if Path(model).exists():
-                return model
-    
+    """
+    Legacy function - no longer used.
+    WAN 2.1 T2V is the only model and it downloads automatically from Hugging Face.
+    This function is kept for backward compatibility but always returns None.
+    """
+    # WAN 2.1 T2V model is handled automatically by diffusers library
+    # Model ID: Wan-AI/Wan2.1-T2V-1.3B-Diffusers
+    # It downloads automatically on first use to Hugging Face cache
     return None
 
-def extract_character_faces_from_cast(cast_list):
-    """Extract character face mappings from the cast array in storyboard."""
-    character_faces = {}
-    
-    if not cast_list:
-        return character_faces
-    
-    for cast_member in cast_list:
-        if isinstance(cast_member, dict):
-            character_name = cast_member.get('name', '')
-            face_path = cast_member.get('face', '')  # New field for face image path
-            
-            if character_name and face_path:
-                if Path(face_path).exists():
-                    character_faces[character_name] = face_path
-                    print(f"✅ Character '{character_name}' will use face: {face_path}")
-                else:
-                    print(f"⚠️ Face image not found for character '{character_name}': {face_path}")
-            elif character_name:
-                print(f"ℹ️ Character '{character_name}' will use auto-generated face")
-        elif isinstance(cast_member, str):
-            print(f"ℹ️ Character '{cast_member}' will use auto-generated face")
-    
-    if character_faces:
-        print(f"✅ Found {len(character_faces)} characters with custom faces")
-    
-    return character_faces
-
-def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality", seed=None):
-    """Generate a cartoon video with the given prompt and character faces."""
+def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False):
+    """Generate a video reel with the given prompt."""
     try:
         # Import the main generator
         from ..core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
@@ -116,12 +73,6 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
         print(f"⚙️ WAN Steps: {wan_steps}, Guidance: {wan_guidance}")
         if seed:
             print(f"🎲 Seed: {seed}")
-        if character_faces:
-            print(f"👥 Character faces: {len(character_faces)} characters mapped")
-            for char, face in character_faces.items():
-                print(f"   - {char}: {face}")
-        else:
-            print(f"👥 Character faces: None")
         print("=" * 50)
         
         print(f"🎬 Starting video generation with WAN 2.1 T2V...")
@@ -132,10 +83,8 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
         print(f"🎯 Prompt enhancement: {'Enabled' if enable_prompt_enhancement else 'Disabled'}")
         print(f"📐 Video format: {video_format}")
         print(f"🎬 WAN settings: {wan_width}x{wan_height}, {wan_num_frames} frames @ {wan_fps}fps")
-        if character_faces:
-            print(f"👥 Character faces: {len(character_faces)} characters mapped")
-            for char, face in character_faces.items():
-                print(f"   - {char}: {face}")
+        if create_reel:
+            print(f"🎬 Reel enabled: {reel_width}x{reel_height} @ {reel_fps}fps, mode={vertical_mode}")
         print("-" * 50)
         
         # Create video configuration
@@ -230,9 +179,9 @@ Storyboard Cast Format (with face images):
     
     parser.add_argument(
         "--style", "-s",
-        choices=["cartoon", "anime", "indian", "indian_cartoon", "desi", "bollywood"],
-        default="cartoon",
-        help="Visual style (cartoon, anime, indian). Use 'indian' for Indian children's-book style"
+        choices=["realistic", "anime", "indian", "desi", "bollywood"],
+        default="realistic",
+        help="Visual style (realistic, anime, indian, etc.)"
     )
     
     # Note: --model-type removed (WAN 2.1 is the only model now)
@@ -519,11 +468,8 @@ Storyboard Cast Format (with face images):
                 scenes = all_scenes
                 print(f"🎬 Processing all {len(scenes)} scenes from storyboard")
             
-            # Extract character faces from cast array
-            cast_list = data.get('cast', []) or []
-            character_faces = extract_character_faces_from_cast(cast_list)
-            
             # Normalize characters: map names in scenes to structured cast entries
+            cast_list = data.get('cast', []) or []
             name_to_cast = {}
             for entry in cast_list:
                 if isinstance(entry, dict) and entry.get('name'):

@@ -415,7 +415,7 @@ class ProfessionalPromptEnhancer:
         
         return results
     
-    def validate_prompt(self, prompt: str, style: str = "cartoon") -> bool:
+    def validate_prompt(self, prompt: str, style: str = "realistic") -> bool:
         """
         Validate if a prompt meets quality standards.
         
