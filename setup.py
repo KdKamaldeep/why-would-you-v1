@@ -141,7 +141,7 @@ def setup_env_file():
 
 def main():
     """Main setup function."""
-    print("🎬 Cartoon Shorts Generator Setup")
+    print("🎬 Video Reel Generator Setup")
     print("=" * 40)
     
     success = True

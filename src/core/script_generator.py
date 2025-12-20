@@ -47,7 +47,7 @@ class ScriptGenerator:
         Requirements:
         - Create exactly 3 scenes, each approximately {scene_duration} seconds long
         - Make it engaging and entertaining for social media
-        - Include VERY detailed visual descriptions for accurate cartoon-style image generation
+        - Include VERY detailed visual descriptions for accurate video generation
         - Add humor, emotion, and personality
         - Optimized for video format (supports both 9:16 and 16:9)
         - Include clear, engaging narration text for each scene (aim for 15-25 words per scene for proper timing)
@@ -67,7 +67,7 @@ class ScriptGenerator:
                 {{
                     "duration": {scene_duration},
                     "description": "Detailed description of what happens in this scene",
-                    "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
+                    "visual_prompt": "VERY detailed realistic description for video generation: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific and realistic.",
                     "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
                     "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
                     "subtitle": "Concise subtitle text that matches the narration",
@@ -93,7 +93,7 @@ class ScriptGenerator:
                 {{
                     "duration": {scene_duration},
                     "description": "Detailed description of what happens in this scene", 
-                    "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
+                    "visual_prompt": "VERY detailed realistic description for video generation: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific and realistic.",
                     "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
                     "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
                     "subtitle": "Concise subtitle text that matches the narration",
@@ -105,7 +105,7 @@ class ScriptGenerator:
                 {{
                     "duration": {scene_duration},
                     "description": "Detailed description of what happens in this scene",
-                    "visual_prompt": "VERY detailed cartoon-style description for Stable Diffusion: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific about cartoon/animated style.",
+                    "visual_prompt": "VERY detailed realistic description for video generation: include character appearance, facial expression, pose, setting, colors, lighting, mood, and any objects or actions. Be specific and realistic.",
                     "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
                     "narration": "Clear, engaging text to be narrated by AI voice (2-3 sentences)",
                     "subtitle": "Concise subtitle text that matches the narration",
@@ -115,7 +115,7 @@ class ScriptGenerator:
                     ]
                 }}
             ],
-            "tags": ["cartoon", "story", "fun"]
+            "tags": ["video", "story", "reel"]
         }}
         
         IMPORTANT: 
@@ -194,7 +194,7 @@ class ScriptGenerator:
             "description": description,
             "total_duration": total_duration,
             "scenes": normalized_scenes,
-            "tags": ["cartoon", "storybook", "adventure"]
+            "tags": ["video", "story", "adventure"]
         }
         logger.info(f"Built script from {len(normalized_scenes)} custom scenes (total {total_duration}s)")
         return script
@@ -223,7 +223,7 @@ class ScriptGenerator:
                 "duration": scene_duration,
                 "description": f"Scene 1: Introduction to {prompt}",
                 "visual_prompt": (
-                    f"Two friends begin an adventure about {prompt}. Vertical cartoon style, vibrant, clean lines, "
+                    f"Two friends begin an adventure about {prompt}. Realistic style, cinematic, natural lighting, "
                     f"background setting related to the story."
                 ),
                 "negative_prompt": "photorealistic, realistic, photo, 3d render, cgi, anime, manga, blurry, low quality, dark, scary, violent, adult content, nsfw, hyperrealistic, detailed textures, photographic, film grain, realistic lighting, realistic shadows, realistic proportions, detailed skin, detailed hair, detailed clothing textures",
@@ -265,8 +265,8 @@ class ScriptGenerator:
 
         return {
             "title": f"Story: {prompt}",
-            "description": f"A fun cartoon story about {prompt}",
+            "description": f"A compelling story about {prompt}",
             "total_duration": scene_duration * 3,
             "scenes": scenes,
-            "tags": [prompt, "cartoon", "story", "fun"]
+            "tags": [prompt, "video", "story", "reel"]
         }

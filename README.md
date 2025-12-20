@@ -1,12 +1,12 @@
-# 🎬 Cartoon Shorts Generator - Professional Edition
+# 🎬 Video Reel Generator - Professional Edition
 
-A complete AI-powered system for generating professional-quality cartoon videos with unlimited length capability and advanced animation options.
+A complete AI-powered system for generating platform-ready vertical Reels/Shorts videos optimized for YouTube and Instagram.
 
 ## 🚀 **Features**
 
-- 🎨 **Stable Diffusion Image Generation** - Professional cartoon-style images with Realistic Vision v4 support
-- 🎭 **Face-Based Character Generation** - Use existing faces for character consistency
-- 🎬 **Dual Animation System** - FFmpeg effects + SVD motion animation
+- 🎬 **WAN 2.1 Text-to-Video** - Direct text-to-video generation (no image step)
+- 📱 **Platform-Ready Output** - 1080×1920, H.264/AAC, 30fps for YouTube/Instagram
+- 🎵 **Smart Audio Mixing** - Voice + optional background music
 - 📝 **GPT-4 Story Generation** - Intelligent script creation
 - 🎤 **Coqui TTS Voice Generation** - Local XTTS v2 model with multilingual support
 - ⚡ **Unlimited Length** - Generate videos of any duration
@@ -28,7 +28,7 @@ WhyWouldYou-v1/
 │   │   └── video_processor.py
 │   │
 │   ├── interfaces/              # User interfaces
-│   │   ├── simple_cartoon_generator.py
+│   │   ├── simple_cartoon_generator.py  # Main CLI interface
 │   │   ├── batch_generate.py
 │   │   └── quick_start.py
 │   │
@@ -49,28 +49,69 @@ WhyWouldYou-v1/
 └── 🚀 main.py                  # Main entry point
 ```
 
-## 🎬 **Video Formats**
+## 🎬 **Video Formats & Platform-Ready Reels**
 
-The system now supports multiple video formats:
+The system generates platform-ready vertical Reels/Shorts optimized for YouTube and Instagram.
 
-### **YouTube Shorts (9:16 Aspect Ratio)**
-- **Dimensions**: 768x1024 pixels
-- **Perfect for**: TikTok, Instagram Reels, YouTube Shorts
-- **Usage**: `--video-format shorts` (default)
+### **Platform-Ready Reel Output (Default)**
+- **Dimensions**: 1080×1920 pixels (vertical)
+- **Frame Rate**: 30 fps
+- **Codec**: H.264 (yuv420p) + AAC audio
+- **Perfect for**: YouTube Shorts, Instagram Reels, TikTok
+- **Output**: `outputs/final_reel.mp4` (upload-ready)
 
-### **Normal Video (16:9 Aspect Ratio)**
-- **Dimensions**: 1920x1080 pixels  
-- **Perfect for**: YouTube, Vimeo, general video platforms
-- **Usage**: `--video-format normal`
+### **Vertical Modes**
+
+**Pad Mode (Default - Safe)**
+- No cropping, preserves full content
+- Safe for faces and important elements
+- Adds letterboxing if needed
+- Usage: `--vertical-mode pad`
+
+**Crop Mode (Fills Frame)**
+- Crops to fill vertical frame
+- More "native" vertical look
+- May crop important content
+- Usage: `--vertical-mode crop`
 
 ### **Example Usage:**
 ```bash
-# Create YouTube Shorts (default)
-python main.py "A dragon learns to bake cookies" --video-format shorts
+# Pad mode (safe, default) - preserves all content
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "A dragon learns to bake cookies" \
+  --vertical \
+  --vertical-mode pad \
+  --music music/background.mp3
 
-# Create normal video
-python main.py "A dragon learns to bake cookies" --video-format normal
+# Crop mode (fills frame) - more native vertical look
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Adventure story" \
+  --vertical \
+  --vertical-mode crop
+
+# Custom dimensions and music volumes
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Your story" \
+  --vertical \
+  --out-width 1080 \
+  --out-height 1920 \
+  --out-fps 30 \
+  --music assets/bgm.mp3 \
+  --music-volume 0.12 \
+  --voice-volume 1.0
+
+# Disable reel creation (use stitched video only)
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Story here" \
+  --no-reel
 ```
+
+### **Reel Rendering Features:**
+- ✅ **Platform-ready format**: 1080×1920, 30fps, H.264/AAC
+- ✅ **Smart audio mixing**: Voice + optional background music
+- ✅ **Volume control**: Adjust voice and music levels independently
+- ✅ **Two vertical modes**: Pad (safe) or Crop (fills frame)
+- ✅ **Works without audio**: Creates silent reel if no voice/music provided
 
 ## 🚀 **Quick Start**
 ```bash
@@ -118,7 +159,7 @@ python3 -m src.interfaces.simple_cartoon_generator \
   --language hi \
   --scene 1
 
-# Face-based character generation (using storyboard)
+# With storyboard
 python -m src.interfaces.simple_cartoon_generator --prompt "A brave lion opens a smoothie shop" --storyboard storyboards/example.json
 
 # Interactive interface
@@ -128,67 +169,71 @@ python -m src.interfaces.quick_start
 python -m src.interfaces.batch_generate
 ```
 
-## 🎬 **Animation System**
+## 🎬 **WAN 2.1 Text-to-Video Pipeline**
 
-### **Dual Animation Options:**
+### **Direct Text-to-Video Generation**
+- **WAN 2.1 T2V** - Generates videos directly from text prompts
+- **No image generation step** - Streamlined pipeline
+- **Multi-scene support** - Automatic scene stitching
+- **Local processing** - Runs entirely on your machine
 
-#### **1. FFmpeg Animation (Default)**
-**6 Professional Effects:**
-1. **Cinematic Zoom-Pan** - Smooth camera movements
-2. **Smooth Slide Animation** - Organic motion
-3. **Organic Rotation** - Natural spinning effects
-4. **Parallax Motion** - Depth and perspective
-5. **Breathing Effect** - Subtle pulsing
-6. **Drift Animation** - Gentle floating motion
+### **Pipeline Flow:**
+```
+Script/Scenes JSON → WAN 2.1 (text2video) → Coqui TTS → FFmpeg stitch → Reel Renderer
+```
 
-#### **2. SVD Motion Animation (Advanced)**
-- **AI-powered motion** using Stable Video Diffusion
-- **Realistic movement** with 25-frame sequences
-- **Automatic looping** for longer videos
-- **Configurable motion intensity** (0-255)
-- **Direct model integration** - No ComfyUI required!
+### **Output Files:**
+- **Scene clips**: `outputs/scenes/scene_1.mp4`, `scene_2.mp4`, etc.
+- **Stitched video**: `outputs/stitched.mp4` (intermediate)
+- **Final reel**: `outputs/final_reel.mp4` (upload-ready, 1080×1920, H.264/AAC, 30fps)
 
 ### **Usage Examples:**
 ```bash
-# FFmpeg animation (default)
-python3 -m src.interfaces.simple_cartoon_generator --prompt "Adventure story" --animator ffmpeg
+# Basic generation (creates platform-ready reel by default)
+python -m src.interfaces.simple_cartoon_generator --prompt "A cat walks on grass"
 
-# SVD motion animation (direct - no ComfyUI needed!)
-python3 -m src.interfaces.simple_cartoon_generator --prompt "Adventure story" --animator svd
+# With background music
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Adventure story" \
+  --music music/background.mp3 \
+  --music-volume 0.12
+
+# Crop mode (fills vertical frame)
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Your story" \
+  --vertical-mode crop
+
+# Custom settings
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Story here" \
+  --out-width 1080 \
+  --out-height 1920 \
+  --out-fps 30 \
+  --voice-volume 1.0 \
+  --music-volume 0.15
 ```
 
-### **Unlimited Length Capability:**
-- No 24-frame limits like AnimateDiff
-- Generate 30s, 60s, or longer videos
-- Professional quality throughout
-- Smart frame management
+## 📁 **Output Structure**
 
-## 🎨 **Image Generation**
+After generation, you'll find:
 
-### **Stable Diffusion Integration:**
-- Professional cartoon-style images
-- Enhanced prompts for better results
-- Automatic fallback to placeholders
-- Memory-optimized processing
-
-### **Model Support:**
-- **Realistic Vision v4** (realistic style) - Default for realistic generation
-- **Anything v5** (cartoon style)
-- **AnimaGine XL** (anime style)
-- **DreamShaper v8** (artistic style)
-- **Deliberate v3** (detailed style)
-
-### **Model Selection:**
-```bash
-# Realistic style
-python3 -m src.interfaces.simple_cartoon_generator --model-type realistic
-
-# Cartoon style
-python3 -m src.interfaces.simple_cartoon_generator --model-type cartoon
-
-# Anime style
-python3 -m src.interfaces.simple_cartoon_generator --model-type anime
 ```
+output/
+├── scenes/
+│   ├── scene_1.mp4          # Individual scene videos (WAN output)
+│   ├── scene_2.mp4
+│   └── scene_3.mp4
+├── stitched.mp4              # Stitched scene videos (intermediate)
+├── final_reel.mp4            # Platform-ready reel (upload-ready)
+│                             # 1080×1920, H.264/AAC, 30fps
+├── script.json               # Generated story script
+├── storyboard.json           # Human-readable storyboard
+├── audio_scene_1.wav         # Voiceover audio clips
+├── audio_scene_2.wav
+└── subtitles.srt             # Subtitle file (if enabled)
+```
+
+**Upload-ready file**: `outputs/final_reel.mp4` (or `output/final_reel.mp4` depending on `--output` flag)
 
 ## 📝 **Story Generation**
 
@@ -238,7 +283,7 @@ ENGLISH_SPEAKER_WAV=path/to/english_speaker.wav
 - **FPS**: 15 (optimized for social media)
 - **Resolution**: 768x1024 (vertical format)
 - **Duration**: Configurable (unlimited)
-- **Style**: Cartoon/anime
+- **Style**: Realistic/anime
 
 ## 🧪 **Testing**
 
@@ -357,7 +402,7 @@ from src.core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
 config = VideoConfig(
     prompt="A magical cat teaches other animals to dance",
     duration=60,  # 60-second video
-    output_path="my_cartoon"
+    output_path="my_video"
 )
 
 generator = CartoonShortsGenerator(config)
@@ -373,14 +418,14 @@ python -m src.interfaces.batch_generate
 ## 🎉 **Results**
 
 Your system generates:
-- ✅ **Professional cartoon videos** with unlimited length
-- ✅ **High-quality animations** using FFmpeg and SVD techniques
+- ✅ **Platform-ready vertical reels** (1080×1920, H.264/AAC, 30fps)
+- ✅ **Direct text-to-video** using WAN 2.1 T2V (no image generation step)
 - ✅ **Intelligent storytelling** powered by GPT-4
 - ✅ **Natural multilingual narration** with local XTTS v2 model
-- ✅ **Cinematic effects** for engaging content
-- ✅ **Realistic images** with Realistic Vision v4 support
-- ✅ **Multiple video formats** (Shorts, Normal, Custom)
+- ✅ **Smart audio mixing** (voice + optional background music)
+- ✅ **Two vertical modes** (pad for safety, crop for native look)
+- ✅ **Upload-ready output** optimized for YouTube/Instagram
 
-## 🚀 **Ready to Create Professional Cartoons!**
+## 🚀 **Ready to Create Professional Video Reels!**
 
-**No more limitations. No more complexity. Just unlimited professional-quality cartoon generation!** 🎬✨
+**Platform-ready vertical Reels/Shorts optimized for YouTube and Instagram!** 🎬✨

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple Cartoon Generator - Easy-to-use script for generating cartoon videos with face-based character generation
+Video Reel Generator - Easy-to-use script for generating platform-ready vertical Reels/Shorts videos
 """
 
 import os
@@ -124,7 +124,7 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
             print(f"👥 Character faces: None")
         print("=" * 50)
         
-        print(f"🎬 Starting cartoon generation with WAN 2.1 T2V...")
+        print(f"🎬 Starting video generation with WAN 2.1 T2V...")
         print(f"📝 Prompt: {prompt}")
         print(f"🎨 Style: {style}")
         print(f"⏱️ Duration: {duration} seconds")
@@ -155,7 +155,16 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
             wan_steps=wan_steps,
             wan_guidance=wan_guidance,
             wan_negative_prompt=wan_negative_prompt,
-            wan_seed=seed
+            wan_seed=seed,
+            create_reel=create_reel,
+            vertical_mode=vertical_mode,
+            reel_width=reel_width,
+            reel_height=reel_height,
+            reel_fps=reel_fps,
+            music_path=music_path,
+            music_volume=music_volume,
+            voice_volume=voice_volume,
+            verbose_ffmpeg=verbose_ffmpeg
         )
         
         # Initialize generator
@@ -167,7 +176,7 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
         print("-" * 50)
         print(f"🎉 Video generation completed!")
         print(f"📁 Output file: {output_path}")
-        print(f"🎬 You can now view your cartoon video!")
+        print(f"🎬 You can now view your video reel!")
         
         return output_path
         
@@ -216,7 +225,7 @@ Storyboard Cast Format (with face images):
     parser.add_argument(
         "--prompt", "-p",
         required=True,
-        help="The story prompt for your cartoon video"
+        help="The story prompt for your video reel"
     )
     
     parser.add_argument(
@@ -369,6 +378,11 @@ Storyboard Cast Format (with face images):
     if args.seed:
         print(f"🎲 Seed: {args.seed}")
     print(f"🔇 Skip Audio: {args.skip_audio}")
+    print(f"🎬 Reel: {'Enabled' if not args.no_reel and (args.format == 'reel' or args.vertical) else 'Disabled'}")
+    if not args.no_reel and (args.format == 'reel' or args.vertical):
+        print(f"📐 Reel: {args.out_width}x{args.out_height} @ {args.out_fps}fps, mode={args.vertical_mode}")
+        if args.music:
+            print(f"🎵 Music: {args.music} (vol={args.music_volume})")
     print("=" * 60)
     
     print("🎨 Simple Cartoon Generator with Face-Based Characters")
@@ -380,7 +394,7 @@ Storyboard Cast Format (with face images):
         sys.exit(1)
     
     if args.check_only:
-        print("\n✅ All requirements are satisfied! You're ready to generate cartoons.")
+        print("\n✅ All requirements are satisfied! You're ready to generate video reels.")
         sys.exit(0)
     
 
@@ -458,6 +472,9 @@ Storyboard Cast Format (with face images):
                 scene_copy['characters'] = structured_chars[:2]
                 normalized_scenes.append(scene_copy)
 
+            # Determine if reel should be created
+            create_reel = not args.no_reel and (args.format == "reel" or args.vertical)
+            
             config = VideoConfig(
                 prompt=args.prompt,
                 duration=args.duration,
@@ -480,7 +497,16 @@ Storyboard Cast Format (with face images):
                 wan_guidance=args.wan_guidance,
                 wan_negative_prompt=args.negative_prompt,
                 wan_seed=args.seed,
-                skip_audio=args.skip_audio
+                skip_audio=args.skip_audio,
+                create_reel=create_reel,
+                vertical_mode=args.vertical_mode,
+                reel_width=args.out_width,
+                reel_height=args.out_height,
+                reel_fps=args.out_fps,
+                music_path=args.music,
+                music_volume=args.music_volume,
+                voice_volume=args.voice_volume,
+                verbose_ffmpeg=args.verbose_ffmpeg
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
@@ -488,6 +514,9 @@ Storyboard Cast Format (with face images):
             print(f"❌ Failed to use storyboard: {e}")
             output_path = None
     else:
+        # Determine if reel should be created
+        create_reel = not args.no_reel and (args.format == "reel" or args.vertical)
+        
         output_path = generate_cartoon(
             args.prompt, 
             args.style, 
@@ -502,7 +531,16 @@ Storyboard Cast Format (with face images):
             args.wan_steps,
             args.wan_guidance,
             args.negative_prompt,
-            args.seed
+            args.seed,
+            create_reel=create_reel,
+            vertical_mode=args.vertical_mode,
+            reel_width=args.out_width,
+            reel_height=args.out_height,
+            reel_fps=args.out_fps,
+            music_path=args.music,
+            music_volume=args.music_volume,
+            voice_volume=args.voice_volume,
+            verbose_ffmpeg=args.verbose_ffmpeg
         )
     
     if output_path:

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Image Generator Module - Handles cartoon image generation using Stable Diffusion
+Image Generator Module - Handles image generation using Stable Diffusion (legacy, not used in main pipeline)
 """
 
 import os
@@ -208,7 +208,7 @@ class ImageGenerator:
 
             self.sd_available = True
             logger.info("✅ Stable Diffusion pipeline initialized successfully!")
-            logger.info("🎨 Ready to generate professional cartoon images!")
+            logger.info("🎨 Ready to generate professional images!")
 
         except Exception as e:
             logger.warning(f"❌ Failed to initialize SD pipeline: {e}")
@@ -218,7 +218,7 @@ class ImageGenerator:
     def generate_cartoon_image(self, prompt: str, output_path: str, subtitle: str = None, negative_prompt: str = None, character_faces: dict = None) -> str:
         """Generate a cartoon-style image using Stable Diffusion with optional subtitle, negative prompt, and character faces."""
         try:
-            logger.info(f"🎨 Generating cartoon image for prompt: {prompt}")
+            logger.info(f"🎨 Generating image for prompt: {prompt}")
             if negative_prompt:
                 logger.info(f"🎨 Using negative prompt: {negative_prompt}")
             if character_faces:
@@ -309,7 +309,7 @@ class ImageGenerator:
                     # Use the new professional enhancer
                     from .prompt_enhancer import ProfessionalPromptEnhancer
                     enhancer = ProfessionalPromptEnhancer()
-                    analysis = enhancer.analyze_prompt(prompt, style="cartoon")
+                    analysis = enhancer.analyze_prompt(prompt, style="realistic")
                     
                     # Use enhanced prompt if it's significantly better
                     if analysis.clarity_score > 0.6 and analysis.structure_score > 0.5:
@@ -370,7 +370,7 @@ class ImageGenerator:
             
             # Use provided negative prompt or create intelligent default
             if negative_prompt is None:
-                # Base negative prompt for cartoon style
+                # Base negative prompt for realistic style
                 base_negative_prompt = (
                     "photorealistic, realistic, photo, 3d render, cgi, anime, manga, "
                     "blurry, low quality, dark, scary, violent, adult content, nsfw, "
@@ -609,7 +609,7 @@ class ImageGenerator:
                 text_font = ImageFont.load_default()
             
             # Title
-            title = "🎬 Cartoon Scene"
+            title = "🎬 Video Scene"
             title_bbox = draw.textbbox((0, 0), title, font=title_font)
             title_width = title_bbox[2] - title_bbox[0]
             title_x = (self.width - title_width) // 2
@@ -778,25 +778,25 @@ class ImageGenerator:
             
             # Create specific adjustment prompts based on attempt number
             if attempt == 1:
-                adjustment_prompt = f"Enhance this visual prompt to create a vibrant, detailed cartoon scene with clear subjects and rich colors: {original_prompt}"
+                adjustment_prompt = f"Enhance this visual prompt to create a detailed, realistic scene with clear subjects and natural lighting: {original_prompt}"
             elif attempt == 2:
-                adjustment_prompt = f"Transform this prompt into a highly detailed, colorful cartoon scene with strong visual elements and clear composition: {original_prompt}"
+                adjustment_prompt = f"Transform this prompt into a highly detailed, realistic scene with strong visual elements and clear composition: {original_prompt}"
             else:
-                adjustment_prompt = f"Create an extremely detailed, vibrant cartoon scene with multiple visual elements, rich colors, and clear subjects: {original_prompt}"
+                adjustment_prompt = f"Create an extremely detailed, realistic scene with multiple visual elements, natural colors, and clear subjects: {original_prompt}"
             
             logger.info(f"🎯 Adjusting prompt (attempt {attempt}): {original_prompt}")
             
             # Use GPT-2 to enhance the prompt
             enhanced_prompt = self.prompt_enhancer.enhance_prompt(
                 adjustment_prompt,
-                enhancement_type="cartoon_detailed",
+                enhancement_type="realistic_detailed",
                 max_tokens=77  # Keep within diffusion model limits
             )
             
             # Add specific cartoon enhancement keywords if not present
             enhancement_keywords = [
-                "vibrant colors", "detailed cartoon", "clear composition", 
-                "rich textures", "bright lighting", "distinct subjects"
+                "natural colors", "detailed", "clear composition", 
+                "rich textures", "natural lighting", "distinct subjects", "photorealistic"
             ]
             
             # Check if any enhancement keywords are missing
@@ -822,9 +822,9 @@ class ImageGenerator:
         Fallback prompt adjustment when GPT-2 is not available.
         """
         base_enhancements = [
-            "vibrant cartoon style, detailed, colorful",
-            "bright cartoon scene, rich details, clear subjects",
-            "highly detailed cartoon, vibrant colors, strong composition"
+            "photorealistic, detailed, natural lighting",
+            "realistic scene, rich details, clear subjects",
+            "highly detailed, natural colors, strong composition"
         ]
         
         enhancement = base_enhancements[min(attempt - 1, len(base_enhancements) - 1)]
@@ -835,7 +835,7 @@ class ImageGenerator:
 
     def generate_cartoon_image_with_validation(self, prompt: str, output_path: str, max_attempts: int = 3, negative_prompt: str = None, character_faces: dict = None) -> str:
         """
-        Generate a cartoon image with validation and automatic prompt adjustment.
+        Generate an image with validation and automatic prompt adjustment (legacy method).
         Retries with adjusted prompts if the generated image is blank or poor quality.
         """
         original_prompt = prompt

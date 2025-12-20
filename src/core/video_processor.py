@@ -19,9 +19,9 @@ class VideoConfig:
     height: int = 1024
     # Encoding options (optimize for smaller files)
     codec: str = "libx265"           # Use HEVC for ~40-60% smaller files
-    crf: int = 28                     # Lower = higher quality. 28 is good for social/cartoon
+    crf: int = 23                     # Lower = higher quality. 23 is good for social media
     preset: str = "medium"           # slower = smaller; keep reasonable CPU cost
-    tune: str = "animation"          # better compression for cartoons
+    tune: str = "film"               # better compression for video content
     audio_bitrate: str = "96k"       # narration-friendly bitrate
     faststart: bool = True            # enable moov atom at front for streaming
 

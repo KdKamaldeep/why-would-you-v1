@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """
-Cartoon Shorts Generator - A complete CLI tool for creating vertical cartoon-style YouTube Shorts videos.
+Cartoon Shorts Generator - A complete CLI tool for creating platform-ready vertical Reels/Shorts videos.
 
 This script follows a specific flow:
 1. Generate 3-scene story with OpenAI GPT-4
-2. Create cartoon images with Stable Diffusion (ToonYou/MeinaMix)
-3. Animate images with AnimateDiff + cartoon LoRA
-4. Generate narration with Coqui TTS (XTTS v2)
-5. Add audio to video clips
-6. Add subtitles and background music
-7. Compile final vertical video
+2. Generate videos directly with WAN 2.1 Text-to-Video (T2V)
+3. Generate narration with Coqui TTS (XTTS v2)
+4. Stitch scene videos together
+5. Create platform-ready reel (1080×1920, H.264/AAC, 30fps)
 
 Usage:
     python generate_cartoon_short.py --prompt "A baby lion opens a smoothie shop in the jungle"
@@ -44,7 +42,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('cartoon_shorts.log'),
+        logging.FileHandler('video_reel.log'),
         logging.StreamHandler(sys.stdout)
     ]
 )
@@ -60,7 +58,7 @@ class VideoConfig:
     width: int = 768
     height: int = 1024  # Vertical format for Shorts
     output_path: str = "output"
-    style: str = "cartoon"
+    style: str = "realistic"
     voice_id: str = ""  # Optional path to reference speaker WAV for Coqui XTTS
     language: str = "en"
     num_scenes: int = 3
@@ -88,6 +86,16 @@ class VideoConfig:
     wan_seed: Optional[int] = None  # WAN random seed (optional)
     # Audio settings
     skip_audio: bool = False  # Skip audio generation entirely
+    # Reel/Shorts rendering settings
+    create_reel: bool = True  # Create platform-ready reel (default: True for vertical format)
+    vertical_mode: str = "pad"  # "pad" (safe) or "crop" (fills frame)
+    reel_width: int = 1080  # Reel output width
+    reel_height: int = 1920  # Reel output height
+    reel_fps: int = 30  # Reel output FPS
+    music_path: Optional[str] = None  # Background music path
+    music_volume: float = 0.12  # Music volume (0.0-1.0)
+    voice_volume: float = 1.0  # Voice volume (0.0-1.0)
+    verbose_ffmpeg: bool = False  # Print FFmpeg commands
 
     def __post_init__(self):
         """Set dimensions based on video format."""
@@ -144,13 +152,17 @@ class CartoonShortsGenerator:
         self.video_processor = VideoProcessor(video_config)
         
     def generate(self) -> str:
-        """Generate the complete cartoon short video following the specified flow."""
+        """Generate the complete video reel following the specified flow."""
         logger.info(f"Starting video generation for prompt: {self.config.prompt}")
         
         try:
             # Early exit if final video already exists and reuse is enabled
-            output_filename = "final_short.mp4" if self.config.video_format == "shorts" else "final_video.mp4"
-            final_output = self.output_dir / output_filename
+            if self.config.create_reel:
+                # Check for reel output
+                final_output = self.output_dir / "final_reel.mp4"
+            else:
+                # Check for stitched output
+                final_output = self.output_dir / "stitched.mp4"
             if self.config.reuse_existing and final_output.exists():
                 logger.info(f"Final video already exists and reuse is enabled: {final_output}")
                 return str(final_output)
@@ -297,8 +309,12 @@ class CartoonShortsGenerator:
             video_clips: List[str] = []
             total_video_duration = 0
             
+            # Create scenes subdirectory
+            scenes_dir = self.output_dir / "scenes"
+            scenes_dir.mkdir(parents=True, exist_ok=True)
+            
             for i, scene in enumerate(script['scenes']):
-                clip_path = self.output_dir / f"scene_{i+1}.mp4"
+                clip_path = scenes_dir / f"scene_{i+1}.mp4"
                 logger.info(f"🎬 Scene {i+1}: Processing video generation...")
                 
                 if self.config.reuse_existing and clip_path.exists():
@@ -408,21 +424,74 @@ class CartoonShortsGenerator:
             logger.info(f"🎵 Background music: {'Yes' if background_music else 'No'}")
             logger.info(f"📁 Final output: {final_output}")
             
+            # Compile stitched video (keep existing output)
+            stitched_output = self.output_dir / "stitched.mp4"
             self.video_processor.compile_final_video(
                 final_clips,
                 final_audio_paths,  # Pass audio paths with pauses included
                 background_music,
                 str(subtitles_path) if self.config.add_subtitles else None,
-                str(final_output)
+                str(stitched_output)
             )
+            logger.info(f"✅ Stitched video created: {stitched_output}")
             
-            # Step 8: Generate metadata
-            logger.info("Step 8: Generating metadata...")
+            # Step 8: Create platform-ready reel (if enabled)
+            if self.config.create_reel:
+                logger.info("Step 8: Creating platform-ready reel...")
+                from ..render.reel_renderer import create_reel
+                
+                # Prepare voice audio (concatenate if multiple)
+                voice_audio_path = None
+                if final_audio_paths and any(final_audio_paths):
+                    # If multiple audio paths, concatenate them
+                    if len(final_audio_paths) > 1:
+                        voice_audio_path = str(self.output_dir / "merged_voice.aac")
+                        self.video_processor.concat_audios(
+                            [p for p in final_audio_paths if p and Path(p).exists()],
+                            voice_audio_path
+                        )
+                    else:
+                        voice_audio_path = final_audio_paths[0] if final_audio_paths[0] else None
+                
+                # Use configured music path or fallback to background_music
+                music_file = self.config.music_path or background_music
+                
+                reel_output = self.output_dir / "final_reel.mp4"
+                try:
+                    create_reel(
+                        stitched_video=str(stitched_output),
+                        voice_audio=voice_audio_path,
+                        music_path=music_file,
+                        output_path=str(reel_output),
+                        vertical_mode=self.config.vertical_mode,
+                        out_width=self.config.reel_width,
+                        out_height=self.config.reel_height,
+                        out_fps=self.config.reel_fps,
+                        voice_volume=self.config.voice_volume,
+                        music_volume=self.config.music_volume,
+                        verbose=self.config.verbose_ffmpeg
+                    )
+                    logger.info(f"🎉 Platform-ready reel created: {reel_output}")
+                    logger.info(f"📐 Format: {self.config.reel_width}x{self.config.reel_height} @ {self.config.reel_fps}fps")
+                    logger.info(f"🎬 Mode: {self.config.vertical_mode}")
+                    final_output = reel_output
+                except Exception as e:
+                    logger.error(f"❌ Failed to create reel: {e}")
+                    logger.warning("⚠️ Falling back to stitched video")
+                    final_output = stitched_output
+            else:
+                logger.info("Step 8: Reel creation disabled, using stitched video")
+                final_output = stitched_output
+            
+            # Step 9: Generate metadata
+            logger.info("Step 9: Generating metadata...")
             self._generate_metadata(script, str(final_output))
             
             logger.info(f"🎉 Video generation completed: {final_output}")
             logger.info(f"📊 Final video duration: {total_video_duration:.1f}s")
             logger.info(f"📊 Total processing time: Audio={total_audio_duration:.1f}s, Video={total_video_duration:.1f}s")
+            if self.config.create_reel and final_output.name == "final_reel.mp4":
+                logger.info(f"📤 Upload-ready: {final_output} (1080x1920, H.264/AAC, 30fps)")
             return str(final_output)
             
         except Exception as e:
@@ -679,7 +748,7 @@ class CartoonShortsGenerator:
 
 def main():
     """Main CLI entry point."""
-    parser = argparse.ArgumentParser(description="Generate cartoon-style videos (YouTube Shorts or normal format)")
+    parser = argparse.ArgumentParser(description="Generate platform-ready vertical Reels/Shorts videos")
     parser.add_argument("--prompt", required=True, help="Story prompt (e.g., 'A baby lion opens a smoothie shop in the jungle')")
     parser.add_argument("--duration", type=int, default=30, help="Video duration in seconds")
     parser.add_argument("--video-format", choices=["shorts", "normal"], default="shorts", 
@@ -690,6 +759,18 @@ def main():
     parser.add_argument("--language", default="en", help="Language for narration")
     parser.add_argument("--no-prompt-enhancement", action="store_true", help="Disable GPT-2 prompt enhancement")
     parser.add_argument("--scene-pause", type=float, default=0.0, help="Pause duration between scenes in seconds (default: 0.0, no black screens)")
+    # Reel/Shorts rendering flags
+    parser.add_argument("--format", choices=["reel", "normal"], default="reel", help="Output format: 'reel' for platform-ready vertical (default), 'normal' for stitched only")
+    parser.add_argument("--vertical", action="store_true", help="Create vertical reel (same as --format reel, default)")
+    parser.add_argument("--no-reel", action="store_true", help="Disable reel creation (use stitched video only)")
+    parser.add_argument("--vertical-mode", choices=["pad", "crop"], default="pad", help="Vertical mode: 'pad' (safe, no cropping) or 'crop' (fills frame)")
+    parser.add_argument("--out-width", type=int, default=1080, help="Reel output width (default: 1080)")
+    parser.add_argument("--out-height", type=int, default=1920, help="Reel output height (default: 1920)")
+    parser.add_argument("--out-fps", type=int, default=30, help="Reel output FPS (default: 30)")
+    parser.add_argument("--music", type=str, default=None, help="Path to background music file (optional)")
+    parser.add_argument("--music-volume", type=float, default=0.12, help="Background music volume (0.0-1.0, default: 0.12)")
+    parser.add_argument("--voice-volume", type=float, default=1.0, help="Voice volume (0.0-1.0, default: 1.0)")
+    parser.add_argument("--verbose-ffmpeg", action="store_true", help="Print FFmpeg commands for debugging")
     
     args = parser.parse_args()
     
@@ -704,6 +785,9 @@ def main():
             logger.info(f"  {var}")
         sys.exit(1)
     
+    # Determine if reel should be created
+    create_reel = not args.no_reel and (args.format == "reel" or args.vertical)
+    
     # Create configuration
     config = VideoConfig(
         prompt=args.prompt,
@@ -714,7 +798,16 @@ def main():
         voice_id=args.voice,
         language=args.language,
         enable_prompt_enhancement=not args.no_prompt_enhancement,
-        scene_pause_duration=args.scene_pause
+        scene_pause_duration=args.scene_pause,
+        create_reel=create_reel,
+        vertical_mode=args.vertical_mode,
+        reel_width=args.out_width,
+        reel_height=args.out_height,
+        reel_fps=args.out_fps,
+        music_path=args.music,
+        music_volume=args.music_volume,
+        voice_volume=args.voice_volume,
+        verbose_ffmpeg=args.verbose_ffmpeg
     )
     
     # Generate video

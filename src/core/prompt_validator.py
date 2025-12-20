@@ -65,7 +65,7 @@ class PromptValidator:
                 "Specify positioning (e.g., 'centered', 'off-center')"
             ],
             "style_inconsistency": [
-                "Add specific style descriptors (e.g., 'cartoon style', 'anime style')",
+                "Add specific style descriptors (e.g., 'realistic', 'photorealistic', 'anime style')",
                 "Add 'consistent style' to positive prompt",
                 "Add conflicting styles to negative prompt"
             ],

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Quick Start Script - Generate a cartoon with minimal setup
+Quick Start Script - Generate a video reel with minimal setup
 """
 
 import os
@@ -9,7 +9,7 @@ from pathlib import Path
 def quick_generate():
     """Quick generation with default settings."""
     
-    print("🚀 Quick Cartoon Generator")
+    print("🚀 Quick Video Reel Generator")
     print("=" * 40)
     
     # Get user input
@@ -19,7 +19,7 @@ def quick_generate():
         print("❌ Please provide a story prompt!")
         return
     
-    print(f"\n🎬 Generating cartoon for: '{prompt}'")
+    print(f"\n🎬 Generating video reel for: '{prompt}'")
     print("⏳ This may take several minutes...")
     print("-" * 40)
     
@@ -31,7 +31,7 @@ def quick_generate():
         config = VideoConfig(
             prompt=prompt,
             duration=30,
-            style="cartoon",
+            style="realistic",
             output_path="output"
         )
         

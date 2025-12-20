@@ -1,8 +1,8 @@
 #!/bin/bash
-# Model Download Script for Cartoon Shorts Generator
+# Model Download Script for Video Reel Generator
 # This script downloads required AI models for video generation with WAN 2.1 T2V
 
-echo "🚀 Downloading AI Models for Cartoon Shorts Generator"
+echo "🚀 Downloading AI Models for Video Reel Generator"
 echo "🎬 WAN 2.1 Text-to-Video Pipeline"
 echo "============================================================"
 

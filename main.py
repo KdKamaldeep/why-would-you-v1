@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 def main():
     """Main entry point for the cartoon generator."""
-    print("🎬 Cartoon Shorts Generator - Professional Edition")
+    print("🎬 Video Reel Generator - Professional Edition")
     print("=" * 50)
     
     try:
@@ -22,7 +22,7 @@ def main():
         from core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
         
         # Parse command line arguments
-        parser = argparse.ArgumentParser(description="Generate cartoon-style videos")
+        parser = argparse.ArgumentParser(description="Generate platform-ready vertical Reels/Shorts videos")
         parser.add_argument("prompt", nargs="?", help="Story prompt (e.g., 'A dragon learns to bake cookies')")
         parser.add_argument("--video-format", choices=["shorts", "normal"], default="shorts",
                            help="Video format: 'shorts' for 9:16 YouTube Shorts, 'normal' for 16:9 standard videos")
@@ -33,7 +33,7 @@ def main():
         
         # Check if prompt is provided
         if args.prompt:
-            print(f"🎯 Generating cartoon for: {args.prompt}")
+            print(f"🎯 Generating video reel for: {args.prompt}")
             print(f"📐 Video format: {args.video_format}")
             print(f"⏱️ Duration: {args.duration} seconds")
             
@@ -49,10 +49,10 @@ def main():
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
             
-            print(f"✅ Cartoon generated successfully: {output_path}")
+            print(f"✅ Video reel generated successfully: {output_path}")
             
         else:
-            print("📝 Usage: python main.py 'Your cartoon prompt here' [options]")
+            print("📝 Usage: python main.py 'Your story prompt here' [options]")
             print("💡 Example: python main.py 'A dragon learns to bake cookies'")
             print("💡 Example: python main.py 'A dragon learns to bake cookies' --video-format normal")
             print("\n🎨 Available options:")
