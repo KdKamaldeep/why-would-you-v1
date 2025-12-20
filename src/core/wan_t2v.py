@@ -248,10 +248,17 @@ class WanT2VGenerator:
             logger.info(f"💾 Saving video to: {output_path}")
             export_to_video(frames, str(output_path), fps=self.fps)
             
+            # Explicitly delete frames and output to free memory
+            del frames
+            del output
+            frames = None
+            output = None
+            
             # Clear GPU cache after generation
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
-                gc.collect()
+                torch.cuda.synchronize()  # Wait for all GPU operations to complete
+            gc.collect()  # Force Python garbage collection
             
             logger.info(f"✅ Video generated successfully: {output_path}")
             return str(output_path)

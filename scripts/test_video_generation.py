@@ -175,6 +175,14 @@ def main():
             negative_prompt=custom_negative_prompt
         )
         
+        # Force cleanup after video generation
+        import gc
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            torch.cuda.synchronize()
+        gc.collect()
+        
         logger.info("=" * 60)
         logger.info("✅ Video generation completed successfully!")
         logger.info(f"📹 Output file: {output_file}")
