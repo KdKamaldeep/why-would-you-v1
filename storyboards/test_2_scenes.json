@@ -1,51 +1,51 @@
 {
-  "title": "A Hidden History Fact",
-  "description": "A short cinematic video revealing a surprising historical fact",
+  "title": "A Surprising Water Fact",
+  "description": "A short cinematic video revealing an interesting and lesser-known fact about water",
   "total_duration": 20,
   "scenes": [
     {
       "duration": 5,
-      "description": "Ancient ruins at sunrise",
-      "visual_prompt": "Ancient stone ruins at sunrise, soft golden light, light mist drifting slowly across the ground, subtle dust particles in the air, slow cinematic push forward, gentle parallax between foreground stones and background ruins, warm atmospheric haze, realistic historical atmosphere",
+      "description": "Flowing river in early morning light",
+      "visual_prompt": "Flowing river at sunrise, soft golden light reflecting on water surface, gentle ripples moving downstream, slow cinematic forward push, light mist rising from water, vertical composition, realistic natural atmosphere",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward push, drifting mist",
+      "motion_hint": "slow forward push, gentle water flow",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Did you know some of the world’s oldest cities existed over five thousand years ago?",
-      "subtitle": "A hidden history fact 🏺"
+      "narration": "Did you know most of the water on Earth is older than the planet itself?",
+      "subtitle": "A surprising water fact 💧"
     },
     {
       "duration": 5,
-      "description": "Planned ancient city ruins",
-      "visual_prompt": "Ancient Indus Valley city ruins, straight streets and stone foundations, early drainage channels visible, slow aerial glide forward, subtle vertical parallax between streets and buildings, light wind moving loose sand, soft sunlight casting long shadows, realistic archaeological environment",
+      "description": "Water droplets floating in sunlight",
+      "visual_prompt": "Close-up of floating water droplets illuminated by sunlight, slow motion feel, subtle rotation and drift, shallow depth of field, soft light rays, vertical framing, ultra realistic",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow aerial glide",
-      "motion_strength": 0.65,
+      "motion_hint": "slow drifting motion, subtle rotation",
+      "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "They were carefully planned, with straight roads and advanced drainage systems.",
-      "subtitle": "Advanced city planning"
+      "narration": "Scientists believe much of Earth’s water came from ancient cosmic sources.",
+      "subtitle": "Water from space"
     },
     {
       "duration": 5,
-      "description": "Ancient artifacts and seals",
-      "visual_prompt": "Ancient Indus Valley artifacts, seals and pottery displayed in sequence, soft museum-style lighting, slow side pan with slight push-in, shallow depth-of-field shift between objects, floating dust motes visible in light rays, high detail realism",
+      "description": "Rain falling on Earth landscape",
+      "visual_prompt": "Gentle rain falling over Earth landscape, droplets hitting soil and leaves, slow cinematic side pan, soft natural lighting, realistic environmental motion, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow side pan",
+      "motion_hint": "slow side pan, falling rain",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Standardized bricks and precise weights show how organized this society was.",
-      "subtitle": "Ahead of its time"
+      "narration": "Some water molecules may have existed before the Sun was formed.",
+      "subtitle": "Older than the Sun"
     },
     {
       "duration": 5,
-      "description": "Ancient ruins at sunset",
-      "visual_prompt": "Wide cinematic view of ancient ruins at sunset, warm fading orange light, slow pull-back camera revealing landscape scale, gentle wind moving dry grass, long shadows stretching across stone structures, subtle atmospheric haze, realistic historical tone",
+      "description": "Wide view of ocean at sunset",
+      "visual_prompt": "Wide cinematic view of ocean at sunset, slow rolling waves, warm orange and blue tones, slow pull-back camera, gentle wind movement on water surface, vertical framing, realistic atmosphere",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow pull-back",
+      "motion_hint": "slow pull-back, rolling waves",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Yet the civilization vanished, leaving historians searching for answers even today.",
-      "subtitle": "An unsolved mystery"
+      "narration": "Every drop you see today could be billions of years old.",
+      "subtitle": "An ancient journey 🌍"
     }
   ]
 }
