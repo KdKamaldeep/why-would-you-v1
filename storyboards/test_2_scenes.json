@@ -1,51 +1,51 @@
 {
-  "title": "A Green Fact About Farmers",
-  "description": "A short cinematic video explaining how farmers help the Earth stay green and balanced",
+  "title": "A Christmas Fact About Santa Claus",
+  "description": "A short cinematic video revealing the true historical origin of Santa Claus",
   "total_duration": 20,
   "scenes": [
     {
       "duration": 5,
-      "description": "Farmer working in green fields at sunrise",
-      "visual_prompt": "Farmer walking through lush green crop fields at sunrise, soft golden sunlight, gentle breeze moving crops, slow cinematic forward push, light morning mist, vertical composition, realistic rural atmosphere",
+      "description": "Snowy Christmas village at night",
+      "visual_prompt": "Snowy Christmas village at night, warm glowing lights from houses, gentle snowfall, slow cinematic forward push, festive decorations, cozy winter atmosphere, vertical composition, realistic holiday scene",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward push, crops moving in wind",
+      "motion_hint": "slow forward push, falling snow",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Did you know farmers play a key role in keeping the Earth green?",
-      "subtitle": "A green fact 🌱"
+      "narration": "Did you know Santa Claus is inspired by a real person?",
+      "subtitle": "A Christmas fact 🎄"
     },
     {
       "duration": 5,
-      "description": "Healthy crops growing under sunlight",
-      "visual_prompt": "Healthy crops growing under bright sunlight, leaves gently swaying, slow side pan across green plants, visible sunlight rays, vertical framing, realistic agricultural environment",
+      "description": "Saint Nicholas helping people",
+      "visual_prompt": "Historical depiction of Saint Nicholas in simple robes, quietly helping people at night, giving gifts, warm candlelight, slow side pan, soft shadows, peaceful atmosphere, vertical framing, realistic historical style",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow side pan, gentle leaf movement",
+      "motion_hint": "slow side pan, gentle candle flicker",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Crops absorb carbon dioxide and release oxygen into the air.",
-      "subtitle": "Plants clean the air"
+      "narration": "Santa is based on Saint Nicholas, a kind bishop who lived over sixteen hundred years ago.",
+      "subtitle": "Inspired by Saint Nicholas"
     },
     {
       "duration": 5,
-      "description": "Farmer tending soil and crops",
-      "visual_prompt": "Farmer tending soil and crops by hand, close-up of healthy soil and roots, slow push-in camera, soft natural light, subtle dust particles, vertical composition, realistic farming detail",
+      "description": "Acts of kindness and gift giving",
+      "visual_prompt": "Warm scene of gifts being left quietly for children, glowing candlelight, soft shadows, slow push-in camera, peaceful nighttime mood, festive but subtle, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow push-in, subtle soil movement",
+      "motion_hint": "slow push-in, candlelight flicker",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "Good farming practices help store carbon safely in the soil.",
-      "subtitle": "Soil stores carbon"
+      "narration": "He was known for secretly helping the poor and giving gifts to children.",
+      "subtitle": "The spirit of giving 🎁"
     },
     {
       "duration": 5,
-      "description": "Wide view of green farmland landscape",
-      "visual_prompt": "Wide cinematic view of green farmland stretching to the horizon, clear sky, gentle wind across fields, slow pull-back camera, peaceful rural atmosphere, vertical framing, realistic environment",
+      "description": "Modern Santa silhouette under moonlight",
+      "visual_prompt": "Silhouette of Santa Claus with a sack under moonlit snowy sky, gentle snowfall, soft glowing moon, slow pull-back camera, magical yet realistic Christmas atmosphere, vertical framing",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow pull-back, wind across fields",
+      "motion_hint": "slow pull-back, falling snow",
       "motion_strength": 0.6,
       "fps_hint": 24,
-      "narration": "By growing food, farmers also help protect the climate.",
-      "subtitle": "Farmers protect the planet 🌍"
+      "narration": "That tradition of kindness became the Santa Claus we celebrate at Christmas today.",
+      "subtitle": "A tradition of kindness 🎅"
     }
   ]
 }
