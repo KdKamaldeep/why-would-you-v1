@@ -25,10 +25,10 @@ class PromptOptimizer:
         
         # Professional prompt examples for different styles
         self.example_prompts = {
-            "cartoon": {
-                "good": "cute cartoon cat, sitting on a wooden table, wearing a red hat, bright eyes, soft lighting, clean lines, vibrant colors, professional illustration",
+            "realistic": {
+                "good": "realistic cat, sitting on a wooden table, wearing a red hat, bright eyes, natural lighting, detailed fur, photorealistic, professional photography",
                 "bad": "a cat",
-                "improved": "adorable cartoon cat character, sitting confidently on rustic wooden table, wearing bright red hat, large expressive eyes, warm soft lighting, clean bold lines, vibrant saturated colors, professional digital illustration"
+                "improved": "photorealistic cat, sitting confidently on rustic wooden table, wearing bright red hat, large expressive eyes, warm natural lighting, detailed fur texture, professional photography quality"
             },
             "anime": {
                 "good": "anime girl, long blue hair, school uniform, sitting in classroom, natural lighting, detailed, clean art style",
@@ -42,13 +42,13 @@ class PromptOptimizer:
             }
         }
     
-    def analyze_prompt(self, prompt: str, style: str = "cartoon") -> PromptAnalysis:
+    def analyze_prompt(self, prompt: str, style: str = "realistic") -> PromptAnalysis:
         """
         Analyze a prompt and provide detailed feedback.
         
         Args:
             prompt: The prompt to analyze
-            style: Target style (cartoon, anime, realistic)
+            style: Target style (realistic, anime, etc.)
             
         Returns:
             Detailed analysis with scores and suggestions
@@ -229,7 +229,7 @@ class PromptOptimizer:
         report.append("💡 BEST PRACTICES FOR PROMPT OPTIMIZATION:")
         report.append("   1. Use comma-separated format for clear structure")
         report.append("   2. Include specific details (colors, poses, expressions)")
-        report.append("   3. Add style descriptors (cartoon style, anime style)")
+        report.append("   3. Add style descriptors (realistic, photorealistic, etc.)")
         report.append("   4. Include quality boosters (high quality, detailed)")
         report.append("   5. Specify lighting and composition")
         report.append("   6. Use appropriate negative prompts")
@@ -309,7 +309,7 @@ class PromptOptimizer:
             print("❌ No prompt entered.")
             return
         
-        style = input("Enter style (cartoon/anime/realistic) [default: cartoon]: ").strip() or "cartoon"
+        style = input("Enter style (realistic/anime) [default: realistic]: ").strip() or "realistic"
         
         analysis = self.analyze_prompt(prompt, style)
         
@@ -326,7 +326,7 @@ class PromptOptimizer:
             print("❌ No prompt entered.")
             return
         
-        style = input("Enter style (cartoon/anime/realistic) [default: cartoon]: ").strip() or "cartoon"
+        style = input("Enter style (realistic/anime) [default: realistic]: ").strip() or "realistic"
         
         optimized = self.optimize_prompt(prompt, style)
         print(f"\n🚀 Optimized prompt: {optimized}")
@@ -346,7 +346,7 @@ class PromptOptimizer:
                 print("❌ No prompts found in file.")
                 return
             
-            style = input("Enter style (cartoon/anime/realistic) [default: cartoon]: ").strip() or "cartoon"
+            style = input("Enter style (realistic/anime) [default: realistic]: ").strip() or "realistic"
             
             print(f"\n🔄 Optimizing {len(prompts)} prompts...")
             optimized_prompts = self.batch_optimize(prompts, style)
@@ -418,7 +418,7 @@ def main():
     parser = argparse.ArgumentParser(description="Professional Prompt Optimizer for Diffusion Models")
     parser.add_argument("--prompt", help="Single prompt to analyze/optimize")
     parser.add_argument("--file", help="File containing prompts (one per line)")
-    parser.add_argument("--style", choices=["cartoon", "anime", "realistic"], default="cartoon",
+    parser.add_argument("--style", choices=["realistic", "anime"], default="realistic",
                        help="Target style for optimization")
     parser.add_argument("--mode", choices=["analyze", "optimize", "examples", "interactive"], 
                        default="interactive", help="Operation mode")

@@ -1,16 +1,17 @@
-# 🎬 Cartoon Shorts Generator - Professional Edition
+# 🎬 Video Reel Generator - Professional Edition
 
-A complete AI-powered system for generating professional-quality cartoon videos with unlimited length capability.
+A complete AI-powered system for generating platform-ready vertical Reels/Shorts videos optimized for YouTube and Instagram.
 
 ## 🚀 **Features**
 
-- 🎨 **Stable Diffusion Image Generation** - Professional cartoon-style images
-- 🎭 **Face-Based Character Generation** - Use existing faces for character consistency
-- 🎬 **FFmpeg Animation System** - 6 professional animation effects
+- 🎬 **WAN 2.1 Text-to-Video** - Direct text-to-video generation (no image step)
+- 📱 **Platform-Ready Output** - 1080×1920, H.264/AAC, 30fps for YouTube/Instagram
+- 🎵 **Smart Audio Mixing** - Voice + optional background music
 - 📝 **GPT-4 Story Generation** - Intelligent script creation
-- 🎤 **ElevenLabs Voice Generation** - Natural narration
+- 🎤 **Coqui TTS Voice Generation** - Local XTTS v2 model with multilingual support
 - ⚡ **Unlimited Length** - Generate videos of any duration
 - 🎯 **Professional Quality** - Hollywood-grade output
+- 🌍 **Multilingual Support** - Hindi, English, and other languages
 
 ## 📁 **Project Structure**
 
@@ -21,12 +22,13 @@ WhyWouldYou-v1/
 │   │   ├── generate_cartoon_short.py
 │   │   ├── image_generator.py
 │   │   ├── animation_generator.py
+│   │   ├── svd_animator.py      # SVD motion animation
+│   │   ├── coqui_voice_synthesizer.py
 │   │   ├── script_generator.py
-│   │   ├── voice_generator.py
 │   │   └── video_processor.py
 │   │
 │   ├── interfaces/              # User interfaces
-│   │   ├── simple_cartoon_generator.py
+│   │   ├── simple_cartoon_generator.py  # Main CLI interface
 │   │   ├── batch_generate.py
 │   │   └── quick_start.py
 │   │
@@ -47,28 +49,85 @@ WhyWouldYou-v1/
 └── 🚀 main.py                  # Main entry point
 ```
 
-## 🎬 **Video Formats**
+## 🎬 **Video Formats & Platform-Ready Reels**
 
-The system now supports multiple video formats:
+The system generates platform-ready vertical Reels/Shorts optimized for YouTube and Instagram.
 
-### **YouTube Shorts (9:16 Aspect Ratio)**
-- **Dimensions**: 768x1024 pixels
-- **Perfect for**: TikTok, Instagram Reels, YouTube Shorts
-- **Usage**: `--video-format shorts` (default)
+### **Platform-Ready Reel Output (Default)**
+- **Dimensions**: 1080×1920 pixels (vertical)
+- **Frame Rate**: 30 fps
+- **Codec**: H.264 (yuv420p) + AAC audio
+- **Perfect for**: YouTube Shorts, Instagram Reels, TikTok
+- **Output**: `outputs/final_reel.mp4` (upload-ready)
 
-### **Normal Video (16:9 Aspect Ratio)**
-- **Dimensions**: 1920x1080 pixels  
-- **Perfect for**: YouTube, Vimeo, general video platforms
-- **Usage**: `--video-format normal`
+### **Vertical Modes**
+
+**Pad Mode (Default - Safe)**
+- No cropping, preserves full content
+- Safe for faces and important elements
+- Adds letterboxing if needed
+- Usage: `--vertical-mode pad`
+
+**Crop Mode (Fills Frame)**
+- Crops to fill vertical frame
+- More "native" vertical look
+- May crop important content
+- Usage: `--vertical-mode crop`
 
 ### **Example Usage:**
 ```bash
-# Create YouTube Shorts (default)
-python main.py "A dragon learns to bake cookies" --video-format shorts
+# Pad mode (safe, default) - preserves all content
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "A dragon learns to bake cookies" \
+  --vertical \
+  --vertical-mode pad \
+  --music music/background.mp3
 
-# Create normal video
-python main.py "A dragon learns to bake cookies" --video-format normal
+# Crop mode (fills frame) - more native vertical look
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Adventure story" \
+  --vertical \
+  --vertical-mode crop
+
+# Custom dimensions and music volumes
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Your story" \
+  --vertical \
+  --out-width 1080 \
+  --out-height 1920 \
+  --out-fps 30 \
+  --music assets/bgm.mp3 \
+  --music-volume 0.12 \
+  --voice-volume 1.0
+
+# Disable reel creation (use stitched video only)
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Story here" \
+  --no-reel
 ```
+
+### **Pipeline Health Check**
+
+Run a lightweight readiness check to confirm WAN (text-to-video), Coqui TTS, and FFmpeg
+are installed before kicking off generation:
+
+```bash
+python scripts/pipeline_health_check.py
+```
+
+The script only verifies imports and binary availability, so it will not trigger large
+model downloads. If something is missing, the output includes a hint such as:
+
+- FFmpeg: `sudo apt install ffmpeg` (or use your OS package manager)
+- WAN diffusers: `pip install diffusers==0.30.2 accelerate torch torchvision`
+- Coqui XTTS: `pip install TTS==0.22.0` and download `models/tts/XTTS-v2`
+
+### **Reel Rendering Features:**
+- ✅ **Platform-ready format**: 1080×1920, 30fps, H.264/AAC
+- ✅ **Smart audio mixing**: Voice + optional background music
+- ✅ **Volume control**: Adjust voice and music levels independently
+- ✅ **Two vertical modes**: Pad (safe) or Crop (fills frame)
+- ✅ **Works without audio**: Creates silent reel if no voice/music provided
 
 ## 🚀 **Quick Start**
 ```bash
@@ -103,7 +162,20 @@ cp config.env .env
 # Simple generation
 python main.py "A dragon learns to bake cookies"
 
-# Face-based character generation (using storyboard)
+# Advanced generation with all features
+python3 -m src.interfaces.simple_cartoon_generator \
+  --prompt "Animal friends adventure" \
+  --storyboard storyboards/horror.json \
+  --no-reuse \
+  --model-type realistic \
+  --style indian \
+  --video-format "shorts" \
+  --animate \
+  --animator ffmpeg \
+  --language hi \
+  --scene 1
+
+# With storyboard
 python -m src.interfaces.simple_cartoon_generator --prompt "A brave lion opens a smoothie shop" --storyboard storyboards/example.json
 
 # Interactive interface
@@ -113,34 +185,71 @@ python -m src.interfaces.quick_start
 python -m src.interfaces.batch_generate
 ```
 
-## 🎬 **Animation System**
+## 🎬 **WAN 2.1 Text-to-Video Pipeline**
 
-### **6 Professional Effects:**
-1. **Cinematic Zoom-Pan** - Smooth camera movements
-2. **Smooth Slide Animation** - Organic motion
-3. **Organic Rotation** - Natural spinning effects
-4. **Parallax Motion** - Depth and perspective
-5. **Breathing Effect** - Subtle pulsing
-6. **Drift Animation** - Gentle floating motion
+### **Direct Text-to-Video Generation**
+- **WAN 2.1 T2V** - Generates videos directly from text prompts
+- **No image generation step** - Streamlined pipeline
+- **Multi-scene support** - Automatic scene stitching
+- **Local processing** - Runs entirely on your machine
 
-### **Unlimited Length Capability:**
-- No 24-frame limits like AnimateDiff
-- Generate 30s, 60s, or longer videos
-- Professional quality throughout
-- Smart frame management
+### **Pipeline Flow:**
+```
+Script/Scenes JSON → WAN 2.1 (text2video) → Coqui TTS → FFmpeg stitch → Reel Renderer
+```
 
-## 🎨 **Image Generation**
+### **Output Files:**
+- **Scene clips**: `outputs/scenes/scene_1.mp4`, `scene_2.mp4`, etc.
+- **Stitched video**: `outputs/stitched.mp4` (intermediate)
+- **Final reel**: `outputs/final_reel.mp4` (upload-ready, 1080×1920, H.264/AAC, 30fps)
 
-### **Stable Diffusion Integration:**
-- Professional cartoon-style images
-- Enhanced prompts for better results
-- Automatic fallback to placeholders
-- Memory-optimized processing
+### **Usage Examples:**
+```bash
+# Basic generation (creates platform-ready reel by default)
+python -m src.interfaces.simple_cartoon_generator --prompt "A cat walks on grass"
 
-### **Model Support:**
-- Anything v5 (cartoon style)
-- AnimaGine XL (anime style)
-- SDXL Lightning LoRA (fast generation)
+# With background music
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Adventure story" \
+  --music music/background.mp3 \
+  --music-volume 0.12
+
+# Crop mode (fills vertical frame)
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Your story" \
+  --vertical-mode crop
+
+# Custom settings
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Story here" \
+  --out-width 1080 \
+  --out-height 1920 \
+  --out-fps 30 \
+  --voice-volume 1.0 \
+  --music-volume 0.15
+```
+
+## 📁 **Output Structure**
+
+After generation, you'll find:
+
+```
+output/
+├── scenes/
+│   ├── scene_1.mp4          # Individual scene videos (WAN output)
+│   ├── scene_2.mp4
+│   └── scene_3.mp4
+├── stitched.mp4              # Stitched scene videos (intermediate)
+├── final_reel.mp4            # Platform-ready reel (upload-ready)
+│                             # 1080×1920, H.264/AAC, 30fps
+├── script.json               # Generated story script
+├── storyboard.json           # Human-readable storyboard
+├── audio_scene_1.wav         # Voiceover audio clips
+├── audio_scene_2.wav
+└── subtitles.srt             # Subtitle file (if enabled)
+```
+
+**Upload-ready file**: `outputs/final_reel.mp4` (or `output/final_reel.mp4` depending on `--output` flag)
 
 ## 📝 **Story Generation**
 
@@ -152,25 +261,45 @@ python -m src.interfaces.batch_generate
 
 ## 🎤 **Voice Generation**
 
-### **ElevenLabs Integration:**
-- Natural-sounding narration
-- Multiple voice options
-- Professional audio quality
-- Automatic timing sync
+### **Coqui TTS Integration:**
+- **Local XTTS v2 model** - No API keys required
+- **Multilingual support** - Hindi, English, Spanish, and more
+- **Natural-sounding narration** with voice cloning
+- **Professional audio quality** with automatic timing sync
+- **Automatic speaker discovery** for language-appropriate voices
+
+### **Language Support:**
+```bash
+# Hindi narration
+python3 -m src.interfaces.simple_cartoon_generator --language hi
+
+# English narration
+python3 -m src.interfaces.simple_cartoon_generator --language en
+
+# Spanish narration
+python3 -m src.interfaces.simple_cartoon_generator --language es
+```
+
+### **Voice Cloning:**
+- Use custom audio files for voice cloning
+- Automatic speaker WAV discovery
+- Multiple voice options per language
 
 ## ⚙️ **Configuration**
 
 ### **Environment Variables (.env):**
 ```env
 OPENAI_API_KEY=your_openai_api_key_here
-ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+# Optional: Custom speaker WAV files
+HINDI_SPEAKER_WAV=path/to/hindi_speaker.wav
+ENGLISH_SPEAKER_WAV=path/to/english_speaker.wav
 ```
 
 ### **Video Settings:**
 - **FPS**: 15 (optimized for social media)
 - **Resolution**: 768x1024 (vertical format)
 - **Duration**: Configurable (unlimited)
-- **Style**: Cartoon/anime
+- **Style**: Realistic/anime
 
 ## 🧪 **Testing**
 
@@ -194,7 +323,29 @@ python test_subtitle_functionality.py
 python reinstall_dependencies.py
 ```
 
-## 🔧 **Recent Fixes**
+## 🔧 **Recent Updates & Fixes**
+
+### **SVD Motion Animation (New)**
+- **Feature**: Added SVD (Stable Video Diffusion) motion animation
+- **Implementation**: AI-powered motion using ComfyUI workflows
+- **Usage**: `--animator svd` for realistic motion animation
+- **Status**: ✅ **Implemented**
+
+### **Local TTS Integration (Updated)**
+- **Feature**: Replaced ElevenLabs with local Coqui TTS XTTS v2 model
+- **Benefits**: No API keys required, multilingual support, voice cloning
+- **Languages**: Hindi, English, Spanish, and more
+- **Status**: ✅ **Implemented**
+
+### **Realistic Vision v4 Support (New)**
+- **Feature**: Added Realistic Vision v4 model for realistic image generation
+- **Usage**: `--model-type realistic` for photorealistic images
+- **Status**: ✅ **Implemented**
+
+### **Enhanced Animation System (Updated)**
+- **Feature**: Dual animation system with FFmpeg and SVD options
+- **Benefits**: More animation choices, better quality, unlimited length
+- **Status**: ✅ **Implemented**
 
 ### **Attention Mask Issue (Fixed)**
 - **Problem**: "The attention mask is not set and cannot be inferred from input because pad token is same as eos token"
@@ -232,6 +383,34 @@ python reinstall_dependencies.py
 python main.py "Space pirates discover treasure"
 ```
 
+### **Advanced Generation with All Features:**
+```bash
+python3 -m src.interfaces.simple_cartoon_generator \
+  --prompt "Animal friends adventure" \
+  --storyboard storyboards/horror.json \
+  --no-reuse \
+  --model-type realistic \
+  --style indian \
+  --video-format "shorts" \
+  --animate \
+  --animator ffmpeg \
+  --language hi \
+  --scene 1
+```
+
+### **SVD Animation (Direct - No ComfyUI Required!):**
+```bash
+# Direct SVD animation - no ComfyUI needed!
+python3 -m src.interfaces.simple_cartoon_generator \
+  --prompt "Adventure story" \
+  --animator svd \
+  --motion-bucket-id 127 \
+  --fps-id 6
+
+# Test SVD implementation
+python test_direct_svd.py
+```
+
 ### **Custom Duration:**
 ```python
 from src.core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
@@ -239,7 +418,7 @@ from src.core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
 config = VideoConfig(
     prompt="A magical cat teaches other animals to dance",
     duration=60,  # 60-second video
-    output_path="my_cartoon"
+    output_path="my_video"
 )
 
 generator = CartoonShortsGenerator(config)
@@ -255,12 +434,14 @@ python -m src.interfaces.batch_generate
 ## 🎉 **Results**
 
 Your system generates:
-- ✅ **Professional cartoon videos** with unlimited length
-- ✅ **High-quality animations** using advanced FFmpeg techniques
+- ✅ **Platform-ready vertical reels** (1080×1920, H.264/AAC, 30fps)
+- ✅ **Direct text-to-video** using WAN 2.1 T2V (no image generation step)
 - ✅ **Intelligent storytelling** powered by GPT-4
-- ✅ **Natural narration** with ElevenLabs voices
-- ✅ **Cinematic effects** for engaging content
+- ✅ **Natural multilingual narration** with local XTTS v2 model
+- ✅ **Smart audio mixing** (voice + optional background music)
+- ✅ **Two vertical modes** (pad for safety, crop for native look)
+- ✅ **Upload-ready output** optimized for YouTube/Instagram
 
-## 🚀 **Ready to Create Professional Cartoons!**
+## 🚀 **Ready to Create Professional Video Reels!**
 
-**No more limitations. No more complexity. Just unlimited professional-quality cartoon generation!** 🎬✨
+**Platform-ready vertical Reels/Shorts optimized for YouTube and Instagram!** 🎬✨

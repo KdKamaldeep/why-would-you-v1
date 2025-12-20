@@ -1,0 +1,18 @@
+{
+  "title": "The Forest That Moves",
+  "description": "A mysterious fantasy short about a forest that changes its paths at night",
+  "total_duration": 18,
+  "scenes": [
+    {
+      "duration": 6,
+      "description": "Dark enchanted forest at night with glowing fog and slow forward camera movement",
+      "visual_prompt": "Enchanted fantasy forest at night, glowing mist drifting slowly between trees, magical particles floating in air, slow forward dolly camera movement, subtle parallax depth between foreground and background trees, cinematic fantasy lighting, volumetric fog, ultra realistic",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow forward camera dolly, fog drifting left to right, subtle environmental motion",
+      "motion_strength": 0.65,
+      "fps_hint": 24,
+      "narration": "They say this forest sleeps during the day… but wakes up at night.",
+      "subtitle": "The forest awakens at night 🌲✨"
+    }
+  ]
+}

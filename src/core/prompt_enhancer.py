@@ -95,13 +95,13 @@ class ProfessionalPromptEnhancer:
             logger.info(f"📝 Using rule-based enhancement (model loading failed: {e})")
             self.model = None
     
-    def analyze_prompt(self, prompt: str, style: str = "cartoon") -> PromptAnalysis:
+    def analyze_prompt(self, prompt: str, style: str = "realistic") -> PromptAnalysis:
         """
         Comprehensive prompt analysis and optimization.
         
         Args:
             prompt: Original prompt to analyze
-            style: Target style (cartoon, realistic, anime)
+            style: Target style (realistic, anime, etc.)
             
         Returns:
             PromptAnalysis with scores, issues, and suggestions
@@ -191,7 +191,7 @@ class ProfessionalPromptEnhancer:
         
         return min(1.0, specificity_count / 6.0)
     
-    def _enhance_prompt(self, prompt: str, style: str = "cartoon") -> str:
+    def _enhance_prompt(self, prompt: str, style: str = "realistic") -> str:
         """
         Enhance prompt using professional techniques.
         
@@ -321,12 +321,12 @@ class ProfessionalPromptEnhancer:
         enhanced = prompt
         
         # Add style-specific enhancements
-        if style == "cartoon":
-            enhanced += ", cartoon style, clean lines, vibrant colors"
+        if style == "realistic":
+            enhanced += ", photorealistic, detailed textures, natural lighting"
         elif style == "anime":
             enhanced += ", anime style, detailed, clean art"
-        elif style == "realistic":
-            enhanced += ", photorealistic, detailed textures"
+        else:
+            enhanced += ", high quality, detailed, professional"
         
         return enhanced
     
@@ -346,9 +346,9 @@ class ProfessionalPromptEnhancer:
         
         # Style-specific negative prompts
         style_negatives = {
-            "cartoon": "photorealistic, realistic, 3d render, cgi, anime, manga",
+            "realistic": "cartoon, anime, manga, illustration, painting, drawing, sketch",
             "anime": "realistic, photorealistic, 3d render, cgi, western cartoon",
-            "realistic": "cartoon, anime, manga, illustration, painting, drawing"
+            "default": "cartoon, anime, manga, illustration, painting, drawing, sketch"
         }
         
         if style in style_negatives:
@@ -389,7 +389,7 @@ class ProfessionalPromptEnhancer:
             logger.warning(f"⚠️ Token limiting failed: {e}")
             return prompt
     
-    def enhance_multiple_prompts(self, prompts: List[str], style: str = "cartoon") -> List[Tuple[str, str]]:
+    def enhance_multiple_prompts(self, prompts: List[str], style: str = "realistic") -> List[Tuple[str, str]]:
         """
         Enhance multiple prompts with analysis.
         
@@ -415,7 +415,7 @@ class ProfessionalPromptEnhancer:
         
         return results
     
-    def validate_prompt(self, prompt: str, style: str = "cartoon") -> bool:
+    def validate_prompt(self, prompt: str, style: str = "realistic") -> bool:
         """
         Validate if a prompt meets quality standards.
         
@@ -446,7 +446,7 @@ class PromptEnhancer(ProfessionalPromptEnhancer):
     def enhance_prompt(self, original_prompt: str, max_length: int = 100, 
                       enhancement_type: str = "diffusion", max_tokens: int = 77) -> str:
         """Legacy method for backward compatibility."""
-        analysis = self.analyze_prompt(original_prompt, style="cartoon")
+        analysis = self.analyze_prompt(original_prompt, style="realistic")
         return analysis.enhanced_prompt
 
 
@@ -466,7 +466,7 @@ def test_prompt_enhancement():
     
     for i, prompt in enumerate(test_prompts):
         print(f"\n📝 Test {i+1}: {prompt}")
-        analysis = enhancer.analyze_prompt(prompt, style="cartoon")
+        analysis = enhancer.analyze_prompt(prompt, style="realistic")
         
         print(f"📊 Scores - Clarity: {analysis.clarity_score:.2f}, Structure: {analysis.structure_score:.2f}, Specificity: {analysis.specificity_score:.2f}")
         

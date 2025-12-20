@@ -1,1 +1,1 @@
-# Cartoon Shorts Generator - Professional AI Video Generation System
+# Video Reel Generator - Professional AI Video Generation System

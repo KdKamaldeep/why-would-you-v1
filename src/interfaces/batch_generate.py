@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Batch Cartoon Generator - Generate multiple cartoons from a list
+Batch Video Reel Generator - Generate multiple video reels from a list
 """
 
 import os
@@ -18,9 +18,9 @@ SAMPLE_PROMPTS = [
 ]
 
 def batch_generate(prompts_file=None, use_samples=False):
-    """Generate multiple cartoons from a list of prompts."""
+    """Generate multiple video reels from a list of prompts."""
     
-    print("🎬 Batch Cartoon Generator")
+    print("🎬 Batch Video Reel Generator")
     print("=" * 50)
     
     # Get prompts
@@ -103,7 +103,7 @@ def main():
         else:
             batch_generate(prompts_file=sys.argv[1])
     else:
-        print("🎬 Batch Cartoon Generator")
+        print("🎬 Batch Video Reel Generator")
         print("\nUsage:")
         print("  python batch_generate.py --samples")
         print("  python batch_generate.py prompts.txt")
