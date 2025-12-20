@@ -1,51 +1,51 @@
 {
-  "title": "A Mind-Blowing History Fact",
-  "description": "A cinematic short revealing an unbelievable truth from ancient engineering",
+  "title": "A Dark History Secret",
+  "description": "A mysterious cinematic short revealing a disturbing truth from ancient history",
   "total_duration": 28,
   "scenes": [
     {
       "duration": 7,
-      "description": "Ancient desert landscape with ruins",
-      "visual_prompt": "Ancient desert ruins at sunrise, foreground broken stone pillars partially occluding view, wind-blown sand moving across ground, heat haze in distance, soft golden sunlight, slow cinematic forward push, deep perspective, realistic historical atmosphere, vertical composition",
+      "description": "Abandoned ancient city at night",
+      "visual_prompt": "Abandoned ancient stone city at night, foreground broken pillars and hanging vines partially occluding frame, cold blue moonlight, drifting fog crawling along the ground, distant flickering torches, slow cinematic forward push, deep shadows, eerie atmosphere, realistic historical ruins, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward push, drifting sand, heat shimmer",
+      "motion_hint": "slow forward push, rolling fog, subtle torch flicker",
+      "motion_strength": 0.75,
+      "fps_hint": 24,
+      "narration": "History hides secrets that were never meant to be remembered.",
+      "subtitle": "A dark history secret 🕯️"
+    },
+    {
+      "duration": 7,
+      "description": "Ancient burial chamber",
+      "visual_prompt": "Ancient underground burial chamber, foreground stone doorway framing the view, dust particles floating in narrow light beams, old symbols carved into walls, faint smoke drifting upward, slow side pan, oppressive and mysterious mood, realistic ancient textures, vertical framing",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow side pan, drifting dust, faint smoke",
       "motion_strength": 0.7,
       "fps_hint": 24,
-      "narration": "Did you know ancient civilizations built refrigerators thousands of years ago?",
-      "subtitle": "An unbelievable history fact ❄️"
+      "narration": "In ancient times, people feared that the dead could return to harm the living.",
+      "subtitle": "Fear of the dead ⚰️"
     },
     {
       "duration": 7,
-      "description": "Ancient ice storage structure",
-      "visual_prompt": "Ancient underground ice storage chamber, foreground stone arch framing the scene, cool blue light filtering inside, faint mist from cold air, slow side pan, thick stone walls with frost textures, realistic ancient engineering, vertical framing",
+      "description": "Ritual protection against the dead",
+      "visual_prompt": "Ancient ritual scene showing heavy stones placed over a grave, foreground tattered cloth and chains gently moving, torchlight casting long moving shadows, faint mist swirling near ground, slow push-in camera, dark ritualistic atmosphere, realistic historical style, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow side pan, cold air mist, subtle light shimmer",
+      "motion_hint": "slow push-in, fabric movement, shadow flicker",
       "motion_strength": 0.7,
       "fps_hint": 24,
-      "narration": "In ancient Persia, people stored ice underground to keep food cold during extreme heat.",
-      "subtitle": "Ancient engineering 🧱"
+      "narration": "To stop them, bodies were buried with stones, chains, or metal spikes.",
+      "subtitle": "Ancient protection rituals ⛓️"
     },
     {
       "duration": 7,
-      "description": "Ice preserved inside structure",
-      "visual_prompt": "Large blocks of ice preserved inside ancient chamber, foreground hanging fabric edges gently moving, light beams illuminating frost particles, slow push-in camera, cool atmospheric mood, realistic textures, vertical composition",
+      "description": "Silent ancient grave under moonlight",
+      "visual_prompt": "Lonely ancient grave under moonlight, foreground twisted branches partially blocking view, cold mist drifting slowly, clouds passing over the moon creating moving shadows, slow pull-back camera, haunting and quiet atmosphere, realistic night scene, vertical framing",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow push-in, drifting frost particles, fabric movement",
+      "motion_hint": "slow pull-back, drifting mist, moving moon shadows",
       "motion_strength": 0.65,
       "fps_hint": 24,
-      "narration": "These structures, called Yakhchals, used wind and insulation to keep ice frozen year-round.",
-      "subtitle": "Ahead of their time ✨"
-    },
-    {
-      "duration": 7,
-      "description": "Modern cooling symbolism",
-      "visual_prompt": "Symbolic modern scene of cold water slowly flowing over stone, foreground blurred leaves partially occluding frame, gentle ripples, soft cool lighting, slow pull-back camera, calm and reflective mood, realistic style, vertical framing",
-      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow pull-back, water ripples, leaf movement",
-      "motion_strength": 0.65,
-      "fps_hint": 24,
-      "narration": "Long before electricity, humans mastered the science of staying cool.",
-      "subtitle": "History was smarter than we think ⏳"
+      "narration": "These fears may have inspired the legends we now call vampires.",
+      "subtitle": "The origin of a legend 🩸"
     }
   ]
 }
