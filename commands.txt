@@ -1,0 +1,1 @@
+python -m scripts.test_wan --prompt "A cat walks on the grass, realistic" --out outputs/test.mp4

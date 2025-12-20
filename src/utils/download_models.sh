@@ -1,10 +1,10 @@
 #!/bin/bash
-# Model Download Script for Cartoon Shorts Generator - Professional Edition
-# This script downloads all required AI models for professional cartoon generation
+# Model Download Script for Cartoon Shorts Generator
+# This script downloads required AI models for video generation with WAN 2.1 T2V
 
-echo "🚀 Downloading AI Models for Professional Cartoon Generation"
-echo "🎬 Enhanced Animation System with Unlimited Length Capability"
-echo "=" * 60
+echo "🚀 Downloading AI Models for Cartoon Shorts Generator"
+echo "🎬 WAN 2.1 Text-to-Video Pipeline"
+echo "============================================================"
 
 # Parse flags
 REDOWNLOAD=false
@@ -27,267 +27,76 @@ done
 # Create necessary directories
 echo "📁 Creating directories..."
 mkdir -p models
-mkdir -p loras
 mkdir -p models/tts
 
 echo "✅ Directories created"
 
-# Download Stable Diffusion Models
-echo "📋 Downloading Stable Diffusion Models..."
+# WAN 2.1 Text-to-Video Model
+echo ""
+echo "📋 Downloading WAN 2.1 Text-to-Video Model..."
+echo "💡 The WAN model will be automatically downloaded from Hugging Face when first used."
+echo "   This script provides an option to pre-download it now for faster first generation."
 
-# ToonYou model (cartoon style) - Alternative: Use Anything v5 model
-if [ -f "models/toonyou_beta6.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping Anything v5 (already exists): models/toonyou_beta6.safetensors"
+TARGET_WAN_DIR="models/wan-2.1-t2v"
+if [ -d "$TARGET_WAN_DIR" ] && [ "$REDOWNLOAD" != true ]; then
+    echo "⏩ WAN 2.1 model already exists: $TARGET_WAN_DIR"
+    echo "   (Model will be loaded from cache on first use)"
 else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/toonyou_beta6.safetensors"
-    echo "⬇️  Downloading Anything v5 model (cartoon style alternative)..."
-    curl -L "https://huggingface.co/genai-archive/anything-v5/resolve/main/anything-v5.safetensors" \
-         -o "models/toonyou_beta6.safetensors" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ Anything v5 model downloaded successfully"
-    else
-        echo "❌ Failed to download Anything v5 model"
+    if [ "$REDOWNLOAD" = true ] && [ -d "$TARGET_WAN_DIR" ]; then
+        echo "🧹 Removing existing directory for re-download: $TARGET_WAN_DIR"
+        rm -rf "$TARGET_WAN_DIR"
     fi
-fi
 
-# AnimaGine XL model (anime style) - Alternative for MeinaMix
-if [ -f "models/meina_mix.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping AnimaGine XL (already exists): models/meina_mix.safetensors"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/meina_mix.safetensors"
-    echo "⬇️  Downloading AnimaGine XL model (anime style)..."
-    curl -L "https://huggingface.co/cagliostrolab/animagine-xl-3.1/resolve/main/animagine-xl-3.1.safetensors" \
-         -o "models/meina_mix.safetensors" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ AnimaGine XL model downloaded successfully"
+    # Prefer huggingface-cli if available; otherwise, fall back to Python API
+    if command -v huggingface-cli >/dev/null 2>&1; then
+        echo "⬇️  Using huggingface-cli to download Wan-AI/Wan2.1-T2V-1.3B-Diffusers..."
+        huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers \
+            --local-dir "$TARGET_WAN_DIR" \
+            --local-dir-use-symlinks False
+        if [ $? -eq 0 ]; then
+            echo "✅ WAN 2.1 model downloaded to $TARGET_WAN_DIR"
+            USE_PYTHON_FALLBACK=0
+        else
+            echo "❌ huggingface-cli download failed, attempting Python fallback"
+            USE_PYTHON_FALLBACK=1
+        fi
     else
-        echo "❌ Failed to download AnimaGine XL model"
+        USE_PYTHON_FALLBACK=1
     fi
-fi
 
-# Realistic Vision v5.1 model (photorealistic style) - with VAE
-if [ -f "models/realistic-vision-v5.1.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping Realistic Vision v5.1 (already exists): models/realistic-vision-v5.1.safetensors"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/realistic-vision-v5.1.safetensors"
-    echo "⬇️  Downloading Realistic Vision v5.1 model (photorealistic style)..."
-    curl -L "https://huggingface.co/SG161222/Realistic_Vision_V5.1/resolve/main/Realistic_Vision_V5.1.safetensors" \
-         -o "models/realistic-vision-v5.1.safetensors" \
-         --progress-bar
+    if [ "${USE_PYTHON_FALLBACK}" = "1" ]; then
+        if command -v python3 >/dev/null 2>&1; then
+            echo "⬇️  Using Python (huggingface_hub) to download Wan-AI/Wan2.1-T2V-1.3B-Diffusers..."
+            python3 - <<'PY'
+import sys
+from pathlib import Path
+try:
+    from huggingface_hub import snapshot_download
+except Exception as e:
+    print("[INFO] huggingface_hub not available. Model will be downloaded on first use.")
+    print("[INFO] Install it with: pip install huggingface_hub")
+    sys.exit(0)
 
-    if [ $? -eq 0 ]; then
-        echo "✅ Realistic Vision v5.1 model downloaded successfully"
-    else
-        echo "❌ Failed to download Realistic Vision v5.1 model"
-    fi
-fi
-
-# DreamShaper v8 model (realistic style)
-if [ -f "models/dreamshaper-v8.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping DreamShaper v8 (already exists): models/dreamshaper-v8.safetensors"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/dreamshaper-v8.safetensors"
-    echo "⬇️  Downloading DreamShaper v8 model (realistic style)..."
-    curl -L "https://huggingface.co/Lykon/dreamshaper-8/resolve/main/DreamShaper_8_pruned.safetensors" \
-         -o "models/dreamshaper-v8.safetensors" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ DreamShaper v8 model downloaded successfully"
-    else
-        echo "❌ Failed to download DreamShaper v8 model"
-    fi
-fi
-
-# Realistic Vision v4 model (alternative photorealistic style) - more stable
-if [ -f "models/realistic-vision-v4.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping Realistic Vision v4 (already exists): models/realistic-vision-v4.safetensors"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/realistic-vision-v4.safetensors"
-    echo "⬇️  Downloading Realistic Vision v4 model (photorealistic style)..."
-    curl -L "https://huggingface.co/SG161222/Realistic_Vision_V4.0/resolve/main/Realistic_Vision_V4.0.safetensors" \
-         -o "models/realistic-vision-v4.safetensors" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ Realistic Vision v4 model downloaded successfully"
-    else
-        echo "❌ Failed to download Realistic Vision v4 model"
-    fi
-fi
-
-# Deliberate v3 model (realistic style)
-if [ -f "models/deliberate-v3.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping Deliberate v3 (already exists): models/deliberate-v3.safetensors"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/deliberate-v3.safetensors"
-    echo "⬇️  Downloading Deliberate v3 model (realistic style)..."
-    curl -L "https://huggingface.co/XpucT/Deliberate/resolve/main/Deliberate_v3.safetensors" \
-         -o "models/deliberate-v3.safetensors" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ Deliberate v3 model downloaded successfully"
-    else
-        echo "❌ Failed to download Deliberate v3 model"
-    fi
-fi
-
-# Enhanced Animation System - Professional Quality Video Generation
-echo "📹 Enhanced Animation System Ready"
-echo "🎬 Professional quality animations with unlimited length capability"
-echo "💡 No additional model downloads required - uses advanced FFmpeg techniques"
-
-# SVD (Stable Video Diffusion) Models for Motion Animation
-echo "📋 Downloading SVD (Stable Video Diffusion) Models..."
-
-# SVD XT 1.1 (recommended for motion animation)
-if [ -f "models/svd_xt_1_1.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping SVD XT 1.1 (already exists): models/svd_xt_1_1.safetensors"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/svd_xt_1_1.safetensors"
-    echo "⬇️  Downloading SVD XT 1.1 model (motion animation)..."
-    curl -L "https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt-1-1/resolve/main/svd_xt_1_1.safetensors" \
-         -o "models/svd_xt_1_1.safetensors" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ SVD XT 1.1 model downloaded successfully"
-    else
-        echo "❌ Failed to download SVD XT 1.1 model"
-    fi
-fi
-
-# SVD XT (alternative for motion animation)
-if [ -f "models/svd_xt.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping SVD XT (already exists): models/svd_xt.safetensors"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/svd_xt.safetensors"
-    echo "⬇️  Downloading SVD XT model (motion animation)..."
-    curl -L "https://huggingface.co/stabilityai/stable-video-diffusion-img2vid-xt/resolve/main/svd_xt.safetensors" \
-         -o "models/svd_xt.safetensors" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ SVD XT model downloaded successfully"
-    else
-        echo "❌ Failed to download SVD XT model"
-    fi
-fi
-
-# SVD (original for motion animation)
-if [ -f "models/svd.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping SVD (already exists): models/svd.safetensors"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/svd.safetensors"
-    echo "⬇️  Downloading SVD model (motion animation)..."
-    curl -L "https://huggingface.co/stabilityai/stable-video-diffusion-img2vid/resolve/main/svd.safetensors" \
-         -o "models/svd.safetensors" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ SVD model downloaded successfully"
-    else
-        echo "❌ Failed to download SVD model"
-    fi
-fi
-
-# LoRA Models for cartoon style
-echo "📋 Downloading LoRA Models..."
-
-# SDXL Lightning LoRA (fast generation)
-if [ -f "loras/sdxl_lightning_4step.safetensors" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping SDXL Lightning LoRA (already exists): loras/sdxl_lightning_4step.safetensors"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "loras/sdxl_lightning_4step.safetensors"
-    echo "⬇️  Downloading SDXL Lightning LoRA..."
-    curl -L "https://huggingface.co/ByteDance/SDXL-Lightning/resolve/main/sdxl_lightning_4step_lora.safetensors" \
-         -o "loras/sdxl_lightning_4step.safetensors" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ SDXL Lightning LoRA downloaded successfully"
-    else
-        echo "❌ Failed to download SDXL Lightning LoRA"
-    fi
-fi
-
-# Face-Based Generation Models
-echo "📋 Downloading Face-Based Generation Models..."
-
-# Create directories for face generation models
-mkdir -p models/controlnet
-mkdir -p models/ip_adapter
-
-# ControlNet for face control (Canny edge detection)
-if [ -f "models/controlnet/control_v11p_sd15_canny.pth" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping ControlNet Canny (already exists): models/controlnet/control_v11p_sd15_canny.pth"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/controlnet/control_v11p_sd15_canny.pth"
-    echo "⬇️  Downloading ControlNet Canny model..."
-    curl -L "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_canny.pth" \
-         -o "models/controlnet/control_v11p_sd15_canny.pth" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ ControlNet Canny model downloaded successfully"
-    else
-        echo "❌ Failed to download ControlNet Canny model"
-    fi
-fi
-
-# ControlNet for face landmarks (OpenPose)
-if [ -f "models/controlnet/control_v11p_sd15_openpose.pth" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping ControlNet OpenPose (already exists): models/controlnet/control_v11p_sd15_openpose.pth"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/controlnet/control_v11p_sd15_openpose.pth"
-    echo "⬇️  Downloading ControlNet OpenPose model..."
-    curl -L "https://huggingface.co/lllyasviel/ControlNet-v1-1/resolve/main/control_v11p_sd15_openpose.pth" \
-         -o "models/controlnet/control_v11p_sd15_openpose.pth" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ ControlNet OpenPose model downloaded successfully"
-    else
-        echo "❌ Failed to download ControlNet OpenPose model"
-    fi
-fi
-
-# IP-Adapter for image prompting
-if [ -f "models/ip_adapter/ip-adapter_sd15.bin" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping IP-Adapter (already exists): models/ip_adapter/ip-adapter_sd15.bin"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/ip_adapter/ip-adapter_sd15.bin"
-    echo "⬇️  Downloading IP-Adapter model..."
-    curl -L "https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter_sd15.bin" \
-         -o "models/ip_adapter/ip-adapter_sd15.bin" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ IP-Adapter model downloaded successfully"
-    else
-        echo "❌ Failed to download IP-Adapter model"
-    fi
-fi
-
-# IP-Adapter VIT-H model for better quality
-if [ -f "models/ip_adapter/ip-adapter_sd15_vit-h.bin" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ Skipping IP-Adapter VIT-H (already exists): models/ip_adapter/ip-adapter_sd15_vit-h.bin"
-else
-    [ "$REDOWNLOAD" = true ] && rm -f "models/ip_adapter/ip-adapter_sd15_vit-h.bin"
-    echo "⬇️  Downloading IP-Adapter VIT-H model..."
-    curl -L "https://huggingface.co/h94/IP-Adapter/resolve/main/models/ip-adapter_sd15_vit-h.bin" \
-         -o "models/ip_adapter/ip-adapter_sd15_vit-h.bin" \
-         --progress-bar
-
-    if [ $? -eq 0 ]; then
-        echo "✅ IP-Adapter VIT-H model downloaded successfully"
-    else
-        echo "❌ Failed to download IP-Adapter VIT-H model"
+target_dir = Path("models/wan-2.1-t2v")
+target_dir.mkdir(parents=True, exist_ok=True)
+try:
+    snapshot_download(
+        repo_id="Wan-AI/Wan2.1-T2V-1.3B-Diffusers",
+        local_dir=str(target_dir),
+        local_dir_use_symlinks=False,
+        resume_download=True,
+    )
+    print("[OK] WAN 2.1 model downloaded to", target_dir)
+except Exception as e:
+    print("[INFO] Model download failed, but it will be downloaded automatically on first use:", e)
+    sys.exit(0)
+PY
+            if [ $? -eq 0 ]; then
+                echo "✅ WAN 2.1 model pre-downloaded (or will download on first use)"
+            fi
+        else
+            echo "ℹ️  Python3 not found. WAN model will be downloaded automatically on first use."
+        fi
     fi
 fi
 
@@ -363,69 +172,37 @@ fi
 
 
 echo ""
-echo "=" * 60
-echo "🎊 PROFESSIONAL MODEL DOWNLOAD COMPLETED!"
-echo "=" * 60
+echo "============================================================"
+echo "🎊 MODEL DOWNLOAD COMPLETED!"
+echo "============================================================"
 echo ""
 echo "📊 Downloaded Models Summary:"
-echo "  ├── 📹 Enhanced Animation System:"
-echo "  │   ├── Professional FFmpeg Techniques"
-echo "  │   ├── 6 Advanced Animation Effects"
-echo "  │   └── Unlimited Length Capability"
-echo "  ├── 🎬 SVD Motion Animation Models:"
-echo "  │   ├── SVD XT 1.1 (recommended): models/svd_xt_1_1.safetensors"
-echo "  │   ├── SVD XT (alternative): models/svd_xt.safetensors"
-echo "  │   └── SVD (original): models/svd.safetensors"
-echo "  ├── 🎨 Stable Diffusion Models:"
-echo "  │   ├── Anything v5 (cartoon style): models/toonyou_beta6.safetensors"
-echo "  │   ├── AnimaGine XL (anime style): models/meina_mix.safetensors"
-echo "  │   ├── Realistic Vision v5.1 (photorealistic): models/realistic-vision-v5.1.safetensors"
-echo "  │   ├── Realistic Vision v4 (photorealistic): models/realistic-vision-v4.safetensors"
-echo "  │   ├── DreamShaper v8 (realistic): models/dreamshaper-v8.safetensors"
-echo "  │   └── Deliberate v3 (realistic): models/deliberate-v3.safetensors"
-echo "  ├── ⚡ LoRA Models:"
-echo "  │   └── SDXL Lightning LoRA: loras/sdxl_lightning_4step.safetensors"
-echo "  ├── 🎭 Face-Based Generation Models:"
-echo "  │   ├── ControlNet Canny: models/controlnet/control_v11p_sd15_canny.pth"
-echo "  │   ├── ControlNet OpenPose: models/controlnet/control_v11p_sd15_openpose.pth"
-echo "  │   ├── IP-Adapter: models/ip_adapter/ip-adapter_sd15.bin"
-echo "  │   └── IP-Adapter VIT-H: models/ip_adapter/ip-adapter_sd15_vit-h.bin"
+echo "  ├── 🎬 WAN 2.1 Text-to-Video:"
+echo "  │   └── Wan-AI/Wan2.1-T2V-1.3B-Diffusers: models/wan-2.1-t2v"
+echo "  │       (Downloads automatically from Hugging Face on first use)"
 echo "  └── 🔊 TTS Models:"
 echo "      └── Coqui XTTS v2: models/tts/XTTS-v2"
 
 echo ""
-echo "🎬 PROFESSIONAL FEATURES ENABLED:"
-echo "  ✅ Unlimited Length Video Generation"
-echo "  ✅ 6 Professional Animation Effects"
-echo "  ✅ SVD Motion Animation (AI-powered motion, 25-frame limit)"
-echo "  ✅ Cinematic Quality Output"
-echo "  ✅ Smart Frame Management"
-echo "  ✅ Advanced FFmpeg Techniques"
-echo "  ✅ Face-Based Character Generation"
-echo "  ✅ ControlNet Face Control"
-echo "  ✅ IP-Adapter Image Prompting"
-echo "  ✅ Multiple Visual Styles (Cartoon, Anime, Realistic)"
+echo "🎬 FEATURES ENABLED:"
+echo "  ✅ WAN 2.1 Text-to-Video Generation"
+echo "  ✅ Direct text-to-video (no image generation step)"
+echo "  ✅ Multi-scene video stitching"
+echo "  ✅ Coqui TTS voice synthesis"
+echo "  ✅ FFmpeg video processing"
 
 echo ""
 echo "🚀 Next Steps:"
 echo "  1. Install dependencies: pip install -r requirements.txt"
-echo "  2. Edit .env file and add your API keys"
-echo "  3. Test installation: python test_enhanced_animation.py"
-echo "  4. Test different styles:"
-echo "     • Cartoon: python scripts/scene_visual_test.py --style cartoon"
-echo "     • Realistic: python scripts/scene_visual_test.py --style realistic"
-echo "  5. Generate unlimited videos: python simple_cartoon_generator.py --prompt 'Epic adventure' --duration 60"
-echo "  6. Test SVD motion animation:"
-echo "     • FFmpeg animation: python3 -m src.interfaces.simple_cartoon_generator --animator ffmpeg --prompt 'test'"
-echo "     • SVD animation: python3 -m src.interfaces.simple_cartoon_generator --animator svd --prompt 'test'"
-echo "  7. Test face-based generation: python test_face_integration.py"
-echo "  8. Generate with character faces: python simple_cartoon_generator.py --storyboard storyboards/independence.json"
+echo "  2. Edit .env file and add your API keys (OPENAI_API_KEY required)"
+echo "  3. Test WAN generation: python -m scripts.test_wan --prompt 'A cat walks on grass'"
+echo "  4. Generate full video: python -m src.interfaces.simple_cartoon_generator --prompt 'Your story here'"
 
 echo ""
 echo "💡 Hardware Requirements:"
-echo "  • Enhanced Animations: Any modern GPU (recommended)"
-echo "  • Image Generation: Any GPU with 4GB+ VRAM"
-echo "  • Fallback: CPU-only (slower but functional)"
+echo "  • GPU recommended: CUDA-capable GPU with 8GB+ VRAM for best performance"
+echo "  • CPU supported: Will run on CPU but will be very slow (bfloat16 not available)"
+echo "  • Model size: ~1.3B parameters, downloads ~5GB from Hugging Face"
 
 echo ""
-echo "🎉 YOUR CARTOON GENERATOR IS NOW PROFESSIONAL GRADE!"
+echo "🎉 YOUR VIDEO GENERATOR IS READY!"

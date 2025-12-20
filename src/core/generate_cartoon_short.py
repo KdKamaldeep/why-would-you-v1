@@ -31,9 +31,8 @@ from dotenv import load_dotenv
 
 # Import modular classes
 from .script_generator import ScriptGenerator
-from .image_generator import ImageGenerator
+from .wan_t2v import WanT2VGenerator
 from .coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
-from .animation_generator import AnimationGenerator
 from .video_processor import VideoProcessor, VideoConfig as VPConfig
 
 
@@ -78,21 +77,15 @@ class VideoConfig:
     enable_prompt_enhancement: bool = True
     # Control pause between scenes (in seconds)
     scene_pause_duration: float = 0.0  # Default 0.0 second pause between scenes (no black screens)
-    # Control image validation and automatic prompt adjustment
-    enable_image_validation: bool = True  # Enable automatic blank image detection and prompt adjustment
-    # Character face mappings for face-based generation
-    character_faces: DictType[str, str] = None  # Maps character names to face image paths
-    # Model path for image generation
-    model_path: Optional[str] = None
-    # SVD chunking configuration
-    svd_overlap_frames: int = 6  # Number of frames to overlap between SVD chunks (4-8 range)
-    svd_chunked_generation: bool = True  # Enable overlapping chunk generation for SVD
-    # Animation settings
-    animator_type: str = "ffmpeg"  # "ffmpeg" or "svd"
-    motion_bucket_id: int = 127  # SVD motion intensity (0-255)
-    fps_id: int = 6  # SVD FPS setting (0-7)
-    cond_aug: float = 0.02  # SVD conditioning augmentation
-    svd_chunked_generation: bool = True  # Use chunked generation instead of looping for SVD
+    # WAN T2V settings
+    wan_width: int = 832  # WAN video width
+    wan_height: int = 480  # WAN video height
+    wan_num_frames: int = 49  # WAN number of frames to generate
+    wan_fps: int = 12  # WAN output FPS
+    wan_steps: int = 30  # WAN inference steps
+    wan_guidance: float = 6.0  # WAN guidance scale
+    wan_negative_prompt: str = "text, subtitles, watermark, blurry, low quality"  # WAN negative prompt
+    wan_seed: Optional[int] = None  # WAN random seed (optional)
     # Audio settings
     skip_audio: bool = False  # Skip audio generation entirely
 
@@ -100,10 +93,12 @@ class VideoConfig:
         """Set dimensions based on video format."""
         if self.video_format.lower() == "shorts":
             # YouTube Shorts: 9:16 aspect ratio
+            # Note: WAN uses fixed dimensions, but we'll crop/resize in post-processing
             self.width = 768
             self.height = 1024
         elif self.video_format.lower() == "normal":
             # Normal video: 16:9 aspect ratio
+            # Note: WAN uses fixed dimensions, but we'll crop/resize in post-processing
             self.width = 1920
             self.height = 1080
         else:
@@ -122,35 +117,18 @@ class CartoonShortsGenerator:
         
         # Initialize components using modular classes
         self.script_generator = ScriptGenerator(os.getenv('OPENAI_API_KEY', ''))
-        # Choose model path: config model_path takes priority, then style-based selection
-        if config.model_path:
-            model_path = config.model_path
-        else:
-            # Choose a more neutral/non-anime base when Indian style is requested
-            default_model = "models/toonyou_beta6.safetensors"
-            indian_pref_model = os.getenv("INDIAN_STYLE_MODEL", default_model)
-            model_path = indian_pref_model if (config.style or "").lower() in {"indian", "indian_cartoon", "desi", "bollywood"} else default_model
         
-        lora_path = os.getenv("INDIAN_STYLE_LORA", "") or None
-        try:
-            self.image_generator = ImageGenerator(
-                model_path=model_path, 
-                lora_path=lora_path, 
-                lora_scale=0.85,
-                enable_prompt_enhancement=config.enable_prompt_enhancement,
-                width=config.width,
-                height=config.height
-            )
-        except TypeError:
-            # Fallback for older ImageGenerator signature
-            self.image_generator = ImageGenerator(model_path=model_path)
-        self.animation_generator = AnimationGenerator(
-            width=config.width, 
-            height=config.height,
-            animator_type=config.animator_type,
-            svd_chunked_generation=config.svd_chunked_generation,
-            svd_overlap_frames=config.svd_overlap_frames
+        # Initialize WAN T2V generator
+        self.wan_generator = WanT2VGenerator(
+            width=config.wan_width,
+            height=config.wan_height,
+            num_frames=config.wan_num_frames,
+            fps=config.wan_fps,
+            num_inference_steps=config.wan_steps,
+            guidance_scale=config.wan_guidance,
+            negative_prompt=config.wan_negative_prompt
         )
+        
         # Initialize Coqui TTS voice synthesizer
         self.voice_synthesizer = CoquiVoiceSynthesizer(
             CoquiVoiceConfig(language=config.language)
@@ -313,140 +291,48 @@ class CartoonShortsGenerator:
                 logger.info(f"📊 Total scene duration: {total_audio_duration:.1f}s")
                 logger.info(f"📊 Average scene duration: {total_audio_duration/len(actual_scene_durations):.1f}s")
             
-            # Step 3: Generate cartoon images for scenes
-            logger.info("Step 3: Generating cartoon images...")
-            logger.info(f"🖼️ Total images to generate: {len(script['scenes'])}")
-            image_paths = []
-            for i, scene in enumerate(script['scenes']):
-                image_path = self.output_dir / f"scene_{i+1}.png"
-                logger.info(f"🖼️ Scene {i+1}: Processing image generation...")
-                
-                if self.config.reuse_existing and image_path.exists():
-                    logger.info(f"Skipping image generation (exists): {image_path}")
-                    final_image_path = str(image_path)
-                else:
-                    prompt, negative_prompt = self._compose_image_prompt(scene)
-                    logger.info(f"🖼️ Scene {i+1}: Generating image with prompt ({len(prompt)} characters)")
-                    logger.info(f"🖼️ Scene {i+1}: Prompt preview: {prompt[:100]}...")
-                    if negative_prompt:
-                        logger.info(f"🖼️ Scene {i+1}: Using negative prompt ({len(negative_prompt)} characters)")
-                    
-                    # Use validation method if enabled, otherwise use standard generation
-                    if self.config.enable_image_validation:
-                        final_image_path = self.image_generator.generate_cartoon_image_with_validation(prompt, str(image_path), max_attempts=3, negative_prompt=negative_prompt, character_faces=self.config.character_faces)
-                    else:
-                        final_image_path = self.image_generator.generate_cartoon_image(prompt, str(image_path), negative_prompt=negative_prompt, character_faces=self.config.character_faces)
-                    logger.info(f"🖼️ Scene {i+1}: Image generation completed: {final_image_path}")
-                
-                image_paths.append(final_image_path)
-                logger.info(f"Scene {i+1}: Image ready: {final_image_path}")
-            
-            # Step 4: Animate images with AnimateDiff (using audio clip lengths)
-            logger.info("Step 4: Creating animations with audio clip timing...")
-            logger.info(f"🎬 Total animations to create: {len(image_paths)}")
-            scene_prompts = [scene['visual_prompt'] for scene in script['scenes']]
-            
-            # Calculate frames per scene based on actual audio clip lengths
-            frames_per_scene = []
-            total_frames_needed = 0
-            logger.info("📊 Calculating frames per scene based on audio durations...")
-            
-            # Check if using SVD and warn about frame limits
-            if self.config.animator_type == "svd":
-                logger.info("🎬 SVD Animation Mode: Frame limits will be handled automatically")
-                logger.info("🎬 SVD generates 24 frames max, will use overlapping chunks for longer sequences")
-            
-            for i, audio_duration in enumerate(actual_scene_durations):
-                # Use actual audio duration to determine frame count
-                total_frames = max(30, int(audio_duration * self.config.fps))
-                frames_per_scene.append(total_frames)
-                total_frames_needed += total_frames
-                
-                if self.config.animator_type == "svd" and total_frames > 24:
-                    logger.info(f"📊 Scene {i+1}: {audio_duration:.1f}s → {total_frames} frames (SVD will use overlapping chunks)")
-                else:
-                    logger.info(f"📊 Scene {i+1}: {audio_duration:.1f}s → {total_frames} frames")
-            
-            logger.info(f"📊 Audio clip lengths: {actual_scene_durations} seconds")
-            logger.info(f"📊 Frames per scene: {frames_per_scene}")
-            logger.info(f"📊 Total frames needed: {total_frames_needed}")
-            logger.info(f"📊 FPS setting: {self.config.fps}")
-            logger.info("🎬 Using audio clip timing for animation frames")
-            
-            frame_dirs: List[str] = []
-            for i, image_path in enumerate(image_paths):
-                frames_dir = self.output_dir / f"scene_{i+1}_frames"
-                expected_frames = frames_per_scene[i]
-                logger.info(f"🎬 Scene {i+1}: Starting animation process...")
-                logger.info(f"🎬 Scene {i+1}: Target frames: {expected_frames} ({actual_scene_durations[i]:.1f}s @ {self.config.fps}fps)")
-                
-                if self.config.reuse_existing and frames_dir.exists():
-                    # Count frames
-                    existing = list(frames_dir.glob("frame_*.png"))
-                    logger.info(f"🎬 Scene {i+1}: Checking existing frames: {len(existing)} found")
-                    if len(existing) >= expected_frames:
-                        logger.info(f"Skipping animation (frames ready): {frames_dir} ({len(existing)} frames)")
-                        frame_dirs.append(str(frames_dir))
-                        continue
-                    else:
-                        logger.info(f"🎬 Scene {i+1}: Existing frames insufficient ({len(existing)} < {expected_frames}), regenerating...")
-                
-                # Generate frames based on audio clip length
-                logger.info(f"🎬 Scene {i+1}: Generating {expected_frames} frames from image...")
-                dir_path = self.animation_generator.animate_image(
-                    image_path,
-                    str(frames_dir),
-                    num_frames=expected_frames,
-                    prompt=scene_prompts[i] if i < len(scene_prompts) else "",
-                    motion_bucket_id=self.config.motion_bucket_id,
-                    fps_id=self.config.fps_id,
-                    cond_aug=self.config.cond_aug,
-                    seed=None  # Use random seed for variety
-                )
-                frame_dirs.append(dir_path)
-                logger.info(f"🎬 Scene {i+1}: Animation completed: {dir_path}")
-            
-            # Step 5: Convert frames to MP4 videos (already expanded to match audio)
-            logger.info("Step 5: Converting frames to MP4 videos (expanded to match audio)...")
-            logger.info(f"📹 Total videos to create: {len(frame_dirs)}")
+            # Step 3: Generate videos directly from prompts using WAN T2V
+            logger.info("Step 3: Generating videos with WAN 2.1 T2V...")
+            logger.info(f"🎬 Total videos to generate: {len(script['scenes'])}")
             video_clips: List[str] = []
             total_video_duration = 0
             
-            for i, frames_dir in enumerate(frame_dirs):
+            for i, scene in enumerate(script['scenes']):
                 clip_path = self.output_dir / f"scene_{i+1}.mp4"
-                expected_duration = actual_scene_durations[i]
-                logger.info(f"📹 Scene {i+1}: Processing video creation...")
-                logger.info(f"📹 Scene {i+1}: Expected duration: {expected_duration:.1f}s")
+                logger.info(f"🎬 Scene {i+1}: Processing video generation...")
                 
                 if self.config.reuse_existing and clip_path.exists():
-                    logger.info(f"Skipping frames->video (exists): {clip_path}")
+                    logger.info(f"Skipping video generation (exists): {clip_path}")
                     video_clips.append(str(clip_path))
-                    total_video_duration += expected_duration
+                    # Get actual duration of existing video
+                    existing_duration = self.video_processor.get_audio_duration(str(clip_path))
+                    total_video_duration += existing_duration
                     continue
                 
-                logger.info(f"📹 Scene {i+1}: Converting {frames_per_scene[i]} frames to MP4...")
+                # Compose prompt from scene
+                prompt, negative_prompt = self._compose_video_prompt(scene)
+                logger.info(f"🎬 Scene {i+1}: Generating video with prompt ({len(prompt)} characters)")
+                logger.info(f"🎬 Scene {i+1}: Prompt preview: {prompt[:100]}...")
+                if negative_prompt:
+                    logger.info(f"🎬 Scene {i+1}: Using negative prompt ({len(negative_prompt)} characters)")
                 
-                # Validate frames directory exists and contains frames
-                if not frames_dir or frames_dir == "None":
-                    logger.error(f"❌ Invalid frames directory for scene {i+1}: {frames_dir}")
-                    raise ValueError(f"Invalid frames directory: {frames_dir}")
-                
-                frames_path = Path(frames_dir)
-                if not frames_path.exists():
-                    logger.error(f"❌ Frames directory does not exist for scene {i+1}: {frames_dir}")
-                    raise FileNotFoundError(f"Frames directory not found: {frames_dir}")
-                
-                frame_files = list(frames_path.glob("frame_*.png"))
-                if not frame_files:
-                    logger.error(f"❌ No frame files found in directory for scene {i+1}: {frames_dir}")
-                    raise FileNotFoundError(f"No frame files found in: {frames_dir}")
-                
-                logger.info(f"📹 Scene {i+1}: Found {len(frame_files)} frame files in {frames_dir}")
-                video_path = self.video_processor.frames_to_video(frames_dir, str(clip_path), fps=self.config.fps)
-                video_clips.append(video_path)
-                total_video_duration += expected_duration
-                logger.info(f"Scene {i+1}: Created MP4 with {actual_scene_durations[i]:.1f}s duration")
-                logger.info(f"📹 Scene {i+1}: Video file: {video_path}")
+                # Generate video with WAN
+                try:
+                    video_path = self.wan_generator.generate_video(
+                        prompt=prompt,
+                        output_path=str(clip_path),
+                        seed=self.config.wan_seed,
+                        negative_prompt=negative_prompt or None
+                    )
+                    video_clips.append(video_path)
+                    
+                    # Get actual duration of generated video
+                    actual_duration = self.video_processor.get_audio_duration(video_path)
+                    total_video_duration += actual_duration
+                    logger.info(f"🎬 Scene {i+1}: Video generated: {video_path} ({actual_duration:.1f}s)")
+                except Exception as e:
+                    logger.error(f"❌ Error generating video for scene {i+1}: {e}")
+                    raise
             
             logger.info(f"📊 Total video duration created: {total_video_duration:.1f}s")
             logger.info(f"📊 Video clips ready: {len(video_clips)}")
@@ -492,8 +378,8 @@ class CartoonShortsGenerator:
             logger.info(f"📊 Final clips to compile: {len(final_clips)} (including pauses)")
             logger.info(f"📊 Final audio clips: {len(final_audio_paths)} (including silence)")
             
-            # Step 7: Create subtitles (optional) - accounting for pauses
-            logger.info("Step 7: Creating subtitles...")
+            # Step 5: Create subtitles (optional) - accounting for pauses
+            logger.info("Step 5: Creating subtitles...")
             subtitles_path = self.output_dir / "subtitles.srt"
             if self.config.add_subtitles:
                 logger.info("📝 Subtitles enabled - creating SRT file...")
@@ -504,18 +390,18 @@ class CartoonShortsGenerator:
                     self._create_subtitles_with_pauses(script, str(subtitles_path))
                     logger.info(f"📝 Subtitles created: {subtitles_path}")
             else:
-                logger.info("Step 7: Subtitles disabled; skipping SRT generation and overlay")
+                logger.info("Step 5: Subtitles disabled; skipping SRT generation and overlay")
             
-            # Step 8: Select background music
-            logger.info("Step 8: Adding background music...")
+            # Step 6: Select background music
+            logger.info("Step 6: Adding background music...")
             background_music = self._get_background_music()
             if background_music:
                 logger.info(f"🎵 Background music selected: {background_music}")
             else:
                 logger.info("🎵 No background music found - proceeding without music")
             
-            # Step 9: Compile final video
-            logger.info("Step 9: Compiling final video...")
+            # Step 7: Compile final video
+            logger.info("Step 7: Compiling final video...")
             logger.info(f"🎬 Compiling {len(final_clips)} video clips...")
             logger.info(f"🎵 Using {len(final_audio_paths)} audio clips...")
             logger.info(f"📝 Subtitles: {'Enabled' if self.config.add_subtitles else 'Disabled'}")
@@ -530,8 +416,8 @@ class CartoonShortsGenerator:
                 str(final_output)
             )
             
-            # Step 10: Generate metadata
-            logger.info("Step 10: Generating metadata...")
+            # Step 8: Generate metadata
+            logger.info("Step 8: Generating metadata...")
             self._generate_metadata(script, str(final_output))
             
             logger.info(f"🎉 Video generation completed: {final_output}")
@@ -719,22 +605,18 @@ class CartoonShortsGenerator:
         millisecs = int((seconds % 1) * 1000)
         return f"{hours:02d}:{minutes:02d}:{secs:02d},{millisecs:03d}"
 
-    def _compose_image_prompt(self, scene: Dict) -> tuple[str, str]:
-        """Compose an image prompt and negative prompt using the visual_prompt from script with intelligent aspect ratio adaptation and character role integration."""
+    def _compose_video_prompt(self, scene: Dict) -> tuple[str, str]:
+        """Compose a video prompt and negative prompt using the visual_prompt from script with character role integration."""
         # Get the visual_prompt from the script (this is the key requirement)
         visual_prompt = scene.get('visual_prompt', '')
         base_prompt = visual_prompt or "Cartoon scene"
         
-        # Get the negative prompt from the script
-        negative_prompt = scene.get('negative_prompt', '')
+        # Get the negative prompt from the script, or use default
+        negative_prompt = scene.get('negative_prompt', self.config.wan_negative_prompt)
 
         # Enhance prompt with character role information if available
         enhanced_prompt = self._enhance_prompt_with_character_roles(base_prompt, scene)
-
-        # Determine aspect ratio for intelligent prompt adaptation
-        is_16_9_format = self.config.width > self.config.height and self.config.width / self.config.height > 1.5
         
-        # Disable prompt enhancement to preserve original prompt structure with weights
         logger.info(f"🎯 Using enhanced visual_prompt with character roles: {enhanced_prompt}")
         return enhanced_prompt, negative_prompt
     
@@ -808,7 +690,6 @@ def main():
     parser.add_argument("--language", default="en", help="Language for narration")
     parser.add_argument("--no-prompt-enhancement", action="store_true", help="Disable GPT-2 prompt enhancement")
     parser.add_argument("--scene-pause", type=float, default=0.0, help="Pause duration between scenes in seconds (default: 0.0, no black screens)")
-    parser.add_argument("--no-image-validation", action="store_true", help="Disable automatic image validation and prompt adjustment")
     
     args = parser.parse_args()
     
@@ -833,8 +714,7 @@ def main():
         voice_id=args.voice,
         language=args.language,
         enable_prompt_enhancement=not args.no_prompt_enhancement,
-        scene_pause_duration=args.scene_pause,
-        enable_image_validation=not args.no_image_validation
+        scene_pause_duration=args.scene_pause
     )
     
     # Generate video

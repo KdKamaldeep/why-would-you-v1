@@ -260,44 +260,9 @@ class ImageGenerator:
     
     def _generate_face_based_image(self, prompt: str, output_path: str, negative_prompt: str = None, character_faces: dict = None) -> str:
         """Generate image using face-based generation for characters."""
-        try:
-            from .face_image_generator import FaceImageGenerator
-            
-            logger.info("🎭 Using face-based image generation")
-            
-            # Initialize face-based generator
-            face_generator = FaceImageGenerator(
-                model_path=self.model_path,
-                device='cuda' if torch.cuda.is_available() else 'cpu'
-            )
-            
-            # Find the best matching character face for this prompt
-            best_face_path = self._find_best_character_face(prompt, character_faces)
-            
-            if best_face_path:
-                logger.info(f"🎭 Using face from: {best_face_path}")
-                
-                # Generate image with face
-                result = face_generator.generate_with_face(
-                    prompt=prompt,
-                    face_image_path=best_face_path,
-                    negative_prompt=negative_prompt or "",
-                    output_path=output_path
-                )
-                
-                if result:
-                    logger.info(f"✅ Face-based image generated successfully: {output_path}")
-                    return output_path
-                else:
-                    logger.warning("⚠️ Face-based generation failed, falling back to standard generation")
-            
-            # Fallback to standard generation
-            return self._generate_sd_image(prompt, output_path, negative_prompt)
-            
-        except Exception as e:
-            logger.error(f"❌ Face-based generation failed: {e}")
-            logger.info("🔄 Falling back to standard generation")
-            return self._generate_sd_image(prompt, output_path, negative_prompt)
+        # Note: Face-based generation removed - using standard SD generation instead
+        logger.warning("⚠️ Face-based generation not available, using standard image generation")
+        return self._generate_sd_image(prompt, output_path, negative_prompt)
     
     def _find_best_character_face(self, prompt: str, character_faces: dict) -> str:
         """Find the best matching character face for the given prompt."""

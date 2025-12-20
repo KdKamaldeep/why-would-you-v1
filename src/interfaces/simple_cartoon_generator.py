@@ -37,13 +37,7 @@ def check_requirements():
         print("❌ Models directory not found. Please run the model download script first.")
         return False
     
-    # Check for at least one supported model (others optional)
-    preferred_models = [
-        "models/toonyou_beta6.safetensors",
-        "models/meina_mix.safetensors"
-    ]
-    if not any(Path(m).exists() for m in preferred_models):
-        print("⚠️ No preferred SD models found (toonyou or meina). The app will use placeholder images.")
+    # Note: WAN model will be downloaded automatically from Hugging Face when first used
     
     print("✅ All requirements satisfied!")
     return True
@@ -102,7 +96,7 @@ def extract_character_faces_from_cast(cast_list):
     
     return character_faces
 
-def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", character_faces=None, model_type="cartoon", animator_type="ffmpeg", motion_bucket_id=127, fps_id=6, cond_aug=0.02, svd_chunked_generation=True):
+def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable_prompt_enhancement=True, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality", seed=None):
     """Generate a cartoon video with the given prompt and character faces."""
     try:
         # Import the main generator
@@ -117,11 +111,11 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
         print(f"🗣️ Language: {language}")
         print(f"✨ Enable Prompt Enhancement: {enable_prompt_enhancement}")
         print(f"📐 Video Format: {video_format}")
-        print(f"🤖 Model Type: {model_type}")
-        print(f"🎭 Animator Type: {animator_type}")
-        print(f"🏃 Motion Bucket ID: {motion_bucket_id}")
-        print(f"🎞️ FPS ID: {fps_id}")
-        print(f"🔧 Cond Aug: {cond_aug}")
+        print(f"🎬 WAN Width: {wan_width}, Height: {wan_height}")
+        print(f"🎞️ WAN Frames: {wan_num_frames} @ {wan_fps}fps")
+        print(f"⚙️ WAN Steps: {wan_steps}, Guidance: {wan_guidance}")
+        if seed:
+            print(f"🎲 Seed: {seed}")
         if character_faces:
             print(f"👥 Character faces: {len(character_faces)} characters mapped")
             for char, face in character_faces.items():
@@ -130,26 +124,19 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
             print(f"👥 Character faces: None")
         print("=" * 50)
         
-        print(f"🎬 Starting cartoon generation...")
+        print(f"🎬 Starting cartoon generation with WAN 2.1 T2V...")
         print(f"📝 Prompt: {prompt}")
         print(f"🎨 Style: {style}")
         print(f"⏱️ Duration: {duration} seconds")
         print(f"🗣️ Language: {language}")
         print(f"🎯 Prompt enhancement: {'Enabled' if enable_prompt_enhancement else 'Disabled'}")
         print(f"📐 Video format: {video_format}")
-        print(f"🤖 Model type: {model_type}")
+        print(f"🎬 WAN settings: {wan_width}x{wan_height}, {wan_num_frames} frames @ {wan_fps}fps")
         if character_faces:
             print(f"👥 Character faces: {len(character_faces)} characters mapped")
             for char, face in character_faces.items():
                 print(f"   - {char}: {face}")
         print("-" * 50)
-        
-        # Get appropriate model for the selected type
-        model_path = get_model_path_for_type(model_type)
-        if model_path:
-            print(f"✅ Using {model_type} model: {model_path}")
-        else:
-            print(f"⚠️ No {model_type} model found, will use default model")
         
         # Create video configuration
         config = VideoConfig(
@@ -161,13 +148,14 @@ def generate_cartoon(prompt, style="cartoon", duration=30, language="en", enable
             add_subtitles=False,
             language=language,
             enable_prompt_enhancement=enable_prompt_enhancement,
-            character_faces=character_faces or {},
-            model_path=model_path,
-            animator_type=animator_type,
-            motion_bucket_id=motion_bucket_id,
-            fps_id=fps_id,
-            cond_aug=cond_aug,
-            svd_chunked_generation=svd_chunked_generation
+            wan_width=wan_width,
+            wan_height=wan_height,
+            wan_num_frames=wan_num_frames,
+            wan_fps=wan_fps,
+            wan_steps=wan_steps,
+            wan_guidance=wan_guidance,
+            wan_negative_prompt=wan_negative_prompt,
+            wan_seed=seed
         )
         
         # Initialize generator
@@ -205,17 +193,14 @@ Examples:
   # Custom style and duration
   python simple_cartoon_generator.py --prompt "A robot learns to dance" --style anime --duration 45
   
-  # Realistic model generation
-  python simple_cartoon_generator.py --prompt "A photorealistic landscape" --model-type realistic
-  
   # With storyboard (includes character faces from cast)
   python simple_cartoon_generator.py --prompt "Magic forest adventure" --storyboard storyboards/tillu.json
   
   # Process only the first scene from storyboard
   python simple_cartoon_generator.py --prompt "Magic forest adventure" --storyboard storyboards/tillu.json --scene 1
   
-  # Use SVD looping instead of chunked generation for extended sequences
-  python simple_cartoon_generator.py --prompt "Adventure story" --animator svd --svd-looping
+  # Custom WAN settings
+  python simple_cartoon_generator.py --prompt "Adventure story" --wan-width 832 --wan-height 480 --wan-num-frames 49
 
 Storyboard Cast Format (with face images):
   {
@@ -241,12 +226,7 @@ Storyboard Cast Format (with face images):
         help="Visual style (cartoon, anime, indian). Use 'indian' for Indian children's-book style"
     )
     
-    parser.add_argument(
-        "--model-type", "-m",
-        choices=["cartoon", "realistic"],
-        default="cartoon",
-        help="Model type: cartoon (default) or realistic for photorealistic images"
-    )
+    # Note: --model-type removed (WAN 2.1 is the only model now)
     
     parser.add_argument(
         "--duration", "-d",
@@ -307,45 +287,65 @@ Storyboard Cast Format (with face images):
     )
     
     parser.add_argument(
-        "--animator",
-        choices=["ffmpeg", "svd"],
-        default="ffmpeg",
-        help="Animation method: 'ffmpeg' for zoom/pan effects, 'svd' for motion animation"
-    )
-    
-    parser.add_argument(
-        "--motion-bucket-id",
+        "--wan-width",
         type=int,
-        default=127,
-        choices=[0, 63, 127, 191, 255],
-        help="SVD motion intensity: 0=very low, 63=low, 127=medium, 191=high, 255=very high"
+        default=832,
+        help="WAN video width (default: 832)"
     )
     
     parser.add_argument(
-        "--fps-id",
+        "--wan-height",
         type=int,
-        default=6,
-        choices=[0, 1, 2, 3, 4, 5, 6],
-        help="SVD FPS setting: 0=very slow, 2=normal, 6=maximum"
+        default=480,
+        help="WAN video height (default: 480)"
     )
     
     parser.add_argument(
-        "--cond-aug",
+        "--wan-num-frames",
+        type=int,
+        default=49,
+        help="WAN number of frames to generate (default: 49)"
+    )
+    
+    parser.add_argument(
+        "--wan-fps",
+        type=int,
+        default=12,
+        help="WAN output FPS (default: 12)"
+    )
+    
+    parser.add_argument(
+        "--wan-steps",
+        type=int,
+        default=30,
+        help="WAN inference steps (default: 30)"
+    )
+    
+    parser.add_argument(
+        "--wan-guidance",
         type=float,
-        default=0.02,
-        help="SVD conditioning augmentation (0.0-1.0, default: 0.02)"
+        default=6.0,
+        help="WAN guidance scale (default: 6.0)"
+    )
+    
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Random seed for video generation (optional)"
+    )
+    
+    parser.add_argument(
+        "--negative-prompt",
+        type=str,
+        default="text, subtitles, watermark, blurry, low quality",
+        help="Negative prompt for video generation (default: 'text, subtitles, watermark, blurry, low quality')"
     )
     
     parser.add_argument(
         "--skip-audio",
         action="store_true",
         help="Skip audio generation (create video without narration)"
-    )
-    
-    parser.add_argument(
-        "--svd-looping",
-        action="store_true",
-        help="Use SVD looping instead of chunked generation for extended sequences (default: chunked generation)"
     )
     
     args = parser.parse_args()
@@ -355,7 +355,6 @@ Storyboard Cast Format (with face images):
     print("=" * 60)
     print(f"📝 Prompt: {args.prompt}")
     print(f"🎨 Style: {args.style}")
-    print(f"🤖 Model Type: {args.model_type}")
     print(f"⏱️ Duration: {args.duration} seconds")
     print(f"📐 Video Format: {args.video_format}")
     print(f"🗣️ Language: {args.language}")
@@ -364,13 +363,12 @@ Storyboard Cast Format (with face images):
     print(f"🔄 No Reuse: {args.no_reuse}")
     print(f"✨ No Prompt Enhancement: {args.no_prompt_enhancement}")
     print(f"🔍 Check Only: {args.check_only}")
-    print(f"🎬 Animate: {args.animate}")
-    print(f"🎭 Animator: {args.animator}")
-    print(f"🏃 Motion Bucket ID: {args.motion_bucket_id}")
-    print(f"🎞️ FPS ID: {args.fps_id}")
-    print(f"🔧 Cond Aug: {args.cond_aug}")
+    print(f"🎬 WAN Width: {args.wan_width}, Height: {args.wan_height}")
+    print(f"🎞️ WAN Frames: {args.wan_num_frames} @ {args.wan_fps}fps")
+    print(f"⚙️ WAN Steps: {args.wan_steps}, Guidance: {args.wan_guidance}")
+    if args.seed:
+        print(f"🎲 Seed: {args.seed}")
     print(f"🔇 Skip Audio: {args.skip_audio}")
-    print(f"🔄 SVD Looping: {args.svd_looping}")
     print("=" * 60)
     
     print("🎨 Simple Cartoon Generator with Face-Based Characters")
@@ -402,13 +400,12 @@ Storyboard Cast Format (with face images):
             print(f"⏱️ Duration: {args.duration}")
             print(f"📐 Video Format: {args.video_format}")
             print(f"🗣️ Language: {args.language}")
-            print(f"🤖 Model Type: {args.model_type}")
-            print(f"🎭 Animator: {args.animator}")
-            print(f"🏃 Motion Bucket ID: {args.motion_bucket_id}")
-            print(f"🎞️ FPS ID: {args.fps_id}")
-            print(f"🔧 Cond Aug: {args.cond_aug}")
+            print(f"🎬 WAN Width: {args.wan_width}, Height: {args.wan_height}")
+            print(f"🎞️ WAN Frames: {args.wan_num_frames} @ {args.wan_fps}fps")
+            print(f"⚙️ WAN Steps: {args.wan_steps}, Guidance: {args.wan_guidance}")
+            if args.seed:
+                print(f"🎲 Seed: {args.seed}")
             print(f"🔇 Skip Audio: {args.skip_audio}")
-            print(f"🔄 SVD Looping: {args.svd_looping}")
             print(f"🔄 No Reuse: {args.no_reuse}")
             print(f"✨ No Prompt Enhancement: {args.no_prompt_enhancement}")
             print("=" * 50)
@@ -461,13 +458,6 @@ Storyboard Cast Format (with face images):
                 scene_copy['characters'] = structured_chars[:2]
                 normalized_scenes.append(scene_copy)
 
-            # Get appropriate model for the selected type
-            model_path = get_model_path_for_type(args.model_type)
-            if model_path:
-                print(f"✅ Using {args.model_type} model: {model_path}")
-            else:
-                print(f"⚠️ No {args.model_type} model found, will use default model")
-            
             config = VideoConfig(
                 prompt=args.prompt,
                 duration=args.duration,
@@ -482,13 +472,14 @@ Storyboard Cast Format (with face images):
                 add_subtitles=False,
                 language=args.language,
                 enable_prompt_enhancement=(not args.no_prompt_enhancement),
-                character_faces=character_faces,
-                model_path=model_path,
-                animator_type=args.animator,
-                motion_bucket_id=args.motion_bucket_id,
-                fps_id=args.fps_id,
-                cond_aug=args.cond_aug,
-                svd_chunked_generation=(not args.svd_looping),
+                wan_width=args.wan_width,
+                wan_height=args.wan_height,
+                wan_num_frames=args.wan_num_frames,
+                wan_fps=args.wan_fps,
+                wan_steps=args.wan_steps,
+                wan_guidance=args.wan_guidance,
+                wan_negative_prompt=args.negative_prompt,
+                wan_seed=args.seed,
                 skip_audio=args.skip_audio
             )
             generator = CartoonShortsGenerator(config)
@@ -504,13 +495,14 @@ Storyboard Cast Format (with face images):
             args.language, 
             not args.no_prompt_enhancement, 
             args.video_format,
-            {},  # No character faces for non-storyboard generation
-            args.model_type,
-            args.animator,
-            args.motion_bucket_id,
-            args.fps_id,
-            args.cond_aug,
-            not args.svd_looping  # Use chunked generation unless --svd-looping is specified
+            args.wan_width,
+            args.wan_height,
+            args.wan_num_frames,
+            args.wan_fps,
+            args.wan_steps,
+            args.wan_guidance,
+            args.negative_prompt,
+            args.seed
         )
     
     if output_path:

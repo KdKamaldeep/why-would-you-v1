@@ -178,10 +178,12 @@ def main():
     if success:
         print("✅ Setup completed successfully!")
         print("\nNext steps:")
-        print("1. Edit .env file and add your API keys")
-        print("2. Download the required AI models")
-        print("3. Add background music to the 'music/' directory")
-        print("5. Run: python generate_cartoon_short.py --prompt 'Your story prompt'")
+        print("1. Edit .env file and add your API keys (OPENAI_API_KEY required)")
+        print("2. The WAN 2.1 model will download automatically on first use")
+        print("   (Or pre-download with: bash src/utils/download_models.sh)")
+        print("3. Add background music to the 'music/' directory (optional)")
+        print("4. Test WAN: python -m scripts.test_wan --prompt 'A cat walks on grass'")
+        print("5. Generate video: python -m src.interfaces.simple_cartoon_generator --prompt 'Your story prompt'")
     else:
         print("⚠️  Setup completed with some issues.")
         print("Please check the output above and complete manual steps.")
