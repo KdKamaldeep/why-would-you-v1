@@ -100,28 +100,32 @@ class VideoConfig:
     def __post_init__(self):
         """Set dimensions based on video format."""
         if self.video_format.lower() == "shorts":
-            # YouTube Shorts: 9:16 aspect ratio (1080x1920)
-            self.width = 1080
+            # YouTube Shorts: 9:16 aspect ratio
+            # WAN requires dimensions divisible by 16, so we use 1088x1920 (closest to 1080x1920)
+            # 1088 = 16 * 68, 1920 = 16 * 120
+            self.width = 1088
             self.height = 1920
-            # Set WAN dimensions to match shorts format
-            self.wan_width = 1080
-            self.wan_height = 1920
-            # Ensure reel dimensions match
+            # Set WAN dimensions (must be divisible by 16)
+            self.wan_width = 1088  # 16 * 68 (closest to 1080)
+            self.wan_height = 1920  # 16 * 120
+            # Final reel output dimensions (can be 1080x1920, will be resized in post-processing)
             self.reel_width = 1080
             self.reel_height = 1920
         elif self.video_format.lower() == "normal":
             # Normal video: 16:9 aspect ratio
+            # WAN requires dimensions divisible by 16
+            # 1920 = 16 * 120, 1088 = 16 * 68 (closest to 1080)
             self.width = 1920
-            self.height = 1080
-            # Set WAN dimensions to match normal format
-            self.wan_width = 1920
-            self.wan_height = 1080
+            self.height = 1088  # 16 * 68 (closest to 1080)
+            # Set WAN dimensions (must be divisible by 16)
+            self.wan_width = 1920  # 16 * 120
+            self.wan_height = 1088  # 16 * 68
         else:
             # Default to shorts if invalid format
             self.video_format = "shorts"
-            self.width = 1080
-            self.height = 1920
-            self.wan_width = 1080
+            self.width = 1088  # 16 * 68 (divisible by 16, closest to 1080)
+            self.height = 1920  # 16 * 120
+            self.wan_width = 1088
             self.wan_height = 1920
             self.reel_width = 1080
             self.reel_height = 1920
