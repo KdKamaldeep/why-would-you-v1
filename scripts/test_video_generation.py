@@ -100,6 +100,24 @@ def main():
         default=None,
         help="Negative prompt (default: excludes non-realistic styles like cartoon, anime, etc.)"
     )
+    parser.add_argument(
+        "--audio-text",
+        type=str,
+        default=None,
+        help="Text to convert to speech and add as audio track (optional)"
+    )
+    parser.add_argument(
+        "--language",
+        type=str,
+        default="en",
+        help="Language for audio synthesis (default: en)"
+    )
+    parser.add_argument(
+        "--voice-file",
+        type=str,
+        default=None,
+        help="Path to reference audio file for voice cloning (optional)"
+    )
     
     args = parser.parse_args()
     

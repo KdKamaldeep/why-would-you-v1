@@ -1,97 +1,20 @@
 ssh-keygen -t rsa -b 4096 -C "kdkamaldeep2@gmail.com" && cat ~/.ssh/id_rsa.pub
 
-python setup.py
-	python install_hf_cli.py
+python -m src.interfaces.simple_cartoon_generator --prompt "Girl sitting in bar talking about drinks"
+python -m src.interfaces.simple_cartoon_generator --help
 
-python command for stories for develop branch
-python3 -m src.interfaces.simple_cartoon_generator --prompt "Animal friends adventure" --storyboard storyboards/horror.json --no-reuse --model-type realistic --style indian --video-format "shorts" --animate --animator svd --language hi 
+# Basic usage with just a prompt
+python -m scripts.test_video_generation --prompt "A cat walks on the grass"
 
-for svd-motion-work branch
-python3 -m src.interfaces.simple_cartoon_generator --prompt "Animal friends adventure" --storyboard storyboards/fireflies.json --no-reuse --style indian --language hi --enable-chunked-processing --no-prompt-enhancement --animation-type svd
+# Or use short form
+python -m scripts.test_video_generation -p "A dog running in a park"
 
-python tests/test_image_generation.py --prompt "(wide shot:1.2) little Indian girl with long black hair tied, wearing pink frock, sitting near a pond under full moonlight, soft ripples in water, lotus flowers, storybook style:1.3" --negative-prompt "extra humans, multiple people, crowded, group, blurry, low resolution, distorted, unnatural poses, text, watermark, dark edges, cropped limbs, chaotic background
-" --video-format "normal"
+# With custom output location
+python -m scripts.test_video_generation -p "Sunset over mountains" --output outputs/my_test.mp4
 
-# This should now work without blank images
-python test_image_generation.py --video-format normal --prompt "(Lavanya:1.2), (yellow dress:1.1), (flying:1.3), (golden glowbird:1.4), (magical sky:1.0)" --negative-prompt "extra humans, crowded, blurry, low resolution, distorted"
-	
-	python3 -m src.interfaces.simple_cartoon_generator \
-  --prompt "A magical forest adventure with animal friends" \
-  --style indian \
-  --duration 45 \
-  --language hi \
-  --storyboard storyboards/fireflies.json \
-  --no-reuse \
-  --svd-frames 14 \
-  --enable-chunked-processing \
-  --no-prompt-enhancement \
-  --animation-type svd
+# With custom parameters
+python -m scripts.test_video_generation -p "City street at night" --width 1024 --height 576 --steps 50 --seed 42
+
   
-  # Basic SVD animation (default)
-python -m src.interfaces.simple_cartoon_generator --prompt "A magical forest" --animate
-
-# SVD with custom settings
-python -m src.interfaces.simple_cartoon_generator --prompt "A magical forest" --animate --animator svd --frames 48 --fps 12
-
-# AnimateDiff animation
-python -m src.interfaces.simple_cartoon_generator --prompt "A robot dancing" --animate --animator animatediff --frames 24
-
-# With storyboard and SVD animation
-python -m src.interfaces.simple_cartoon_generator --prompt "Adventure story" --storyboard storyboards/example.json --animate --animator svd
-
-
-python src/interfaces/simple_cartoon_generator.py \
-  --prompt "Motion sequence demo" \
-  --storyboard storyboards/one.json \
-  --animation-type svd \
-  --enable-chunked-processing \
-  --style cartoon
-  
-	
-	python -m pip install --no-cache-dir --force-reinstall "TTS==0.22.0" "transformers==4.35.2" "huggingface_hub==0.20.3"
-
-apt-get update && cd src/util;src/utils && bash download_models.sh
-pyhton setup.py on root
-
-python install_ai_dependencies.py if needed
-python fix_torch_conflict.py if needed
-
-ngrok config add-authtoken 30tsYGlsYPi5sHHIcGb5JkwsiNj_77uYBxPjyNTZdgEwuqbwH
-ngrok http 7860
-
-nohup uvicorn main:app --host 0.0.0.0 --port 7860 > uvicorn.log 2>&1 &
-
-
-pip install --upgrade diffusers
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-pip install accelerate transformers xformers einops opencv-python imageio
-pip install safetensors
-
-
-
-# Ubuntu/Debian
-sudo apt update && sudo apt install -y ffmpeg
-# API keys (or use .env)
-
-
-git config --global user.email "kdkamaldeep2@gmail.com"
-git config --global user.name "Parmjeet Singh"
- 
- python command for stories
-python3 -m src.interfaces.simple_cartoon_generator --prompt "Animal friends adventure" --storyboard storyboards/village_festival.json 
-    --no-reuse running
-	
-	
-	want camera-type weights like (wide shot:1.2) or (medium shot:1.3) in every visual_prompt, but still keep each one under 77 characters for diffusion.
-	
-	
-	
-	  • Strengthened T2V to avoid blank outputs:
-    • Added negative terms: “blank, plain canvas, solid color, monochrome, low-contrast, blurry, low-res”.
-    • Increased steps and guidance in the test.
-    • Added a low-detail check to auto-fallback to cinematic animation over a toon SD base if needed.
-  • Test run completed with frames and video created. If you still see low-detail frames:
-    • Raise --steps (e.g., 32–40) and --guidance (9–11).
-    • Enrich the visual_prompt with more concrete nouns and attributes: character pose, outfit, background elements.
-    • Optionally set --width/--height to your final aspect and slightly larger resolution.
-
+python -m scripts.test_video_generation   -p "Sunset over mountains, time-lapse, fast moving clouds, cinematic drone flyover, parallax, film look, high detail"   --negative "text, watermark, subtitles, blurry, low quality, static"   --num-frames 81 --fps 12 --steps 30 --guidance 5 --audio-text "As the sun sinks behind the mountains, clouds race across the sky, painting the horizon in gold and fire.
+" --output outputs/my_test.mp4
