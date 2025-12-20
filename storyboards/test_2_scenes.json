@@ -1,23 +1,15 @@
 {
-  "title": "Morning Expectations vs Reality",
-  "description": "A funny conversation between two girls about how mornings are imagined vs how they actually happen",
-  "total_duration": 16,
+  "title": "The Forest That Moves",
+  "description": "A mysterious fantasy short about a forest that changes its paths at night",
+  "total_duration": 18,
   "scenes": [
     {
-      "duration": 8,
-      "description": "Girl confidently planning a perfect morning routine",
-      "visual_prompt": "A young girl sitting confidently with a notebook and coffee mug, imagining a perfect morning routine, bright indoor lighting, expressive face, cinematic look, realistic, shallow depth of field",
-      "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, illustration, distorted, deformed",
-      "narration": "Girl one says, Tomorrow morning I will wake up early, exercise, drink warm water, meditate, and start my day fresh.",
-      "subtitle": "Girl 1: Tomorrow I’ll be productive 💪"
-    },
-    {
-      "duration": 8,
-      "description": "Second girl reacting with brutal reality humor",
-      "visual_prompt": "Another young girl lying on a couch with messy hair, holding phone, laughing sarcastically, casual indoor setting, realistic, cinematic lighting, film look",
-      "negative_prompt": "text, subtitles, watermark, blurry, low quality, cartoon, anime, illustration, distorted, deformed",
-      "narration": "Girl two replies, Yes… and tomorrow you will also wake up late, scroll reels for one hour, and skip breakfast.",
-      "subtitle": "Girl 2: Reality has entered the chat 😴📱"
+      "duration": 6,
+      "description": "Dark enchanted forest at night with glowing fog",
+      "visual_prompt": "Enchanted fantasy forest at night, glowing mist between trees, faint magical lights, cinematic fantasy lighting, slow camera movement, mystical atmosphere, ultra realistic",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "narration": "They say this forest sleeps during the day… but wakes up at night.",
+      "subtitle": "The forest awakens at night 🌲✨"
     }
   ]
 }

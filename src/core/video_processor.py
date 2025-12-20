@@ -21,7 +21,7 @@ class VideoConfig:
     codec: str = "libx265"           # Use HEVC for ~40-60% smaller files
     crf: int = 23                     # Lower = higher quality. 23 is good for social media
     preset: str = "medium"           # slower = smaller; keep reasonable CPU cost
-    tune: str = "film"               # better compression for video content
+    tune: str = "grain"              # Valid for libx265 (psnr, ssim, grain, zerolatency, fastdecode, animation). For libx264, use "film"
     audio_bitrate: str = "96k"       # narration-friendly bitrate
     faststart: bool = True            # enable moov atom at front for streaming
 
@@ -41,9 +41,13 @@ class VideoProcessor:
                 '-c:v', self.config.codec,
                 '-preset', self.config.preset,
                 '-crf', str(self.config.crf),
-                '-tune', self.config.tune,
                 '-pix_fmt', 'yuv420p'
             ]
+            # Add tune parameter only for supported codecs
+            if self.config.codec == 'libx264':
+                cmd.extend(['-tune', 'film'])  # film is valid for libx264
+            elif self.config.codec == 'libx265':
+                cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
             # Improve compatibility for HEVC in MP4 (especially on Safari)
             if self.config.codec == 'libx265':
                 cmd.extend(['-tag:v', 'hvc1'])
@@ -176,11 +180,15 @@ class VideoProcessor:
                 '-c:v', self.config.codec,
                 '-preset', self.config.preset,
                 '-crf', str(self.config.crf),
-                '-tune', self.config.tune,
                 '-c:a', 'aac',
-                '-b:a', self.config.audio_bitrate,
-                output_video
+                '-b:a', self.config.audio_bitrate
             ]
+            # Add tune parameter only for supported codecs
+            if self.config.codec == 'libx264':
+                cmd.extend(['-tune', 'film'])  # film is valid for libx264
+            elif self.config.codec == 'libx265':
+                cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
+            cmd.append(output_video)
             
             subprocess.run(cmd, check=True, capture_output=True)
             logger.info(f"Adjusted video duration: {current_duration:.2f}s → {target_duration_sec:.2f}s (speed: {speed_factor:.2f}x)")
@@ -348,10 +356,14 @@ class VideoProcessor:
                 '-c:v', self.config.codec,
                 '-preset', self.config.preset,
                 '-crf', str(self.config.crf),
-                '-tune', self.config.tune,
-                '-pix_fmt', 'yuv420p',
-                output_path
+                '-pix_fmt', 'yuv420p'
             ]
+            # Add tune parameter only for supported codecs
+            if self.config.codec == 'libx264':
+                cmd.extend(['-tune', 'film'])  # film is valid for libx264
+            elif self.config.codec == 'libx265':
+                cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
+            cmd.append(output_path)
             
             subprocess.run(cmd, check=True, capture_output=True)
             logger.info(f"Created pause video: {output_path} ({duration:.2f}s)")
@@ -462,11 +474,15 @@ class VideoProcessor:
                 '-c:v', self.config.codec,
                 '-preset', self.config.preset,
                 '-crf', str(self.config.crf),
-                '-tune', self.config.tune,
                 '-c:a', 'aac',
                 '-b:a', self.config.audio_bitrate,
                 '-pix_fmt', 'yuv420p'
             ])
+            # Add tune parameter only for supported codecs
+            if self.config.codec == 'libx264':
+                cmd.extend(['-tune', 'film'])  # film is valid for libx264
+            elif self.config.codec == 'libx265':
+                cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
             # Cap final muxing to video duration to prevent runaway outputs
             if video_duration is not None and video_duration > 0:
                 cmd.extend(['-t', f"{video_duration:.3f}"])
