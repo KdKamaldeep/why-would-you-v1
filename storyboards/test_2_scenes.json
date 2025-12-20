@@ -11,7 +11,7 @@
       "motion_hint": "slow forward dolly, clouds drifting upward, waterfalls flowing",
       "motion_strength": 0.65,
       "fps_hint": 24,
-      "narration": "Beyond the skies we know, there exists a realm untouched by time.",
+      "narration": "Beyond the skies we know…\nthere is a realm—\nuntouched by time.",
       "subtitle": "A realm beyond the skies ☁️✨"
     },
     {
@@ -22,7 +22,7 @@
       "motion_hint": "slow camera orbit around character, fog drifting sideways",
       "motion_strength": 0.7,
       "fps_hint": 24,
-      "narration": "Guardians rise when ancient magic stirs once more.",
+      "narration": "When ancient magic stirs…\nguardians rise.\n\nSilent.\nWatching.\nWaiting.",
       "subtitle": "The guardian awakens 🛡️🌲"
     }
   ]
