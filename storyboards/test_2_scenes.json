@@ -1,57 +1,57 @@
 {
-  "title": "Ancient Herbs Science Still Studies Today",
-  "description": "A cinematic short revealing ancient herbal medicines that modern science still uses today.",
-  "total_duration": 26,
+  "title": "Ancient Beauty Secrets Science Confirms",
+  "description": "A cinematic journey revealing that the best skincare ingredients are thousands of years old.",
+  "total_duration": 28,
   "scenes": [
     {
-      "duration": 4,
-      "description": "Ancient healing chamber with early physicians",
-      "visual_prompt": "Cinematic vertical 9:16 shot, slow push forward into an ancient stone healing chamber, carved mystical symbols on walls, wooden shelves with dried herbs, soft flickering torchlight, drifting incense smoke, ultra-realistic textures, 8k, volumetric lighting.",
-      "negative_prompt": "modern technology, plastic, text, watermark, blurry, distorted faces, cartoon, 2d",
-      "motion_hint": "slow cinematic push forward",
+      "duration": 5,
+      "description": "The Hook: Ancient Queen's Ritual",
+      "visual_prompt": "Cinematic vertical 9:16 shot, opulent ancient bathhouse, a woman's hand gently dropping rose petals into milky water, steam rising, soft warm golden lighting, luxurious textures, slow motion, 8k, hyper-realistic.",
+      "negative_prompt": "modern bathroom, plastic bottles, bright harsh light, text, watermark, blurry",
+      "motion_hint": "slow cinematic push in on the hand",
       "motion_strength": 0.5,
       "fps_hint": 24,
-      "narration": "Thousands of years ago, healers relied on nature instead of pills."
+      "narration": "Before thousand-dollar creams, queens used ingredients you have in your kitchen."
     },
     {
       "duration": 6,
-      "description": "Close-up of turmeric, ginger, and garlic preparation",
-      "visual_prompt": "Extreme close-up, macro photography, fresh turmeric roots, ginger, and garlic cloves on a dark ancient wooden table, a stone mortar and pestle grinding herbs, warm candlelight, shallow depth of field, vertical 9:16, hyper-detailed textures.",
-      "negative_prompt": "text, watermark, messy, bright modern lighting, plastic, cartoon",
-      "motion_hint": "slow left to right pan",
-      "motion_strength": 0.45,
-      "fps_hint": 24,
-      "narration": "Turmeric to fight inflammation. Ginger to aid digestion. Garlic to protect the heart."
-    },
-    {
-      "duration": 6,
-      "description": "Medicinal plants growing naturally in the wild",
-      "visual_prompt": "Cinematic macro shot of aloe vera and neem leaves with glistening dew drops, holy basil tulsi plant, natural golden hour sunlight, leaves swaying gently in the breeze, hyper-realistic nature photography, vertical 9:16 frame, vivid colors.",
-      "negative_prompt": "dead plants, dry, text, watermark, low resolution, blurry background",
-      "motion_hint": "gentle zoom in",
+      "description": "Ingredient 1: Rose & Water",
+      "visual_prompt": "Extreme close-up macro shot, fresh pink rose petals being crushed in a marble mortar, water droplets glistening, vibrant color, shallow depth of field, natural light, vertical 9:16.",
+      "negative_prompt": "dead flowers, mess, machinery, text, cartoon",
+      "motion_hint": "slow gentle pan across the petals",
       "motion_strength": 0.4,
       "fps_hint": 24,
-      "narration": "Aloe vera for healing skin. Neem to fight infection. Tulsi to strengthen immunity."
+      "narration": "Rose water. Science now knows it balances pH and hydrates better than most toners."
     },
     {
       "duration": 6,
-      "description": "Ancient knowledge blending into modern science",
-      "visual_prompt": "A seamless cinematic transition, ancient parchment scrolls and herbs dissolving into a high-tech modern laboratory, scientists in lab coats examining plant extracts, blue scientific lighting, glowing particles, vertical 9:16, hyper-realistic.",
-      "negative_prompt": "messy lab, text, watermark, cartoon, bad anatomy, distorted faces",
-      "motion_hint": "crossfade with slow zoom",
-      "motion_strength": 0.5,
+      "description": "Ingredient 2: Saffron/Gold",
+      "visual_prompt": "Cinematic close-up, a rich golden paste (like turmeric and saffron) being gently applied to skin with a brush, glowing warm light, rich texture, reflective gold elements, vertical 9:16, ultra-detailed skin texture.",
+      "negative_prompt": "messy application, plastic brush, bad lighting, text",
+      "motion_hint": "slow tracking shot following the brush",
+      "motion_strength": 0.4,
       "fps_hint": 24,
-      "narration": "Today, science confirms many of these ancient remedies truly work."
+      "narration": "Saffron and turmeric. An ancient antioxidant boost for a glow that filters can't mimic."
     },
     {
-      "duration": 4,
-      "description": "Powerful mysterious ending",
-      "visual_prompt": "Mysterious cinematic background, dark moody atmosphere, various herbs subtly glowing with ethereal light, soft floating dust particles, light rays from above, ultra-realistic, vertical 9:16, high contrast.",
-      "negative_prompt": "bright, text, watermark, low quality, cartoon, simple",
-      "motion_hint": "slow fade out",
-      "motion_strength": 0.3,
+      "duration": 6,
+      "description": "The Modern Reveal",
+      "visual_prompt": "A seamless transition from ancient textures to a modern, confident woman looking in a mirror. Her skin is naturally glowing, clean aesthetic, bright natural morning light, confident smile, vertical 9:16.",
+      "negative_prompt": "heavy makeup, artificial setting, sad expression, text, watermark",
+      "motion_hint": "slow pull back to reveal her face",
+      "motion_strength": 0.5,
       "fps_hint": 24,
-      "narration": "So the question is… would you trust ancient medicine today?"
+      "narration": "True beauty isn't bought in a bottle. It's remembered from our past."
+    },
+    {
+      "duration": 5,
+      "description": "Call to Action/Outro",
+      "visual_prompt": "Mysterious and beautiful ending, a single drop of golden oil falling into clear water creating ripples, soft bokeh background of botanical elements, cinematic lighting, high contrast, vertical 9:16.",
+      "negative_prompt": "text, logo, simple, boring, flat lighting",
+      "motion_hint": "slow motion impact of the drop",
+      "motion_strength": 0.3,
+      "fps_hint": 60,
+      "narration": "Are you ready to try the original skincare?"
     }
   ]
 }
