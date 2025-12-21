@@ -17,6 +17,43 @@ from pathlib import Path
 import torch
 from pydantic import BaseModel
 
+# Configure TTS_HOME BEFORE any TTS imports
+# TTS reads TTS_HOME when the module is first imported, so we must set it here
+def _configure_tts_cache():
+    """Configure TTS_HOME to use workspace folder if available."""
+    # Force set TTS_HOME to workspace if available (even if already set)
+    workspace_tts_dir = Path("/workspace/.cache/tts")
+    workspace_exists = Path("/workspace").exists()
+    
+    if workspace_exists:
+        # Always use workspace if it exists (override any existing TTS_HOME)
+        workspace_tts_dir.mkdir(parents=True, exist_ok=True)
+        os.environ["TTS_HOME"] = str(workspace_tts_dir)
+        print(f"[TTS_CONFIG] TTS_HOME set to workspace: {workspace_tts_dir}")
+        logging.getLogger(__name__).info(f"📁 TTS model cache configured to: {workspace_tts_dir}")
+        return str(workspace_tts_dir)
+    elif "TTS_HOME" not in os.environ:
+        # Use default location only if workspace doesn't exist and TTS_HOME not set
+        local_tts_dir = Path.home() / ".local" / "share" / "tts"
+        local_tts_dir.mkdir(parents=True, exist_ok=True)
+        os.environ["TTS_HOME"] = str(local_tts_dir)
+        print(f"[TTS_CONFIG] TTS_HOME set to default: {local_tts_dir}")
+        logging.getLogger(__name__).info(f"📁 TTS model cache using default: {local_tts_dir}")
+        return str(local_tts_dir)
+    else:
+        # TTS_HOME already set, log it
+        existing_home = os.environ["TTS_HOME"]
+        print(f"[TTS_CONFIG] TTS_HOME already set to: {existing_home}")
+        logging.getLogger(__name__).info(f"📁 TTS model cache using existing TTS_HOME: {existing_home}")
+        return existing_home
+
+# Configure TTS cache directory IMMEDIATELY (before any TTS imports)
+_configure_tts_cache()
+
+# Verify TTS_HOME is set correctly
+_tts_home_verify = os.environ.get("TTS_HOME", "NOT SET")
+print(f"[TTS_CONFIG] Verification - TTS_HOME = {_tts_home_verify}")
+
 # Suppress torchaudio deprecation warnings
 warnings.filterwarnings("ignore", message=".*torchaudio.load.*")
 warnings.filterwarnings("ignore", message=".*StreamingMediaDecoder.*")
@@ -136,32 +173,88 @@ class CoquiVoiceSynthesizer:
     def _load_model(self):
         """Load the Coqui TTS model - prioritize XTTS-v2 from workspace cache, download if needed"""
         try:
+            # Ensure TTS_HOME is set before importing TTS
+            # TTS reads TTS_HOME when the module is first imported
+            if "TTS_HOME" not in os.environ:
+                _configure_tts_cache()
+            
+            # Verify TTS_HOME is set correctly
+            tts_home = os.environ.get("TTS_HOME", "")
+            if tts_home:
+                logger.info(f"📁 TTS_HOME is set to: {tts_home}")
+                # Ensure directory exists
+                Path(tts_home).mkdir(parents=True, exist_ok=True)
+            else:
+                logger.warning("⚠️ TTS_HOME not set, TTS will use default location")
+            
             from TTS.api import TTS
+            
+            # After import, verify TTS is using the correct cache
+            # TTS stores models in TTS_HOME/tts_models/...
+            if tts_home:
+                expected_cache = Path(tts_home) / "tts_models"
+                logger.info(f"📥 TTS models will be cached in: {expected_cache}")
 
             device = "cuda" if self.config.gpu and torch.cuda.is_available() else "cpu"
             lang = (self.config.language or "en").lower()
             
+            # Helper to check if a path is a valid model directory
+            def is_valid_model_path(path: Path) -> bool:
+                """Check if path contains a valid TTS model."""
+                if not path.exists() or not path.is_dir():
+                    return False
+                # Check for common model indicator files
+                return any([
+                    (path / "config.json").exists(),
+                    (path / "model.pth").exists(),
+                    (path / "vocab.json").exists(),
+                    any(path.glob("*.pth")),
+                    any(path.glob("*.pt")),
+                    (path / "model_file.pth").exists(),
+                ])
+            
             # Build prioritized list - ONLY XTTS-v2 models, no fallback to other models
             model_priority = []
             
-            # 1. First priority: Workspace cache if it exists
+            # 1. First priority: Workspace explicit cache if it exists
             workspace_model_path = Path("/workspace/models/tts/XTTS-v2")
-            if workspace_model_path.exists():
+            if is_valid_model_path(workspace_model_path):
                 model_priority.append(str(workspace_model_path))
                 logger.info(f"Found workspace cache: {workspace_model_path}")
             
-            # 2. Second priority: Local cache
+            # 2. Second priority: TTS_HOME cache (configured to workspace if available)
+            tts_home = os.environ.get("TTS_HOME", "")
+            if tts_home:
+                tts_home_path = Path(tts_home)
+                # Check common TTS model paths in TTS_HOME
+                for possible_path in [
+                    tts_home_path / "tts_models" / "multilingual" / "multi-dataset" / "xtts_v2",
+                    tts_home_path / "coqui" / "XTTS-v2",
+                    tts_home_path / "XTTS-v2",
+                ]:
+                    if is_valid_model_path(possible_path):
+                        model_priority.append(str(possible_path))
+                        logger.info(f"Found TTS_HOME cache: {possible_path}")
+                        break
+            
+            # 3. Third priority: Local cache
             local_model_path = Path("models/tts/XTTS-v2")
-            if local_model_path.exists():
+            if is_valid_model_path(local_model_path):
                 model_priority.append(str(local_model_path))
                 logger.info(f"Found local cache: {local_model_path}")
             
             # 3. Third priority: Download XTTS-v2 (will download on first use)
+            # Models will be downloaded to TTS_HOME (configured to workspace if available)
             # Try different XTTS-v2 model identifiers
             model_priority.extend([
-                "coqui/XTTS-v2",  # Coqui's XTTS-v2
-                "tts_models/multilingual/multi-dataset/xtts_v2",  # HuggingFace XTTS-v2
+                "coqui/XTTS-v2",  # Coqui's XTTS-v2 (downloads to TTS_HOME)
+                "tts_models/multilingual/multi-dataset/xtts_v2",  # HuggingFace XTTS-v2 (downloads to TTS_HOME)
             ])
+            
+            # Log where models will be downloaded
+            tts_home = os.environ.get("TTS_HOME", "")
+            if tts_home:
+                logger.info(f"📥 TTS models will download to: {tts_home}")
             
             logger.info(f"Loading TTS model for language: {lang}")
             logger.info(f"Model priority list: {model_priority}")
