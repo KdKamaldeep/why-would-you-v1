@@ -6,8 +6,8 @@
     {
       "duration": 5,
       "description": "The Hook: Ancient Queen's Ritual",
-      "visual_prompt": "Cinematic vertical 9:16 shot, opulent ancient bathhouse, a woman's hand gently dropping rose petals into milky water, steam rising, soft warm golden lighting, luxurious textures, slow motion, 8k, hyper-realistic.",
-      "negative_prompt": "modern bathroom, plastic bottles, bright harsh light, text, watermark, blurry",
+      "visual_prompt": "Extreme close-up macro shot, cinematic vertical 9:16. An elegant, highly detailed female hand with graceful fingers and natural manicured nails is gently dropping rose petals into milky water. Steam rises around the hand. Soft warm golden lighting highlighting skin texture and water droplets, luxurious, slow motion, 8k, hyper-realistic, shallow depth of field focused sharply on the hand.",
+      "negative_prompt": "bad anatomy, distorted fingers, malformed hand, extra fingers, missing fingers, claw hand, blurry hand, modern bathroom, plastic, bright harsh light, text, watermark",
       "motion_hint": "slow cinematic push in on the hand",
       "motion_strength": 0.5,
       "fps_hint": 24,
