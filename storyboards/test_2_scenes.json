@@ -1,51 +1,57 @@
 {
-  "title": "A Dark History Secret",
-  "description": "A mysterious cinematic short revealing a disturbing truth from ancient history",
-  "total_duration": 28,
+  "title": "This Ancient Medicine Still Works Today",
+  "description": "A cinematic short revealing ancient herbal medicines that modern science still uses today.",
+  "total_duration": 26,
   "scenes": [
     {
-      "duration": 7,
-      "description": "Abandoned ancient city at night",
-      "visual_prompt": "Abandoned ancient stone city at night, foreground broken pillars and hanging vines partially occluding frame, cold blue moonlight, drifting fog crawling along the ground, distant flickering torches, slow cinematic forward push, deep shadows, eerie atmosphere, realistic historical ruins, vertical composition",
-      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward push, rolling fog, subtle torch flicker",
-      "motion_strength": 0.75,
+      "duration": 4,
+      "description": "Ancient healing chamber with early physicians",
+      "visual_prompt": "ancient healing chamber, stone walls, soft torchlight illuminating carved symbols, wooden shelves with herbs, smoke drifting slowly, cinematic lighting, ultra realistic textures, vertical composition",
+      "negative_prompt": "people talking, mouth movement, modern objects, text, watermark, cartoon, anime",
+      "motion_hint": "slow cinematic push forward",
+      "motion_strength": 0.5,
       "fps_hint": 24,
-      "narration": "History hides secrets that were never meant to be remembered.",
-      "subtitle": "A dark history secret 🕯️"
+      "narration": "Thousands of years ago, healers relied on nature instead of pills."
     },
     {
-      "duration": 7,
-      "description": "Ancient burial chamber",
-      "visual_prompt": "Ancient underground burial chamber, foreground stone doorway framing the view, dust particles floating in narrow light beams, old symbols carved into walls, faint smoke drifting upward, slow side pan, oppressive and mysterious mood, realistic ancient textures, vertical framing",
+      "duration": 6,
+      "description": "Close-up of turmeric, ginger, and garlic preparation",
+      "visual_prompt": "close-up of turmeric roots, fresh ginger, garlic cloves on ancient wooden table, stone mortar and pestle grinding herbs, warm candlelight, extreme realism, shallow depth of field, vertical frame",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow side pan, drifting dust, faint smoke",
-      "motion_strength": 0.7,
+      "motion_hint": "slow left to right pan",
+      "motion_strength": 0.45,
       "fps_hint": 24,
-      "narration": "In ancient times, people feared that the dead could return to harm the living.",
-      "subtitle": "Fear of the dead ⚰️"
+      "narration": "Turmeric to fight inflammation. Ginger to aid digestion. Garlic to protect the heart."
     },
     {
-      "duration": 7,
-      "description": "Ritual protection against the dead",
-      "visual_prompt": "Ancient ritual scene showing heavy stones placed over a grave, foreground tattered cloth and chains gently moving, torchlight casting long moving shadows, faint mist swirling near ground, slow push-in camera, dark ritualistic atmosphere, realistic historical style, vertical composition",
+      "duration": 6,
+      "description": "Medicinal plants growing naturally in the wild",
+      "visual_prompt": "aloe vera plants in natural sunlight, neem tree leaves moving gently in breeze, tulsi holy basil plant with dew drops, cinematic macro photography, hyper realistic nature, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow push-in, fabric movement, shadow flicker",
-      "motion_strength": 0.7,
+      "motion_hint": "gentle zoom in",
+      "motion_strength": 0.4,
       "fps_hint": 24,
-      "narration": "To stop them, bodies were buried with stones, chains, or metal spikes.",
-      "subtitle": "Ancient protection rituals ⛓️"
+      "narration": "Aloe vera for healing skin. Neem to fight infection. Tulsi to strengthen immunity."
     },
     {
-      "duration": 7,
-      "description": "Silent ancient grave under moonlight",
-      "visual_prompt": "Lonely ancient grave under moonlight, foreground twisted branches partially blocking view, cold mist drifting slowly, clouds passing over the moon creating moving shadows, slow pull-back camera, haunting and quiet atmosphere, realistic night scene, vertical framing",
+      "duration": 6,
+      "description": "Ancient knowledge blending into modern science",
+      "visual_prompt": "smooth cinematic transition from ancient scrolls and herbs into modern laboratory, scientists examining plant extracts, glowing particles linking past and present, dramatic lighting, realistic lab environment, vertical composition",
       "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow pull-back, drifting mist, moving moon shadows",
-      "motion_strength": 0.65,
+      "motion_hint": "crossfade with slow zoom",
+      "motion_strength": 0.5,
       "fps_hint": 24,
-      "narration": "These fears may have inspired the legends we now call vampires.",
-      "subtitle": "The origin of a legend 🩸"
+      "narration": "Today, science confirms many of these ancient remedies truly work."
+    },
+    {
+      "duration": 4,
+      "description": "Powerful mysterious ending",
+      "visual_prompt": "dark cinematic background with herbs subtly glowing, soft light rays, mysterious mood, ultra realistic, vertical composition",
+      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
+      "motion_hint": "slow fade out",
+      "motion_strength": 0.3,
+      "fps_hint": 24,
+      "narration": "So the question is… would you trust ancient medicine today?"
     }
   ]
 }
