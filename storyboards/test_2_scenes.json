@@ -1,42 +1,57 @@
 {
-  "title": "She Didn’t Quit",
-  "description": "A short motivational story about a young girl discovering her strength through small moments.",
+  "title": "Ancient Herbs Science Still Studies Today",
+  "description": "A cinematic short revealing ancient herbal medicines that modern science still uses today.",
   "total_duration": 26,
   "scenes": [
     {
       "duration": 4,
-      "description": "Girl feeling unsure",
-      "visual_prompt": "young girl sitting alone by a window, soft daylight entering room, thoughtful and slightly unsure expression, cinematic lighting, realistic child features, vertical composition, no speaking",
-      "negative_prompt": "mouth movement, speaking, text, watermark, cartoon, anime",
-      "narration": "Some days feel heavier than others."
-    },
-    {
-      "duration": 5,
-      "description": "Girl trying despite difficulty",
-      "visual_prompt": "young girl practicing writing or drawing at a desk, erasing mistakes and trying again, warm indoor lighting, close-up on hands and face, realistic home environment, vertical frame",
-      "negative_prompt": "mouth movement, speaking, text, watermark, cartoon, anime",
-      "narration": "She doubted herself more than once."
+      "description": "Ancient healing chamber with early physicians",
+      "visual_prompt": "Cinematic vertical 9:16 shot, slow push forward into an ancient stone healing chamber, carved mystical symbols on walls, wooden shelves with dried herbs, soft flickering torchlight, drifting incense smoke, ultra-realistic textures, 8k, volumetric lighting.",
+      "negative_prompt": "modern technology, plastic, text, watermark, blurry, distorted faces, cartoon, 2d",
+      "motion_hint": "slow cinematic push forward",
+      "motion_strength": 0.5,
+      "fps_hint": 24,
+      "narration": "Thousands of years ago, healers relied on nature instead of pills."
     },
     {
       "duration": 6,
-      "description": "Moment of encouragement",
-      "visual_prompt": "girl looking up as a woman gently places a reassuring hand on her shoulder, soft smiles, emotional warmth, cinematic depth of field, realistic family setting, vertical composition",
-      "negative_prompt": "mouth movement, speaking, text, watermark, cartoon, anime",
-      "narration": "But someone believed in her when she couldn’t."
+      "description": "Close-up of turmeric, ginger, and garlic preparation",
+      "visual_prompt": "Extreme close-up, macro photography, fresh turmeric roots, ginger, and garlic cloves on a dark ancient wooden table, a stone mortar and pestle grinding herbs, warm candlelight, shallow depth of field, vertical 9:16, hyper-detailed textures.",
+      "negative_prompt": "text, watermark, messy, bright modern lighting, plastic, cartoon",
+      "motion_hint": "slow left to right pan",
+      "motion_strength": 0.45,
+      "fps_hint": 24,
+      "narration": "Turmeric to fight inflammation. Ginger to aid digestion. Garlic to protect the heart."
     },
     {
       "duration": 6,
-      "description": "Girl gaining confidence",
-      "visual_prompt": "young girl confidently presenting her drawing or homework, subtle smile, brighter lighting, cinematic realism, vertical composition, no visible speaking",
-      "negative_prompt": "mouth movement, speaking, text, watermark, cartoon, anime",
-      "narration": "And slowly, she began to believe too."
+      "description": "Medicinal plants growing naturally in the wild",
+      "visual_prompt": "Cinematic macro shot of aloe vera and neem leaves with glistening dew drops, holy basil tulsi plant, natural golden hour sunlight, leaves swaying gently in the breeze, hyper-realistic nature photography, vertical 9:16 frame, vivid colors.",
+      "negative_prompt": "dead plants, dry, text, watermark, low resolution, blurry background",
+      "motion_hint": "gentle zoom in",
+      "motion_strength": 0.4,
+      "fps_hint": 24,
+      "narration": "Aloe vera for healing skin. Neem to fight infection. Tulsi to strengthen immunity."
     },
     {
-      "duration": 5,
-      "description": "Hopeful ending",
-      "visual_prompt": "girl walking forward in sunlight, light breeze moving her hair, hopeful expression, cinematic backlight, ultra realistic, vertical composition",
-      "negative_prompt": "mouth movement, speaking, text, watermark, cartoon, anime",
-      "narration": "She didn’t become fearless. She just didn’t quit."
+      "duration": 6,
+      "description": "Ancient knowledge blending into modern science",
+      "visual_prompt": "A seamless cinematic transition, ancient parchment scrolls and herbs dissolving into a high-tech modern laboratory, scientists in lab coats examining plant extracts, blue scientific lighting, glowing particles, vertical 9:16, hyper-realistic.",
+      "negative_prompt": "messy lab, text, watermark, cartoon, bad anatomy, distorted faces",
+      "motion_hint": "crossfade with slow zoom",
+      "motion_strength": 0.5,
+      "fps_hint": 24,
+      "narration": "Today, science confirms many of these ancient remedies truly work."
+    },
+    {
+      "duration": 4,
+      "description": "Powerful mysterious ending",
+      "visual_prompt": "Mysterious cinematic background, dark moody atmosphere, various herbs subtly glowing with ethereal light, soft floating dust particles, light rays from above, ultra-realistic, vertical 9:16, high contrast.",
+      "negative_prompt": "bright, text, watermark, low quality, cartoon, simple",
+      "motion_hint": "slow fade out",
+      "motion_strength": 0.3,
+      "fps_hint": 24,
+      "narration": "So the question is… would you trust ancient medicine today?"
     }
   ]
 }
