@@ -190,7 +190,13 @@ def get_tts_instance(config: Optional["CoquiVoiceConfig"] = None, force_reload: 
         for model_path in model_priority:
             try:
                 logger.info(f"Attempting to load TTS model: {model_path}")
-                tts_model = TTS(model_path, progress_bar=config.progress_bar)
+                # Explicitly specify GPU device if available
+                if device == "cuda" and torch.cuda.is_available():
+                    tts_model = TTS(model_path, progress_bar=config.progress_bar).to(device)
+                    logger.info(f"✅ TTS model loaded and moved to GPU: {device}")
+                else:
+                    tts_model = TTS(model_path, progress_bar=config.progress_bar)
+                    logger.info(f"✅ TTS model loaded on CPU")
                 logger.info(f"✅ Successfully loaded TTS model: {model_path}")
                 break
             except Exception as e:
@@ -306,6 +312,28 @@ class CoquiVoiceSynthesizer:
         
         logger.info(f"Coqui TTS initialized with model: {self.config.model_name}")
         logger.info(f"GPU enabled: {self.config.gpu}")
+        
+        # Verify and ensure model is on GPU
+        if self.config.gpu and torch.cuda.is_available():
+            try:
+                # Try to move model to GPU explicitly
+                if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+                    self.tts.synthesizer.model = self.tts.synthesizer.model.cuda()
+                    model_device = next(self.tts.synthesizer.model.parameters()).device
+                    logger.info(f"✅ TTS model moved to GPU: {model_device}")
+                elif hasattr(self.tts, 'model'):
+                    self.tts.model = self.tts.model.cuda()
+                    model_device = next(self.tts.model.parameters()).device
+                    logger.info(f"✅ TTS model moved to GPU: {model_device}")
+                else:
+                    # Try to move TTS object itself
+                    try:
+                        self.tts = self.tts.to("cuda")
+                        logger.info(f"✅ TTS object moved to GPU")
+                    except:
+                        logger.warning("Could not move TTS to GPU - may use CPU for inference")
+            except Exception as e:
+                logger.warning(f"Could not move TTS model to GPU: {e}")
         
         # Verify model device
         if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
@@ -769,12 +797,23 @@ class CoquiVoiceSynthesizer:
                                     )
                             else:
                                 # No cached latents - standard call (will encode speaker_wav)
-                                self.tts.tts_to_file(
-                                    text=full_text,
-                                    file_path=output_path,
-                                    speaker_wav=speaker_wav_arg,
-                                    language=self.config.language,
-                                )
+                                # Ensure GPU is used for inference
+                                if torch.cuda.is_available() and self.config.gpu:
+                                    # Force GPU context for inference
+                                    with torch.cuda.device(0):
+                                        self.tts.tts_to_file(
+                                            text=full_text,
+                                            file_path=output_path,
+                                            speaker_wav=speaker_wav_arg,
+                                            language=self.config.language,
+                                        )
+                                else:
+                                    self.tts.tts_to_file(
+                                        text=full_text,
+                                        file_path=output_path,
+                                        speaker_wav=speaker_wav_arg,
+                                        language=self.config.language,
+                                    )
                             elapsed = time.time() - start_time
                             logger.info(f"✅ TTS synthesis completed in {elapsed:.2f} seconds")
                         except Exception as e:
@@ -784,25 +823,24 @@ class CoquiVoiceSynthesizer:
                         # No reference: pass an explicit speaker token
                         chosen_speaker = speaker_value or self.config.speaker or "default"
                         logger.info(f"XTTS synthesis with speaker: {chosen_speaker}")
-                        logger.info(f"Text length: {len(full_text)} characters")
-                        logger.info(f"Starting TTS synthesis... (timeout: 300s)")
                         
-                        start_time = time.time()
-                        try:
-                            self._tts_call_with_timeout(
-                                timeout_seconds=300,
+                        # Ensure GPU is used for inference
+                        if torch.cuda.is_available() and self.config.gpu:
+                            # Force GPU context for inference
+                            with torch.cuda.device(0):
+                                self.tts.tts_to_file(
+                                    text=full_text,
+                                    file_path=output_path,
+                                    speaker=chosen_speaker,
+                                    language=self.config.language,
+                                )
+                        else:
+                            self.tts.tts_to_file(
                                 text=full_text,
                                 file_path=output_path,
                                 speaker=chosen_speaker,
                                 language=self.config.language,
                             )
-                            elapsed = time.time() - start_time
-                            logger.info(f"✅ TTS synthesis completed in {elapsed:.2f} seconds")
-                        except TimeoutError:
-                            raise
-                        except Exception as e:
-                            logger.error(f"TTS synthesis error: {e}")
-                            raise
 
                 # Try multiple synthesis strategies
                 synthesis_success = False
