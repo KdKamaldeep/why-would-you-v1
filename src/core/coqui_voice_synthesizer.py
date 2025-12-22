@@ -306,6 +306,15 @@ class CoquiVoiceSynthesizer:
         
         logger.info(f"Coqui TTS initialized with model: {self.config.model_name}")
         logger.info(f"GPU enabled: {self.config.gpu}")
+        
+        # Verify model device
+        if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+            model_device = next(self.tts.synthesizer.model.parameters()).device
+            logger.info(f"TTS model device: {model_device}")
+        elif hasattr(self.tts, 'model'):
+            model_device = next(self.tts.model.parameters()).device
+            logger.info(f"TTS model device: {model_device}")
+        
         logger.info(f"Voice directory: {self.config.voice_dir}")
         logger.info(f"Language: {self.config.language}")
         
