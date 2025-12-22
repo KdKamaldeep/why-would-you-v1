@@ -112,6 +112,52 @@ def find_final_reels(output_dir: Path) -> list:
     return final_reels
 
 
+def find_subtitle_files(output_dir: Path) -> list:
+    """
+    Find all subtitle files (.srt) in output directory (recursively).
+    
+    Args:
+        output_dir: Root output directory to search
+        
+    Returns:
+        List of Path objects to .srt files
+    """
+    subtitle_files = []
+    
+    if not output_dir.exists():
+        return subtitle_files
+    
+    # Search recursively for .srt files
+    for file_path in output_dir.rglob("*.srt"):
+        subtitle_files.append(file_path)
+        logger.info(f"Found subtitle file: {file_path}")
+    
+    return subtitle_files
+
+
+def remove_subtitle_file(subtitle_path: Path) -> bool:
+    """
+    Remove a subtitle file.
+    
+    Args:
+        subtitle_path: Path to subtitle file to remove
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        if subtitle_path.exists():
+            subtitle_path.unlink()
+            logger.info(f"✅ Removed subtitle file: {subtitle_path}")
+            return True
+        else:
+            logger.warning(f"Subtitle file does not exist: {subtitle_path}")
+            return False
+    except Exception as e:
+        logger.error(f"❌ Error removing subtitle file {subtitle_path}: {e}")
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Remove subtitles from final_reel.mp4 files in output folder"
@@ -158,6 +204,14 @@ def main():
     
     logger.info(f"Found {len(final_reels)} final_reel.mp4 file(s)")
     
+    # Find subtitle files if requested
+    subtitle_files = []
+    if args.remove_srt_files:
+        logger.info(f"Searching for .srt subtitle files in: {output_dir}")
+        subtitle_files = find_subtitle_files(output_dir)
+        if subtitle_files:
+            logger.info(f"Found {len(subtitle_files)} subtitle file(s)")
+    
     if args.dry_run:
         logger.info("DRY RUN - Files that would be processed:")
         for file_path in final_reels:
@@ -166,6 +220,11 @@ def main():
             else:
                 output_path = file_path.parent / f"{file_path.stem}{args.output_suffix}{file_path.suffix}"
                 logger.info(f"  Would process: {file_path} -> {output_path}")
+        
+        if args.remove_srt_files and subtitle_files:
+            logger.info("\nSubtitle files that would be removed:")
+            for srt_file in subtitle_files:
+                logger.info(f"  Would remove: {srt_file}")
         sys.exit(0)
     
     # Process each file
@@ -183,22 +242,47 @@ def main():
         else:
             failed.append(file_path)
     
+    # Remove subtitle files if requested
+    removed_srt_files = []
+    failed_srt_removals = []
+    
+    if args.remove_srt_files and subtitle_files:
+        logger.info(f"\n{'='*70}")
+        logger.info("REMOVING SUBTITLE FILES")
+        logger.info(f"{'='*70}")
+        
+        for srt_file in subtitle_files:
+            if remove_subtitle_file(srt_file):
+                removed_srt_files.append(srt_file)
+            else:
+                failed_srt_removals.append(srt_file)
+    
     # Summary
     logger.info(f"\n{'='*70}")
     logger.info("SUMMARY")
     logger.info(f"{'='*70}")
-    logger.info(f"✅ Successful: {len(successful)}/{len(final_reels)}")
+    logger.info(f"✅ Videos processed: {len(successful)}/{len(final_reels)}")
     for file_path in successful:
         logger.info(f"   ✓ {file_path}")
     
     if failed:
-        logger.info(f"\n❌ Failed: {len(failed)}/{len(final_reels)}")
+        logger.info(f"\n❌ Videos failed: {len(failed)}/{len(final_reels)}")
         for file_path in failed:
             logger.info(f"   ✗ {file_path}")
     
+    if args.remove_srt_files:
+        logger.info(f"\n📝 Subtitle files removed: {len(removed_srt_files)}/{len(subtitle_files)}")
+        for srt_file in removed_srt_files:
+            logger.info(f"   ✓ Removed: {srt_file}")
+        
+        if failed_srt_removals:
+            logger.info(f"\n❌ Subtitle files failed: {len(failed_srt_removals)}/{len(subtitle_files)}")
+            for srt_file in failed_srt_removals:
+                logger.info(f"   ✗ {srt_file}")
+    
     logger.info(f"{'='*70}")
     
-    sys.exit(0 if not failed else 1)
+    sys.exit(0 if not failed and not failed_srt_removals else 1)
 
 
 if __name__ == "__main__":
