@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to remove subtitles from final_reel.mp4 files in output folder.
+Regenerates final_reel.mp4 from existing scene videos and audio files without subtitles.
 """
 
 import os
@@ -9,6 +10,7 @@ import subprocess
 from pathlib import Path
 import argparse
 import logging
+import json
 
 logging.basicConfig(
     level=logging.INFO,
@@ -90,26 +92,214 @@ def remove_subtitles(input_path: Path, output_path: Path = None, overwrite: bool
 
 def find_final_reels(output_dir: Path) -> list:
     """
-    Find all final_reel.mp4 files in output directory (recursively).
+    Find all directories containing final_reel.mp4 files (recursively).
+    Returns directories that have final_reel.mp4 and can be regenerated.
     
     Args:
         output_dir: Root output directory to search
         
     Returns:
-        List of Path objects to final_reel.mp4 files
+        List of Path objects to directories containing final_reel.mp4
     """
-    final_reels = []
+    reel_dirs = []
     
     if not output_dir.exists():
         logger.error(f"Output directory does not exist: {output_dir}")
-        return final_reels
+        return reel_dirs
     
     # Search recursively for final_reel.mp4 files
     for file_path in output_dir.rglob("final_reel.mp4"):
-        final_reels.append(file_path)
-        logger.info(f"Found: {file_path}")
+        reel_dir = file_path.parent
+        if reel_dir not in reel_dirs:
+            reel_dirs.append(reel_dir)
+            logger.info(f"Found final_reel in: {reel_dir}")
     
-    return final_reels
+    return reel_dirs
+
+
+def find_scene_files(reel_dir: Path) -> tuple:
+    """
+    Find scene video files and audio files in a reel directory.
+    Checks both the reel directory and a 'scenes' subdirectory.
+    
+    Args:
+        reel_dir: Directory containing the reel files
+        
+    Returns:
+        Tuple of (list of scene video paths, list of audio paths) sorted by scene number
+    """
+    scene_videos = []
+    audio_files = []
+    
+    # Check scenes subdirectory first, then root directory
+    search_dirs = [reel_dir / "scenes", reel_dir]
+    
+    for search_dir in search_dirs:
+        if not search_dir.exists():
+            continue
+            
+        # Find scene video files (scene_1.mp4, scene_2.mp4, etc.)
+        for scene_file in sorted(search_dir.glob("scene_*.mp4")):
+            if scene_file not in scene_videos:
+                scene_videos.append(scene_file)
+    
+    # Find audio files in root directory (audio_scene_1.wav, audio_scene_1.aac, etc.)
+    for audio_file in sorted(reel_dir.glob("audio_scene_*.*")):
+        if audio_file.suffix.lower() in ['.wav', '.aac', '.mp3', '.m4a']:
+            audio_files.append(audio_file)
+    
+    # Sort by scene number
+    def get_scene_number(path: Path) -> int:
+        try:
+            # Extract number from filename like "scene_1.mp4" or "audio_scene_1.wav"
+            name = path.stem
+            if 'scene_' in name:
+                num_str = name.split('scene_')[1].split('.')[0]
+                return int(num_str)
+            return 0
+        except:
+            return 0
+    
+    scene_videos.sort(key=get_scene_number)
+    audio_files.sort(key=get_scene_number)
+    
+    return scene_videos, audio_files
+
+
+def get_video_format_from_script(reel_dir: Path) -> dict:
+    """
+    Try to read script.json to get video format settings.
+    
+    Args:
+        reel_dir: Directory containing the reel
+        
+    Returns:
+        Dict with format settings or defaults
+    """
+    script_path = reel_dir / "script.json"
+    defaults = {
+        "out_width": 1080,
+        "out_height": 1920,
+        "out_fps": 30,
+        "vertical_mode": "pad"
+    }
+    
+    if script_path.exists():
+        try:
+            with open(script_path, 'r', encoding='utf-8') as f:
+                script_data = json.load(f)
+                # Check if video_format is specified in script metadata
+                # For now, default to shorts format (9:16)
+                return defaults
+        except Exception as e:
+            logger.warning(f"Could not read script.json: {e}")
+    
+    return defaults
+
+
+def regenerate_final_reel(reel_dir: Path, scene_videos: list, audio_files: list, output_suffix: str = "_clean") -> bool:
+    """
+    Regenerate final_reel.mp4 from scene videos and audio files without subtitles.
+    
+    Args:
+        reel_dir: Directory containing the reel
+        scene_videos: List of scene video file paths
+        audio_files: List of audio file paths
+        output_suffix: Suffix for output file
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        # Import required modules
+        project_root = Path(__file__).parent.parent
+        sys.path.insert(0, str(project_root))
+        sys.path.insert(0, str(project_root / "src"))
+        
+        from src.core.video_processor import VideoProcessor, VideoConfig as VPConfig
+        from src.render.reel_renderer import create_reel
+        
+        if not scene_videos:
+            logger.error(f"No scene video files found in {reel_dir}")
+            return False
+        
+        logger.info(f"Found {len(scene_videos)} scene video(s) and {len(audio_files)} audio file(s)")
+        
+        # Get video format settings (default to shorts format)
+        format_settings = get_video_format_from_script(reel_dir)
+        
+        # Create video processor config
+        vp_config = VPConfig()
+        video_processor = VideoProcessor(vp_config)
+        
+        # Step 1: Create stitched video from scenes (without subtitles)
+        stitched_output = reel_dir / f"stitched{output_suffix}.mp4"
+        logger.info(f"Creating stitched video from {len(scene_videos)} scenes...")
+        
+        # Prepare audio paths (match scene count)
+        narration_audio = []
+        for i, scene_video in enumerate(scene_videos):
+            if i < len(audio_files):
+                narration_audio.append(str(audio_files[i]))
+            else:
+                narration_audio.append("")  # No audio for this scene
+        
+        # Compile stitched video WITHOUT subtitles (pass None for subtitles_path)
+        video_processor.compile_final_video(
+            clips=[str(v) for v in scene_videos],
+            narration_audio=narration_audio if len(narration_audio) > 1 else (narration_audio[0] if narration_audio else None),
+            background_music=None,
+            subtitles_path=None,  # No subtitles!
+            output_path=str(stitched_output)
+        )
+        
+        logger.info(f"✅ Stitched video created: {stitched_output}")
+        
+        # Step 2: Create final reel from stitched video
+        final_reel_output = reel_dir / f"final_reel{output_suffix}.mp4"
+        logger.info(f"Creating final reel...")
+        
+        # Get merged audio if multiple audio files
+        voice_audio = None
+        if len(audio_files) > 1:
+            merged_audio = reel_dir / f"merged_voice{output_suffix}.aac"
+            video_processor.concat_audios(
+                [str(a) for a in audio_files],
+                str(merged_audio)
+            )
+            voice_audio = str(merged_audio)
+        elif len(audio_files) == 1:
+            voice_audio = str(audio_files[0])
+        
+        # Create reel (vertical format, no subtitles)
+        create_reel(
+            stitched_video=str(stitched_output),
+            voice_audio=voice_audio,
+            music_path=None,
+            output_path=str(final_reel_output),
+            vertical_mode=format_settings["vertical_mode"],
+            out_width=format_settings["out_width"],
+            out_height=format_settings["out_height"],
+            out_fps=format_settings["out_fps"],
+            voice_volume=1.0,
+            music_volume=0.12,
+            verbose=False
+        )
+        
+        logger.info(f"✅ Final reel regenerated without subtitles: {final_reel_output}")
+        return True
+        
+    except ImportError as e:
+        logger.error(f"❌ Failed to import required modules: {e}")
+        logger.error("Make sure you're running from the project root directory")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+    except Exception as e:
+        logger.error(f"❌ Error regenerating final reel: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
 
 
 def find_subtitle_files(output_dir: Path) -> list:
@@ -184,6 +374,11 @@ def main():
         action="store_true",
         help="Show what would be processed without actually processing"
     )
+    parser.add_argument(
+        "--remove-srt-files",
+        action="store_true",
+        help="Also remove .srt subtitle files from the output directory (default: only remove subtitle streams from video)"
+    )
     
     args = parser.parse_args()
     
@@ -213,13 +408,14 @@ def main():
             logger.info(f"Found {len(subtitle_files)} subtitle file(s)")
     
     if args.dry_run:
-        logger.info("DRY RUN - Files that would be processed:")
-        for file_path in final_reels:
-            if args.overwrite:
-                logger.info(f"  Would process: {file_path} (overwrite)")
-            else:
-                output_path = file_path.parent / f"{file_path.stem}{args.output_suffix}{file_path.suffix}"
-                logger.info(f"  Would process: {file_path} -> {output_path}")
+        logger.info("DRY RUN - Reels that would be regenerated:")
+        for reel_dir in final_reels:
+            scene_videos, audio_files = find_scene_files(reel_dir)
+            logger.info(f"  Would regenerate: {reel_dir}")
+            logger.info(f"    Scenes: {len(scene_videos)}")
+            logger.info(f"    Audio files: {len(audio_files)}")
+            output_path = reel_dir / f"final_reel{args.output_suffix}.mp4"
+            logger.info(f"    Output: {output_path}")
         
         if args.remove_srt_files and subtitle_files:
             logger.info("\nSubtitle files that would be removed:")
@@ -227,20 +423,28 @@ def main():
                 logger.info(f"  Would remove: {srt_file}")
         sys.exit(0)
     
-    # Process each file
+    # Process each reel directory
     successful = []
     failed = []
     
-    for file_path in final_reels:
-        if args.overwrite:
-            output_path = None
-        else:
-            output_path = file_path.parent / f"{file_path.stem}{args.output_suffix}{file_path.suffix}"
+    for reel_dir in final_reels:
+        logger.info(f"\n{'='*70}")
+        logger.info(f"Processing reel directory: {reel_dir}")
+        logger.info(f"{'='*70}")
         
-        if remove_subtitles(file_path, output_path, args.overwrite):
-            successful.append(file_path)
+        # Find scene videos and audio files
+        scene_videos, audio_files = find_scene_files(reel_dir)
+        
+        if not scene_videos:
+            logger.warning(f"⚠️ No scene video files found in {reel_dir}, skipping")
+            failed.append((reel_dir, "No scene videos found"))
+            continue
+        
+        # Regenerate final_reel without subtitles
+        if regenerate_final_reel(reel_dir, scene_videos, audio_files, args.output_suffix):
+            successful.append(reel_dir)
         else:
-            failed.append(file_path)
+            failed.append((reel_dir, "Regeneration failed"))
     
     # Remove subtitle files if requested
     removed_srt_files = []
@@ -261,14 +465,15 @@ def main():
     logger.info(f"\n{'='*70}")
     logger.info("SUMMARY")
     logger.info(f"{'='*70}")
-    logger.info(f"✅ Videos processed: {len(successful)}/{len(final_reels)}")
-    for file_path in successful:
-        logger.info(f"   ✓ {file_path}")
+    logger.info(f"✅ Reels regenerated: {len(successful)}/{len(final_reels)}")
+    for reel_dir in successful:
+        output_file = reel_dir / f"final_reel{args.output_suffix}.mp4"
+        logger.info(f"   ✓ {reel_dir} -> {output_file}")
     
     if failed:
-        logger.info(f"\n❌ Videos failed: {len(failed)}/{len(final_reels)}")
-        for file_path in failed:
-            logger.info(f"   ✗ {file_path}")
+        logger.info(f"\n❌ Reels failed: {len(failed)}/{len(final_reels)}")
+        for reel_dir, error in failed:
+            logger.info(f"   ✗ {reel_dir}: {error}")
     
     if args.remove_srt_files:
         logger.info(f"\n📝 Subtitle files removed: {len(removed_srt_files)}/{len(subtitle_files)}")

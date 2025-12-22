@@ -69,8 +69,8 @@ class VideoConfig:
     scene_duration: int = 8  # Used when custom_scenes is provided and per-scene duration not specified
     # Reuse assets to speed up repeated runs
     reuse_existing: bool = True
-    # Control subtitle rendering
-    add_subtitles: bool = True
+    # Control subtitle rendering (disabled by default, enable with --auto-sub)
+    add_subtitles: bool = False
     # Control prompt enhancement
     enable_prompt_enhancement: bool = True
     # Control pause between scenes (in seconds)
@@ -811,6 +811,7 @@ def main():
     parser.add_argument("--music-volume", type=float, default=0.12, help="Background music volume (0.0-1.0, default: 0.12)")
     parser.add_argument("--voice-volume", type=float, default=1.0, help="Voice volume (0.0-1.0, default: 1.0)")
     parser.add_argument("--verbose-ffmpeg", action="store_true", help="Print FFmpeg commands for debugging")
+    parser.add_argument("--auto-sub", action="store_true", help="Enable automatic subtitle generation (disabled by default)")
     
     # Bulk generation arguments
     parser.add_argument("--gen-bulk", action="store_true", help="Enable bulk generation from a single storyboard JSON file with multiple stories")
@@ -871,6 +872,7 @@ def main():
             language=args.language,
             enable_prompt_enhancement=False,
             scene_pause_duration=args.scene_pause,
+            add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
             create_reel=not args.no_reel and (args.format == "reel" or args.vertical),
             vertical_mode=args.vertical_mode,
             reel_width=args.out_width,
@@ -1022,6 +1024,7 @@ def main():
         language=args.language,
         enable_prompt_enhancement=False,  # Prompt enhancement disabled
         scene_pause_duration=args.scene_pause,
+        add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
         create_reel=create_reel,
         vertical_mode=args.vertical_mode,
         reel_width=args.out_width,

@@ -94,7 +94,7 @@ def generate_cartoon(prompt, style="realistic", duration=30, language="en", enab
             style=style,
             video_format=video_format,
             output_path="output",
-            add_subtitles=False,
+            add_subtitles=auto_sub,  # Only enable if --auto-sub is provided
             language=language,
             enable_prompt_enhancement=enable_prompt_enhancement,
             wan_width=wan_width,
@@ -224,7 +224,11 @@ Storyboard Cast Format (with face images):
         help="Enable bulk generation from a single storyboard JSON file with multiple stories in a 'stories' array"
     )
     
-
+    parser.add_argument(
+        "--auto-sub",
+        action="store_true",
+        help="Enable automatic subtitle generation (disabled by default)"
+    )
     
     parser.add_argument(
         "--no-reuse",
@@ -472,6 +476,7 @@ Storyboard Cast Format (with face images):
                     style=args.style,
                     language=args.language,
                     enable_prompt_enhancement=False,
+                    add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
                     wan_width=args.wan_width,
                     wan_height=args.wan_height,
                     wan_num_frames=args.wan_num_frames,
@@ -682,7 +687,7 @@ Storyboard Cast Format (with face images):
                 custom_scenes=normalized_scenes,
                 scene_duration=scene_duration,
                 reuse_existing=(not args.no_reuse),
-                add_subtitles=False,
+                add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
                 language=args.language,
                 enable_prompt_enhancement=False,  # Prompt enhancement disabled
                 wan_width=args.wan_width,
@@ -736,7 +741,8 @@ Storyboard Cast Format (with face images):
             music_path=args.music,
             music_volume=args.music_volume,
             voice_volume=args.voice_volume,
-            verbose_ffmpeg=args.verbose_ffmpeg
+            verbose_ffmpeg=args.verbose_ffmpeg,
+            auto_sub=args.auto_sub
         )
     
     if output_path:
