@@ -41,3 +41,12 @@ python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
   --storyboard storyboards/test_2_scenes.json \
   --skip-audio
+  
+  # Bulk generate from a single JSON file with multiple stories
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Sunset over mountains" \
+  --storyboard storyboards/mult-story.json \
+  --wan-num-frames 81 \
+  --wan-fps 12 \
+  --wan-steps 30 \
+  --wan-guidance 5

@@ -209,13 +209,19 @@ Storyboard Cast Format (with face images):
     parser.add_argument(
         "--storyboard",
         type=str,
-        help="Path to a JSON file with custom storyboard scenes (title, description, scenes[])"
+        help="Path to a JSON file with custom storyboard scenes (title, description, scenes[]) or a file with 'stories' array for bulk generation"
     )
     
     parser.add_argument(
         "--scene",
         type=int,
         help="Process only a specific scene number (1-based index). Use with --storyboard to process single scene."
+    )
+    
+    parser.add_argument(
+        "--gen-bulk",
+        action="store_true",
+        help="Enable bulk generation from a single storyboard JSON file with multiple stories in a 'stories' array"
     )
     
 
@@ -430,6 +436,173 @@ Storyboard Cast Format (with face images):
         try:
             from ..core.generate_cartoon_short import CartoonShortsGenerator, VideoConfig
             
+            # Bulk generation mode
+            if args.gen_bulk:
+                storyboard_file = Path(args.storyboard)
+                if not storyboard_file.exists() or not storyboard_file.is_file():
+                    print(f"❌ Storyboard file does not exist: {storyboard_file}")
+                    sys.exit(1)
+                
+                # Load the storyboard JSON file
+                try:
+                    with open(storyboard_file, 'r', encoding='utf-8') as f:
+                        storyboard_data = json.load(f)
+                except json.JSONDecodeError as e:
+                    print(f"❌ Invalid JSON in storyboard file: {e}")
+                    sys.exit(1)
+                except Exception as e:
+                    print(f"❌ Failed to read storyboard file: {e}")
+                    sys.exit(1)
+                
+                # Extract stories array
+                stories = storyboard_data.get('stories', [])
+                if not stories:
+                    print(f"❌ No 'stories' array found in storyboard file. Expected format: {{'stories': [...]}}")
+                    sys.exit(1)
+                
+                print(f"📁 Found {len(stories)} stories in {storyboard_file.name}")
+                
+                # Initialize pipelines once (singleton pattern ensures they're shared)
+                print("🔄 Initializing pipelines (will be reused for all stories)...")
+                base_config = VideoConfig(
+                    prompt="",  # Will be overridden per story
+                    duration=args.duration,
+                    video_format=args.video_format,
+                    output_path="output",
+                    style=args.style,
+                    language=args.language,
+                    enable_prompt_enhancement=False,
+                    wan_width=args.wan_width,
+                    wan_height=args.wan_height,
+                    wan_num_frames=args.wan_num_frames,
+                    wan_fps=args.wan_fps,
+                    wan_steps=args.wan_steps,
+                    wan_guidance=args.wan_guidance,
+                    wan_negative_prompt=args.negative_prompt,
+                    wan_seed=args.seed,
+                    skip_audio=args.skip_audio,
+                    create_reel=not args.no_reel and (args.format == "reel" or args.vertical),
+                    vertical_mode=args.vertical_mode,
+                    reel_width=args.out_width,
+                    reel_height=args.out_height,
+                    reel_fps=args.out_fps,
+                    music_path=args.music,
+                    music_volume=args.music_volume,
+                    voice_volume=args.voice_volume,
+                    verbose_ffmpeg=args.verbose_ffmpeg
+                )
+                
+                # Pre-initialize generator to load pipelines once
+                print("📦 Loading WAN pipeline (singleton - will be reused)...")
+                print("📦 Loading TTS model (singleton - will be reused)...")
+                temp_generator = CartoonShortsGenerator(base_config)
+                print("✅ Pipelines initialized and ready for bulk generation")
+                
+                # Process each story in the stories array
+                successful = []
+                failed = []
+                
+                for i, story in enumerate(stories, 1):
+                    print(f"\n{'='*70}")
+                    print(f"Processing story {i}/{len(stories)}")
+                    print(f"{'='*70}")
+                    
+                    try:
+                        title = story.get('title', f'Story_{i}')
+                        description = story.get('description', '')
+                        scenes = story.get('scenes', [])
+                        total_duration = story.get('total_duration', args.duration)
+                        
+                        if not scenes:
+                            print(f"⚠️ No scenes found in story {i}, skipping")
+                            failed.append((title, "No scenes found"))
+                            continue
+                        
+                        # Calculate scene duration if not provided
+                        for scene in scenes:
+                            if 'duration' not in scene:
+                                scene['duration'] = total_duration // len(scenes)
+                        
+                        # Create output folder by title
+                        safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
+                        safe_title = safe_title.replace(' ', '_')[:50]
+                        if not safe_title:
+                            safe_title = f"Story_{i}"
+                        output_folder = Path("output") / safe_title
+                        output_folder.mkdir(parents=True, exist_ok=True)
+                        
+                        print(f"📁 Output folder: {output_folder}")
+                        print(f"📋 Title: {title}")
+                        print(f"🎬 Scenes: {len(scenes)}")
+                        
+                        # Normalize scenes
+                        cast_list = story.get('cast', []) or storyboard_data.get('cast', []) or []
+                        name_to_cast = {}
+                        for entry in cast_list:
+                            if isinstance(entry, dict) and entry.get('name'):
+                                name_to_cast[entry['name']] = entry
+                            elif isinstance(entry, str):
+                                name_to_cast[entry] = {"name": entry, "role": "character"}
+                        
+                        normalized_scenes = []
+                        for scene in scenes:
+                            scene_copy = dict(scene)
+                            scene_chars = scene_copy.get('characters', [])
+                            structured_chars = []
+                            for ch in scene_chars:
+                                if isinstance(ch, dict):
+                                    structured_chars.append(ch)
+                                elif isinstance(ch, str):
+                                    base = name_to_cast.get(ch, {"name": ch, "role": "character"})
+                                    structured_chars.append({
+                                        "name": base.get("name", ch),
+                                        "role": base.get("role", "character")
+                                    })
+                            scene_copy['characters'] = structured_chars[:2]
+                            normalized_scenes.append(scene_copy)
+                        
+                        # Update generator config (reuse same instance)
+                        temp_generator.config.prompt = title
+                        temp_generator.config.title = title
+                        temp_generator.config.description = description
+                        temp_generator.config.custom_scenes = normalized_scenes
+                        temp_generator.config.duration = total_duration
+                        if normalized_scenes and 'duration' in normalized_scenes[0]:
+                            temp_generator.config.scene_duration = normalized_scenes[0].get('duration', 8)
+                        else:
+                            temp_generator.config.scene_duration = total_duration // len(normalized_scenes) if normalized_scenes else 8
+                        temp_generator.config.output_path = str(output_folder)
+                        temp_generator.output_dir = output_folder
+                        temp_generator.output_dir.mkdir(parents=True, exist_ok=True)
+                        
+                        # Generate video using the same generator instance
+                        output_path = temp_generator.generate()
+                        successful.append((title, output_path))
+                        print(f"✅ Successfully generated: {output_path}")
+                        
+                    except Exception as e:
+                        print(f"❌ Failed to process story {i} ({title if 'title' in locals() else 'Unknown'}): {e}")
+                        import traceback
+                        traceback.print_exc()
+                        failed.append((title if 'title' in locals() else f"Story_{i}", str(e)))
+                
+                # Print summary
+                print(f"\n{'='*70}")
+                print("BULK GENERATION SUMMARY")
+                print(f"{'='*70}")
+                print(f"✅ Successful: {len(successful)}/{len(stories)}")
+                for title, output in successful:
+                    print(f"   ✓ {title} -> {output}")
+                
+                if failed:
+                    print(f"\n❌ Failed: {len(failed)}/{len(stories)}")
+                    for title, error in failed:
+                        print(f"   ✗ {title}: {error}")
+                
+                print(f"{'='*70}")
+                sys.exit(0 if not failed else 1)
+            
+            # Single storyboard mode (existing logic)
             # Log storyboard processing arguments
             print("🔍 STORYBOARD PROCESSING ARGUMENTS:")
             print("=" * 50)
