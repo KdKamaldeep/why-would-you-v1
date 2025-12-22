@@ -16,6 +16,8 @@ from typing import List, Optional, Dict, Any
 from pathlib import Path
 import torch
 from pydantic import BaseModel
+import threading
+import time
 
 # Configure TTS_HOME BEFORE any TTS imports
 # TTS reads TTS_HOME when the module is first imported, so we must set it here
@@ -462,6 +464,45 @@ class CoquiVoiceSynthesizer:
             raise
 
     
+    def _tts_call_with_timeout(self, timeout_seconds: int = 300, **kwargs):
+        """
+        Call TTS synthesis with timeout protection.
+        
+        Args:
+            timeout_seconds: Maximum time to wait for synthesis (default: 5 minutes)
+            **kwargs: Arguments to pass to tts_to_file
+            
+        Returns:
+            True if successful, False if timeout
+        """
+        result = [None]
+        exception = [None]
+        
+        def _call_tts():
+            try:
+                self.tts.tts_to_file(**kwargs)
+                result[0] = True
+            except Exception as e:
+                exception[0] = e
+                result[0] = False
+        
+        thread = threading.Thread(target=_call_tts, daemon=True)
+        thread.start()
+        thread.join(timeout=timeout_seconds)
+        
+        if thread.is_alive():
+            logger.error(f"❌ TTS synthesis timed out after {timeout_seconds} seconds")
+            logger.error("This may indicate:")
+            logger.error("  1. Model is stuck in inference")
+            logger.error("  2. Speaker WAV file is corrupted or incompatible")
+            logger.error("  3. GPU/CPU resource issues")
+            raise TimeoutError(f"TTS synthesis timed out after {timeout_seconds} seconds")
+        
+        if exception[0] is not None:
+            raise exception[0]
+        
+        return result[0]
+    
     def synthesize_voice(self, 
                         narration_lines: List[str], 
                         output_path: str,
@@ -610,24 +651,60 @@ class CoquiVoiceSynthesizer:
                 def _xtts_call(speaker_value: Optional[str]) -> None:
                     # Avoid passing progress_bar to suppress model_kwargs warnings
                     if speaker_wav_arg is not None:
-                        # Reference voice provided: do not pass speaker token
-                        logger.info(f"XTTS synthesis with speaker_wav: {speaker_wav_arg}")
-                        self.tts.tts_to_file(
-                            text=full_text,
-                            file_path=output_path,
-                            speaker_wav=speaker_wav_arg,
-                            language=self.config.language,
-                        )
+                        # Validate speaker_wav file before using
+                        if not os.path.exists(speaker_wav_arg):
+                            raise FileNotFoundError(f"Speaker WAV file not found: {speaker_wav_arg}")
+                        
+                        # Check file size (should be reasonable, not empty or too large)
+                        file_size = os.path.getsize(speaker_wav_arg)
+                        if file_size == 0:
+                            raise ValueError(f"Speaker WAV file is empty: {speaker_wav_arg}")
+                        if file_size > 50 * 1024 * 1024:  # 50MB limit
+                            raise ValueError(f"Speaker WAV file too large ({file_size} bytes): {speaker_wav_arg}")
+                        
+                        logger.info(f"XTTS synthesis with speaker_wav: {speaker_wav_arg} ({file_size} bytes)")
+                        logger.info(f"Text length: {len(full_text)} characters")
+                        logger.info(f"Starting TTS synthesis... (timeout: 300s)")
+                        
+                        start_time = time.time()
+                        try:
+                            self._tts_call_with_timeout(
+                                timeout_seconds=300,
+                                text=full_text,
+                                file_path=output_path,
+                                speaker_wav=speaker_wav_arg,
+                                language=self.config.language,
+                            )
+                            elapsed = time.time() - start_time
+                            logger.info(f"✅ TTS synthesis completed in {elapsed:.2f} seconds")
+                        except TimeoutError:
+                            raise
+                        except Exception as e:
+                            logger.error(f"TTS synthesis error: {e}")
+                            raise
                     else:
                         # No reference: pass an explicit speaker token
                         chosen_speaker = speaker_value or self.config.speaker or "default"
                         logger.info(f"XTTS synthesis with speaker: {chosen_speaker}")
-                        self.tts.tts_to_file(
-                            text=full_text,
-                            file_path=output_path,
-                            speaker=chosen_speaker,
-                            language=self.config.language,
-                        )
+                        logger.info(f"Text length: {len(full_text)} characters")
+                        logger.info(f"Starting TTS synthesis... (timeout: 300s)")
+                        
+                        start_time = time.time()
+                        try:
+                            self._tts_call_with_timeout(
+                                timeout_seconds=300,
+                                text=full_text,
+                                file_path=output_path,
+                                speaker=chosen_speaker,
+                                language=self.config.language,
+                            )
+                            elapsed = time.time() - start_time
+                            logger.info(f"✅ TTS synthesis completed in {elapsed:.2f} seconds")
+                        except TimeoutError:
+                            raise
+                        except Exception as e:
+                            logger.error(f"TTS synthesis error: {e}")
+                            raise
 
                 # Try multiple synthesis strategies
                 synthesis_success = False
@@ -691,14 +768,16 @@ class CoquiVoiceSynthesizer:
                         logger.info(f"Extended text: {extended_text[:100]}...")
                         
                         if speaker_wav_arg is not None:
-                            self.tts.tts_to_file(
+                            self._tts_call_with_timeout(
+                                timeout_seconds=300,
                                 text=extended_text,
                                 file_path=output_path,
                                 speaker_wav=speaker_wav_arg,
                                 language=self.config.language,
                             )
                         else:
-                            self.tts.tts_to_file(
+                            self._tts_call_with_timeout(
+                                timeout_seconds=300,
                                 text=extended_text,
                                 file_path=output_path,
                                 speaker="default",
