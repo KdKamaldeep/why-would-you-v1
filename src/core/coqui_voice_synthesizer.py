@@ -85,6 +85,9 @@ logger = logging.getLogger(__name__)
 _tts_instance = None
 _tts_model_cache = {}
 
+# Cache for speaker WAV conditioning latents (keyed by file path + language)
+_speaker_wav_cache = {}
+
 
 def get_tts_instance(config: Optional["CoquiVoiceConfig"] = None, force_reload: bool = False):
     """
@@ -305,6 +308,58 @@ class CoquiVoiceSynthesizer:
         logger.info(f"GPU enabled: {self.config.gpu}")
         logger.info(f"Voice directory: {self.config.voice_dir}")
         logger.info(f"Language: {self.config.language}")
+        
+        # Cache for speaker WAV conditioning latents (per instance, keyed by file path + language)
+        self._speaker_latents_cache = {}
+    
+    def _get_cached_speaker_latents(self, speaker_wav_path: str, language: str):
+        """
+        Get cached conditioning latents for a speaker WAV file, or compute and cache them.
+        For XTTS models, this avoids re-encoding the speaker WAV on every call.
+        
+        Args:
+            speaker_wav_path: Path to speaker WAV file
+            language: Language code
+            
+        Returns:
+            Tuple of (gpt_cond_latent, speaker_embedding) or None if caching not supported
+        """
+        cache_key = f"{speaker_wav_path}_{language}"
+        
+        # Check cache first
+        if cache_key in self._speaker_latents_cache:
+            logger.info(f"♻️ Using cached speaker conditioning latents for: {speaker_wav_path}")
+            return self._speaker_latents_cache[cache_key]
+        
+        # Try to get conditioning latents from XTTS model
+        try:
+            # For XTTS models, access the underlying model to get conditioning latents
+            if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+                model = self.tts.synthesizer.model
+                if hasattr(model, 'get_conditioning_latents'):
+                    logger.info(f"📦 Computing and caching speaker conditioning latents for: {speaker_wav_path}")
+                    latents = model.get_conditioning_latents(speaker_wav_path)
+                    self._speaker_latents_cache[cache_key] = latents
+                    logger.info(f"✅ Cached speaker conditioning latents (will reuse on next call)")
+                    return latents
+            # Alternative: Check if model has get_conditioning_latents method directly
+            elif hasattr(self.tts, 'model') and hasattr(self.tts.model, 'get_conditioning_latents'):
+                logger.info(f"📦 Computing and caching speaker conditioning latents for: {speaker_wav_path}")
+                latents = self.tts.model.get_conditioning_latents(speaker_wav_path)
+                self._speaker_latents_cache[cache_key] = latents
+                logger.info(f"✅ Cached speaker conditioning latents (will reuse on next call)")
+                return latents
+            # Check if TTS has get_conditioning_latents directly
+            elif hasattr(self.tts, 'get_conditioning_latents'):
+                logger.info(f"📦 Computing and caching speaker conditioning latents for: {speaker_wav_path}")
+                latents = self.tts.get_conditioning_latents(speaker_wav_path)
+                self._speaker_latents_cache[cache_key] = latents
+                logger.info(f"✅ Cached speaker conditioning latents (will reuse on next call)")
+                return latents
+        except Exception as e:
+            logger.debug(f"Could not cache speaker latents (will encode each time): {e}")
+        
+        return None
     
     def _load_model(self):
         """Load the Coqui TTS model - prioritize XTTS-v2 from workspace cache, download if needed"""
@@ -655,30 +710,64 @@ class CoquiVoiceSynthesizer:
                         if not os.path.exists(speaker_wav_arg):
                             raise FileNotFoundError(f"Speaker WAV file not found: {speaker_wav_arg}")
                         
-                        # Check file size (should be reasonable, not empty or too large)
-                        file_size = os.path.getsize(speaker_wav_arg)
-                        if file_size == 0:
-                            raise ValueError(f"Speaker WAV file is empty: {speaker_wav_arg}")
-                        if file_size > 50 * 1024 * 1024:  # 50MB limit
-                            raise ValueError(f"Speaker WAV file too large ({file_size} bytes): {speaker_wav_arg}")
+                        # Try to use cached conditioning latents to avoid re-encoding
+                        cached_latents = self._get_cached_speaker_latents(speaker_wav_arg, self.config.language)
                         
-                        logger.info(f"XTTS synthesis with speaker_wav: {speaker_wav_arg} ({file_size} bytes)")
+                        logger.info(f"XTTS synthesis with speaker_wav: {speaker_wav_arg}")
                         logger.info(f"Text length: {len(full_text)} characters")
-                        logger.info(f"Starting TTS synthesis... (timeout: 300s)")
                         
                         start_time = time.time()
                         try:
-                            self._tts_call_with_timeout(
-                                timeout_seconds=300,
-                                text=full_text,
-                                file_path=output_path,
-                                speaker_wav=speaker_wav_arg,
-                                language=self.config.language,
-                            )
+                            # If we have cached latents, try to use them directly with the model
+                            if cached_latents is not None:
+                                try:
+                                    # Access the underlying model to use cached latents
+                                    if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+                                        model = self.tts.synthesizer.model
+                                        # Use model's inference with cached latents
+                                        # This bypasses the speaker_wav encoding step
+                                        logger.info("Using cached speaker conditioning latents (skipping re-encoding)")
+                                        wav = model.inference(
+                                            full_text,
+                                            self.config.language,
+                                            cached_latents[0],  # gpt_cond_latent
+                                            cached_latents[1],  # speaker_embedding
+                                        )
+                                        # Save the generated audio
+                                        import soundfile as sf
+                                        sf.write(output_path, wav, samplerate=22050)
+                                    elif hasattr(self.tts, 'model') and hasattr(self.tts.model, 'inference'):
+                                        logger.info("Using cached speaker conditioning latents (skipping re-encoding)")
+                                        wav = self.tts.model.inference(
+                                            full_text,
+                                            self.config.language,
+                                            cached_latents[0],  # gpt_cond_latent
+                                            cached_latents[1],  # speaker_embedding
+                                        )
+                                        import soundfile as sf
+                                        sf.write(output_path, wav, samplerate=22050)
+                                    else:
+                                        # Fall back to standard call if model structure is different
+                                        raise AttributeError("Model structure not recognized for cached latents")
+                                except Exception as e:
+                                    logger.warning(f"Failed to use cached latents, falling back to speaker_wav: {e}")
+                                    # Fall back to standard call
+                                    self.tts.tts_to_file(
+                                        text=full_text,
+                                        file_path=output_path,
+                                        speaker_wav=speaker_wav_arg,
+                                        language=self.config.language,
+                                    )
+                            else:
+                                # No cached latents - standard call (will encode speaker_wav)
+                                self.tts.tts_to_file(
+                                    text=full_text,
+                                    file_path=output_path,
+                                    speaker_wav=speaker_wav_arg,
+                                    language=self.config.language,
+                                )
                             elapsed = time.time() - start_time
                             logger.info(f"✅ TTS synthesis completed in {elapsed:.2f} seconds")
-                        except TimeoutError:
-                            raise
                         except Exception as e:
                             logger.error(f"TTS synthesis error: {e}")
                             raise
