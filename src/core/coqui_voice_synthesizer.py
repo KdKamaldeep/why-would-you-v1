@@ -84,7 +84,7 @@ _tts_instance = None
 _tts_model_cache = {}
 
 
-def get_tts_instance(config: Optional[CoquiVoiceConfig] = None, force_reload: bool = False):
+def get_tts_instance(config: Optional["CoquiVoiceConfig"] = None, force_reload: bool = False):
     """
     Get or initialize the global TTS instance (singleton pattern).
     
