@@ -152,16 +152,25 @@ def find_scene_files(reel_dir: Path) -> tuple:
     def get_scene_number(path: Path) -> int:
         try:
             # Extract number from filename like "scene_1.mp4" or "audio_scene_1.wav"
-            name = path.stem
+            name = path.stem  # This gives us "scene_1" or "audio_scene_1" (no extension)
             if 'scene_' in name:
-                num_str = name.split('scene_')[1].split('.')[0]
-                return int(num_str)
+                # For "scene_1" -> split('scene_')[1] = "1"
+                # For "audio_scene_1" -> split('scene_')[1] = "1"
+                num_str = name.split('scene_')[1]
+                # Remove any remaining non-numeric characters (shouldn't be needed, but safe)
+                num_str = ''.join(filter(str.isdigit, num_str))
+                return int(num_str) if num_str else 0
             return 0
-        except:
+        except Exception as e:
+            logger.warning(f"Could not extract scene number from {path}: {e}")
             return 0
     
     scene_videos.sort(key=get_scene_number)
     audio_files.sort(key=get_scene_number)
+    
+    # Debug: Log found files
+    logger.info(f"Found scene videos: {[f.name for f in scene_videos]}")
+    logger.info(f"Found audio files: {[f.name for f in audio_files]}")
     
     return scene_videos, audio_files
 
@@ -237,17 +246,55 @@ def regenerate_final_reel(reel_dir: Path, scene_videos: list, audio_files: list,
         logger.info(f"Creating stitched video from {len(scene_videos)} scenes...")
         
         # Prepare audio paths (match scene count)
+        # Match audio files to scenes by scene number, not by index
+        def get_scene_num_from_path(path: Path) -> int:
+            try:
+                name = path.stem
+                if 'scene_' in name:
+                    num_str = name.split('scene_')[1]
+                    num_str = ''.join(filter(str.isdigit, num_str))
+                    return int(num_str) if num_str else 0
+                return 0
+            except:
+                return 0
+        
+        # Create a mapping of scene number to audio file
+        audio_by_scene = {get_scene_num_from_path(audio): audio for audio in audio_files}
+        logger.info(f"Audio mapping: {[(k, v.name) for k, v in sorted(audio_by_scene.items())]}")
+        
         narration_audio = []
-        for i, scene_video in enumerate(scene_videos):
-            if i < len(audio_files):
-                narration_audio.append(str(audio_files[i]))
+        for scene_video in scene_videos:
+            scene_num = get_scene_num_from_path(scene_video)
+            logger.info(f"Processing scene_{scene_num}: {scene_video.name}")
+            if scene_num in audio_by_scene:
+                audio_path = str(audio_by_scene[scene_num])
+                narration_audio.append(audio_path)
+                logger.info(f"  ✓ Matched with audio: {audio_by_scene[scene_num].name}")
             else:
                 narration_audio.append("")  # No audio for this scene
+                logger.warning(f"  ⚠ No audio found for scene_{scene_num}.mp4")
+        
+        # Filter out empty audio paths and prepare narration_audio
+        # If all scenes have audio, pass as list; otherwise filter empty strings
+        filtered_narration_audio = [a for a in narration_audio if a]
+        
+        if not filtered_narration_audio:
+            # No audio files found
+            logger.warning("⚠️ No audio files found, creating video without audio")
+            final_narration_audio = None
+        elif len(filtered_narration_audio) == 1:
+            # Single audio file
+            final_narration_audio = filtered_narration_audio[0]
+        else:
+            # Multiple audio files - pass as list to be concatenated
+            final_narration_audio = filtered_narration_audio
+        
+        logger.info(f"Using {len(filtered_narration_audio)} audio file(s) for {len(scene_videos)} scene(s)")
         
         # Compile stitched video WITHOUT subtitles (pass None for subtitles_path)
         video_processor.compile_final_video(
             clips=[str(v) for v in scene_videos],
-            narration_audio=narration_audio if len(narration_audio) > 1 else (narration_audio[0] if narration_audio else None),
+            narration_audio=final_narration_audio,
             background_music=None,
             subtitles_path=None,  # No subtitles!
             output_path=str(stitched_output)
