@@ -789,7 +789,7 @@ class CartoonShortsGenerator:
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(description="Generate platform-ready vertical Reels/Shorts videos")
-    parser.add_argument("--prompt", required=True, help="Story prompt (e.g., 'A baby lion opens a smoothie shop in the jungle')")
+    parser.add_argument("--prompt", required=False, help="Story prompt (e.g., 'A baby lion opens a smoothie shop in the jungle') - not required with --gen-bulk")
     parser.add_argument("--duration", type=int, default=30, help="Video duration in seconds")
     parser.add_argument("--video-format", choices=["shorts", "normal"], default="shorts", 
                        help="Video format: 'shorts' for 9:16 YouTube Shorts, 'normal' for 16:9 standard videos")
@@ -812,6 +812,10 @@ def main():
     parser.add_argument("--voice-volume", type=float, default=1.0, help="Voice volume (0.0-1.0, default: 1.0)")
     parser.add_argument("--verbose-ffmpeg", action="store_true", help="Print FFmpeg commands for debugging")
     
+    # Bulk generation arguments
+    parser.add_argument("--gen-bulk", action="store_true", help="Enable bulk generation from a single storyboard JSON file with multiple stories")
+    parser.add_argument("--storyboard", type=str, help="Path to storyboard JSON file containing a 'stories' array (required with --gen-bulk)")
+    
     args = parser.parse_args()
     
     # Validate environment variables
@@ -823,6 +827,185 @@ def main():
         logger.info("Please set the following environment variables:")
         for var in missing_vars:
             logger.info(f"  {var}")
+        sys.exit(1)
+    
+    # Bulk generation mode
+    if args.gen_bulk:
+        if not args.storyboard:
+            logger.error("❌ --storyboard is required when using --gen-bulk")
+            sys.exit(1)
+        
+        storyboard_file = Path(args.storyboard)
+        if not storyboard_file.exists() or not storyboard_file.is_file():
+            logger.error(f"❌ Storyboard file does not exist: {storyboard_file}")
+            sys.exit(1)
+        
+        # Load the storyboard JSON file
+        try:
+            with open(storyboard_file, 'r', encoding='utf-8') as f:
+                storyboard_data = json.load(f)
+        except json.JSONDecodeError as e:
+            logger.error(f"❌ Invalid JSON in storyboard file: {e}")
+            sys.exit(1)
+        except Exception as e:
+            logger.error(f"❌ Failed to read storyboard file: {e}")
+            sys.exit(1)
+        
+        # Extract stories array
+        stories = storyboard_data.get('stories', [])
+        if not stories:
+            logger.error(f"❌ No 'stories' array found in storyboard file. Expected format: {{'stories': [...]}}")
+            sys.exit(1)
+        
+        logger.info(f"📁 Found {len(stories)} stories in {storyboard_file.name}")
+        
+        # Initialize pipelines once (singleton pattern ensures they're shared)
+        logger.info("🔄 Initializing pipelines (will be reused for all stories)...")
+        base_config = VideoConfig(
+            prompt="",  # Will be overridden per story
+            duration=args.duration,
+            video_format=args.video_format,
+            output_path=args.output,
+            style=args.style,
+            voice_id=args.voice,
+            language=args.language,
+            enable_prompt_enhancement=False,
+            scene_pause_duration=args.scene_pause,
+            create_reel=not args.no_reel and (args.format == "reel" or args.vertical),
+            vertical_mode=args.vertical_mode,
+            reel_width=args.out_width,
+            reel_height=args.out_height,
+            reel_fps=args.out_fps,
+            music_path=args.music,
+            music_volume=args.music_volume,
+            voice_volume=args.voice_volume,
+            verbose_ffmpeg=args.verbose_ffmpeg
+        )
+        
+        # Pre-initialize generator to load pipelines once (WAN and TTS use singletons)
+        logger.info("📦 Loading WAN pipeline (singleton - will be reused)...")
+        logger.info("📦 Loading TTS model (singleton - will be reused)...")
+        temp_generator = CartoonShortsGenerator(base_config)
+        logger.info("✅ Pipelines initialized and ready for bulk generation")
+        
+        # Process each story in the stories array
+        successful = []
+        failed = []
+        
+        for i, story in enumerate(stories, 1):
+            logger.info(f"\n{'='*70}")
+            logger.info(f"Processing story {i}/{len(stories)}")
+            logger.info(f"{'='*70}")
+            
+            try:
+                title = story.get('title', f'Story_{i}')
+                description = story.get('description', '')
+                scenes = story.get('scenes', [])
+                total_duration = story.get('total_duration', args.duration)
+                
+                if not scenes:
+                    logger.warning(f"⚠️ No scenes found in story {i}, skipping")
+                    failed.append((title, "No scenes found"))
+                    continue
+                
+                # Calculate scene duration if not provided in each scene
+                # Use total_duration divided by number of scenes, or use scene's own duration
+                for scene in scenes:
+                    if 'duration' not in scene:
+                        scene['duration'] = total_duration // len(scenes)
+                
+                # Create output folder by title (sanitize filename)
+                safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
+                safe_title = safe_title.replace(' ', '_')[:50]  # Limit length
+                if not safe_title:
+                    safe_title = f"Story_{i}"  # Fallback to index
+                output_folder = Path(args.output) / safe_title
+                output_folder.mkdir(parents=True, exist_ok=True)
+                
+                logger.info(f"📁 Output folder: {output_folder}")
+                logger.info(f"📋 Title: {title}")
+                logger.info(f"📝 Description: {description}")
+                logger.info(f"🎬 Scenes: {len(scenes)}")
+                logger.info(f"⏱️ Total duration: {total_duration}s")
+                
+                # Normalize scenes (handle characters if present)
+                # Check if there's a cast at the story level or file level
+                cast_list = story.get('cast', []) or storyboard_data.get('cast', []) or []
+                name_to_cast = {}
+                for entry in cast_list:
+                    if isinstance(entry, dict) and entry.get('name'):
+                        name_to_cast[entry['name']] = entry
+                    elif isinstance(entry, str):
+                        name_to_cast[entry] = {"name": entry, "role": "character"}
+                
+                normalized_scenes = []
+                for scene in scenes:
+                    scene_copy = dict(scene)
+                    scene_chars = scene_copy.get('characters', [])
+                    structured_chars = []
+                    for ch in scene_chars:
+                        if isinstance(ch, dict):
+                            structured_chars.append(ch)
+                        elif isinstance(ch, str):
+                            base = name_to_cast.get(ch, {"name": ch, "role": "character"})
+                            structured_chars.append({
+                                "name": base.get("name", ch),
+                                "role": base.get("role", "character")
+                            })
+                    scene_copy['characters'] = structured_chars[:2]  # Limit to 2 characters
+                    normalized_scenes.append(scene_copy)
+                
+                # Update generator config and output directory (reuse same instance)
+                # This ensures WAN and TTS pipelines are truly reused (not reloaded)
+                temp_generator.config.prompt = title
+                temp_generator.config.title = title
+                temp_generator.config.description = description
+                temp_generator.config.custom_scenes = normalized_scenes
+                temp_generator.config.duration = total_duration
+                # Use scene duration from first scene if available, otherwise calculate
+                if normalized_scenes and 'duration' in normalized_scenes[0]:
+                    temp_generator.config.scene_duration = normalized_scenes[0].get('duration', 8)
+                else:
+                    temp_generator.config.scene_duration = total_duration // len(normalized_scenes) if normalized_scenes else 8
+                temp_generator.config.output_path = str(output_folder)
+                temp_generator.output_dir = output_folder
+                temp_generator.output_dir.mkdir(parents=True, exist_ok=True)
+                
+                # Update voice synthesizer language if needed
+                if args.language != temp_generator.config.language:
+                    temp_generator.config.language = args.language
+                    # Note: TTS model is already loaded, language change will be handled during synthesis
+                
+                # Generate video using the same generator instance
+                output_path = temp_generator.generate()
+                successful.append((title, output_path))
+                logger.info(f"✅ Successfully generated: {output_path}")
+                
+            except Exception as e:
+                logger.error(f"❌ Failed to process story {i} ({title if 'title' in locals() else 'Unknown'}): {e}")
+                import traceback
+                logger.error(traceback.format_exc())
+                failed.append((title if 'title' in locals() else f"Story_{i}", str(e)))
+        
+        # Print summary
+        logger.info(f"\n{'='*70}")
+        logger.info("BULK GENERATION SUMMARY")
+        logger.info(f"{'='*70}")
+        logger.info(f"✅ Successful: {len(successful)}/{len(stories)}")
+        for title, output in successful:
+            logger.info(f"   ✓ {title} -> {output}")
+        
+        if failed:
+            logger.info(f"\n❌ Failed: {len(failed)}/{len(stories)}")
+            for title, error in failed:
+                logger.info(f"   ✗ {title}: {error}")
+        
+        logger.info(f"{'='*70}")
+        sys.exit(0 if not failed else 1)
+    
+    # Single generation mode (existing logic)
+    if not args.prompt:
+        logger.error("❌ --prompt is required when not using --gen-bulk")
         sys.exit(1)
     
     # Determine if reel should be created

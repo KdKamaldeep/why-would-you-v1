@@ -79,6 +79,138 @@ warnings.filterwarnings("ignore", message=".*Using the model-agnostic default.*"
 
 logger = logging.getLogger(__name__)
 
+# Global singleton TTS instance
+_tts_instance = None
+_tts_model_cache = {}
+
+
+def get_tts_instance(config: Optional[CoquiVoiceConfig] = None, force_reload: bool = False):
+    """
+    Get or initialize the global TTS instance (singleton pattern).
+    
+    Args:
+        config: Configuration for voice synthesis. Only used on first load.
+        force_reload: Force reload of the TTS model even if already loaded.
+        
+    Returns:
+        TTS API instance or None if loading fails
+    """
+    global _tts_instance, _tts_model_cache
+    
+    if _tts_instance is not None and not force_reload:
+        logger.info("♻️ Reusing existing TTS instance (singleton) - model already loaded")
+        return _tts_instance
+    
+    if config is None:
+        default_model = _get_default_tts_model_path()
+        config = CoquiVoiceConfig(model_name=default_model)
+    elif config.model_name is None or config.model_name == "models/tts/XTTS-v2":
+        config.model_name = _get_default_tts_model_path()
+    
+    # Create cache key based on model and device
+    device = "cuda" if config.gpu and torch.cuda.is_available() else "cpu"
+    cache_key = f"{config.model_name}_{device}"
+    
+    # Check if model is already cached
+    if cache_key in _tts_model_cache and not force_reload:
+        logger.info(f"♻️ Reusing cached TTS model: {cache_key}")
+        _tts_instance = _tts_model_cache[cache_key]
+        return _tts_instance
+    
+    try:
+        # Ensure TTS_HOME is set before importing TTS
+        if "TTS_HOME" not in os.environ:
+            _configure_tts_cache()
+        
+        tts_home = os.environ.get("TTS_HOME", "")
+        if tts_home:
+            logger.info(f"📁 TTS_HOME is set to: {tts_home}")
+            Path(tts_home).mkdir(parents=True, exist_ok=True)
+        
+        from TTS.api import TTS
+        
+        device = "cuda" if config.gpu and torch.cuda.is_available() else "cpu"
+        lang = (config.language or "en").lower()
+        
+        # Helper to check if a path is a valid model directory
+        def is_valid_model_path(path: Path) -> bool:
+            """Check if path contains a valid TTS model."""
+            if not path.exists() or not path.is_dir():
+                return False
+            return any([
+                (path / "config.json").exists(),
+                (path / "model.pth").exists(),
+                (path / "vocab.json").exists(),
+                any(path.glob("*.pth")),
+                any(path.glob("*.pt")),
+                (path / "model_file.pth").exists(),
+            ])
+        
+        # Build prioritized list - ONLY XTTS-v2 models
+        model_priority = []
+        
+        workspace_model_path = Path("/workspace/models/tts/XTTS-v2")
+        if is_valid_model_path(workspace_model_path):
+            model_priority.append(str(workspace_model_path))
+            logger.info(f"Found workspace cache: {workspace_model_path}")
+        
+        tts_home = os.environ.get("TTS_HOME", "")
+        if tts_home:
+            tts_home_path = Path(tts_home)
+            for possible_path in [
+                tts_home_path / "tts_models" / "multilingual" / "multi-dataset" / "xtts_v2",
+                tts_home_path / "coqui" / "XTTS-v2",
+                tts_home_path / "XTTS-v2",
+            ]:
+                if is_valid_model_path(possible_path):
+                    model_priority.append(str(possible_path))
+                    logger.info(f"Found TTS_HOME cache: {possible_path}")
+                    break
+        
+        local_model_path = Path("models/tts/XTTS-v2")
+        if is_valid_model_path(local_model_path):
+            model_priority.append(str(local_model_path))
+            logger.info(f"Found local cache: {local_model_path}")
+        
+        # 4. Final fallback: Online model identifier
+        model_priority.append("tts_models/multilingual/multi-dataset/xtts_v2")
+        
+        logger.info(f"📦 Loading TTS model (singleton - will be reused)...")
+        logger.info(f"🔍 Model priority list: {model_priority}")
+        
+        # Try loading models in priority order
+        tts_model = None
+        last_error = None
+        
+        for model_path in model_priority:
+            try:
+                logger.info(f"Attempting to load TTS model: {model_path}")
+                tts_model = TTS(model_path, progress_bar=config.progress_bar)
+                logger.info(f"✅ Successfully loaded TTS model: {model_path}")
+                break
+            except Exception as e:
+                last_error = e
+                logger.warning(f"Failed to load model {model_path}: {e}")
+                continue
+        
+        if tts_model is None:
+            raise RuntimeError(f"Failed to load any TTS model. Last error: {last_error}")
+        
+        # Cache the instance
+        _tts_instance = tts_model
+        _tts_model_cache[cache_key] = tts_model
+        logger.info(f"✅ TTS model loaded and cached (singleton): {cache_key}")
+        logger.info(f"📦 TTS pipeline initialized ONCE - will be reused for all subsequent generations")
+        
+        return _tts_instance
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to load TTS model: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return None
+
+
 # Patch for PyTorch 2.6 weights_only issue
 def _patch_torch_load():
     """Patch torch.load to handle PyTorch 2.6 weights_only compatibility issue"""
@@ -162,13 +294,15 @@ class CoquiVoiceSynthesizer:
         # Create voice directory if it doesn't exist
         os.makedirs(self.config.voice_dir, exist_ok=True)
         
-        # Initialize TTS model
-        self.tts = None
-        self._load_model()
+        # Initialize TTS model using singleton pattern
+        self.tts = get_tts_instance(self.config)
+        if self.tts is None:
+            raise RuntimeError("Failed to initialize TTS model")
         
         logger.info(f"Coqui TTS initialized with model: {self.config.model_name}")
         logger.info(f"GPU enabled: {self.config.gpu}")
         logger.info(f"Voice directory: {self.config.voice_dir}")
+        logger.info(f"Language: {self.config.language}")
     
     def _load_model(self):
         """Load the Coqui TTS model - prioritize XTTS-v2 from workspace cache, download if needed"""

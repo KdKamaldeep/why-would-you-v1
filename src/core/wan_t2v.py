@@ -49,6 +49,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
     global _wan_pipeline, _wan_vae
     
     if _wan_pipeline is not None and not force_reload:
+        logger.info("♻️ Reusing existing WAN pipeline (singleton) - model already loaded")
         return _wan_pipeline
     
     if device is None:
@@ -127,6 +128,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
                 logger.info("ℹ️ xFormers not available; continuing without it")
         
         logger.info("✅ WAN 2.1 T2V pipeline loaded successfully")
+        logger.info("📦 WAN pipeline initialized ONCE - will be reused for all subsequent generations")
         return _wan_pipeline
         
     except ImportError as e:
