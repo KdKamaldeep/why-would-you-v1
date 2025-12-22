@@ -1,38 +1,38 @@
 [
   {
     "duration": 5,
-    "description": "The Hook: Space in a Glass",
-    "visual_prompt": "Cinematic vertical 9:16. Extreme macro close-up of a designer glass being filled with crystal clear water. The water swirls violently in slow motion, creating intricate bubbles and silver reflections. Lighting is moody and dark with a single sharp spotlight. 8k resolution, hyper-realistic water physics, shallow depth of field.",
-    "negative_prompt": "plastic cup, blurry water, low quality, shaky camera, bright room, text, watermark",
-    "motion_hint": "Slow motion pour with rising bubbles and splash",
-    "motion_strength": 0.6,
-    "narration": "Did you know that the water in your glass is actually older than the Sun?"
-  },
-  {
-    "duration": 7,
-    "description": "The 'Older Than You Think' Fact: Interstellar Origins",
-    "visual_prompt": "A cinematic transition from the water glass to a vast, swirling interstellar nebula in deep space. Wisps of blue and violet cosmic gas mimic the movement of the water. Tiny ice crystals glint like diamonds floating through the void. Cinematic lighting, deep blacks, ethereal atmosphere.",
-    "negative_prompt": "cartoon, 2d, bright colorful stars, low-res space, planets",
-    "motion_hint": "Slow cinematic zoom-out into the cosmic nebula",
-    "motion_strength": 0.4,
-    "narration": "Before the Earth or the Sun even existed, this water was floating through the freezing vacuum of interstellar space as cosmic ice."
+    "description": "The Hook: Desert Mystery",
+    "visual_prompt": "Cinematic vertical 9:16. A massive, swirling sandstorm in the deep Sahara desert. The wind picks up fine grains of golden sand, revealing the corner of a carved stone pillar buried underneath. Harsh, dramatic sunlight creating long shadows. 8k, hyper-realistic sand physics, grit and texture.",
+    "negative_prompt": "blurry sand, flat lighting, modern vehicles, plastic, text, watermark",
+    "motion_hint": "A powerful horizontal pan as the sand blows across the hidden ruins.",
+    "motion_strength": 0.7,
+    "narration": "Did you know that the largest desert on Earth was a lush green paradise just five thousand years ago?"
   },
   {
     "duration": 8,
-    "description": "Counter-Intuitive Science: The Heavy Hydrogen Proof",
-    "visual_prompt": "Extreme macro shot of a single water droplet hanging from a leaf, reflecting a prehistoric jungle. The camera moves 'inside' the droplet to reveal a glowing, stylized molecular structure of 'Heavy Water' (Deuterium). The molecules pulse with a soft blue light against a dark, organic background.",
-    "negative_prompt": "laboratory, clinical white, 2d diagram, low quality, bright daylight",
-    "motion_hint": "Camera moves through the water surface into the molecular level",
+    "description": "The Discovery: The Lost Lake",
+    "visual_prompt": "Cinematic overhead drone shot. A transition from dry, cracked desert floor to a prehistoric lush river valley with deep blue water and giant green ferns. Ancient stone huts line the shore. Ethereal, shimmering heat haze effect. Vibrant greens and deep blues.",
+    "negative_prompt": "low resolution, 2d map, cartoon, dry desert, blurry water",
+    "motion_hint": "A slow, sweeping aerial flyover of the prehistoric lake.",
     "motion_strength": 0.5,
-    "narration": "Science shows that 50% of Earth’s water contains a chemical signature found only in the birth clouds of stars, not in our own solar system."
+    "narration": "Hidden beneath the dunes of the Sahara lie the skeletons of massive lakes and river systems that once sustained entire civilizations."
   },
   {
-    "duration": 7,
-    "description": "The Conclusion: Timeless Wisdom",
-    "visual_prompt": "A cinematic medium shot of a person’s silhouette at night, taking a sip of water from a ceramic cup. Behind them, the massive Milky Way galaxy is visible through a large window. The moonlight catches the rim of the cup. Peaceful, awe-inspiring tone.",
-    "negative_prompt": "modern city, cars, bright interior, blurry face, distorted hands",
-    "motion_hint": "Slow, steady pan across the silhouette toward the stars",
+    "duration": 8,
+    "description": "Counter-Intuitive Science: Forbidden Cave Art",
+    "visual_prompt": "Extreme macro shot inside a dark, cool cave. A flashlight beam sweeps across a wall to reveal ancient, vivid paintings of people swimming and hunting hippos in the middle of the desert. The rock texture is rough and detailed. Dust particles glint in the flashlight beam.",
+    "negative_prompt": "modern graffiti, bright white light, blurry paintings, distorted people",
+    "motion_hint": "Steady flashlight movement revealing the art from left to right.",
+    "motion_strength": 0.4,
+    "narration": "Scientists have found cave paintings deep in the dry heat showing people swimming, proving that our world changes faster than historians ever expected."
+  },
+  {
+    "duration": 6,
+    "description": "The Conclusion: Hidden Future",
+    "visual_prompt": "Cinematic medium shot. An explorer's hand brushes sand off an ancient, ornate clay pot half-buried in a dune. The sun is setting behind a distant pyramid-shaped mountain. Soft, warm lighting.",
+    "negative_prompt": "extra fingers, distorted hand, plastic bottle, modern watch",
+    "motion_hint": "Slow push in on the hand clearing the sand.",
     "motion_strength": 0.3,
-    "narration": "You aren't just drinking a refreshment; you're consuming a 5-billion-year-old piece of the galaxy. #spacetime #ancientsecrets"
+    "narration": "The desert is not just a graveyard of the past. It is a warning about the future of our planet."
   }
 ]
