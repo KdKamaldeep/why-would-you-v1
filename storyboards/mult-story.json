@@ -1,45 +1,6 @@
 {
   "stories": [
     {
-      "title": "Ancient Beauty Secrets Science Confirms",
-      "description": "A cinematic journey revealing that the best skincare ingredients are thousands of years old.",
-      "total_duration": 28,
-      "scenes": [
-        {
-          "duration": 6,
-          "visual_prompt": "Cinematic vertical 9:16, extreme macro. A flawless female hand slowly releases deep red rose petals into a bowl of steaming milky water. The petals hit the surface with a gentle splash. Soft volumetric steam curls around the fingers. Warm, golden candlelight.",
-          "negative_prompt": "deformed fingers, extra digits, plastic, modern bathroom, harsh light, text",
-          "motion_hint": "Slow-motion dolly-in toward the fingertips as they release the petals.",
-          "motion_strength": 0.5,
-          "narration": "Before thousand dollar creams, queens used ingredients you have in your kitchen."
-        },
-        {
-          "duration": 8,
-          "visual_prompt": "Cinematic 9:16. Inside a sun-drenched ancient stone temple. A heavy granite pestle grinds bright orange turmeric roots inside a weathered stone mortar. Fine, glowing orange dust particles dance in a sharp beam of sunlight.",
-          "negative_prompt": "electric mixer, stainless steel, modern kitchen, neon, blurry",
-          "motion_hint": "Circular rhythmic grinding motion of the pestle with realistic dust displacement.",
-          "motion_strength": 0.7,
-          "narration": "In ancient India, the Golden Spice was not just for food—it was the secret to a royal glow that never faded."
-        },
-        {
-          "duration": 7,
-          "visual_prompt": "Macro high-speed cinematography. A single, viscous drop of glowing amber oil falls and impacts a water surface, creating perfect concentric ripples. In the background, an ancient clay jar sits on a stone plinth.",
-          "negative_prompt": "lab equipment, test tubes, clinical white, plastic, 2d",
-          "motion_hint": "Extreme slow-motion fluid dynamics and ripple expansion.",
-          "motion_strength": 0.4,
-          "narration": "Modern science now proves these ancient antioxidants protect your skin better than many synthetic chemicals."
-        },
-        {
-          "duration": 7,
-          "visual_prompt": "Wide cinematic shot, 9:16. A silhouette of a graceful woman standing at a stone window overlooking an ancient Mediterranean city at dusk. Deep orange sunset sky. Billowing sheer yellow silk curtains catch a light breeze.",
-          "negative_prompt": "cars, power lines, modern buildings, bright daylight",
-          "motion_hint": "Slow steady crane-style zoom out from the window toward the horizon.",
-          "motion_strength": 0.3,
-          "narration": "Sometimes the future of beauty is hidden in the wisdom of our ancestors."
-        }
-      ]
-    },
-    {
       "title": "The Sahara’s Green Ghost",
       "description": "The discovery of a lush prehistoric paradise hidden under desert sand.",
       "total_duration": 27,
