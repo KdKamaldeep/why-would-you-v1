@@ -45,8 +45,12 @@ python -m src.interfaces.simple_cartoon_generator \
   # Bulk generate from a single JSON file with multiple stories
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
+  --gen-bulk \
   --storyboard storyboards/mult-story.json \
   --wan-num-frames 81 \
   --wan-fps 12 \
   --wan-steps 30 \
   --wan-guidance 5
+  
+  
+python scripts/remove_subtitles.py --output-suffix "_st" --remove-srt-files
