@@ -8,8 +8,12 @@ import os
 import logging
 import torch
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict, Any, Union
 import gc
+import subprocess
+import tempfile
+import cv2
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +191,10 @@ class WanT2VGenerator:
                       output_path: str,
                       seed: Optional[int] = None,
                       negative_prompt: Optional[str] = None,
-                      duration: Optional[float] = None) -> str:
+                      duration: Optional[float] = None,
+                      scene_id: Optional[str] = None,
+                      visual_reference: Optional[str] = None,
+                      slug: Optional[str] = None) -> Union[str, Dict[str, Any]]:
         """
         Generate a video from a text prompt.
         
@@ -198,9 +205,17 @@ class WanT2VGenerator:
             negative_prompt: Override default negative prompt (optional)
             duration: Target duration in seconds. If provided, num_frames will be calculated from this.
                       If None, uses the default num_frames from initialization.
+            scene_id: Scene identifier for frame extraction (optional)
+            visual_reference: Visual reference description from storyboard (optional)
+            slug: Slug for best frame filename (optional)
             
         Returns:
-            Path to the generated video file
+            Dictionary with:
+            - video_path: Path to the generated video file
+            - best_frame_path: Path to the best frame PNG (if scene_id provided)
+            - scene_id: Scene identifier
+            - visual_reference: Visual reference from storyboard
+            If scene_id not provided, returns just video_path as string (backward compatible)
         """
         if self.pipeline is None:
             raise RuntimeError("WAN pipeline not available. Cannot generate video.")
@@ -275,13 +290,138 @@ class WanT2VGenerator:
             gc.collect()  # Force Python garbage collection
             
             logger.info(f"✅ Video generated successfully: {output_path}")
-            return str(output_path)
+            
+            # Extract best frame if scene_id is provided
+            result = {"video_path": str(output_path)}
+            if scene_id is not None:
+                try:
+                    best_frame_path = self._extract_best_frame(
+                        video_path=str(output_path),
+                        scene_id=scene_id,
+                        slug=slug,
+                        output_dir=output_path.parent
+                    )
+                    result.update({
+                        "best_frame_path": best_frame_path,
+                        "scene_id": scene_id,
+                        "visual_reference": visual_reference
+                    })
+                    logger.info(f"✅ Best frame extracted: {best_frame_path}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Failed to extract best frame: {e}")
+                    # Continue without best frame - video generation succeeded
+            
+            # Return dict if scene_id provided, otherwise string for backward compatibility
+            return result if scene_id is not None else str(output_path)
             
         except Exception as e:
             logger.error(f"❌ Error generating video: {e}")
             import traceback
             logger.error(traceback.format_exc())
             raise
+    
+    def _extract_best_frame(self, 
+                           video_path: str,
+                           scene_id: str,
+                           slug: Optional[str] = None,
+                           output_dir: Optional[Path] = None,
+                           extraction_fps: float = 9.0) -> str:
+        """
+        Extract frames from video and select the best frame using Laplacian variance.
+        
+        Args:
+            video_path: Path to the video file
+            scene_id: Scene identifier
+            slug: Slug for filename (optional, uses scene_id if not provided)
+            output_dir: Directory to save the best frame (optional, uses video parent dir)
+            extraction_fps: FPS for frame extraction (6-12 fps range, default 9)
+            
+        Returns:
+            Path to the saved best frame PNG
+        """
+        video_path_obj = Path(video_path)
+        if output_dir is None:
+            output_dir = video_path_obj.parent
+        else:
+            output_dir = Path(output_dir)
+        
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create temporary directory for extracted frames
+        temp_frames_dir = tempfile.mkdtemp(prefix="wan_frames_")
+        temp_frames_dir_path = Path(temp_frames_dir)
+        
+        try:
+            # Extract frames using ffmpeg at specified FPS
+            logger.info(f"📸 Extracting frames from video at {extraction_fps} fps...")
+            frame_pattern = str(temp_frames_dir_path / "frame_%04d.png")
+            
+            cmd = [
+                'ffmpeg', '-y',
+                '-i', str(video_path),
+                '-vf', f'fps={extraction_fps}',
+                frame_pattern
+            ]
+            
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            
+            # Find all extracted frames
+            frame_files = sorted(temp_frames_dir_path.glob("frame_*.png"))
+            if not frame_files:
+                raise ValueError("No frames extracted from video")
+            
+            logger.info(f"📸 Extracted {len(frame_files)} frames")
+            
+            # Calculate Laplacian variance for each frame (sharpness metric)
+            best_frame_path = None
+            best_sharpness = -1
+            
+            for frame_file in frame_files:
+                try:
+                    # Read frame as grayscale
+                    img = cv2.imread(str(frame_file), cv2.IMREAD_GRAYSCALE)
+                    if img is None:
+                        continue
+                    
+                    # Calculate Laplacian variance (sharpness metric)
+                    laplacian = cv2.Laplacian(img, cv2.CV_64F)
+                    sharpness = laplacian.var()
+                    
+                    if sharpness > best_sharpness:
+                        best_sharpness = sharpness
+                        best_frame_path = frame_file
+                except Exception as e:
+                    logger.warning(f"⚠️ Error processing frame {frame_file}: {e}")
+                    continue
+            
+            if best_frame_path is None:
+                raise ValueError("Could not find a valid frame")
+            
+            logger.info(f"✅ Best frame selected (sharpness: {best_sharpness:.2f})")
+            
+            # Generate output filename: <slug>__<scene_id>.png
+            if slug:
+                output_filename = f"{slug}__{scene_id}.png"
+            else:
+                output_filename = f"{scene_id}.png"
+            
+            output_frame_path = output_dir / output_filename
+            
+            # Copy best frame to output location
+            import shutil
+            shutil.copy2(best_frame_path, output_frame_path)
+            logger.info(f"💾 Saved best frame: {output_frame_path}")
+            
+            return str(output_frame_path)
+            
+        finally:
+            # Clean up temporary frames directory
+            try:
+                import shutil
+                shutil.rmtree(temp_frames_dir, ignore_errors=True)
+                logger.debug(f"🧹 Cleaned up temporary frames directory: {temp_frames_dir}")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not clean up temp directory: {e}")
     
     def is_available(self) -> bool:
         """Check if WAN pipeline is available."""

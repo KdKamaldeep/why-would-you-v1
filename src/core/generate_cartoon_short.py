@@ -377,13 +377,37 @@ class CartoonShortsGenerator:
                         target_duration = actual_scene_durations[i]
                         logger.info(f"🎬 Scene {i+1}: Using narration duration ({target_duration:.2f}s) to calculate frames")
                     
-                    video_path = self.wan_generator.generate_video(
+                    # Extract scene metadata for best frame extraction
+                    scene_id = scene.get('id', f"scene_{i+1}")
+                    visual_reference = scene.get('visual_reference', None)
+                    # Generate slug from story title (sanitized for filename)
+                    story_title = script.get('title', 'story')
+                    slug = "".join(c for c in story_title if c.isalnum() or c in (' ', '-', '_')).strip().replace(' ', '_').lower()[:50]
+                    
+                    # Generate video with optional best frame extraction
+                    result = self.wan_generator.generate_video(
                         prompt=prompt,
                         output_path=str(clip_path),
                         seed=self.config.wan_seed,
                         negative_prompt=negative_prompt or None,
-                        duration=target_duration  # Pass narration duration to calculate frames
+                        duration=target_duration,  # Pass narration duration to calculate frames
+                        scene_id=scene_id,
+                        visual_reference=visual_reference,
+                        slug=slug
                     )
+                    
+                    # Handle return type: dict (with metadata) or string (backward compatible)
+                    if isinstance(result, dict):
+                        video_path = result['video_path']
+                        # Store metadata for downstream article generation
+                        if 'best_frame_path' in result:
+                            scene['best_frame_path'] = result['best_frame_path']
+                            scene['scene_id'] = result['scene_id']
+                            scene['visual_reference'] = result['visual_reference']
+                            logger.info(f"📸 Scene {i+1}: Best frame saved: {result['best_frame_path']}")
+                    else:
+                        # Backward compatibility: result is a string
+                        video_path = result
                     
                     # Get actual video duration
                     actual_duration = self.video_processor.get_video_duration(str(video_path))
