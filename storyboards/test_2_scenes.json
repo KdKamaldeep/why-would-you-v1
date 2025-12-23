@@ -1,57 +1,38 @@
-{
-  "title": "Ancient Beauty Secrets Science Confirms",
-  "description": "A cinematic journey revealing that the best skincare ingredients are thousands of years old.",
-  "total_duration": 28,
-  "scenes": [
-    {
-      "duration": 5,
-      "description": "The Hook: Ancient Queen's Ritual",
-      "visual_prompt": "Extreme close-up macro shot, cinematic vertical 9:16. An elegant, highly detailed female hand with graceful fingers and natural manicured nails is gently dropping rose petals into milky water. Steam rises around the hand. Soft warm golden lighting highlighting skin texture and water droplets, luxurious, slow motion, 8k, hyper-realistic, shallow depth of field focused sharply on the hand.",
-      "negative_prompt": "bad anatomy, distorted fingers, malformed hand, extra fingers, missing fingers, claw hand, blurry hand, modern bathroom, plastic, bright harsh light, text, watermark",
-      "motion_hint": "slow cinematic push in on the hand",
-      "motion_strength": 0.5,
-      "fps_hint": 24,
-      "narration": "Before thousand-dollar creams, queens used ingredients you have in your kitchen."
-    },
-    {
-      "duration": 6,
-      "description": "Ingredient 1: Rose & Water",
-      "visual_prompt": "Extreme close-up macro shot, fresh pink rose petals being crushed in a marble mortar, water droplets glistening, vibrant color, shallow depth of field, natural light, vertical 9:16.",
-      "negative_prompt": "dead flowers, mess, machinery, text, cartoon",
-      "motion_hint": "slow gentle pan across the petals",
-      "motion_strength": 0.4,
-      "fps_hint": 24,
-      "narration": "Rose water. Science now knows it balances pH and hydrates better than most toners."
-    },
-    {
-      "duration": 6,
-      "description": "Ingredient 2: Saffron/Gold",
-      "visual_prompt": "Cinematic close-up, a rich golden paste (like turmeric and saffron) being gently applied to skin with a brush, glowing warm light, rich texture, reflective gold elements, vertical 9:16, ultra-detailed skin texture.",
-      "negative_prompt": "messy application, plastic brush, bad lighting, text",
-      "motion_hint": "slow tracking shot following the brush",
-      "motion_strength": 0.4,
-      "fps_hint": 24,
-      "narration": "Saffron and turmeric. An ancient antioxidant boost for a glow that filters can't mimic."
-    },
-    {
-      "duration": 6,
-      "description": "The Modern Reveal",
-      "visual_prompt": "A seamless transition from ancient textures to a modern, confident woman looking in a mirror. Her skin is naturally glowing, clean aesthetic, bright natural morning light, confident smile, vertical 9:16.",
-      "negative_prompt": "heavy makeup, artificial setting, sad expression, text, watermark",
-      "motion_hint": "slow pull back to reveal her face",
-      "motion_strength": 0.5,
-      "fps_hint": 24,
-      "narration": "True beauty isn't bought in a bottle. It's remembered from our past."
-    },
-    {
-      "duration": 5,
-      "description": "Call to Action/Outro",
-      "visual_prompt": "Mysterious and beautiful ending, a single drop of golden oil falling into clear water creating ripples, soft bokeh background of botanical elements, cinematic lighting, high contrast, vertical 9:16.",
-      "negative_prompt": "text, logo, simple, boring, flat lighting",
-      "motion_hint": "slow motion impact of the drop",
-      "motion_strength": 0.3,
-      "fps_hint": 60,
-      "narration": "So the question is, Are you ready to try the original skincare?"
-    }
-  ]
-}
+[
+  {
+    "duration": 5,
+    "description": "The Hook: Desert Mystery",
+    "visual_prompt": "Cinematic vertical 9:16. A massive, swirling sandstorm in the deep Sahara desert. The wind picks up fine grains of golden sand, revealing the corner of a carved stone pillar buried underneath. Harsh, dramatic sunlight creating long shadows. 8k, hyper-realistic sand physics, grit and texture.",
+    "negative_prompt": "blurry sand, flat lighting, modern vehicles, plastic, text, watermark",
+    "motion_hint": "A powerful horizontal pan as the sand blows across the hidden ruins.",
+    "motion_strength": 0.7,
+    "narration": "Did you know that the largest desert on Earth was a lush green paradise just five thousand years ago?"
+  },
+  {
+    "duration": 8,
+    "description": "The Discovery: The Lost Lake",
+    "visual_prompt": "Cinematic overhead drone shot. A transition from dry, cracked desert floor to a prehistoric lush river valley with deep blue water and giant green ferns. Ancient stone huts line the shore. Ethereal, shimmering heat haze effect. Vibrant greens and deep blues.",
+    "negative_prompt": "low resolution, 2d map, cartoon, dry desert, blurry water",
+    "motion_hint": "A slow, sweeping aerial flyover of the prehistoric lake.",
+    "motion_strength": 0.5,
+    "narration": "Hidden beneath the dunes of the Sahara lie the skeletons of massive lakes and river systems that once sustained entire civilizations."
+  },
+  {
+    "duration": 8,
+    "description": "Counter-Intuitive Science: Forbidden Cave Art",
+    "visual_prompt": "Extreme macro shot inside a dark, cool cave. A flashlight beam sweeps across a wall to reveal ancient, vivid paintings of people swimming and hunting hippos in the middle of the desert. The rock texture is rough and detailed. Dust particles glint in the flashlight beam.",
+    "negative_prompt": "modern graffiti, bright white light, blurry paintings, distorted people",
+    "motion_hint": "Steady flashlight movement revealing the art from left to right.",
+    "motion_strength": 0.4,
+    "narration": "Scientists have found cave paintings deep in the dry heat showing people swimming, proving that our world changes faster than historians ever expected."
+  },
+  {
+    "duration": 6,
+    "description": "The Conclusion: Hidden Future",
+    "visual_prompt": "Cinematic medium shot. An explorer's hand brushes sand off an ancient, ornate clay pot half-buried in a dune. The sun is setting behind a distant pyramid-shaped mountain. Soft, warm lighting.",
+    "negative_prompt": "extra fingers, distorted hand, plastic bottle, modern watch",
+    "motion_hint": "Slow push in on the hand clearing the sand.",
+    "motion_strength": 0.3,
+    "narration": "The desert is not just a graveyard of the past. It is a warning about the future of our planet."
+  }
+]
