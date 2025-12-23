@@ -1,7 +1,7 @@
 ssh-keygen -t rsa -b 4096 -C "kdkamaldeep2@gmail.com" && cat ~/.ssh/id_rsa.pub
 
-pip install -U torchcodec
-pip install -U xformers
+apt update
+apt install ffmpeg -y
 
 python -m src.interfaces.simple_cartoon_generator --prompt "Girl sitting in bar talking about drinks"
 python -m src.interfaces.simple_cartoon_generator --help
@@ -41,3 +41,18 @@ python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
   --storyboard storyboards/test_2_scenes.json \
   --skip-audio
+  
+
+-- symlink hf cache/huggingface/hub 
+ ln -s /workspace/huggingface/hub ~/.cache/huggingface/hub
+
+ 
+pip uninstall -y transformers tokenizers
+pip install --no-cache-dir "transformers==4.42.4" "tokenizers==0.19.1"
+
+export HF_HOME=/workspace/.cache/huggingface
+export HF_HUB_CACHE=/workspace/.cache/huggingface/hub
+export TRANSFORMERS_CACHE=/workspace/.cache/huggingface/transformers
+export DIFFUSERS_CACHE=/workspace/.cache/huggingface/diffusers
+export XDG_CACHE_HOME=/workspace/.cache
+mkdir -p "$HF_HUB_CACHE" "$TRANSFORMERS_CACHE" "$DIFFUSERS_CACHE"

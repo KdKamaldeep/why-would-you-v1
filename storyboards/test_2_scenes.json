@@ -1,51 +1,38 @@
-{
-  "title": "A Shocking History Fact",
-  "description": "A cinematic short revealing an unbelievable truth from ancient history",
-  "total_duration": 28,
-  "scenes": [
-    {
-      "duration": 7,
-      "description": "Ancient city awakening at dawn",
-      "visual_prompt": "Ancient stone city at dawn, foreground stone pillars partially framing the view, soft cloth banners hanging close to camera gently swaying, soft leaves entering frame edges, golden sunlight spreading across rooftops, light mist drifting between buildings, distant birds flying, slow cinematic forward push, deep perspective, realistic historical atmosphere, vertical composition",
-      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow forward push, foreground fabric sway, drifting mist, birds gliding",
-      "motion_strength": 0.7,
-      "fps_hint": 24,
-      "narration": "Did you know that thousands of years ago, people didn’t rely on modern medicine at all?",
-      "subtitle": "A surprising history fact 🏺"
-    },
-    {
-      "duration": 7,
-      "description": "Ancient healers using honey by torchlight",
-      "visual_prompt": "Ancient healers applying honey to wounds by torchlight, foreground hanging fabric partially obscuring edges of frame, flickering flames casting moving shadows, thin smoke rising upward, stone pillar close to camera creating depth, hands moving slowly and carefully, warm amber lighting, slow side pan, realistic ancient medical scene, vertical framing",
-      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow side pan, torch flicker, rising smoke, subtle fabric movement",
-      "motion_strength": 0.7,
-      "fps_hint": 24,
-      "narration": "In ancient Egypt, healers used honey to clean wounds and protect them from dangerous infections.",
-      "subtitle": "Ancient medicine 🍯"
-    },
-    {
-      "duration": 7,
-      "description": "Preserved honey jars inside ancient tomb",
-      "visual_prompt": "Ancient tomb interior with preserved honey jars, foreground broken stone slabs and hanging roots framing the shot, floating dust particles illuminated by narrow light beams, faint air movement causing dust to swirl, slow push-in camera, mysterious and respectful mood, realistic textures, vertical composition",
-      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow push-in, drifting dust, subtle foreground shadow movement",
-      "motion_strength": 0.65,
-      "fps_hint": 24,
-      "narration": "Even more incredible, honey never spoils. Jars found in ancient tombs are still edible today.",
-      "subtitle": "Nature’s miracle ✨"
-    },
-    {
-      "duration": 7,
-      "description": "Modern honey glowing in soft light",
-      "visual_prompt": "Close-up of golden honey slowly dripping from a wooden spoon, foreground blurred leaves and jar rim partially occluding frame edges, light reflecting and refracting inside the liquid, gentle camera pull-back, soft bokeh highlights in background, calm and awe-inspiring mood, realistic macro style, vertical framing",
-      "negative_prompt": "people talking, mouth movement, text, watermark, cartoon, anime",
-      "motion_hint": "slow pull-back, honey dripping, foreground blur movement, light shimmer",
-      "motion_strength": 0.65,
-      "fps_hint": 24,
-      "narration": "Sometimes, the most advanced science is wisdom that humanity discovered long ago.",
-      "subtitle": "History still amazes us ⏳"
-    }
-  ]
-}
+[
+  {
+    "duration": 5,
+    "description": "The Hook: Desert Mystery",
+    "visual_prompt": "Cinematic vertical 9:16. A massive, swirling sandstorm in the deep Sahara desert. The wind picks up fine grains of golden sand, revealing the corner of a carved stone pillar buried underneath. Harsh, dramatic sunlight creating long shadows. 8k, hyper-realistic sand physics, grit and texture.",
+    "negative_prompt": "blurry sand, flat lighting, modern vehicles, plastic, text, watermark",
+    "motion_hint": "A powerful horizontal pan as the sand blows across the hidden ruins.",
+    "motion_strength": 0.7,
+    "narration": "Did you know that the largest desert on Earth was a lush green paradise just five thousand years ago?"
+  },
+  {
+    "duration": 8,
+    "description": "The Discovery: The Lost Lake",
+    "visual_prompt": "Cinematic overhead drone shot. A transition from dry, cracked desert floor to a prehistoric lush river valley with deep blue water and giant green ferns. Ancient stone huts line the shore. Ethereal, shimmering heat haze effect. Vibrant greens and deep blues.",
+    "negative_prompt": "low resolution, 2d map, cartoon, dry desert, blurry water",
+    "motion_hint": "A slow, sweeping aerial flyover of the prehistoric lake.",
+    "motion_strength": 0.5,
+    "narration": "Hidden beneath the dunes of the Sahara lie the skeletons of massive lakes and river systems that once sustained entire civilizations."
+  },
+  {
+    "duration": 8,
+    "description": "Counter-Intuitive Science: Forbidden Cave Art",
+    "visual_prompt": "Extreme macro shot inside a dark, cool cave. A flashlight beam sweeps across a wall to reveal ancient, vivid paintings of people swimming and hunting hippos in the middle of the desert. The rock texture is rough and detailed. Dust particles glint in the flashlight beam.",
+    "negative_prompt": "modern graffiti, bright white light, blurry paintings, distorted people",
+    "motion_hint": "Steady flashlight movement revealing the art from left to right.",
+    "motion_strength": 0.4,
+    "narration": "Scientists have found cave paintings deep in the dry heat showing people swimming, proving that our world changes faster than historians ever expected."
+  },
+  {
+    "duration": 6,
+    "description": "The Conclusion: Hidden Future",
+    "visual_prompt": "Cinematic medium shot. An explorer's hand brushes sand off an ancient, ornate clay pot half-buried in a dune. The sun is setting behind a distant pyramid-shaped mountain. Soft, warm lighting.",
+    "negative_prompt": "extra fingers, distorted hand, plastic bottle, modern watch",
+    "motion_hint": "Slow push in on the hand clearing the sand.",
+    "motion_strength": 0.3,
+    "narration": "The desert is not just a graveyard of the past. It is a warning about the future of our planet."
+  }
+]

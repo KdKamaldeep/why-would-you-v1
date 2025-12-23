@@ -1,0 +1,163 @@
+{
+  "stories": [
+    {
+      "title": "The Ocean That Lives Without Sunlight",
+      "description": "Life thriving in total darkness deep beneath the ocean.",
+      "total_duration": 24,
+      "scenes": [
+        {
+          "duration": 5,
+          "visual_prompt": "Cinematic deep ocean abyss, complete darkness, faint blue bioluminescent glow, slow drifting particles suspended in water, subtle light shimmer, atmospheric motion, vertical 9:16",
+          "negative_prompt": "text, watermark, cartoon, low quality, blurry",
+          "narration": "Did you know some ecosystems survive on Earth without any sunlight at all?"
+        },
+        {
+          "duration": 7,
+          "visual_prompt": "Hydrothermal vents on ocean floor releasing glowing mineral-rich steam, gentle plume movement, shimmering heat distortion in water, floating particles, cinematic lighting, vertical 9:16",
+          "negative_prompt": "text, watermark, cartoon, flat lighting",
+          "narration": "Deep beneath the ocean, life survives using heat from the Earth itself."
+        },
+        {
+          "duration": 6,
+          "visual_prompt": "Deep-sea creatures silhouetted near glowing vents, slow graceful drifting motion, soft light flicker, underwater haze gently moving, cinematic realism",
+          "negative_prompt": "humans, text, watermark, distorted animals",
+          "narration": "These creatures use chemical energy instead of sunlight to survive."
+        },
+        {
+          "duration": 6,
+          "visual_prompt": "Wide view of vast dark ocean floor, glowing vents pulsing faintly, particles slowly sinking and drifting, subtle cinematic camera drift into darkness",
+          "negative_prompt": "text, watermark, low resolution",
+          "narration": "Even in darkness, life always finds a way."
+        }
+      ]
+    },
+
+    {
+      "title": "The Day the Earth Almost Froze",
+      "description": "When Earth became a frozen snowball.",
+      "total_duration": 25,
+      "scenes": [
+        {
+          "duration": 5,
+          "visual_prompt": "Planet Earth completely covered in ice seen from space, slow planetary rotation, soft light moving across frozen surface, cinematic realism, vertical 9:16",
+          "negative_prompt": "text, watermark, cartoon",
+          "narration": "Did you know Earth was once frozen almost entirely from pole to pole?"
+        },
+        {
+          "duration": 7,
+          "visual_prompt": "Endless glaciers stretching across the planet, icy winds blowing fine snow across surface, drifting ice fog, subtle atmospheric movement",
+          "negative_prompt": "text, watermark, blurry",
+          "narration": "Scientists call this extreme period Snowball Earth."
+        },
+        {
+          "duration": 6,
+          "visual_prompt": "Small pockets of liquid water beneath thick ice sheets, faint light rippling through ice layers, slow moving bubbles, cinematic macro atmosphere",
+          "negative_prompt": "text, watermark, unrealistic colors",
+          "narration": "Life barely survived beneath the ice, waiting for warmth."
+        },
+        {
+          "duration": 7,
+          "visual_prompt": "Ice sheets slowly cracking and melting, sunlight gradually spreading, mist rising gently from thawing ice, hopeful cinematic motion",
+          "negative_prompt": "text, watermark, cartoon",
+          "narration": "When the ice melted, life reshaped the planet again."
+        }
+      ]
+    },
+
+    {
+      "title": "The Invisible Shield Around Earth",
+      "description": "Earth’s hidden force field that protects all life.",
+      "total_duration": 23,
+      "scenes": [
+        {
+          "duration": 5,
+          "visual_prompt": "Earth floating in space surrounded by glowing magnetic field lines, energy lines slowly flowing and bending, subtle orbital camera drift, deep blue tones",
+          "negative_prompt": "text, watermark, cartoon",
+          "narration": "Did you know Earth is protected by an invisible shield?"
+        },
+        {
+          "duration": 6,
+          "visual_prompt": "Solar storm particles streaming toward Earth and curving away around magnetic field, flowing particle motion, cinematic space atmosphere",
+          "negative_prompt": "text, watermark, low quality",
+          "narration": "This magnetic field deflects harmful radiation from the sun."
+        },
+        {
+          "duration": 6,
+          "visual_prompt": "Aurora borealis slowly rippling across polar night sky, smooth flowing light waves, stars subtly shifting, cinematic night atmosphere",
+          "negative_prompt": "text, watermark, city lights",
+          "narration": "Auroras are visible signs of this powerful protection."
+        },
+        {
+          "duration": 6,
+          "visual_prompt": "Earth rotating peacefully in space, clouds slowly moving over surface, calm cinematic camera drift outward",
+          "negative_prompt": "text, watermark",
+          "narration": "Without it, life on Earth would not exist."
+        }
+      ]
+    },
+
+    {
+      "title": "The Ice That Remembers the Past",
+      "description": "Ice holding Earth’s ancient climate secrets.",
+      "total_duration": 24,
+      "scenes": [
+        {
+          "duration": 5,
+          "visual_prompt": "Massive Antarctic ice sheets under cold blue light, drifting snow particles, slow aerial glide, endless frozen horizon",
+          "negative_prompt": "text, watermark, blurry",
+          "narration": "Did you know ice preserves Earth’s climate history for thousands of years?"
+        },
+        {
+          "duration": 7,
+          "visual_prompt": "Macro view of ice core with trapped air bubbles, bubbles slowly shifting, light refracting through ice layers, cinematic texture detail",
+          "negative_prompt": "text, watermark, unrealistic bubbles",
+          "narration": "Tiny air bubbles trapped in ice hold ancient atmosphere."
+        },
+        {
+          "duration": 6,
+          "visual_prompt": "Scientists drilling deep ice cores in polar landscape, drifting ice fog, subtle camera movement across frozen terrain",
+          "negative_prompt": "text, watermark, modern lab",
+          "narration": "Scientists study ice cores to understand Earth’s past."
+        },
+        {
+          "duration": 6,
+          "visual_prompt": "Endless frozen horizon fading into distance, gentle snowfall, soft light changes, quiet cinematic motion",
+          "negative_prompt": "text, watermark",
+          "narration": "The ice remembers what the Earth once was."
+        }
+      ]
+    },
+
+    {
+      "title": "The River Beneath the Amazon",
+      "description": "A hidden river flowing deep underground.",
+      "total_duration": 25,
+      "scenes": [
+        {
+          "duration": 5,
+          "visual_prompt": "Aerial view of Amazon rainforest canopy, clouds slowly drifting overhead, river gently flowing below, cinematic daylight",
+          "negative_prompt": "text, watermark, cartoon",
+          "narration": "Did you know a massive river flows beneath the Amazon?"
+        },
+        {
+          "duration": 6,
+          "visual_prompt": "Smooth transition from surface river into underground layers, soil and rock subtly shifting, water glow moving downward",
+          "negative_prompt": "text, watermark, flat graphics",
+          "narration": "Deep underground, a hidden river flows through rock."
+        },
+        {
+          "duration": 7,
+          "visual_prompt": "Underground water channels flowing slowly through rock layers, light shimmering through water, suspended particles drifting",
+          "negative_prompt": "text, watermark, unrealistic water",
+          "narration": "It moves silently beneath the forest, unseen above."
+        },
+        {
+          "duration": 7,
+          "visual_prompt": "Amazon River at sunset, slow flowing water reflecting sky, mist rising gently from surface, calm cinematic drift",
+          "negative_prompt": "text, watermark",
+          "narration": "Some of Earth’s greatest wonders remain hidden."
+        }
+      ]
+    }
+  ]
+}
