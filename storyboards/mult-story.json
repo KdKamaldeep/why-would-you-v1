@@ -1,92 +1,182 @@
 {
   "stories": [
     {
-      "title": "The City That Sank Overnight",
-      "slug": "sunken-city-disaster",
-      "description": "A real city that vanished beneath the sea in a single night.",
+      "title": "The Valley Where Time Slows",
+      "slug": "time-dilation-valley",
+      "description": "A place where time itself behaves differently.",
       "total_duration": 24,
       "aspect_ratio": "16:9",
       "scenes": [
         {
           "id": "scene_01",
           "duration": 6,
-          "visual_prompt": "Ancient coastal city at dusk. Stone buildings glow softly as calm waves touch the shoreline. Slow cinematic pan, warm lighting, realistic environment, 16:9.",
-          "negative_prompt": "text, watermark, modern buildings",
+          "visual_prompt": "Wide cinematic shot of a remote mountain valley at dawn. Thin mist rises from the ground and drifts slowly between rocks. Soft natural light, calm atmosphere, slow camera glide, realistic environment, 16:9.",
+          "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "sunken_city_01.png",
-          "narration": "Did you know an entire ancient city disappeared beneath the sea in just one terrifying night?"
+          "best_frame_filename": "time_valley_01.png",
+          "narration": "Hidden deep in the mountains, there is a valley where time does not move normally."
         },
         {
           "id": "scene_02",
           "duration": 6,
-          "visual_prompt": "Underwater view of the seabed shaking as cracks form. Buildings tilt slightly as sand rises into the water. Gentle camera shake, dark blue tones, 16:9.",
+          "visual_prompt": "Close-up of grass and leaves gently moving in slow motion as fog rolls across the ground. Subtle wind movement, shallow depth of field, natural lighting, 16:9.",
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "sunken_city_02.png",
-          "narration": "A sudden earthquake caused the ground below the city to collapse without warning."
+          "best_frame_filename": "time_valley_02.png",
+          "narration": "Inside this valley, motion appears slower, as if the world itself is breathing carefully."
         },
         {
           "id": "scene_03",
           "duration": 6,
-          "visual_prompt": "Submerged ruins resting underwater. Columns and statues lie covered in drifting sand. Slow forward movement, muted colors, quiet atmosphere, 16:9.",
-          "negative_prompt": "text, watermark, scuba divers",
+          "visual_prompt": "Slow tracking shot along a stream flowing through rocks. Water ripples stretch unnaturally long before breaking. Calm reflections, muted tones, realistic physics, 16:9.",
+          "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "sunken_city_03.png",
-          "narration": "By sunrise, streets, temples, and homes were already resting silently beneath the water."
+          "best_frame_filename": "time_valley_03.png",
+          "narration": "Scientists believe extreme gravity beneath the ground could be bending time slightly."
         },
         {
           "id": "scene_04",
           "duration": 6,
-          "visual_prompt": "Calm ocean surface at sunrise. Gentle waves reflect soft orange light. Slow pull-back shot, peaceful mood, cinematic realism, 16:9.",
+          "visual_prompt": "Wide sunset shot of the valley as shadows lengthen rapidly across the landscape. Mist thickens near the ground. Slow pull-back, quiet mystery, cinematic realism, 16:9.",
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "sunken_city_04.png",
-          "narration": "The sea erased the city completely, leaving behind only ruins and legends."
+          "best_frame_filename": "time_valley_04.png",
+          "narration": "Step inside for a moment, and the outside world may age without you."
         }
       ]
     },
     {
-      "title": "The River That Boils Without Fire",
-      "slug": "boiling-river-amazon",
-      "description": "A real river so hot it can kill without flames.",
+      "title": "The Ocean That Remembers",
+      "slug": "memory-ocean",
+      "description": "A sea that records everything that touches it.",
       "total_duration": 24,
       "aspect_ratio": "16:9",
       "scenes": [
         {
           "id": "scene_01",
           "duration": 6,
-          "visual_prompt": "Aerial view of a winding river deep in the rainforest. Steam rises gently from the water surface. Slow drone-style movement, humid atmosphere, realistic jungle lighting, 16:9.",
+          "visual_prompt": "Wide shot of a calm ocean under overcast skies. Gentle waves roll toward a rocky shore. Cool tones, slow camera drift, realistic coastal environment, 16:9.",
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "boiling_river_01.png",
-          "narration": "Deep in the rainforest, there is a river so hot that it appears to be boiling."
+          "best_frame_filename": "memory_ocean_01.png",
+          "narration": "There is a stretch of ocean where scientists believe water can store information."
         },
         {
           "id": "scene_02",
           "duration": 6,
-          "visual_prompt": "Close-up of bubbling river water releasing thick steam. Leaves touch the surface and quickly wilt. Static camera, heat shimmer, natural lighting, 16:9.",
-          "negative_prompt": "text, watermark, lava",
+          "visual_prompt": "Close-up of water ripples spreading outward after a single drop falls. Patterns linger longer than expected. Natural lighting, macro realism, 16:9.",
+          "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "boiling_river_02.png",
-          "narration": "Heat from deep underground raises the water temperature high enough to kill instantly."
+          "best_frame_filename": "memory_ocean_02.png",
+          "narration": "Every movement leaves patterns that do not fade as quickly as they should."
         },
         {
           "id": "scene_03",
           "duration": 6,
-          "visual_prompt": "Slow tracking shot along the steaming riverbank surrounded by dense jungle. Heavy mist hangs in the air. Calm but dangerous atmosphere, 16:9.",
+          "visual_prompt": "Slow underwater shot beneath the surface. Light rays move through suspended particles. Calm drifting motion, deep blue tones, realistic water behavior, 16:9.",
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "boiling_river_03.png",
-          "narration": "Animals sense the danger and avoid the river long before reaching its edge."
+          "best_frame_filename": "memory_ocean_03.png",
+          "narration": "Some physicists think the water itself may be recording past events."
         },
         {
           "id": "scene_04",
           "duration": 6,
-          "visual_prompt": "Wide sunset shot of the steaming river glowing orange beneath the forest canopy. Camera slowly pulls back into the jungle. Cinematic mystery, 16:9.",
+          "visual_prompt": "Wide dusk shot of the ocean as waves reflect fading light. Horizon remains perfectly still. Slow pull-back, quiet sci-fi mystery, cinematic realism, 16:9.",
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "boiling_river_04.png",
-          "narration": "It is one of Earth’s deadliest natural wonders, hidden quietly within the jungle."
+          "best_frame_filename": "memory_ocean_04.png",
+          "narration": "If true, the ocean may remember everything humanity has forgotten."
+        }
+      ]
+    },
+    {
+      "title": "The Forest That Rewrites Reality",
+      "slug": "reality-forest",
+      "description": "A place where the environment subtly alters perception.",
+      "total_duration": 24,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 6,
+          "visual_prompt": "Wide shot of a dense forest under thick fog. Tall trees fade into mist. Soft natural light, slow forward movement, realistic woodland environment, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "forest_01.png",
+          "narration": "Deep within this forest, reality feels slightly unstable."
+        },
+        {
+          "id": "scene_02",
+          "duration": 6,
+          "visual_prompt": "Close-up of tree leaves gently vibrating as if reacting to unseen forces. Subtle motion, shallow depth of field, natural lighting, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "forest_02.png",
+          "narration": "Compasses fail here, and sounds seem to arrive before they are made."
+        },
+        {
+          "id": "scene_03",
+          "duration": 6,
+          "visual_prompt": "Slow tracking shot along a forest path where shadows move slightly out of sync with the light. Muted greens, calm motion, realistic visuals, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "forest_03.png",
+          "narration": "Scientists suspect powerful magnetic anomalies beneath the ground."
+        },
+        {
+          "id": "scene_04",
+          "duration": 6,
+          "visual_prompt": "Wide shot of the forest clearing at sunset. Fog thickens as the light fades. Slow pull-back, eerie calm, cinematic realism, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "forest_04.png",
+          "narration": "In this forest, reality quietly bends without ever breaking."
+        }
+      ]
+    },
+    {
+      "title": "The Desert That Hums",
+      "slug": "singing-desert",
+      "description": "A place where the ground produces unexplained sound.",
+      "total_duration": 24,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 6,
+          "visual_prompt": "Wide cinematic shot of endless sand dunes under a pale sky. Wind slowly shapes the surface. Soft natural lighting, slow pan, realistic desert environment, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "desert_01.png",
+          "narration": "There is a desert where the ground itself produces a deep humming sound."
+        },
+        {
+          "id": "scene_02",
+          "duration": 6,
+          "visual_prompt": "Close-up of sand grains sliding down a dune face. Fine particles move in smooth waves. Macro realism, warm tones, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "desert_02.png",
+          "narration": "As sand moves, vibrations travel through the dunes like sound waves."
+        },
+        {
+          "id": "scene_03",
+          "duration": 6,
+          "visual_prompt": "Wide shot of dunes vibrating subtly as wind passes over them. Heat haze visible in the distance. Natural motion, cinematic realism, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "desert_03.png",
+          "narration": "The frequency is low enough to be felt more than heard."
+        },
+        {
+          "id": "scene_04",
+          "duration": 6,
+          "visual_prompt": "Sunset over the dunes as shadows stretch across the sand. Wind calms. Slow pull-back, quiet mystery, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "desert_04.png",
+          "narration": "It is one of Earth’s strangest natural signals, still not fully understood."
         }
       ]
     }
