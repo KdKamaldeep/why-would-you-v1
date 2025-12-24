@@ -1,71 +1,137 @@
 {
   "stories": [
     {
-      "title": "Hidden Fire Hazards in Plain Sight",
-      "slug": "hidden-home-fire-hazards-safety",
-      "description": "Critical home safety areas that often go unnoticed but pose significant fire risks.",
-      "total_duration": 65,
+      "title": "The Day the Sun Went Silent",
+      "slug": "solar-minimum-event",
+      "description": "When the Sun nearly shut down and Earth felt the consequences.",
+      "total_duration": 24,
       "aspect_ratio": "16:9",
       "scenes": [
         {
-          "id": "scene_01_safety_intro",
-          "duration": 8,
-          "visual_prompt": "A cinematic slow-pan across a peaceful, sun-drenched living room. Dust motes drift slowly through golden light beams. The camera moves with a smooth gimbal glide, revealing a modern home interior that feels safe and calm.",
-          "visual_reference": "A cozy home interior that looks safe but hides small risks.",
-          "negative_prompt": "text, watermark, smoke, fire, messy, dark, scary",
+          "id": "scene_01",
+          "duration": 6,
+          "visual_prompt": "Close-up view of the Sun’s surface with very few solar flares. Dark sunspots drift slowly across the glowing surface. Slow camera push-in, realistic space lighting, cinematic contrast, 16:9.",
+          "negative_prompt": "text, watermark, cartoon",
           "fps_hint": 24,
-          "best_frame_filename": "hidden_fire_hazards__scene_1.png",
-          "narration": "A safe home starts with noticing the small details that usually go unseen."
+          "best_frame_filename": "sun_silent_01.png",
+          "narration": "Did you know there was a time when the Sun nearly went quiet?"
         },
         {
-          "id": "scene_02_dryer_lint",
-          "duration": 10,
-          "visual_prompt": "A slow, dramatic macro-zoom into the dark opening of a dryer vent. Clumps of grey lint vibrate slightly as air huffs through the silver hose. The camera pushes deep into the texture of the trapped fibers.",
-          "visual_reference": "Extreme close-up of lint buildup in a dryer exhaust pipe.",
-          "negative_prompt": "text, watermark, laundry, washing machine",
+          "id": "scene_02",
+          "duration": 6,
+          "visual_prompt": "Wide view of Earth from space under thick cloud cover. The planet rotates slowly as weak sunlight reaches the surface. Cool blue tones, gentle motion, realistic style, 16:9.",
+          "negative_prompt": "text, watermark, satellites",
           "fps_hint": 24,
-          "best_frame_filename": "hidden_fire_hazards__scene_2.png",
-          "narration": "Hidden lint buildup in dryer vents is a leading cause of preventable home fires."
+          "best_frame_filename": "sun_silent_02.png",
+          "narration": "During a rare solar minimum, Earth cooled dramatically."
         },
         {
-          "id": "scene_03_overloaded_outlets",
-          "duration": 10,
-          "visual_prompt": "A low-angle tracking shot moving slowly alongside a power strip on a wooden floor. The camera orbits the tangled wires, focusing on a heavy adapter that is sagging out of the socket. Soft shadows shift as the camera circles.",
-          "visual_reference": "A power strip with many electronic devices plugged in.",
-          "negative_prompt": "text, watermark, sparks, fire, cartoonish, messy cables",
+          "id": "scene_03",
+          "duration": 6,
+          "visual_prompt": "Snow-covered farmland stretching into the distance. Wind moves across frozen fields and dead crops. Slow side tracking shot, overcast lighting, realistic winter atmosphere, 16:9.",
+          "negative_prompt": "text, watermark, modern machinery",
           "fps_hint": 24,
-          "best_frame_filename": "hidden_fire_hazards__scene_3.png",
-          "narration": "Overloading power strips can lead to overheating long before a breaker ever trips."
+          "best_frame_filename": "sun_silent_03.png",
+          "narration": "Harsh winters caused food shortages across the world."
         },
         {
-          "id": "scene_04_kitchen_grease",
-          "duration": 10,
-          "visual_prompt": "The camera tilts upward slowly, starting from a stove top and rising to the range hood. It settles on a close-up of the metal mesh where amber grease droplets are slowly forming and glistening under the stovetop light.",
-          "visual_reference": "A dirty kitchen grease filter under a vent hood.",
-          "negative_prompt": "text, watermark, food, person cooking, fire",
+          "id": "scene_04",
+          "duration": 6,
+          "visual_prompt": "The Sun slowly growing brighter with gentle solar activity returning. Camera pulls back to reveal Earth warming again. Soft golden light, hopeful tone, cinematic realism, 16:9.",
+          "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "hidden_fire_hazards__scene_4.png",
-          "narration": "Cooking grease trapped in range hood filters can ignite during high-heat cooking."
+          "best_frame_filename": "sun_silent_04.png",
+          "narration": "When the Sun recovered, life slowly returned to normal."
+        }
+      ]
+    },
+    {
+      "title": "The City That Sank Overnight",
+      "slug": "sunken-city-disaster",
+      "description": "A real city that vanished beneath the sea in a single night.",
+      "total_duration": 24,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 6,
+          "visual_prompt": "Ancient coastal city at dusk. Stone buildings glow softly as calm waves touch the shoreline. Slow cinematic pan, warm lighting, realistic environment, 16:9.",
+          "negative_prompt": "text, watermark, modern buildings",
+          "fps_hint": 24,
+          "best_frame_filename": "sunken_city_01.png",
+          "narration": "Did you know an entire city once vanished in a single night?"
         },
         {
-          "id": "scene_05_smoke_detector_test",
-          "duration": 9,
-          "visual_prompt": "A sharp, static close-up of a white smoke detector. A finger enters the frame and presses the 'Test' button, causing a small green LED light to blink rapidly. The camera has a very slight handheld shake for a realistic feel.",
-          "visual_reference": "A smoke alarm being tested in a modern home.",
-          "negative_prompt": "text, watermark, yellowed plastic, broken alarm",
+          "id": "scene_02",
+          "duration": 6,
+          "visual_prompt": "Underwater view of the seabed shaking as cracks form. Buildings tilt slightly as sand rises into the water. Gentle camera shake, dark blue tones, 16:9.",
+          "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "hidden_fire_hazards__scene_5.png",
-          "narration": "Checking your alarms monthly ensures they are ready when seconds count."
+          "best_frame_filename": "sunken_city_02.png",
+          "narration": "An earthquake caused the land beneath it to collapse."
         },
         {
-          "id": "scene_06_safety_conclusion",
-          "duration": 8,
-          "visual_prompt": "A wide, cinematic pull-back shot (dolly out) from a red fire extinguisher mounted on a clean white wall. The room opens up as the camera retreats, showing a perfectly organized and safe hallway bathed in soft morning light.",
-          "visual_reference": "A well-prepared home with safety equipment in place.",
-          "negative_prompt": "text, watermark, clutter, dark, scary, fire",
+          "id": "scene_03",
+          "duration": 6,
+          "visual_prompt": "Submerged ruins resting underwater. Columns and statues lie covered in drifting sand. Slow forward movement, muted colors, quiet atmosphere, 16:9.",
+          "negative_prompt": "text, watermark, scuba divers",
           "fps_hint": 24,
-          "best_frame_filename": "hidden_fire_hazards__scene_6.png",
-          "narration": "A few minutes of inspection today can protect your home for years to come."
+          "best_frame_filename": "sunken_city_03.png",
+          "narration": "By morning, the city was completely underwater."
+        },
+        {
+          "id": "scene_04",
+          "duration": 6,
+          "visual_prompt": "Calm ocean surface at sunrise. Gentle waves reflect soft orange light. Slow pull-back shot, peaceful mood, cinematic realism, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "sunken_city_04.png",
+          "narration": "Only legends remain of the city beneath the sea."
+        }
+      ]
+    },
+    {
+      "title": "The River That Boils Without Fire",
+      "slug": "boiling-river-amazon",
+      "description": "A real river so hot it can kill without flames.",
+      "total_duration": 24,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 6,
+          "visual_prompt": "Aerial view of a winding river deep in the rainforest. Steam rises gently from the water surface. Slow drone-style movement, humid atmosphere, realistic jungle lighting, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "boiling_river_01.png",
+          "narration": "Did you know there is a river that boils without fire?"
+        },
+        {
+          "id": "scene_02",
+          "duration": 6,
+          "visual_prompt": "Close-up of bubbling river water releasing thick steam. Leaves touch the surface and quickly wilt. Static camera, heat shimmer, natural lighting, 16:9.",
+          "negative_prompt": "text, watermark, lava",
+          "fps_hint": 24,
+          "best_frame_filename": "boiling_river_02.png",
+          "narration": "Heat from deep underground raises the water to deadly temperatures."
+        },
+        {
+          "id": "scene_03",
+          "duration": 6,
+          "visual_prompt": "Slow tracking shot along the steaming riverbank surrounded by dense jungle. Heavy mist hangs in the air. Calm but dangerous atmosphere, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "boiling_river_03.png",
+          "narration": "Animals instinctively avoid its waters."
+        },
+        {
+          "id": "scene_04",
+          "duration": 6,
+          "visual_prompt": "Wide sunset shot of the steaming river glowing orange beneath the forest canopy. Camera slowly pulls back into the jungle. Cinematic mystery, 16:9.",
+          "negative_prompt": "text, watermark",
+          "fps_hint": 24,
+          "best_frame_filename": "boiling_river_04.png",
+          "narration": "Nature hides its most dangerous secrets in silence."
         }
       ]
     }
