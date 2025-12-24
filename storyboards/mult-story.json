@@ -14,7 +14,7 @@
           "negative_prompt": "text, watermark, cartoon",
           "fps_hint": 24,
           "best_frame_filename": "sun_silent_01.png",
-          "narration": "Did you know there was a time when the Sun nearly went quiet?"
+          "narration": "Did you know there was a moment in history when the Sun itself became unusually quiet and inactive?"
         },
         {
           "id": "scene_02",
@@ -23,7 +23,7 @@
           "negative_prompt": "text, watermark, satellites",
           "fps_hint": 24,
           "best_frame_filename": "sun_silent_02.png",
-          "narration": "During a rare solar minimum, Earth cooled dramatically."
+          "narration": "During a rare solar minimum, Earth received less energy, causing global temperatures to fall noticeably."
         },
         {
           "id": "scene_03",
@@ -32,7 +32,7 @@
           "negative_prompt": "text, watermark, modern machinery",
           "fps_hint": 24,
           "best_frame_filename": "sun_silent_03.png",
-          "narration": "Harsh winters caused food shortages across the world."
+          "narration": "Long, brutal winters followed, destroying crops and triggering widespread hunger across many regions of the world."
         },
         {
           "id": "scene_04",
@@ -41,7 +41,7 @@
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
           "best_frame_filename": "sun_silent_04.png",
-          "narration": "When the Sun recovered, life slowly returned to normal."
+          "narration": "When solar activity finally returned, climates stabilized, reminding humanity how dependent life is on the Sun."
         }
       ]
     },
@@ -59,7 +59,7 @@
           "negative_prompt": "text, watermark, modern buildings",
           "fps_hint": 24,
           "best_frame_filename": "sunken_city_01.png",
-          "narration": "Did you know an entire city once vanished in a single night?"
+          "narration": "Did you know an entire ancient city disappeared beneath the sea in just one terrifying night?"
         },
         {
           "id": "scene_02",
@@ -68,7 +68,7 @@
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
           "best_frame_filename": "sunken_city_02.png",
-          "narration": "An earthquake caused the land beneath it to collapse."
+          "narration": "A sudden earthquake caused the ground below the city to collapse without warning."
         },
         {
           "id": "scene_03",
@@ -77,7 +77,7 @@
           "negative_prompt": "text, watermark, scuba divers",
           "fps_hint": 24,
           "best_frame_filename": "sunken_city_03.png",
-          "narration": "By morning, the city was completely underwater."
+          "narration": "By sunrise, streets, temples, and homes were already resting silently beneath the water."
         },
         {
           "id": "scene_04",
@@ -86,7 +86,7 @@
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
           "best_frame_filename": "sunken_city_04.png",
-          "narration": "Only legends remain of the city beneath the sea."
+          "narration": "The sea erased the city completely, leaving behind only ruins and legends."
         }
       ]
     },
@@ -104,7 +104,7 @@
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
           "best_frame_filename": "boiling_river_01.png",
-          "narration": "Did you know there is a river that boils without fire?"
+          "narration": "Deep in the rainforest, there is a river so hot that it appears to be boiling."
         },
         {
           "id": "scene_02",
@@ -113,7 +113,7 @@
           "negative_prompt": "text, watermark, lava",
           "fps_hint": 24,
           "best_frame_filename": "boiling_river_02.png",
-          "narration": "Heat from deep underground raises the water to deadly temperatures."
+          "narration": "Heat from deep underground raises the water temperature high enough to kill instantly."
         },
         {
           "id": "scene_03",
@@ -122,7 +122,7 @@
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
           "best_frame_filename": "boiling_river_03.png",
-          "narration": "Animals instinctively avoid its waters."
+          "narration": "Animals sense the danger and avoid the river long before reaching its edge."
         },
         {
           "id": "scene_04",
@@ -131,7 +131,7 @@
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
           "best_frame_filename": "boiling_river_04.png",
-          "narration": "Nature hides its most dangerous secrets in silence."
+          "narration": "It is one of Earth’s deadliest natural wonders, hidden quietly within the jungle."
         }
       ]
     }
