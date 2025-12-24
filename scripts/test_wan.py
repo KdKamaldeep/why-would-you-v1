@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for WAN 2.1 Text-to-Video generation
+Test script for WAN 2.2 Text-to-Video generation
 """
 
 import sys
@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 def main():
     """Main function to test WAN T2V generation."""
-    parser = argparse.ArgumentParser(description="Test WAN 2.1 Text-to-Video generation")
+    parser = argparse.ArgumentParser(description="Test WAN 2.2 Text-to-Video generation")
     parser.add_argument(
         "--prompt",
         type=str,
@@ -77,7 +77,7 @@ def main():
     
     args = parser.parse_args()
     
-    print("🧪 Testing WAN 2.1 Text-to-Video Generation")
+    print("🧪 Testing WAN 2.2 Text-to-Video Generation")
     print("=" * 60)
     print(f"📝 Prompt: {args.prompt}")
     print(f"📐 Dimensions: {args.width}x{args.height}")

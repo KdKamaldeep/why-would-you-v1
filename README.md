@@ -4,7 +4,7 @@ A complete AI-powered system for generating platform-ready vertical Reels/Shorts
 
 ## 🚀 **Features**
 
-- 🎬 **WAN 2.1 Text-to-Video** - Direct text-to-video generation (no image step)
+- 🎬 **WAN 2.2 Text-to-Video** - Direct text-to-video generation (no image step)
 - 📱 **Platform-Ready Output** - 1080×1920, H.264/AAC, 30fps for YouTube/Instagram
 - 🎵 **Smart Audio Mixing** - Voice + optional background music
 - 📝 **GPT-4 Story Generation** - Intelligent script creation
@@ -185,17 +185,17 @@ python -m src.interfaces.quick_start
 python -m src.interfaces.batch_generate
 ```
 
-## 🎬 **WAN 2.1 Text-to-Video Pipeline**
+## 🎬 **WAN 2.2 Text-to-Video Pipeline**
 
 ### **Direct Text-to-Video Generation**
-- **WAN 2.1 T2V** - Generates videos directly from text prompts
+- **WAN 2.2 T2V** - Generates videos directly from text prompts
 - **No image generation step** - Streamlined pipeline
 - **Multi-scene support** - Automatic scene stitching
 - **Local processing** - Runs entirely on your machine
 
 ### **Pipeline Flow:**
 ```
-Script/Scenes JSON → WAN 2.1 (text2video) → Coqui TTS → FFmpeg stitch → Reel Renderer
+Script/Scenes JSON → WAN 2.2 (text2video) → Coqui TTS → FFmpeg stitch → Reel Renderer
 ```
 
 ### **Output Files:**
@@ -435,7 +435,7 @@ python -m src.interfaces.batch_generate
 
 Your system generates:
 - ✅ **Platform-ready vertical reels** (1080×1920, H.264/AAC, 30fps)
-- ✅ **Direct text-to-video** using WAN 2.1 T2V (no image generation step)
+- ✅ **Direct text-to-video** using WAN 2.2 T2V (no image generation step)
 - ✅ **Intelligent storytelling** powered by GPT-4
 - ✅ **Natural multilingual narration** with local XTTS v2 model
 - ✅ **Smart audio mixing** (voice + optional background music)
