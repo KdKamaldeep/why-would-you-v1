@@ -1,95 +1,71 @@
 {
   "stories": [
     {
-      "title": "Seasonal Home Maintenance Tips Homeowners Forget",
-      "slug": "seasonal-home-maintenance-tips-to-follow",
-      "description": "Simple seasonal home maintenance areas homeowners often overlook throughout the year.",
-      "total_duration": 70,
+      "title": "Hidden Fire Hazards in Plain Sight",
+      "slug": "hidden-home-fire-hazards-safety",
+      "description": "Critical home safety areas that often go unnoticed but pose significant fire risks.",
+      "total_duration": 65,
       "aspect_ratio": "16:9",
       "scenes": [
         {
-          "id": "scene_01_seasonal_overview",
+          "id": "scene_01_safety_intro",
           "duration": 8,
-          "visual_prompt": "Cinematic time-lapse shot of a contemporary suburban home. The environment seamlessly transitions from autumn leaves to winter snow, then spring blooms, and bright summer sun. High dynamic range, hyper-realistic architectural photography style.",
-          "visual_reference": "A suburban home shown across different seasons with subtle changes in weather and lighting.",
-          "negative_prompt": "text, watermark, cartoon, blurry, distorted architecture",
-          "motion_hint": "smooth time-lapse transition",
-          "motion_strength": 0.5,
+          "visual_prompt": "A cinematic slow-pan across a peaceful, sun-drenched living room. Dust motes drift slowly through golden light beams. The camera moves with a smooth gimbal glide, revealing a modern home interior that feels safe and calm.",
+          "visual_reference": "A cozy home interior that looks safe but hides small risks.",
+          "negative_prompt": "text, watermark, smoke, fire, messy, dark, scary",
           "fps_hint": 24,
-          "best_frame_filename": "seasonal-home-maintenance__scene_01_seasonal_overview.png",
-          "narration": "Every season brings small changes that quietly affect how a home functions."
+          "best_frame_filename": "hidden_fire_hazards__scene_1.png",
+          "narration": "A safe home starts with noticing the small details that usually go unseen."
         },
         {
-          "id": "scene_02_rainy_gutters",
+          "id": "scene_02_dryer_lint",
           "duration": 10,
-          "visual_prompt": "Macro low-angle shot of a clean metal gutter overflowing during a heavy rainstorm. Detailed water droplets splashing, dark moody sky, wet shingles with realistic texture and reflections.",
-          "visual_reference": "Rainwater flowing along a roof gutter during the rainy season.",
-          "negative_prompt": "text, watermark, people, plastic look, dry spots",
-          "motion_hint": "rapid water flow and splashing",
-          "motion_strength": 0.6,
+          "visual_prompt": "A slow, dramatic macro-zoom into the dark opening of a dryer vent. Clumps of grey lint vibrate slightly as air huffs through the silver hose. The camera pushes deep into the texture of the trapped fibers.",
+          "visual_reference": "Extreme close-up of lint buildup in a dryer exhaust pipe.",
+          "negative_prompt": "text, watermark, laundry, washing machine",
           "fps_hint": 24,
-          "best_frame_filename": "seasonal-home-maintenance__scene_02_rainy_gutters.png",
-          "narration": "During the rainy season, roof edges and gutters handle large amounts of flowing water."
+          "best_frame_filename": "hidden_fire_hazards__scene_2.png",
+          "narration": "Hidden lint buildup in dryer vents is a leading cause of preventable home fires."
         },
         {
-          "id": "scene_03_summer_ac_heat",
+          "id": "scene_03_overloaded_outlets",
           "duration": 10,
-          "visual_prompt": "An outdoor HVAC condenser unit in a backyard. Intense golden hour sunlight creating a visible heat haze rising from the fan. Dry grass in the background, sharp focus on the metal grill of the unit.",
-          "visual_reference": "An outdoor air conditioning unit exposed to strong summer sunlight.",
-          "negative_prompt": "text, watermark, brand logos, indoor unit",
-          "motion_hint": "shimmering heat waves",
-          "motion_strength": 0.4,
+          "visual_prompt": "A low-angle tracking shot moving slowly alongside a power strip on a wooden floor. The camera orbits the tangled wires, focusing on a heavy adapter that is sagging out of the socket. Soft shadows shift as the camera circles.",
+          "visual_reference": "A power strip with many electronic devices plugged in.",
+          "negative_prompt": "text, watermark, sparks, fire, cartoonish, messy cables",
           "fps_hint": 24,
-          "best_frame_filename": "seasonal-home-maintenance__scene_03_summer_ac_heat.png",
-          "narration": "Hot summer temperatures place extra demand on cooling systems throughout the day."
+          "best_frame_filename": "hidden_fire_hazards__scene_3.png",
+          "narration": "Overloading power strips can lead to overheating long before a breaker ever trips."
         },
         {
-          "id": "scene_04_winter_window_moisture",
+          "id": "scene_04_kitchen_grease",
           "duration": 10,
-          "visual_prompt": "Interior close-up of a double-pane glass window. Condensation fogging the edges, small water beads trickling down. Through the glass, a blurry cold blue winter landscape is visible.",
-          "visual_reference": "Light condensation forming on an indoor window during cold weather.",
-          "negative_prompt": "text, watermark, frost indoors, broken glass",
-          "motion_hint": "slow water bead sliding down glass",
-          "motion_strength": 0.2,
+          "visual_prompt": "The camera tilts upward slowly, starting from a stove top and rising to the range hood. It settles on a close-up of the metal mesh where amber grease droplets are slowly forming and glistening under the stovetop light.",
+          "visual_reference": "A dirty kitchen grease filter under a vent hood.",
+          "negative_prompt": "text, watermark, food, person cooking, fire",
           "fps_hint": 24,
-          "best_frame_filename": "seasonal-home-maintenance__scene_04_winter_window_moisture.png",
-          "narration": "In colder months, temperature differences can cause moisture to appear on windows."
+          "best_frame_filename": "hidden_fire_hazards__scene_4.png",
+          "narration": "Cooking grease trapped in range hood filters can ignite during high-heat cooking."
         },
         {
-          "id": "scene_05_pest_entry_points",
-          "duration": 10,
-          "visual_prompt": "Extreme close-up of a wooden door frame meeting a brick wall. A visible hairline crack and gap in the caulking. Sharp textures of wood grain and mortar, neutral daylight.",
-          "visual_reference": "Small gaps around a door frame and wall corner in a home.",
-          "negative_prompt": "text, watermark, visible insects, dirty, messy",
-          "motion_hint": "slow camera crawl along the crack",
-          "motion_strength": 0.2,
+          "id": "scene_05_smoke_detector_test",
+          "duration": 9,
+          "visual_prompt": "A sharp, static close-up of a white smoke detector. A finger enters the frame and presses the 'Test' button, causing a small green LED light to blink rapidly. The camera has a very slight handheld shake for a realistic feel.",
+          "visual_reference": "A smoke alarm being tested in a modern home.",
+          "negative_prompt": "text, watermark, yellowed plastic, broken alarm",
           "fps_hint": 24,
-          "best_frame_filename": "seasonal-home-maintenance__scene_05_pest_entry_points.png",
-          "narration": "Seasonal expansion and contraction can create small gaps around doors and walls."
+          "best_frame_filename": "hidden_fire_hazards__scene_5.png",
+          "narration": "Checking your alarms monthly ensures they are ready when seconds count."
         },
         {
-          "id": "scene_06_electrical_safety_check",
-          "duration": 10,
-          "visual_prompt": "Professional shot of an open modern electrical panel. Tidy rows of circuit breakers with clear labels. Soft overhead garage lighting, shallow depth of field focusing on a 'Test' button.",
-          "visual_reference": "A home electrical switchboard with clearly visible safety switches and organized wiring.",
-          "negative_prompt": "text, watermark, exposed sparks, messy wires, fire",
-          "motion_hint": "very slight zoom in",
-          "motion_strength": 0.1,
+          "id": "scene_06_safety_conclusion",
+          "duration": 8,
+          "visual_prompt": "A wide, cinematic pull-back shot (dolly out) from a red fire extinguisher mounted on a clean white wall. The room opens up as the camera retreats, showing a perfectly organized and safe hallway bathed in soft morning light.",
+          "visual_reference": "A well-prepared home with safety equipment in place.",
+          "negative_prompt": "text, watermark, clutter, dark, scary, fire",
           "fps_hint": 24,
-          "best_frame_filename": "seasonal-home-maintenance__scene_06_electrical_safety_check.png",
-          "narration": "Electrical systems also experience seasonal changes as usage patterns shift."
-        },
-        {
-          "id": "scene_07_well_maintained_home",
-          "duration": 12,
-          "visual_prompt": "Wide angle interior of a cozy, minimalist living room. Warm ambient lighting from lamps, golden hour light hitting polished hardwood floors. A sense of peace and structural integrity.",
-          "visual_reference": "A calm, clean, well-maintained home interior with balanced lighting.",
-          "negative_prompt": "text, watermark, clutter, dust, dark corners",
-          "motion_hint": "slow cinematic gimbal pan",
-          "motion_strength": 0.3,
-          "fps_hint": 24,
-          "best_frame_filename": "seasonal-home-maintenance__scene_07_well_maintained_home.png",
-          "narration": "Paying attention to seasonal changes helps keep a home comfortable and well maintained year-round."
+          "best_frame_filename": "hidden_fire_hazards__scene_6.png",
+          "narration": "A few minutes of inspection today can protect your home for years to come."
         }
       ]
     }
