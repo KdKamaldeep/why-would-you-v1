@@ -4,7 +4,7 @@ Cartoon Shorts Generator - A complete CLI tool for creating platform-ready verti
 
 This script follows a specific flow:
 1. Generate 3-scene story with OpenAI GPT-4
-2. Generate videos directly with WAN 2.2 Text-to-Video (T2V)
+2. Generate videos directly with WAN 2.1 Text-to-Video (T2V)
 3. Generate narration with Coqui TTS (XTTS v2)
 4. Stitch scene videos together
 5. Create platform-ready reel (1080×1920, H.264/AAC, 30fps)
@@ -330,7 +330,7 @@ class CartoonShortsGenerator:
                 logger.info(f"📊 Average scene duration: {total_audio_duration/len(actual_scene_durations):.1f}s")
             
             # Step 3: Generate videos directly from prompts using WAN T2V
-            logger.info("Step 3: Generating videos with WAN 2.2 T2V...")
+            logger.info("Step 3: Generating videos with WAN 2.1 T2V...")
             logger.info(f"🎬 Total videos to generate: {len(script['scenes'])}")
             video_clips: List[str] = []
             total_video_duration = 0

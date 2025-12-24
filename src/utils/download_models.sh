@@ -1,9 +1,9 @@
 #!/bin/bash
 # Model Download Script for Video Reel Generator
-# This script downloads required AI models for video generation with WAN 2.2 T2V
+# This script downloads required AI models for video generation with WAN 2.1 T2V
 
 echo "🚀 Downloading AI Models for Video Reel Generator"
-echo "🎬 WAN 2.2 Text-to-Video Pipeline"
+echo "🎬 WAN 2.1 Text-to-Video Pipeline"
 echo "============================================================"
 
 # Parse flags
@@ -31,15 +31,15 @@ mkdir -p models/tts
 
 echo "✅ Directories created"
 
-# WAN 2.2 Text-to-Video Model
+# WAN 2.1 Text-to-Video Model
 echo ""
-echo "📋 Downloading WAN 2.2 Text-to-Video Model..."
+echo "📋 Downloading WAN 2.1 Text-to-Video Model..."
 echo "💡 The WAN model will be automatically downloaded from Hugging Face when first used."
 echo "   This script provides an option to pre-download it now for faster first generation."
 
-TARGET_WAN_DIR="models/wan-2.2-t2v"
+TARGET_WAN_DIR="models/wan-2.1-t2v"
 if [ -d "$TARGET_WAN_DIR" ] && [ "$REDOWNLOAD" != true ]; then
-    echo "⏩ WAN 2.2 model already exists: $TARGET_WAN_DIR"
+    echo "⏩ WAN 2.1 model already exists: $TARGET_WAN_DIR"
     echo "   (Model will be loaded from cache on first use)"
 else
     if [ "$REDOWNLOAD" = true ] && [ -d "$TARGET_WAN_DIR" ]; then
@@ -49,12 +49,12 @@ else
 
     # Prefer huggingface-cli if available; otherwise, fall back to Python API
     if command -v huggingface-cli >/dev/null 2>&1; then
-        echo "⬇️  Using huggingface-cli to download Wan-AI/Wan2.2-T2V-A14B..."
-        huggingface-cli download Wan-AI/Wan2.2-T2V-A14B \
+        echo "⬇️  Using huggingface-cli to download Wan-AI/Wan2.1-T2V-1.3B-Diffusers..."
+        huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers \
             --local-dir "$TARGET_WAN_DIR" \
             --local-dir-use-symlinks False
     if [ $? -eq 0 ]; then
-            echo "✅ WAN 2.2 model downloaded to $TARGET_WAN_DIR"
+            echo "✅ WAN 2.1 model downloaded to $TARGET_WAN_DIR"
             USE_PYTHON_FALLBACK=0
     else
             echo "❌ huggingface-cli download failed, attempting Python fallback"
@@ -66,7 +66,7 @@ else
 
     if [ "${USE_PYTHON_FALLBACK}" = "1" ]; then
         if command -v python3 >/dev/null 2>&1; then
-            echo "⬇️  Using Python (huggingface_hub) to download Wan-AI/Wan2.2-T2V-A14B..."
+            echo "⬇️  Using Python (huggingface_hub) to download Wan-AI/Wan2.1-T2V-1.3B-Diffusers..."
             python3 - <<'PY'
 import sys
 from pathlib import Path
@@ -77,22 +77,22 @@ except Exception as e:
     print("[INFO] Install it with: pip install huggingface_hub")
     sys.exit(0)
 
-target_dir = Path("models/wan-2.2-t2v")
+target_dir = Path("models/wan-2.1-t2v")
 target_dir.mkdir(parents=True, exist_ok=True)
 try:
     snapshot_download(
-        repo_id="Wan-AI/Wan2.2-T2V-A14B",
+        repo_id="Wan-AI/Wan2.1-T2V-1.3B-Diffusers",
         local_dir=str(target_dir),
         local_dir_use_symlinks=False,
         resume_download=True,
     )
-    print("[OK] WAN 2.2 model downloaded to", target_dir)
+    print("[OK] WAN 2.1 model downloaded to", target_dir)
 except Exception as e:
     print("[INFO] Model download failed, but it will be downloaded automatically on first use:", e)
     sys.exit(0)
 PY
     if [ $? -eq 0 ]; then
-                echo "✅ WAN 2.2 model pre-downloaded (or will download on first use)"
+                echo "✅ WAN 2.1 model pre-downloaded (or will download on first use)"
             fi
         else
             echo "ℹ️  Python3 not found. WAN model will be downloaded automatically on first use."
@@ -177,15 +177,15 @@ echo "🎊 MODEL DOWNLOAD COMPLETED!"
 echo "============================================================"
 echo ""
 echo "📊 Downloaded Models Summary:"
-echo "  ├── 🎬 WAN 2.2 Text-to-Video:"
-echo "  │   └── Wan-AI/Wan2.2-T2V-A14B: models/wan-2.2-t2v"
+echo "  ├── 🎬 WAN 2.1 Text-to-Video:"
+echo "  │   └── Wan-AI/Wan2.1-T2V-1.3B-Diffusers: models/wan-2.1-t2v"
 echo "  │       (Downloads automatically from Hugging Face on first use)"
 echo "  └── 🔊 TTS Models:"
 echo "      └── Coqui XTTS v2: models/tts/XTTS-v2"
 
 echo ""
 echo "🎬 FEATURES ENABLED:"
-echo "  ✅ WAN 2.2 Text-to-Video Generation"
+echo "  ✅ WAN 2.1 Text-to-Video Generation"
 echo "  ✅ Direct text-to-video (no image generation step)"
 echo "  ✅ Multi-scene video stitching"
 echo "  ✅ Coqui TTS voice synthesis"

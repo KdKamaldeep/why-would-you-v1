@@ -71,7 +71,7 @@ def check_wan() -> CheckResult:
             "Install WAN support: `pip install diffusers==0.30.2 accelerate torch torchvision`.",
         )
 
-    model_dir = Path("models/wan-2.2-t2v")
+    model_dir = Path("models/wan-2.1-t2v")
     if model_dir.exists():
         return CheckResult("WAN Text-to-Video", True, f"WAN model directory present: {model_dir}")
     return CheckResult(

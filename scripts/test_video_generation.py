@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple script to test WAN 2.2 text-to-video generation with a prompt.
+Simple script to test WAN 2.1 text-to-video generation with a prompt.
 Can optionally add audio narration using Coqui TTS.
 
 Usage:
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Test WAN 2.2 text-to-video generation with a prompt"
+        description="Test WAN 2.1 text-to-video generation with a prompt"
     )
     parser.add_argument(
         "-p", "--prompt",
@@ -126,7 +126,7 @@ def main():
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     logger.info("=" * 60)
-    logger.info("WAN 2.2 Text-to-Video Generation Test")
+    logger.info("WAN 2.1 Text-to-Video Generation Test")
     logger.info("=" * 60)
     logger.info(f"📝 Prompt: {args.prompt}")
     logger.info(f"💾 Output: {args.output}")
@@ -144,7 +144,7 @@ def main():
     
     try:
         # Initialize WAN generator
-        logger.info("🔄 Initializing WAN 2.2 T2V generator...")
+        logger.info("🔄 Initializing WAN 2.1 T2V generator...")
         generator = WanT2VGenerator(
             width=args.width,
             height=args.height,

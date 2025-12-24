@@ -45,11 +45,11 @@ def check_requirements():
 def get_model_path_for_type(model_type: str) -> str | None:
     """
     Legacy function - no longer used.
-    WAN 2.2 T2V is the only model and it downloads automatically from Hugging Face.
+    WAN 2.1 T2V is the only model and it downloads automatically from Hugging Face.
     This function is kept for backward compatibility but always returns None.
     """
-    # WAN 2.2 T2V model is handled automatically by diffusers library
-    # Model ID: Wan-AI/Wan2.2-T2V-A14B
+    # WAN 2.1 T2V model is handled automatically by diffusers library
+    # Model ID: Wan-AI/Wan2.1-T2V-1.3B-Diffusers
     # It downloads automatically on first use to Hugging Face cache
     return None
 
@@ -75,7 +75,7 @@ def generate_cartoon(prompt, style="realistic", duration=30, language="en", enab
             print(f"🎲 Seed: {seed}")
         print("=" * 50)
         
-        print(f"🎬 Starting video generation with WAN 2.2 T2V...")
+        print(f"🎬 Starting video generation with WAN 2.1 T2V...")
         print(f"📝 Prompt: {prompt}")
         print(f"🎨 Style: {style}")
         print(f"⏱️ Duration: {duration} seconds")
@@ -184,7 +184,7 @@ Storyboard Cast Format (with face images):
         help="Visual style (realistic, anime, indian, etc.)"
     )
     
-    # Note: --model-type removed (WAN 2.2 is the only model now)
+    # Note: --model-type removed (WAN 2.1 is the only model now)
     
     parser.add_argument(
         "--duration", "-d",

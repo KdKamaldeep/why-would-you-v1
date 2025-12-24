@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-WAN 2.2 Text-to-Video Generator Module
-Handles text-to-video generation using Wan-AI/Wan2.2-T2V-A14B
+WAN 2.1 Text-to-Video Generator Module
+Handles text-to-video generation using Wan-AI/Wan2.1-T2V-1.3B-Diffusers
 """
 
 import os
@@ -62,7 +62,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
     try:
         from diffusers import AutoencoderKLWan, WanPipeline
         
-        model_id = "Wan-AI/Wan2.2-T2V-A14B"
+        model_id = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
         
         # Configure Hugging Face cache directory to use /workspace if available
         # This is important for RunPod and similar environments with attached disks
@@ -74,7 +74,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             default_cache = Path.home() / ".cache" / "huggingface"
             logger.info(f"📁 Using default Hugging Face cache: {default_cache}")
         
-        logger.info(f"🔄 Loading WAN 2.2 T2V model: {model_id}")
+        logger.info(f"🔄 Loading WAN 2.1 T2V model: {model_id}")
         logger.info(f"💻 Device: {device}")
         
         # Determine torch dtype based on device
@@ -131,7 +131,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             except Exception as e:
                 logger.info("ℹ️ xFormers not available; continuing without it")
         
-        logger.info("✅ WAN 2.2 T2V pipeline loaded successfully")
+        logger.info("✅ WAN 2.1 T2V pipeline loaded successfully")
         logger.info("📦 WAN pipeline initialized ONCE - will be reused for all subsequent generations")
         return _wan_pipeline
         
@@ -147,7 +147,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
 
 
 class WanT2VGenerator:
-    """Handles text-to-video generation using WAN 2.2."""
+    """Handles text-to-video generation using WAN 2.1."""
     
     def __init__(self, 
                  width: int = 832,
@@ -233,7 +233,7 @@ class WanT2VGenerator:
             logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
         
         try:
-            logger.info(f"🎬 Generating video with WAN 2.2 T2V...")
+            logger.info(f"🎬 Generating video with WAN 2.1 T2V...")
             logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
             logger.info(f"📐 Dimensions: {self.width}x{self.height}")
             logger.info(f"⚙️ Steps: {self.num_inference_steps}, Guidance: {self.guidance_scale}")
