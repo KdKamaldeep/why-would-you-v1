@@ -1,182 +1,47 @@
 {
   "stories": [
     {
-      "title": "The Valley Where Time Slows",
-      "slug": "time-dilation-valley",
-      "description": "A place where time itself behaves differently.",
-      "total_duration": 24,
+      "title": "The Signal That Arrived Before It Was Sent",
+      "slug": "signal-before-sent",
+      "description": "A mysterious signal that appears to travel backward through time.",
+      "total_duration": 18,
       "aspect_ratio": "16:9",
       "scenes": [
         {
           "id": "scene_01",
-          "duration": 6,
-          "visual_prompt": "Wide cinematic shot of a remote mountain valley at dawn. Thin mist rises from the ground and drifts slowly between rocks. Soft natural light, calm atmosphere, slow camera glide, realistic environment, 16:9.",
+          "duration": 4,
+          "visual_prompt": "Cinematic wide shot of a massive radio telescope under a star-filled night sky. Subtle rotation of the dish, faint electronic lights blinking. Slow camera push forward, realistic sci-fi atmosphere, 16:9.",
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "time_valley_01.png",
-          "narration": "Hidden deep in the mountains, there is a valley where time does not move normally."
+          "best_frame_filename": "signal_01.png",
+          "narration": "This signal was detected before it was ever sent."
         },
         {
           "id": "scene_02",
-          "duration": 6,
-          "visual_prompt": "Close-up of grass and leaves gently moving in slow motion as fog rolls across the ground. Subtle wind movement, shallow depth of field, natural lighting, 16:9.",
+          "duration": 5,
+          "visual_prompt": "Close-up of glowing data streams and waveform patterns floating in darkness. Timecode numbers flicker briefly and reverse. Slow drifting motion, cinematic sci-fi realism, 16:9.",
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "time_valley_02.png",
-          "narration": "Inside this valley, motion appears slower, as if the world itself is breathing carefully."
+          "best_frame_filename": "signal_02.png",
+          "narration": "Scientists recorded a transmission with a timestamp from the future."
         },
         {
           "id": "scene_03",
-          "duration": 6,
-          "visual_prompt": "Slow tracking shot along a stream flowing through rocks. Water ripples stretch unnaturally long before breaking. Calm reflections, muted tones, realistic physics, 16:9.",
+          "duration": 5,
+          "visual_prompt": "Wide shot of Earth seen from space as faint signal lines ripple outward and then pull back inward. Subtle distortion around the planet, realistic cosmic lighting, 16:9.",
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "time_valley_03.png",
-          "narration": "Scientists believe extreme gravity beneath the ground could be bending time slightly."
+          "best_frame_filename": "signal_03.png",
+          "narration": "The data appeared to move backward, against the flow of time."
         },
         {
           "id": "scene_04",
-          "duration": 6,
-          "visual_prompt": "Wide sunset shot of the valley as shadows lengthen rapidly across the landscape. Mist thickens near the ground. Slow pull-back, quiet mystery, cinematic realism, 16:9.",
+          "duration": 4,
+          "visual_prompt": "Slow pull-back into deep space as the signal fades into darkness. Stars stretch slightly, quiet tension, cinematic sci-fi ending, 16:9.",
           "negative_prompt": "text, watermark",
           "fps_hint": 24,
-          "best_frame_filename": "time_valley_04.png",
-          "narration": "Step inside for a moment, and the outside world may age without you."
-        }
-      ]
-    },
-    {
-      "title": "The Ocean That Remembers",
-      "slug": "memory-ocean",
-      "description": "A sea that records everything that touches it.",
-      "total_duration": 24,
-      "aspect_ratio": "16:9",
-      "scenes": [
-        {
-          "id": "scene_01",
-          "duration": 6,
-          "visual_prompt": "Wide shot of a calm ocean under overcast skies. Gentle waves roll toward a rocky shore. Cool tones, slow camera drift, realistic coastal environment, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "memory_ocean_01.png",
-          "narration": "There is a stretch of ocean where scientists believe water can store information."
-        },
-        {
-          "id": "scene_02",
-          "duration": 6,
-          "visual_prompt": "Close-up of water ripples spreading outward after a single drop falls. Patterns linger longer than expected. Natural lighting, macro realism, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "memory_ocean_02.png",
-          "narration": "Every movement leaves patterns that do not fade as quickly as they should."
-        },
-        {
-          "id": "scene_03",
-          "duration": 6,
-          "visual_prompt": "Slow underwater shot beneath the surface. Light rays move through suspended particles. Calm drifting motion, deep blue tones, realistic water behavior, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "memory_ocean_03.png",
-          "narration": "Some physicists think the water itself may be recording past events."
-        },
-        {
-          "id": "scene_04",
-          "duration": 6,
-          "visual_prompt": "Wide dusk shot of the ocean as waves reflect fading light. Horizon remains perfectly still. Slow pull-back, quiet sci-fi mystery, cinematic realism, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "memory_ocean_04.png",
-          "narration": "If true, the ocean may remember everything humanity has forgotten."
-        }
-      ]
-    },
-    {
-      "title": "The Forest That Rewrites Reality",
-      "slug": "reality-forest",
-      "description": "A place where the environment subtly alters perception.",
-      "total_duration": 24,
-      "aspect_ratio": "16:9",
-      "scenes": [
-        {
-          "id": "scene_01",
-          "duration": 6,
-          "visual_prompt": "Wide shot of a dense forest under thick fog. Tall trees fade into mist. Soft natural light, slow forward movement, realistic woodland environment, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "forest_01.png",
-          "narration": "Deep within this forest, reality feels slightly unstable."
-        },
-        {
-          "id": "scene_02",
-          "duration": 6,
-          "visual_prompt": "Close-up of tree leaves gently vibrating as if reacting to unseen forces. Subtle motion, shallow depth of field, natural lighting, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "forest_02.png",
-          "narration": "Compasses fail here, and sounds seem to arrive before they are made."
-        },
-        {
-          "id": "scene_03",
-          "duration": 6,
-          "visual_prompt": "Slow tracking shot along a forest path where shadows move slightly out of sync with the light. Muted greens, calm motion, realistic visuals, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "forest_03.png",
-          "narration": "Scientists suspect powerful magnetic anomalies beneath the ground."
-        },
-        {
-          "id": "scene_04",
-          "duration": 6,
-          "visual_prompt": "Wide shot of the forest clearing at sunset. Fog thickens as the light fades. Slow pull-back, eerie calm, cinematic realism, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "forest_04.png",
-          "narration": "In this forest, reality quietly bends without ever breaking."
-        }
-      ]
-    },
-    {
-      "title": "The Desert That Hums",
-      "slug": "singing-desert",
-      "description": "A place where the ground produces unexplained sound.",
-      "total_duration": 24,
-      "aspect_ratio": "16:9",
-      "scenes": [
-        {
-          "id": "scene_01",
-          "duration": 6,
-          "visual_prompt": "Wide cinematic shot of endless sand dunes under a pale sky. Wind slowly shapes the surface. Soft natural lighting, slow pan, realistic desert environment, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "desert_01.png",
-          "narration": "There is a desert where the ground itself produces a deep humming sound."
-        },
-        {
-          "id": "scene_02",
-          "duration": 6,
-          "visual_prompt": "Close-up of sand grains sliding down a dune face. Fine particles move in smooth waves. Macro realism, warm tones, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "desert_02.png",
-          "narration": "As sand moves, vibrations travel through the dunes like sound waves."
-        },
-        {
-          "id": "scene_03",
-          "duration": 6,
-          "visual_prompt": "Wide shot of dunes vibrating subtly as wind passes over them. Heat haze visible in the distance. Natural motion, cinematic realism, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "desert_03.png",
-          "narration": "The frequency is low enough to be felt more than heard."
-        },
-        {
-          "id": "scene_04",
-          "duration": 6,
-          "visual_prompt": "Sunset over the dunes as shadows stretch across the sand. Wind calms. Slow pull-back, quiet mystery, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "desert_04.png",
-          "narration": "It is one of Earth’s strangest natural signals, still not fully understood."
+          "best_frame_filename": "signal_04.png",
+          "narration": "And no one knows who sent it… or why."
         }
       ]
     }
