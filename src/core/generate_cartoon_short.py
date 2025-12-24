@@ -168,6 +168,7 @@ class CartoonShortsGenerator:
                 return str(final_output)
             # Step 1: Generate story
             script_path = self.output_dir / "script.json"
+            original_storyboard = None  # Store original storyboard for saving later
             # Prioritize custom_scenes (from storyboard) over reusing existing script
             if self.config.custom_scenes and len(self.config.custom_scenes) > 0:
                 logger.info("Step 1: Using custom storyboard scenes provided by user...")
@@ -180,6 +181,16 @@ class CartoonShortsGenerator:
                     except Exception as e:
                         logger.warning(f"Could not remove old script.json: {e}")
                 
+                # Store original storyboard structure (same as sent for reel creation)
+                original_storyboard = {
+                    "title": self.config.title or f"Story: {self.config.prompt}",
+                    "description": self.config.description or f"An adventure about: {self.config.prompt}",
+                    "scenes": self.config.custom_scenes
+                }
+                # Add total_duration if available from config
+                if hasattr(self.config, 'duration') and self.config.duration:
+                    original_storyboard["total_duration"] = self.config.duration
+                
                 script = self.script_generator.generate_script_from_custom(
                     title=self.config.title or f"Story: {self.config.prompt}",
                     description=self.config.description or f"An adventure about: {self.config.prompt}",
@@ -190,6 +201,8 @@ class CartoonShortsGenerator:
                 try:
                     total_duration = sum(scene.get('duration', self.config.scene_duration) for scene in script['scenes'])
                     self.config.duration = max(self.config.duration, total_duration)
+                    if original_storyboard:
+                        original_storyboard["total_duration"] = total_duration
                 except Exception:
                     pass
                 # Save script for reuse
@@ -210,11 +223,13 @@ class CartoonShortsGenerator:
                 with open(script_path, 'w', encoding='utf-8') as f:
                     json.dump(script, f, indent=2)
             
-            # Save a human-friendly storyboard alongside the raw script
+            # Save storyboard: use original storyboard if available (same as sent for reel creation),
+            # otherwise use the generated script
             storyboard_path = self.output_dir / "storyboard.json"
             try:
+                storyboard_to_save = original_storyboard if original_storyboard else script
                 with open(storyboard_path, 'w', encoding='utf-8') as f:
-                    json.dump(script, f, indent=2)
+                    json.dump(storyboard_to_save, f, indent=2)
                 logger.info(f"Saved storyboard: {storyboard_path}")
             except Exception as e:
                 logger.warning(f"Failed to save storyboard: {e}")
@@ -380,6 +395,7 @@ class CartoonShortsGenerator:
                     # Extract scene metadata for best frame extraction
                     scene_id = scene.get('id', f"scene_{i+1}")
                     visual_reference = scene.get('visual_reference', None)
+                    best_frame_filename = scene.get('best_frame_filename', None)
                     # Generate slug from story title (sanitized for filename)
                     story_title = script.get('title', 'story')
                     slug = "".join(c for c in story_title if c.isalnum() or c in (' ', '-', '_')).strip().replace(' ', '_').lower()[:50]
@@ -393,7 +409,8 @@ class CartoonShortsGenerator:
                         duration=target_duration,  # Pass narration duration to calculate frames
                         scene_id=scene_id,
                         visual_reference=visual_reference,
-                        slug=slug
+                        slug=slug,
+                        best_frame_filename=best_frame_filename
                     )
                     
                     # Handle return type: dict (with metadata) or string (backward compatible)

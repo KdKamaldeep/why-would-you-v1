@@ -194,7 +194,8 @@ class WanT2VGenerator:
                       duration: Optional[float] = None,
                       scene_id: Optional[str] = None,
                       visual_reference: Optional[str] = None,
-                      slug: Optional[str] = None) -> Union[str, Dict[str, Any]]:
+                      slug: Optional[str] = None,
+                      best_frame_filename: Optional[str] = None) -> Union[str, Dict[str, Any]]:
         """
         Generate a video from a text prompt.
         
@@ -207,7 +208,8 @@ class WanT2VGenerator:
                       If None, uses the default num_frames from initialization.
             scene_id: Scene identifier for frame extraction (optional)
             visual_reference: Visual reference description from storyboard (optional)
-            slug: Slug for best frame filename (optional)
+            slug: Slug for best frame filename (optional, used if best_frame_filename not provided)
+            best_frame_filename: Explicit filename for best frame (optional, takes precedence over slug/scene_id)
             
         Returns:
             Dictionary with:
@@ -299,6 +301,7 @@ class WanT2VGenerator:
                         video_path=str(output_path),
                         scene_id=scene_id,
                         slug=slug,
+                        best_frame_filename=best_frame_filename,
                         output_dir=output_path.parent
                     )
                     result.update({
@@ -324,6 +327,7 @@ class WanT2VGenerator:
                            video_path: str,
                            scene_id: str,
                            slug: Optional[str] = None,
+                           best_frame_filename: Optional[str] = None,
                            output_dir: Optional[Path] = None,
                            extraction_fps: float = 9.0) -> str:
         """
@@ -332,7 +336,8 @@ class WanT2VGenerator:
         Args:
             video_path: Path to the video file
             scene_id: Scene identifier
-            slug: Slug for filename (optional, uses scene_id if not provided)
+            slug: Slug for filename (optional, used if best_frame_filename not provided)
+            best_frame_filename: Explicit filename for best frame (optional, takes precedence)
             output_dir: Directory to save the best frame (optional, uses video parent dir)
             extraction_fps: FPS for frame extraction (6-12 fps range, default 9)
             
@@ -399,8 +404,10 @@ class WanT2VGenerator:
             
             logger.info(f"✅ Best frame selected (sharpness: {best_sharpness:.2f})")
             
-            # Generate output filename: <slug>__<scene_id>.png
-            if slug:
+            # Use best_frame_filename from scene if provided, otherwise generate from slug/scene_id
+            if best_frame_filename:
+                output_filename = best_frame_filename
+            elif slug:
                 output_filename = f"{slug}__{scene_id}.png"
             else:
                 output_filename = f"{scene_id}.png"
