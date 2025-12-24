@@ -1,51 +1,6 @@
 {
   "stories": [
     {
-      "title": "The Day the Sun Went Silent",
-      "slug": "solar-minimum-event",
-      "description": "When the Sun nearly shut down and Earth felt the consequences.",
-      "total_duration": 24,
-      "aspect_ratio": "16:9",
-      "scenes": [
-        {
-          "id": "scene_01",
-          "duration": 6,
-          "visual_prompt": "Close-up view of the Sun’s surface with very few solar flares. Dark sunspots drift slowly across the glowing surface. Slow camera push-in, realistic space lighting, cinematic contrast, 16:9.",
-          "negative_prompt": "text, watermark, cartoon",
-          "fps_hint": 24,
-          "best_frame_filename": "sun_silent_01.png",
-          "narration": "Did you know there was a moment in history when the Sun itself became unusually quiet and inactive?"
-        },
-        {
-          "id": "scene_02",
-          "duration": 6,
-          "visual_prompt": "Wide view of Earth from space under thick cloud cover. The planet rotates slowly as weak sunlight reaches the surface. Cool blue tones, gentle motion, realistic style, 16:9.",
-          "negative_prompt": "text, watermark, satellites",
-          "fps_hint": 24,
-          "best_frame_filename": "sun_silent_02.png",
-          "narration": "During a rare solar minimum, Earth received less energy, causing global temperatures to fall noticeably."
-        },
-        {
-          "id": "scene_03",
-          "duration": 6,
-          "visual_prompt": "Snow-covered farmland stretching into the distance. Wind moves across frozen fields and dead crops. Slow side tracking shot, overcast lighting, realistic winter atmosphere, 16:9.",
-          "negative_prompt": "text, watermark, modern machinery",
-          "fps_hint": 24,
-          "best_frame_filename": "sun_silent_03.png",
-          "narration": "Long, brutal winters followed, destroying crops and triggering widespread hunger across many regions of the world."
-        },
-        {
-          "id": "scene_04",
-          "duration": 6,
-          "visual_prompt": "The Sun slowly growing brighter with gentle solar activity returning. Camera pulls back to reveal Earth warming again. Soft golden light, hopeful tone, cinematic realism, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "sun_silent_04.png",
-          "narration": "When solar activity finally returned, climates stabilized, reminding humanity how dependent life is on the Sun."
-        }
-      ]
-    },
-    {
       "title": "The City That Sank Overnight",
       "slug": "sunken-city-disaster",
       "description": "A real city that vanished beneath the sea in a single night.",
