@@ -1,48 +1,48 @@
 {
-  "title": "The Mission Hidden Under the Ocean",
-  "description": "A real Cold War operation that stayed secret for years.",
+  "title": "The Ghost Army That Fooled Hitler",
+  "description": "A real World War II deception unit that changed the course of battles without firing shots.",
   "total_duration": 18,
   "stories": [
     {
-      "top_hook_text": "This mission was real",
-      "bottom_hook_text": "Would this still work today?",
+      "top_hook_text": "This army was fake",
+      "bottom_hook_text": "Could deception still win wars?",
       "scenes": [
         {
           "id": "scene_01",
           "duration": 4,
-          "visual_prompt": "Deep underwater darkness. A diver silhouette moves toward a thick undersea communication cable. Strong motion at frame zero, bubbles rising, cinematic lighting. Keep the diver distant, no face or mouth visible, no hands visible, silhouette only.",
-          "visual_reference": "deep underwater diver silhouette approaching cable, cinematic blue lighting, bubbles rising",
-          "best_frame_filename": "ivy_bells_01.png",
-          "negative_prompt": "hands, fingers, face, mouth, lip sync, text, watermark, logo, cartoon, low quality, blurry, distorted anatomy",
-          "hook_text": "Hidden beneath the ocean",
-          "narration": "This mission happened deep underwater."
+          "visual_prompt": "Foggy dawn over a World War II battlefield. Inflatable tanks slowly rise into shape as air pumps inside them. Canvas surfaces ripple in the wind. Strong motion at frame zero with fog rolling laterally across the ground. No soldiers clearly visible, distant silhouettes only.",
+          "visual_reference": "inflatable tanks ww2 battlefield foggy dawn",
+          "best_frame_filename": "ghost_army_01.png",
+          "negative_prompt": "clear faces, modern vehicles, text, watermark, logo, cartoon, low quality, blurry",
+          "hook_text": "An army that wasn’t real",
+          "narration": "During World War Two, an entire army existed that wasn’t real."
         },
         {
           "id": "scene_02",
           "duration": 4,
-          "visual_prompt": "Wide shot of an undersea communication cable stretching across the ocean floor. Faint signal pulses move along it. No humans visible. Slow cinematic drift, floating particles, deep ocean mood.",
-          "visual_reference": "undersea communication cable on ocean floor, dark water, faint glowing signals",
-          "best_frame_filename": "ivy_bells_02.png",
-          "negative_prompt": "humans, diver, hands, fingers, face, mouth, lip sync, text, watermark, logo, cartoon, low quality, blurry",
-          "narration": "During the Cold War, secret messages traveled through cables on the ocean floor."
+          "visual_prompt": "Wide aerial-style shot of fake military camps. Inflatable trucks, tanks, and artillery arranged in formation. Fabric flaps subtly flutter. Tire tracks appear in dirt as if recently driven. Slow cinematic camera drift from left to right.",
+          "visual_reference": "fake ww2 military camp inflatable vehicles",
+          "best_frame_filename": "ghost_army_02.png",
+          "negative_prompt": "real combat, explosions, text, watermark, logo, cartoon, low quality, blurry",
+          "narration": "They used inflatable tanks and fake camps to look massive from the air."
         },
         {
           "id": "scene_03",
           "duration": 5,
-          "visual_prompt": "Underwater POV shot of a sealed mechanical listening device already locked around a thick undersea cable. The device emits a faint indicator glow. Slow drifting particles in water. No humans visible. Calm but tense cinematic lighting.",
-          "visual_reference": "mechanical listening device attached to underwater cable, dark ocean, faint indicator light",
-          "best_frame_filename": "ivy_bells_03.png",
-          "negative_prompt": "hands, fingers, humans, diver, face, mouth, lip sync, text, watermark, logo, cartoon, low quality, blurry",
-          "narration": "Divers secretly attached a listening device without cutting the cable."
+          "visual_prompt": "Close-up ground-level shot of a portable loudspeaker hidden behind crates. Sound waves visually ripple through the air as ghostly silhouettes of marching troops appear in dust. Subtle camera push-in. Dust particles vibrate in sync with the sound illusion.",
+          "visual_reference": "ww2 loudspeakers battlefield deception",
+          "best_frame_filename": "ghost_army_03.png",
+          "negative_prompt": "modern speakers, visible text, watermark, logo, cartoon, low quality, blurry",
+          "narration": "They played recorded sounds of marching soldiers and moving armor."
         },
         {
           "id": "scene_04",
           "duration": 5,
-          "visual_prompt": "Wide cinematic shot of the ocean floor as the undersea cable fades into total darkness. Light slowly falls off. Fine sediment drifts past the lens. Silent, unresolved tension. No humans visible.",
-          "visual_reference": "dark ocean floor fading into black, cable disappearing into darkness",
-          "best_frame_filename": "ivy_bells_04.png",
-          "negative_prompt": "humans, diver, hands, fingers, face, mouth, lip sync, text, watermark, logo, cartoon, low quality, blurry",
-          "narration": "It worked for years. It was called Operation Ivy Bells."
+          "visual_prompt": "Nighttime battlefield map dissolves into a real frontline shifting away. Enemy markers retreat on the map overlay. Stars drift slowly overhead. Fade-to-dark motion with gentle zoom out. No humans visible.",
+          "visual_reference": "ww2 battlefield map deception retreat",
+          "best_frame_filename": "ghost_army_04.png",
+          "negative_prompt": "modern UI, text labels, watermark, logo, cartoon, low quality, blurry",
+          "narration": "The enemy moved their forces. The deception worked. They were called the Ghost Army."
         }
       ]
     }
