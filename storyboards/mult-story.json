@@ -1,48 +1,48 @@
 {
   "title": "The Ghost Army That Fooled Hitler",
-  "description": "A real World War II deception unit that changed the course of battles without firing shots.",
+  "description": "A real World War II deception unit that won battles using illusion instead of bullets.",
   "total_duration": 18,
   "stories": [
     {
-      "top_hook_text": "This army was fake",
-      "bottom_hook_text": "Could deception still win wars?",
+      "top_hook_text": "This army didn’t exist",
+      "bottom_hook_text": "Could this trick still work today?",
       "scenes": [
         {
           "id": "scene_01",
           "duration": 4,
-          "visual_prompt": "Foggy dawn over a World War II battlefield. Inflatable tanks slowly rise into shape as air pumps inside them. Canvas surfaces ripple in the wind. Strong motion at frame zero with fog rolling laterally across the ground. No soldiers clearly visible, distant silhouettes only.",
-          "visual_reference": "inflatable tanks ww2 battlefield foggy dawn",
+          "visual_prompt": "Fog-filled World War II battlefield at dawn. Thick fog rolls rapidly from left to right while inflatable tanks visibly expand as air pumps inflate them. Canvas surfaces ripple continuously in the wind. Camera performs a slow forward dolly-in. Dust lifts from the ground and drifts past the lens. Distant soldier silhouettes move slightly but remain indistinct.",
+          "visual_reference": "inflatable tanks ww2 battlefield fog dawn",
           "best_frame_filename": "ghost_army_01.png",
-          "negative_prompt": "clear faces, modern vehicles, text, watermark, logo, cartoon, low quality, blurry",
-          "hook_text": "An army that wasn’t real",
-          "narration": "During World War Two, an entire army existed that wasn’t real."
+          "negative_prompt": "clear faces, modern vehicles, explosions, text, watermark, logo, cartoon, low quality, blurry",
+          "hook_text": "An army that was fake",
+          "narration": "In World War Two, the Allies created an army that didn’t exist."
         },
         {
           "id": "scene_02",
           "duration": 4,
-          "visual_prompt": "Wide aerial-style shot of fake military camps. Inflatable trucks, tanks, and artillery arranged in formation. Fabric flaps subtly flutter. Tire tracks appear in dirt as if recently driven. Slow cinematic camera drift from left to right.",
+          "visual_prompt": "Wide elevated shot of a fake military camp. Inflatable tanks, trucks, and artillery sway slightly as wind passes over them. Loose tarps flap rhythmically. Fresh tire tracks appear sequentially in the dirt as if vehicles just moved. Camera slowly pans from right to left while shadows shift with moving clouds overhead.",
           "visual_reference": "fake ww2 military camp inflatable vehicles",
           "best_frame_filename": "ghost_army_02.png",
-          "negative_prompt": "real combat, explosions, text, watermark, logo, cartoon, low quality, blurry",
-          "narration": "They used inflatable tanks and fake camps to look massive from the air."
+          "negative_prompt": "real combat, fire, explosions, text, watermark, logo, cartoon, low quality, blurry",
+          "narration": "From the air, it looked like thousands of troops were preparing to attack."
         },
         {
           "id": "scene_03",
           "duration": 5,
-          "visual_prompt": "Close-up ground-level shot of a portable loudspeaker hidden behind crates. Sound waves visually ripple through the air as ghostly silhouettes of marching troops appear in dust. Subtle camera push-in. Dust particles vibrate in sync with the sound illusion.",
-          "visual_reference": "ww2 loudspeakers battlefield deception",
+          "visual_prompt": "Ground-level cinematic shot of hidden loudspeakers behind crates. Visible sound waves ripple through the air, disturbing dust and loose debris. Ghostly marching shadows pass across the ground. The camera slowly pushes forward. Nearby grass vibrates from the sound while distant lights flicker like moving vehicles.",
+          "visual_reference": "ww2 battlefield loudspeaker deception",
           "best_frame_filename": "ghost_army_03.png",
           "negative_prompt": "modern speakers, visible text, watermark, logo, cartoon, low quality, blurry",
-          "narration": "They played recorded sounds of marching soldiers and moving armor."
+          "narration": "They played fake sounds of tanks, trucks, and marching soldiers."
         },
         {
           "id": "scene_04",
           "duration": 5,
-          "visual_prompt": "Nighttime battlefield map dissolves into a real frontline shifting away. Enemy markers retreat on the map overlay. Stars drift slowly overhead. Fade-to-dark motion with gentle zoom out. No humans visible.",
+          "visual_prompt": "Nighttime war map overlay hovering above dark terrain. Enemy position markers slide backward as if retreating. The map slowly dissolves into a real battlefield with empty ground. Stars drift across the sky. Camera smoothly pulls upward and backward while the scene fades into darkness.",
           "visual_reference": "ww2 battlefield map deception retreat",
           "best_frame_filename": "ghost_army_04.png",
-          "negative_prompt": "modern UI, text labels, watermark, logo, cartoon, low quality, blurry",
-          "narration": "The enemy moved their forces. The deception worked. They were called the Ghost Army."
+          "negative_prompt": "modern UI elements, readable text labels, watermark, logo, cartoon, low quality, blurry",
+          "narration": "The enemy moved away. The illusion worked. They were called the Ghost Army."
         }
       ]
     }
