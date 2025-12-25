@@ -10,38 +10,38 @@
         {
           "id": "scene_01",
           "duration": 4,
-          "visual_prompt": "Deep underwater darkness. A diver silhouette moves toward a thick undersea communication cable. Strong motion at frame zero, bubbles rising, cinematic lighting.",
-          "visual_reference": "deep underwater diver approaching cable, cinematic blue lighting, bubbles rising",
+          "visual_prompt": "Deep underwater darkness. A diver silhouette moves toward a thick undersea communication cable. Strong motion at frame zero, bubbles rising, cinematic lighting. Keep the diver distant, no face or mouth visible, no hands visible, silhouette only.",
+          "visual_reference": "deep underwater diver silhouette approaching cable, cinematic blue lighting, bubbles rising",
           "best_frame_filename": "ivy_bells_01.png",
-          "negative_prompt": "text, watermark, logo, cartoon, low quality, blurry, distorted anatomy",
+          "negative_prompt": "hands, fingers, face, mouth, lip sync, text, watermark, logo, cartoon, low quality, blurry, distorted anatomy",
           "hook_text": "Hidden beneath the ocean",
           "narration": "This mission happened deep underwater."
         },
         {
           "id": "scene_02",
           "duration": 4,
-          "visual_prompt": "Wide shot of an undersea communication cable stretching across the ocean floor. Faint signal pulses move along it.",
+          "visual_prompt": "Wide shot of an undersea communication cable stretching across the ocean floor. Faint signal pulses move along it. No humans visible. Slow cinematic drift, floating particles, deep ocean mood.",
           "visual_reference": "undersea communication cable on ocean floor, dark water, faint glowing signals",
           "best_frame_filename": "ivy_bells_02.png",
-          "negative_prompt": "text, watermark, logo, cartoon, low quality, blurry",
+          "negative_prompt": "humans, diver, hands, fingers, face, mouth, lip sync, text, watermark, logo, cartoon, low quality, blurry",
           "narration": "During the Cold War, secret messages traveled through cables on the ocean floor."
         },
         {
           "id": "scene_03",
           "duration": 5,
-          "visual_prompt": "Close-up of gloved hands quietly attaching a mechanical device around the cable. Calm, precise movement, tense atmosphere.",
-          "visual_reference": "gloved diver hands attaching mechanical device to underwater cable",
+          "visual_prompt": "Underwater POV shot of a sealed mechanical listening device already locked around a thick undersea cable. The device emits a faint indicator glow. Slow drifting particles in water. No humans visible. Calm but tense cinematic lighting.",
+          "visual_reference": "mechanical listening device attached to underwater cable, dark ocean, faint indicator light",
           "best_frame_filename": "ivy_bells_03.png",
-          "negative_prompt": "text, watermark, logo, cartoon, low quality, blurry, extra fingers",
+          "negative_prompt": "hands, fingers, humans, diver, face, mouth, lip sync, text, watermark, logo, cartoon, low quality, blurry",
           "narration": "Divers secretly attached a listening device without cutting the cable."
         },
         {
           "id": "scene_04",
           "duration": 5,
-          "visual_prompt": "Ocean floor fades into darkness as the cable disappears from view. Slow pull-back, unresolved tension.",
+          "visual_prompt": "Wide cinematic shot of the ocean floor as the undersea cable fades into total darkness. Light slowly falls off. Fine sediment drifts past the lens. Silent, unresolved tension. No humans visible.",
           "visual_reference": "dark ocean floor fading into black, cable disappearing into darkness",
           "best_frame_filename": "ivy_bells_04.png",
-          "negative_prompt": "text, watermark, logo, cartoon, low quality, blurry",
+          "negative_prompt": "humans, diver, hands, fingers, face, mouth, lip sync, text, watermark, logo, cartoon, low quality, blurry",
           "narration": "It worked for years. It was called Operation Ivy Bells."
         }
       ]
