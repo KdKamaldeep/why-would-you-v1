@@ -86,6 +86,10 @@ class VideoConfig:
     wan_seed: Optional[int] = None  # WAN random seed (optional)
     # Audio settings
     skip_audio: bool = False  # Skip audio generation entirely
+    # Hook text settings
+    add_hooks: bool = False  # Enable hook text rendering (top_hook_text, bottom_hook_text, scene hook_text)
+    top_hook_text: Optional[str] = None  # Top hook text to display on black area when upscaling
+    bottom_hook_text: Optional[str] = None  # Bottom hook text to display on black area when upscaling
     # Reel/Shorts rendering settings
     create_reel: bool = True  # Create platform-ready reel (default: True for vertical format)
     vertical_mode: str = "pad"  # "pad" (safe) or "crop" (fills frame)
@@ -190,6 +194,11 @@ class CartoonShortsGenerator:
                 # Add total_duration if available from config
                 if hasattr(self.config, 'duration') and self.config.duration:
                     original_storyboard["total_duration"] = self.config.duration
+                # Add hook texts from config if present
+                if self.config.top_hook_text:
+                    original_storyboard["top_hook_text"] = self.config.top_hook_text
+                if self.config.bottom_hook_text:
+                    original_storyboard["bottom_hook_text"] = self.config.bottom_hook_text
                 
                 script = self.script_generator.generate_script_from_custom(
                     title=self.config.title or f"Story: {self.config.prompt}",
@@ -588,6 +597,42 @@ class CartoonShortsGenerator:
                 music_file = self.config.music_path or background_music
                 
                 reel_output = self.output_dir / "final_reel.mp4"
+                
+                # Extract hook texts from storyboard
+                top_hook = None
+                bottom_hook = None
+                scene_hooks = []  # List of (start_time, end_time, hook_text) tuples
+                
+                if self.config.add_hooks:
+                    # Try to load storyboard to get hook texts
+                    storyboard_path = self.output_dir / "storyboard.json"
+                    if storyboard_path.exists():
+                        try:
+                            with open(storyboard_path, 'r', encoding='utf-8') as f:
+                                storyboard_data = json.load(f)
+                            top_hook = storyboard_data.get('top_hook_text')
+                            bottom_hook = storyboard_data.get('bottom_hook_text')
+                        except Exception as e:
+                            logger.warning(f"Could not load storyboard for hook texts: {e}")
+                    
+                    # Extract from config if not in storyboard
+                    if not top_hook:
+                        top_hook = self.config.top_hook_text
+                    if not bottom_hook:
+                        bottom_hook = self.config.bottom_hook_text
+                
+                # Extract scene hook_text from script (always, not just when add_hooks is True)
+                for i, scene in enumerate(script['scenes']):
+                    hook_text = scene.get('hook_text')
+                    if hook_text:
+                        # Calculate timing for this scene (accounting for pauses between scenes)
+                        scene_duration = scene.get('duration', 8)
+                        start_time = sum(s.get('duration', 8) for s in script['scenes'][:i])
+                        # Add pause duration for each previous scene (except before first scene)
+                        start_time += self.config.scene_pause_duration * i
+                        end_time = start_time + scene_duration
+                        scene_hooks.append((start_time, end_time, hook_text))
+                
                 try:
                     create_reel(
                         stitched_video=str(stitched_output),
@@ -600,7 +645,11 @@ class CartoonShortsGenerator:
                         out_fps=self.config.reel_fps,
                         voice_volume=self.config.voice_volume,
                         music_volume=self.config.music_volume,
-                        verbose=self.config.verbose_ffmpeg
+                        verbose=self.config.verbose_ffmpeg,
+                        add_hooks=self.config.add_hooks,
+                        top_hook_text=top_hook,
+                        bottom_hook_text=bottom_hook,
+                        scene_hooks=scene_hooks
                     )
                     logger.info(f"🎉 Platform-ready reel created: {reel_output}")
                     logger.info(f"📐 Format: {self.config.reel_width}x{self.config.reel_height} @ {self.config.reel_fps}fps")
@@ -853,6 +902,7 @@ def main():
     parser.add_argument("--voice-volume", type=float, default=1.0, help="Voice volume (0.0-1.0, default: 1.0)")
     parser.add_argument("--verbose-ffmpeg", action="store_true", help="Print FFmpeg commands for debugging")
     parser.add_argument("--auto-sub", action="store_true", help="Enable automatic subtitle generation (disabled by default)")
+    parser.add_argument("--add-hooks", action="store_true", help="Enable hook text rendering (top_hook_text, bottom_hook_text from storyboard, and scene hook_text)")
     
     # Bulk generation arguments
     parser.add_argument("--gen-bulk", action="store_true", help="Enable bulk generation from a single storyboard JSON file with multiple stories")
@@ -914,6 +964,7 @@ def main():
             enable_prompt_enhancement=False,
             scene_pause_duration=args.scene_pause,
             add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
+            add_hooks=args.add_hooks,  # Enable hook text rendering
             create_reel=not args.no_reel and (args.format == "reel" or args.vertical),
             vertical_mode=args.vertical_mode,
             reel_width=args.out_width,
@@ -1066,6 +1117,7 @@ def main():
         enable_prompt_enhancement=False,  # Prompt enhancement disabled
         scene_pause_duration=args.scene_pause,
         add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
+        add_hooks=args.add_hooks,  # Enable hook text rendering
         create_reel=create_reel,
         vertical_mode=args.vertical_mode,
         reel_width=args.out_width,

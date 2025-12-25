@@ -1,47 +1,48 @@
 {
+  "title": "The Mission Hidden Under the Ocean",
+  "description": "A real Cold War operation that stayed secret for years.",
+  "total_duration": 18,
   "stories": [
     {
-      "title": "The Signal That Arrived Before It Was Sent",
-      "slug": "signal-before-sent",
-      "description": "A mysterious signal that appears to travel backward through time.",
-      "total_duration": 18,
-      "aspect_ratio": "16:9",
+      "top_hook_text": "This mission was real",
+      "bottom_hook_text": "Would this still work today?",
       "scenes": [
         {
           "id": "scene_01",
           "duration": 4,
-          "visual_prompt": "Cinematic wide shot of a massive radio telescope under a star-filled night sky. Subtle rotation of the dish, faint electronic lights blinking. Slow camera push forward, realistic sci-fi atmosphere, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "signal_01.png",
-          "narration": "This signal was detected before it was ever sent."
+          "visual_prompt": "Deep underwater darkness. A diver silhouette moves toward a thick undersea communication cable. Strong motion at frame zero, bubbles rising, cinematic lighting.",
+          "visual_reference": "deep underwater diver approaching cable, cinematic blue lighting, bubbles rising",
+          "best_frame_filename": "ivy_bells_01.png",
+          "negative_prompt": "text, watermark, logo, cartoon, low quality, blurry, distorted anatomy",
+          "hook_text": "Hidden beneath the ocean",
+          "narration": "This mission happened deep underwater."
         },
         {
           "id": "scene_02",
-          "duration": 5,
-          "visual_prompt": "Close-up of glowing data streams and waveform patterns floating in darkness. Timecode numbers flicker briefly and reverse. Slow drifting motion, cinematic sci-fi realism, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "signal_02.png",
-          "narration": "Scientists recorded a transmission with a timestamp from the future."
+          "duration": 4,
+          "visual_prompt": "Wide shot of an undersea communication cable stretching across the ocean floor. Faint signal pulses move along it.",
+          "visual_reference": "undersea communication cable on ocean floor, dark water, faint glowing signals",
+          "best_frame_filename": "ivy_bells_02.png",
+          "negative_prompt": "text, watermark, logo, cartoon, low quality, blurry",
+          "narration": "During the Cold War, secret messages traveled through cables on the ocean floor."
         },
         {
           "id": "scene_03",
           "duration": 5,
-          "visual_prompt": "Wide shot of Earth seen from space as faint signal lines ripple outward and then pull back inward. Subtle distortion around the planet, realistic cosmic lighting, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "signal_03.png",
-          "narration": "The data appeared to move backward, against the flow of time."
+          "visual_prompt": "Close-up of gloved hands quietly attaching a mechanical device around the cable. Calm, precise movement, tense atmosphere.",
+          "visual_reference": "gloved diver hands attaching mechanical device to underwater cable",
+          "best_frame_filename": "ivy_bells_03.png",
+          "negative_prompt": "text, watermark, logo, cartoon, low quality, blurry, extra fingers",
+          "narration": "Divers secretly attached a listening device without cutting the cable."
         },
         {
           "id": "scene_04",
-          "duration": 4,
-          "visual_prompt": "Slow pull-back into deep space as the signal fades into darkness. Stars stretch slightly, quiet tension, cinematic sci-fi ending, 16:9.",
-          "negative_prompt": "text, watermark",
-          "fps_hint": 24,
-          "best_frame_filename": "signal_04.png",
-          "narration": "And no one knows who sent it… or why."
+          "duration": 5,
+          "visual_prompt": "Ocean floor fades into darkness as the cable disappears from view. Slow pull-back, unresolved tension.",
+          "visual_reference": "dark ocean floor fading into black, cable disappearing into darkness",
+          "best_frame_filename": "ivy_bells_04.png",
+          "negative_prompt": "text, watermark, logo, cartoon, low quality, blurry",
+          "narration": "It worked for years. It was called Operation Ivy Bells."
         }
       ]
     }

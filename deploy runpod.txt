@@ -17,18 +17,31 @@ python -m src.interfaces.simple_cartoon_generator \
   --wan-num-frames 81 \
   --wan-fps 12 \
   --wan-steps 30 \
-  --wan-guidance 5
+  --wan-guidance 5 \
+  --gen-bulk
   
 # With custom WAN settings with 12 steps cause bit slowness
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
   --storyboard storyboards/mult-story.json \
-  --wan-num-frames 81 \
+  --wan-num-frames 72 \
   --wan-fps 12 \
   --wan-steps 30 \
   --wan-guidance 5 \
   --gen-bulk
-  
+  --add-hooks
+ 
+ 
+python -m src.interfaces.simple_cartoon_generator \
+  --prompt "Sunset over mountains" \
+  --storyboard storyboards/mult-story.json \
+  --wan-width 720 \
+  --wan-height 1280 \
+  --wan-num-frames 72 \
+  --wan-fps 12 \
+  --wan-steps 30 \
+  --wan-guidance 5 \
+  --gen-bulk
     
 
 # With Hindi narration

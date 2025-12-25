@@ -231,6 +231,12 @@ Storyboard Cast Format (with face images):
     )
     
     parser.add_argument(
+        "--add-hooks",
+        action="store_true",
+        help="Enable hook text rendering (top_hook_text, bottom_hook_text from storyboard, and scene hook_text)"
+    )
+    
+    parser.add_argument(
         "--no-reuse",
         action="store_true",
         help="Force regeneration of all assets (ignore cached outputs)"
@@ -494,7 +500,8 @@ Storyboard Cast Format (with face images):
                     music_path=args.music,
                     music_volume=args.music_volume,
                     voice_volume=args.voice_volume,
-                    verbose_ffmpeg=args.verbose_ffmpeg
+                    verbose_ffmpeg=args.verbose_ffmpeg,
+                    add_hooks=args.add_hooks  # Enable hook text rendering
                 )
                 
                 # Pre-initialize generator to load pipelines once
@@ -572,6 +579,10 @@ Storyboard Cast Format (with face images):
                         temp_generator.config.description = description
                         temp_generator.config.custom_scenes = normalized_scenes
                         temp_generator.config.duration = total_duration
+                        # Extract hook texts from story
+                        temp_generator.config.top_hook_text = story.get('top_hook_text')
+                        temp_generator.config.bottom_hook_text = story.get('bottom_hook_text')
+                        temp_generator.config.add_hooks = args.add_hooks
                         if normalized_scenes and 'duration' in normalized_scenes[0]:
                             temp_generator.config.scene_duration = normalized_scenes[0].get('duration', 8)
                         else:
@@ -634,6 +645,8 @@ Storyboard Cast Format (with face images):
             title = data.get('title')
             description = data.get('description')
             scene_duration = data.get('scene_duration', 8)
+            top_hook_text = data.get('top_hook_text')
+            bottom_hook_text = data.get('bottom_hook_text')
             
             # Filter scenes based on --scene argument
             if args.scene:
@@ -688,6 +701,9 @@ Storyboard Cast Format (with face images):
                 scene_duration=scene_duration,
                 reuse_existing=(not args.no_reuse),
                 add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
+                add_hooks=args.add_hooks,  # Enable hook text rendering
+                top_hook_text=top_hook_text,
+                bottom_hook_text=bottom_hook_text,
                 language=args.language,
                 enable_prompt_enhancement=False,  # Prompt enhancement disabled
                 wan_width=args.wan_width,

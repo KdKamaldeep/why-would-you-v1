@@ -8,7 +8,7 @@ import os
 import subprocess
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -118,8 +118,15 @@ def mix_audio(
     out_w: int = 1080,
     out_h: int = 1920,
     mode: str = "pad",
-    verbose: bool = False
+    verbose: bool = False,
+    add_hooks: bool = False,
+    top_hook_text: Optional[str] = None,
+    bottom_hook_text: Optional[str] = None,
+    scene_hooks: Optional[List[Tuple[float, float, str]]] = None
 ) -> str:
+    # Default scene_hooks to empty list if None
+    if scene_hooks is None:
+        scene_hooks = []
     """
     Mix voiceover and optional background music with video.
     Creates final platform-ready reel.
@@ -172,10 +179,12 @@ def mix_audio(
         logger.warning(f"Could not probe video dimensions: {e}, assuming needs conversion")
         needs_vertical = True
     
-    # Convert to vertical if needed
+    # Convert to vertical if needed (with hook text support)
     if needs_vertical:
         temp_vertical = str(output_path.parent / "_temp_vertical.mp4")
         logger.info("📐 Converting video to vertical format first...")
+        # If we need hook texts on black areas, we'll add them in mix_audio filter_complex
+        # Otherwise just do the normal vertical conversion
         make_vertical(str(video_path), temp_vertical, mode, out_w, out_h, fps, verbose)
         video_path = Path(temp_vertical)
     else:
@@ -287,32 +296,98 @@ def mix_audio(
     else:
         music_input_idx = None
     
-    # Build filter_complex for audio mixing
+    # Build video filter for text overlays
+    # Determine if we need to add hook texts
+    has_top_bottom_hooks = add_hooks and (top_hook_text or bottom_hook_text)
+    has_scene_hooks = len(scene_hooks) > 0
+    
+    # Build filter_complex for audio mixing and video
+    filter_complex_parts = []
+    
+    # Build video filter with drawtext if needed
+    if has_top_bottom_hooks or has_scene_hooks:
+        # Build drawtext filters (chain them with commas)
+        drawtext_filters = []
+        
+        # Helper function to escape text for drawtext
+        def escape_text(text):
+            # Escape single quotes, colons, and backslashes
+            return text.replace('\\', '\\\\').replace("'", "\\'").replace(':', '\\:')
+        
+        # Top and bottom hook texts (only if add_hooks is True)
+        if has_top_bottom_hooks:
+            if top_hook_text:
+                # Position at top center of black area (in pad mode, black area is at top)
+                # Font size: 48px, white text, black outline
+                drawtext_filters.append(
+                    f"drawtext=text='{escape_text(top_hook_text)}':"
+                    f"fontsize=48:fontcolor=white:"
+                    f"x=(w-text_w)/2:y=50:"
+                    f"box=1:boxcolor=black@0.7:boxborderw=5:"
+                    f"borderw=2:bordercolor=black"
+                )
+            if bottom_hook_text:
+                # Position at bottom center of black area
+                drawtext_filters.append(
+                    f"drawtext=text='{escape_text(bottom_hook_text)}':"
+                    f"fontsize=48:fontcolor=white:"
+                    f"x=(w-text_w)/2:y=h-th-50:"
+                    f"box=1:boxcolor=black@0.7:boxborderw=5:"
+                    f"borderw=2:bordercolor=black"
+                )
+        
+        # Scene hook texts (always show if present, minimal style at bottom)
+        if has_scene_hooks:
+            for start_time, end_time, hook_text in scene_hooks:
+                # Minimal style: small font, bottom of video (not black area), semi-transparent
+                drawtext_filters.append(
+                    f"drawtext=text='{escape_text(hook_text)}':"
+                    f"fontsize=32:fontcolor=white@0.9:"
+                    f"x=(w-text_w)/2:y=h-th-30:"
+                    f"enable='between(t,{start_time},{end_time})':"
+                    f"box=1:boxcolor=black@0.5:boxborderw=3"
+                )
+        
+        if drawtext_filters:
+            # Chain drawtext filters with commas
+            video_filter = f"[0:v]{','.join(drawtext_filters)}[vout]"
+            filter_complex_parts.append(video_filter)
+            video_output = "[vout]"
+        else:
+            video_output = "0:v"
+    else:
+        video_output = "0:v"
+    
+    # Build audio filter
     if has_voice and has_music:
         # Mix both voice and music
-        filter_complex = (
-            f"[{voice_input_idx}:a]volume={voice_vol}[v];"
-            f"[{music_input_idx}:a]volume={music_vol}[m];"
-            f"[v][m]amix=inputs=2:dropout_transition=2:duration=longest[a]"
-        )
-        cmd.extend(['-filter_complex', filter_complex])
-        cmd.extend(['-map', '0:v', '-map', '[a]'])
+        filter_complex_parts.append(f"[{voice_input_idx}:a]volume={voice_vol}[v];")
+        filter_complex_parts.append(f"[{music_input_idx}:a]volume={music_vol}[m];")
+        filter_complex_parts.append(f"[v][m]amix=inputs=2:dropout_transition=2:duration=longest[a]")
+        audio_output = "[a]"
     elif has_voice:
         # Voice only
-        filter_complex = f"[{voice_input_idx}:a]volume={voice_vol}[a]"
-        cmd.extend(['-filter_complex', filter_complex])
-        cmd.extend(['-map', '0:v', '-map', '[a]'])
+        filter_complex_parts.append(f"[{voice_input_idx}:a]volume={voice_vol}[a]")
+        audio_output = "[a]"
     elif has_music:
         # Music only
-        filter_complex = f"[{music_input_idx}:a]volume={music_vol}[a]"
-        cmd.extend(['-filter_complex', filter_complex])
-        cmd.extend(['-map', '0:v', '-map', '[a]'])
+        filter_complex_parts.append(f"[{music_input_idx}:a]volume={music_vol}[a]")
+        audio_output = "[a]"
     else:
         # No audio - create silent audio track
         logger.info("ℹ️ No audio provided, creating silent audio track")
         # Generate silent audio using lavfi
         cmd.extend(['-f', 'lavfi', '-i', 'anullsrc=channel_layout=stereo:sample_rate=48000'])
-        cmd.extend(['-map', '0:v', '-map', '1:a'])
+        audio_output = "1:a"
+    
+    # Apply filter_complex if we have any filters
+    if filter_complex_parts:
+        filter_complex = ''.join(filter_complex_parts)
+        cmd.extend(['-filter_complex', filter_complex])
+        cmd.extend(['-map', video_output, '-map', audio_output])
+    else:
+        # No filters at all
+        cmd.extend(['-map', '0:v', '-map', audio_output])
     
     # Use narration duration if available, otherwise video duration
     target_duration = narration_duration if narration_duration else video_duration
@@ -360,7 +435,11 @@ def create_reel(
     out_fps: int = 30,
     voice_volume: float = 1.0,
     music_volume: float = 0.12,
-    verbose: bool = False
+    verbose: bool = False,
+    add_hooks: bool = False,
+    top_hook_text: Optional[str] = None,
+    bottom_hook_text: Optional[str] = None,
+    scene_hooks: Optional[List[Tuple[float, float, str]]] = None  # List of (start_time, end_time, hook_text) tuples
 ) -> str:
     """
     Complete reel creation pipeline: vertical conversion + audio mixing.
@@ -398,5 +477,9 @@ def create_reel(
         out_w=out_width,
         out_h=out_height,
         mode=vertical_mode,
-        verbose=verbose
+        verbose=verbose,
+        add_hooks=add_hooks,
+        top_hook_text=top_hook_text,
+        bottom_hook_text=bottom_hook_text,
+        scene_hooks=(scene_hooks or []) if scene_hooks is not None else []
     )
