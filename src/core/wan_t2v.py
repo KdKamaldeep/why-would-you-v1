@@ -232,6 +232,12 @@ class WanT2VGenerator:
         else:
             logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
         
+        # Enforce minimum of 72 frames for WAN
+        MIN_FRAMES = 72
+        if num_frames_to_use < MIN_FRAMES:
+            logger.info(f"⚠️ Calculated frames ({num_frames_to_use}) is below minimum ({MIN_FRAMES}), using minimum")
+            num_frames_to_use = MIN_FRAMES
+        
         try:
             logger.info(f"🎬 Generating video with WAN 2.1 T2V...")
             logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
