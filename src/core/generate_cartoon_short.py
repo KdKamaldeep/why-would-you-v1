@@ -992,8 +992,9 @@ def main():
             logger.info(f"{'='*70}")
             
             try:
-                title = story.get('title', f'Story_{i}')
-                description = story.get('description', '')
+                # Use story title if available, otherwise use top-level title, or fallback to Story_{i}
+                title = story.get('title') or storyboard_data.get('title') or f'Story_{i}'
+                description = story.get('description', '') or storyboard_data.get('description', '')
                 scenes = story.get('scenes', [])
                 total_duration = story.get('total_duration', args.duration)
                 
