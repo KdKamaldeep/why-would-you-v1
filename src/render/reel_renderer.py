@@ -360,10 +360,10 @@ def mix_audio(
     
     # Build audio filter
     if has_voice and has_music:
-        # Mix both voice and music
-        filter_complex_parts.append(f"[{voice_input_idx}:a]volume={voice_vol}[v];")
-        filter_complex_parts.append(f"[{music_input_idx}:a]volume={music_vol}[m];")
-        filter_complex_parts.append(f"[v][m]amix=inputs=2:dropout_transition=2:duration=longest[a]")
+        # Mix both voice and music (use [voice] label instead of [v] to avoid conflict)
+        filter_complex_parts.append(f"[{voice_input_idx}:a]volume={voice_vol}[voice]")
+        filter_complex_parts.append(f"[{music_input_idx}:a]volume={music_vol}[music]")
+        filter_complex_parts.append(f"[voice][music]amix=inputs=2:dropout_transition=2:duration=longest[a]")
         audio_output = "[a]"
     elif has_voice:
         # Voice only
@@ -382,7 +382,8 @@ def mix_audio(
     
     # Apply filter_complex if we have any filters
     if filter_complex_parts:
-        filter_complex = ''.join(filter_complex_parts)
+        # Join all filter parts with semicolons (each part is a separate filter statement)
+        filter_complex = ';'.join(filter_complex_parts)
         cmd.extend(['-filter_complex', filter_complex])
         cmd.extend(['-map', video_output, '-map', audio_output])
     else:

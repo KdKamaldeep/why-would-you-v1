@@ -226,17 +226,20 @@ class WanT2VGenerator:
         num_frames_to_use = self.num_frames
         if duration is not None and duration > 0:
             # Calculate frames needed: duration * fps, rounded up to ensure we cover the full duration
-            num_frames_to_use = int(duration * self.fps) + 1
+            calculated_frames = int(duration * self.fps) + 1
+            num_frames_to_use = calculated_frames
             logger.info(f"📏 Target duration: {duration:.2f}s")
-            logger.info(f"🎞️ Calculated frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.2f}s)")
+            logger.info(f"🎞️ Calculated frames: {calculated_frames} @ {self.fps}fps (~{calculated_frames/self.fps:.2f}s)")
         else:
             logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
         
-        # Enforce minimum of 72 frames for WAN
+        # Enforce minimum of 72 frames for WAN (if less than 72, use 72; if more, keep the higher value)
         MIN_FRAMES = 72
         if num_frames_to_use < MIN_FRAMES:
-            logger.info(f"⚠️ Calculated frames ({num_frames_to_use}) is below minimum ({MIN_FRAMES}), using minimum")
+            logger.info(f"⚠️ Calculated frames ({num_frames_to_use}) is below minimum ({MIN_FRAMES}), enforcing minimum to {MIN_FRAMES}")
             num_frames_to_use = MIN_FRAMES
+        else:
+            logger.info(f"✅ Using {num_frames_to_use} frames (meets minimum requirement of {MIN_FRAMES})")
         
         try:
             logger.info(f"🎬 Generating video with WAN 2.1 T2V...")
