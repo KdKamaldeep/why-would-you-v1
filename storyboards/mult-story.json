@@ -10,63 +10,63 @@
         {
           "id": "scene_01_home_lighting_overview",
           "duration": 8,
-          "visual_prompt": "Wide interior view of a modern home in evening light, multiple rooms softly illuminated, calm residential atmosphere, slow ambient lighting transition, subtle camera drift",
+          "visual_prompt": "Wide interior view of a modern home during early evening, multiple rooms softly illuminated, gradual light intensity shift across rooms, slow cinematic camera drift, subtle shadow movement on walls",
           "visual_reference": "A home interior with multiple rooms softly lit during the evening.",
-          "negative_prompt": "text, watermark, futuristic sci-fi",
+          "negative_prompt": "text, watermark, futuristic sci-fi, people, hands",
           "best_frame_filename": "how-smart-lights-work__scene_01_home_lighting_overview.png",
           "narration": "Lighting quietly shapes how a home feels throughout the day and night."
         },
         {
           "id": "scene_02_traditional_light_switch",
           "duration": 10,
-          "visual_prompt": "Close view of a traditional wall light switch being turned on and off, everyday residential setting, gentle hand movement, stable framing",
+          "visual_prompt": "Close view of a traditional wall light switch mounted on a wall, room light softly brightening and dimming on its own, stable framing, gentle ambient shadow changes",
           "visual_reference": "A traditional wall light switch controlling a room light.",
-          "negative_prompt": "text, watermark, branded switch",
+          "negative_prompt": "text, watermark, branded switch, hands, fingers",
           "best_frame_filename": "how-smart-lights-work__scene_02_traditional_light_switch.png",
           "narration": "In most homes, lights respond only when a wall switch is used."
         },
         {
           "id": "scene_03_smart_light_bulb",
           "duration": 10,
-          "visual_prompt": "Smart light bulb installed in a ceiling fixture, brightness gradually changing, smooth light fade, realistic home interior, steady camera",
+          "visual_prompt": "Smart light bulb installed in a ceiling fixture, brightness gradually increasing then softening, smooth light diffusion, realistic home interior, slight camera parallax",
           "visual_reference": "A smart light bulb installed in a ceiling fixture with adjustable brightness.",
-          "negative_prompt": "text, watermark, flashy colors",
+          "negative_prompt": "text, watermark, flashy colors, people",
           "best_frame_filename": "how-smart-lights-work__scene_03_smart_light_bulb.png",
           "narration": "Smart lights adjust brightness and color without changing the fixture itself."
         },
         {
           "id": "scene_04_wireless_signal_flow",
           "duration": 10,
-          "visual_prompt": "Smartphone sending wireless commands to home lights, soft glowing signal paths moving through rooms, slow signal flow, realistic interior context",
-          "visual_reference": "Wireless signals connecting a smartphone to lights inside a home.",
-          "negative_prompt": "text, watermark, abstract graphics",
+          "visual_prompt": "Home interior with lights visible across rooms, soft glowing signal waves flowing slowly through the air toward fixtures, subtle pulsing motion, calm realistic environment",
+          "visual_reference": "Wireless signals connecting lights inside a home.",
+          "negative_prompt": "text, watermark, abstract graphics, people",
           "best_frame_filename": "how-smart-lights-work__scene_04_wireless_signal_flow.png",
           "narration": "Commands are sent wirelessly, allowing lights to respond without physical switches."
         },
         {
           "id": "scene_05_home_network_connection",
           "duration": 10,
-          "visual_prompt": "Home router in a living space, small indicator lights blinking slowly, calm environment, static camera with subtle ambient motion",
+          "visual_prompt": "Home router resting on a shelf, indicator lights blinking in slow repeating rhythm, soft ambient room lighting, static camera with subtle depth-of-field breathing",
           "visual_reference": "A home router connecting smart devices within the house.",
-          "negative_prompt": "text, watermark, technical overlays",
+          "negative_prompt": "text, watermark, technical overlays, people",
           "best_frame_filename": "how-smart-lights-work__scene_05_home_network_connection.png",
           "narration": "Most smart lights communicate through the home network to stay connected."
         },
         {
           "id": "scene_06_daily_lighting_routine",
           "duration": 10,
-          "visual_prompt": "Living room lighting gradually shifting from daylight tones to warm evening tones, smooth color temperature transition, relaxed home atmosphere",
+          "visual_prompt": "Living room lighting smoothly transitioning from cool daylight tones to warm evening tones, shadows slowly stretching, calm atmosphere, gentle camera drift",
           "visual_reference": "Living room lights adjusting automatically as the time of day changes.",
-          "negative_prompt": "text, watermark, dramatic mood",
+          "negative_prompt": "text, watermark, dramatic mood, people",
           "best_frame_filename": "how-smart-lights-work__scene_06_daily_lighting_routine.png",
           "narration": "Over time, smart lighting becomes part of a daily home routine."
         },
         {
           "id": "scene_07_calm_smart_home",
           "duration": 10,
-          "visual_prompt": "Wide modern home interior with balanced smart lighting, calm evening comfort, slow camera drift, steady ambient light",
+          "visual_prompt": "Wide modern home interior at night, balanced smart lighting across rooms, steady ambient glow, slow cinematic camera drift, calm settled atmosphere",
           "visual_reference": "A calm home interior with balanced smart lighting throughout the space.",
-          "negative_prompt": "text, watermark, clutter",
+          "negative_prompt": "text, watermark, clutter, people",
           "best_frame_filename": "how-smart-lights-work__scene_07_calm_smart_home.png",
           "narration": "Smart lighting quietly adapts to support comfort without constant attention."
         }
