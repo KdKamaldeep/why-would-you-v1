@@ -1,18 +1,11 @@
 #!/usr/bin/env python3
 """
 WAN 2.1 Text-to-Video Generator Module
-Handles text-to-video generation using Wan-AI/Wan2.1-T2V-14B-Diffusers
+Handles text-to-video generation using Wan-AI/Wan2.1-T2V-1.3B-Diffusers
 """
 
 import os
 import logging
-
-# Set CUDA allocator config early (before torch import if possible, but setting here still helps)
-# This helps with memory fragmentation, especially for large models like 14B
-# Use new PYTORCH_ALLOC_CONF (PYTORCH_CUDA_ALLOC_CONF is deprecated)
-if 'PYTORCH_ALLOC_CONF' not in os.environ:
-    os.environ['PYTORCH_ALLOC_CONF'] = 'expandable_segments:True'
-
 import torch
 from pathlib import Path
 from typing import Optional, Dict, Any, Union
@@ -27,38 +20,6 @@ logger = logging.getLogger(__name__)
 # Global singleton instance
 _wan_pipeline = None
 _wan_vae = None
-
-
-def round_frames_to_valid_count(num_frames: int) -> int:
-    """
-    Round num_frames to satisfy WAN requirement: (num_frames - 1) must be divisible by 4.
-    Valid counts: 49, 53, 57, 61, 65, 69, 73, 77, etc. (1 mod 4)
-    
-    Args:
-        num_frames: Original frame count
-        
-    Returns:
-        Rounded frame count that satisfies (num_frames - 1) % 4 == 0
-    """
-    if num_frames <= 0:
-        return 49  # Minimum valid count
-    
-    # (num_frames - 1) must be divisible by 4
-    # So num_frames must be 1 mod 4 (i.e., num_frames % 4 == 1)
-    remainder = num_frames % 4
-    
-    if remainder == 1:
-        # Already valid
-        return num_frames
-    elif remainder == 0:
-        # num_frames % 4 == 0, so (num_frames - 1) % 4 == 3, need to add 1
-        return num_frames + 1
-    elif remainder == 2:
-        # num_frames % 4 == 2, so (num_frames - 1) % 4 == 1, need to subtract 1
-        return num_frames - 1
-    else:  # remainder == 3
-        # num_frames % 4 == 3, so (num_frames - 1) % 4 == 2, need to add 2
-        return num_frames + 2
 
 
 def get_cache_dir() -> Optional[str]:
@@ -101,7 +62,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
     try:
         from diffusers import AutoencoderKLWan, WanPipeline
         
-        model_id = "Wan-AI/Wan2.1-T2V-14B-Diffusers"
+        model_id = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
         
         # Configure Hugging Face cache directory to use /workspace if available
         # This is important for RunPod and similar environments with attached disks
@@ -156,21 +117,6 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         
         # Enable memory optimizations if available
         if device == 'cuda':
-            # Enable VAE slicing and tiling for memory efficiency during decode
-            try:
-                if hasattr(_wan_pipeline, 'enable_vae_slicing'):
-                    _wan_pipeline.enable_vae_slicing()
-                    logger.info("✅ Enabled VAE slicing for memory efficiency")
-            except Exception as e:
-                logger.warning(f"⚠️ Could not enable VAE slicing: {e}")
-            
-            try:
-                if hasattr(_wan_pipeline, 'enable_vae_tiling'):
-                    _wan_pipeline.enable_vae_tiling()
-                    logger.info("✅ Enabled VAE tiling for memory efficiency")
-            except Exception as e:
-                logger.warning(f"⚠️ Could not enable VAE tiling: {e}")
-            
             try:
                 if hasattr(_wan_pipeline, 'enable_memory_efficient_attention'):
                     _wan_pipeline.enable_memory_efficient_attention()
@@ -184,14 +130,6 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
                     logger.info("✅ Enabled xformers memory efficient attention")
             except Exception as e:
                 logger.info("ℹ️ xFormers not available; continuing without it")
-            
-            # Configure CUDA allocator for expandable segments (helps with fragmentation)
-            # Use new PYTORCH_ALLOC_CONF (PYTORCH_CUDA_ALLOC_CONF is deprecated)
-            if 'PYTORCH_ALLOC_CONF' not in os.environ:
-                os.environ['PYTORCH_ALLOC_CONF'] = 'expandable_segments:True'
-                logger.info("✅ Set PYTORCH_ALLOC_CONF=expandable_segments:True for better memory management")
-            else:
-                logger.info(f"ℹ️ PYTORCH_ALLOC_CONF already set: {os.environ.get('PYTORCH_ALLOC_CONF')}")
         
         logger.info("✅ WAN 2.1 T2V pipeline loaded successfully")
         logger.info("📦 WAN pipeline initialized ONCE - will be reused for all subsequent generations")
@@ -295,13 +233,13 @@ class WanT2VGenerator:
         else:
             logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
         
-        # Round frames to satisfy WAN requirement: (num_frames - 1) must be divisible by 4
-        original_frames = num_frames_to_use
-        num_frames_to_use = round_frames_to_valid_count(num_frames_to_use)
-        if num_frames_to_use != original_frames:
-            logger.info(f"🔄 Rounded frames from {original_frames} to {num_frames_to_use} (WAN requires (num_frames-1) divisible by 4)")
+        # Enforce minimum of 72 frames for WAN (if less than 72, use 72; if more, keep the higher value)
+        MIN_FRAMES = 72
+        if num_frames_to_use < MIN_FRAMES:
+            logger.info(f"⚠️ Calculated frames ({num_frames_to_use}) is below minimum ({MIN_FRAMES}), enforcing minimum to {MIN_FRAMES}")
+            num_frames_to_use = MIN_FRAMES
         else:
-            logger.info(f"✅ Using {num_frames_to_use} frames (satisfies WAN requirement: (num_frames-1) % 4 == 0)")
+            logger.info(f"✅ Using {num_frames_to_use} frames (meets minimum requirement of {MIN_FRAMES})")
         
         try:
             logger.info(f"🎬 Generating video with WAN 2.1 T2V...")
@@ -326,140 +264,20 @@ class WanT2VGenerator:
                 torch.cuda.empty_cache()
                 gc.collect()
             
-            # Generate video - request latents to avoid VAE decode on GPU
+            # Generate video
             logger.info("🎬 Running inference...")
-            try:
-                # Try to get latents output (avoids VAE decode on GPU)
-                output = self.pipeline(
-                    prompt=prompt,
-                    negative_prompt=neg_prompt,
-                    height=self.height,
-                    width=self.width,
-                    num_frames=num_frames_to_use,
-                    num_inference_steps=self.num_inference_steps,
-                    guidance_scale=self.guidance_scale,
-                    output_type="latent",
-                    return_dict=True
-                )
-                has_latents = True
-                logger.info("✅ Pipeline returned latents (will decode on CPU)")
-            except (TypeError, ValueError) as e:
-                # Fallback: pipeline doesn't support output_type="latent"
-                logger.warning(f"⚠️ Pipeline doesn't support output_type='latent', using default output: {e}")
-                output = self.pipeline(
-                    prompt=prompt,
-                    negative_prompt=neg_prompt,
-                    height=self.height,
-                    width=self.width,
-                    num_frames=num_frames_to_use,
-                    num_inference_steps=self.num_inference_steps,
-                    guidance_scale=self.guidance_scale
-                )
-                has_latents = False
+            output = self.pipeline(
+                prompt=prompt,
+                negative_prompt=neg_prompt,
+                height=self.height,
+                width=self.width,
+                num_frames=num_frames_to_use,  # Use calculated frames based on duration
+                num_inference_steps=self.num_inference_steps,
+                guidance_scale=self.guidance_scale
+            )
             
-            # Clear GPU memory after inference, before VAE decode
-            logger.info("🧹 Clearing GPU cache before VAE decode...")
-            if torch.cuda.is_available():
-                torch.cuda.synchronize()
-                torch.cuda.empty_cache()
-            gc.collect()
-            
-            # Handle VAE decode based on output type
-            if has_latents and hasattr(output, 'latents') and output.latents is not None:
-                try:
-                    # Decode VAE on CPU to avoid OOM
-                    logger.info("🔄 Decoding VAE on CPU to prevent GPU OOM...")
-                    latents = output.latents
-                    
-                    # Ensure latents is a tensor
-                    if not isinstance(latents, torch.Tensor):
-                        if isinstance(latents, (list, tuple)) and len(latents) > 0:
-                            latents = latents[0]
-                        else:
-                            raise ValueError("Unexpected latents format")
-                    
-                    # Move latents to CPU
-                    if latents.is_cuda:
-                        latents = latents.cpu()
-                    
-                    # Get VAE from pipeline
-                    vae = self.pipeline.vae
-                    
-                    # Decode on CPU with no_grad to save memory
-                    with torch.no_grad():
-                        # Move VAE to CPU temporarily for decode
-                        vae_device = next(vae.parameters()).device
-                        vae_on_cpu = vae_device.type == 'cpu'
-                        
-                        if not vae_on_cpu:
-                            logger.info("📦 Moving VAE to CPU for decode...")
-                            vae = vae.to('cpu')
-                        
-                        # Decode latents (output shape: [B, C, T, H, W])
-                        vae_output = vae.decode(latents)
-                        # Handle both BaseOutput and direct tensor returns
-                        if hasattr(vae_output, 'sample'):
-                            frames_tensor = vae_output.sample
-                        else:
-                            frames_tensor = vae_output
-                        
-                        # Move VAE back to original device if needed
-                        if not vae_on_cpu:
-                            logger.info("📦 Moving VAE back to GPU...")
-                            vae = vae.to(vae_device)
-                            self.pipeline.vae = vae
-                    
-                    # Convert tensor to numpy frames format expected by export_to_video
-                    # VAE output: [B, C, T, H, W] with values in [-1, 1]
-                    # Need: list of [H, W, C] arrays with values in [0, 255] uint8
-                    frames_tensor = frames_tensor.cpu()  # Ensure on CPU
-                    # Permute from [B, C, T, H, W] to [B, T, H, W, C]
-                    frames_tensor = frames_tensor.permute(0, 2, 3, 4, 1)
-                    # Convert to numpy and scale from [-1, 1] to [0, 255]
-                    frames_np = ((frames_tensor.float() + 1.0) / 2.0 * 255.0).clamp(0, 255).byte().numpy()
-                    # Convert to list of frames: [B, T, H, W, C] -> list of [H, W, C]
-                    # Use .copy() to ensure each frame is a proper numpy array (not a view)
-                    frames = [np.array(frames_np[0, t], dtype=np.uint8).copy() for t in range(frames_np.shape[1])]
-                    
-                    # Clean up latents
-                    del latents
-                    del frames_tensor
-                    del frames_np
-                    if torch.cuda.is_available():
-                        torch.cuda.empty_cache()
-                    gc.collect()
-                    
-                    logger.info("✅ VAE decode completed on CPU")
-                except Exception as e:
-                    logger.warning(f"⚠️ CPU VAE decode failed: {e}, falling back to default output")
-                    # Fallback: use frames from output (already decoded)
-                    frames = output.frames[0] if hasattr(output, 'frames') else output[0]
-                    # Ensure frames is a list of numpy arrays
-                    if isinstance(frames, np.ndarray):
-                        # If it's a single array with shape [T, H, W, C], convert to list
-                        if len(frames.shape) == 4:
-                            frames = [np.array(frames[t], dtype=np.uint8).copy() for t in range(frames.shape[0])]
-                        else:
-                            frames = [frames]
-                    elif not isinstance(frames, list):
-                        frames = [frames]
-            else:
-                # Fallback: use frames from output (already decoded)
-                logger.info("ℹ️ Using pre-decoded frames from pipeline output")
-                frames = output.frames[0] if hasattr(output, 'frames') else output[0]
-                # Ensure frames is a list of numpy arrays
-                if isinstance(frames, np.ndarray):
-                    # If it's a single array with shape [T, H, W, C], convert to list
-                    if len(frames.shape) == 4:
-                        frames = [np.array(frames[t], dtype=np.uint8).copy() for t in range(frames.shape[0])]
-                    else:
-                        frames = [frames]
-                elif not isinstance(frames, list):
-                    frames = [frames]
-            
-            # Clean up output object
-            del output
-            output = None
+            # Extract frames
+            frames = output.frames[0]
             
             # Export to video
             from diffusers.utils import export_to_video
@@ -467,20 +285,19 @@ class WanT2VGenerator:
             output_path = Path(output_path)
             output_path.parent.mkdir(parents=True, exist_ok=True)
             
-            # Ensure all frames are proper numpy arrays with uint8 dtype
-            frames = [np.array(frame, dtype=np.uint8) if not isinstance(frame, np.ndarray) or frame.dtype != np.uint8 else frame for frame in frames]
-            
-            logger.info(f"💾 Saving video to: {output_path}...")
+            logger.info(f"💾 Saving video to: {output_path}")
             export_to_video(frames, str(output_path), fps=self.fps)
             
-            # Explicitly delete frames to free memory after video export
+            # Explicitly delete frames and output to free memory
             del frames
+            del output
             frames = None
+            output = None
             
-            # Clear GPU cache after video export
+            # Clear GPU cache after generation
             if torch.cuda.is_available():
-                torch.cuda.synchronize()  # Wait for all GPU operations to complete
                 torch.cuda.empty_cache()
+                torch.cuda.synchronize()  # Wait for all GPU operations to complete
             gc.collect()  # Force Python garbage collection
             
             logger.info(f"✅ Video generated successfully: {output_path}")

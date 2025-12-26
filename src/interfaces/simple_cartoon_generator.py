@@ -49,7 +49,7 @@ def get_model_path_for_type(model_type: str) -> str | None:
     This function is kept for backward compatibility but always returns None.
     """
     # WAN 2.1 T2V model is handled automatically by diffusers library
-    # Model ID: Wan-AI/Wan2.1-T2V-14B-Diffusers
+    # Model ID: Wan-AI/Wan2.1-T2V-1.3B-Diffusers
     # It downloads automatically on first use to Hugging Face cache
     return None
 

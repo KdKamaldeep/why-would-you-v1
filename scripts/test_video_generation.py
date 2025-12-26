@@ -85,7 +85,7 @@ def main():
     parser.add_argument(
         "--guidance",
         type=float,
-        default=5.0,
+        default=6.0,
         help="Guidance scale (default: 6.0)"
     )
     parser.add_argument(
