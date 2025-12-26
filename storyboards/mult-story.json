@@ -1,65 +1,69 @@
 {
-  "title": "How an Entire City Vanished Overnight",
-  "description": "A real historical mystery where an entire settlement disappeared without a trace.",
-  "total_duration": 58,
-  "aspect_ratio": "9:16",
-  "scenes": [
+  "stories": [
     {
-      "id": "scene_01_hook_how",
-      "duration": 4,
-      "hook_text": "How an Entire City Vanished Overnight",
-      "visual_prompt": "Wide cinematic shot of an early colonial settlement at dawn, wooden houses, dirt paths, mist drifting slowly, quiet and empty atmosphere",
-      "visual_reference": "roanoke colony illustration empty",
-      "negative_prompt": "text, watermark, logo, modern buildings, cartoon",
-      "narration": "How can an entire town disappear… without a single body left behind?"
-    },
-    {
-      "id": "scene_02_historical_setup",
-      "duration": 7,
-      "visual_prompt": "Colonial era village slowly fading into silence, doors open, tools left behind, fog thickening, sense of abandonment",
-      "visual_reference": "abandoned colonial village fog",
-      "negative_prompt": "text, watermark, logo, people moving, cartoon",
-      "narration": "In the year 1590, English settlers returned to their colony in America… and found nothing."
-    },
-    {
-      "id": "scene_03_mystery_escalation",
-      "duration": 8,
-      "visual_prompt": "Close-up of empty houses, extinguished fires, overturned furniture, nature slowly reclaiming the settlement",
-      "visual_reference": "abandoned village historical mystery",
-      "negative_prompt": "text, watermark, logo, gore, cartoon",
-      "narration": "No signs of a struggle. No graves. No message. Just silence where over a hundred people once lived."
-    },
-    {
-      "id": "scene_04_single_clue",
-      "duration": 9,
-      "visual_prompt": "Close-up of an old wooden post with the word 'CROATOAN' carved deeply, dramatic lighting, historical realism",
-      "visual_reference": "croatoan carved post",
-      "negative_prompt": "text overlay, watermark, logo, modern fonts",
-      "narration": "The only clue was one word carved into wood: Croatoan."
-    },
-    {
-      "id": "scene_05_explanation_theories",
-      "duration": 12,
-      "visual_prompt": "Slow montage of colonial maps, Native American villages, storms over the sea, time passing visually",
-      "visual_reference": "roanoke colony map illustration",
-      "negative_prompt": "text, watermark, logo, fantasy creatures",
-      "narration": "Historians believe the settlers may have joined a nearby tribe, died from disease, or been forced to flee. But no theory explains everything."
-    },
-    {
-      "id": "scene_06_wonder_historical_weight",
-      "duration": 10,
-      "visual_prompt": "Wide shot of overgrown ruins blending into forest, sunlight breaking through trees, quiet and reflective mood",
-      "visual_reference": "lost colony ruins forest",
-      "negative_prompt": "text, watermark, logo, people, cartoon",
-      "narration": "Over four hundred years later, the fate of these people remains unknown. A real mystery, frozen in history."
-    },
-    {
-      "id": "scene_07_lingering_end",
-      "duration": 8,
-      "visual_prompt": "Slow fade to an empty shoreline at dusk, waves gently moving, sense of unanswered questions",
-      "visual_reference": "empty coastline dusk mystery",
-      "negative_prompt": "text, watermark, logo, modern boats",
-      "narration": "They didn’t leave in fear. They didn’t leave in chaos. They just… vanished."
+      "title": "How an Entire City Vanished Overnight",
+      "description": "A real historical mystery where an entire settlement disappeared without a trace.",
+      "total_duration": 58,
+      "aspect_ratio": "9:16",
+      "scenes": [
+        {
+          "id": "scene_01_hook_how",
+          "duration": 4,
+          "hook_text": "How an Entire City Vanished Overnight",
+          "visual_prompt": "Wide cinematic shot of an early colonial settlement at dawn, wooden houses, dirt paths, mist drifting slowly, quiet and empty atmosphere",
+          "visual_reference": "roanoke colony illustration empty",
+          "negative_prompt": "text, watermark, logo, modern buildings, cartoon",
+          "narration": "How can an entire town disappear… without a single body left behind?"
+        },
+        {
+          "id": "scene_02_historical_setup",
+          "duration": 7,
+          "visual_prompt": "Colonial era village slowly fading into silence, doors open, tools left behind, fog thickening, sense of abandonment",
+          "visual_reference": "abandoned colonial village fog",
+          "negative_prompt": "text, watermark, logo, people moving, cartoon",
+          "narration": "In the year 1590, English settlers returned to their colony in America… and found nothing."
+        },
+        {
+          "id": "scene_03_mystery_escalation",
+          "duration": 8,
+          "visual_prompt": "Close-up of empty houses, extinguished fires, overturned furniture, nature slowly reclaiming the settlement",
+          "visual_reference": "abandoned village historical mystery",
+          "negative_prompt": "text, watermark, logo, gore, cartoon",
+          "narration": "No signs of a struggle. No graves. No message. Just silence where over a hundred people once lived."
+        },
+        {
+          "id": "scene_04_single_clue",
+          "duration": 9,
+          "visual_prompt": "Close-up of an old wooden post with the word 'CROATOAN' carved deeply, dramatic lighting, historical realism",
+          "visual_reference": "croatoan carved post",
+          "negative_prompt": "text overlay, watermark, logo, modern fonts",
+          "narration": "The only clue was one word carved into wood: Croatoan."
+        },
+        {
+          "id": "scene_05_explanation_theories",
+          "duration": 12,
+          "visual_prompt": "Slow montage of colonial maps, Native American villages, storms over the sea, time passing visually",
+          "visual_reference": "roanoke colony map illustration",
+          "negative_prompt": "text, watermark, logo, fantasy creatures",
+          "narration": "Historians believe the settlers may have joined a nearby tribe, died from disease, or been forced to flee. But no theory explains everything."
+        },
+        {
+          "id": "scene_06_wonder_historical_weight",
+          "duration": 10,
+          "visual_prompt": "Wide shot of overgrown ruins blending into forest, sunlight breaking through trees, quiet and reflective mood",
+          "visual_reference": "lost colony ruins forest",
+          "negative_prompt": "text, watermark, logo, people, cartoon",
+          "narration": "Over four hundred years later, the fate of these people remains unknown. A real mystery, frozen in history."
+        },
+        {
+          "id": "scene_07_lingering_end",
+          "duration": 8,
+          "visual_prompt": "Slow fade to an empty shoreline at dusk, waves gently moving, sense of unanswered questions",
+          "visual_reference": "empty coastline dusk mystery",
+          "negative_prompt": "text, watermark, logo, modern boats",
+          "narration": "They didn’t leave in fear. They didn’t leave in chaos. They just… vanished."
+        }
+      ]
     }
   ]
 }
