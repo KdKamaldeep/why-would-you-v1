@@ -69,8 +69,8 @@ class VideoConfig:
     scene_duration: int = 8  # Used when custom_scenes is provided and per-scene duration not specified
     # Reuse assets to speed up repeated runs
     reuse_existing: bool = True
-    # Control subtitle rendering
-    add_subtitles: bool = True
+    # Control subtitle rendering (disabled by default, enable with --auto-sub)
+    add_subtitles: bool = False
     # Control prompt enhancement
     enable_prompt_enhancement: bool = True
     # Control pause between scenes (in seconds)
@@ -86,6 +86,10 @@ class VideoConfig:
     wan_seed: Optional[int] = None  # WAN random seed (optional)
     # Audio settings
     skip_audio: bool = False  # Skip audio generation entirely
+    # Hook text settings
+    add_hooks: bool = False  # Enable hook text rendering (top_hook_text, bottom_hook_text, scene hook_text)
+    top_hook_text: Optional[str] = None  # Top hook text to display on black area when upscaling
+    bottom_hook_text: Optional[str] = None  # Bottom hook text to display on black area when upscaling
     # Reel/Shorts rendering settings
     create_reel: bool = True  # Create platform-ready reel (default: True for vertical format)
     vertical_mode: str = "pad"  # "pad" (safe) or "crop" (fills frame)
@@ -168,6 +172,7 @@ class CartoonShortsGenerator:
                 return str(final_output)
             # Step 1: Generate story
             script_path = self.output_dir / "script.json"
+            original_storyboard = None  # Store original storyboard for saving later
             # Prioritize custom_scenes (from storyboard) over reusing existing script
             if self.config.custom_scenes and len(self.config.custom_scenes) > 0:
                 logger.info("Step 1: Using custom storyboard scenes provided by user...")
@@ -180,6 +185,21 @@ class CartoonShortsGenerator:
                     except Exception as e:
                         logger.warning(f"Could not remove old script.json: {e}")
                 
+                # Store original storyboard structure (same as sent for reel creation)
+                original_storyboard = {
+                    "title": self.config.title or f"Story: {self.config.prompt}",
+                    "description": self.config.description or f"An adventure about: {self.config.prompt}",
+                    "scenes": self.config.custom_scenes
+                }
+                # Add total_duration if available from config
+                if hasattr(self.config, 'duration') and self.config.duration:
+                    original_storyboard["total_duration"] = self.config.duration
+                # Add hook texts from config if present
+                if self.config.top_hook_text:
+                    original_storyboard["top_hook_text"] = self.config.top_hook_text
+                if self.config.bottom_hook_text:
+                    original_storyboard["bottom_hook_text"] = self.config.bottom_hook_text
+                
                 script = self.script_generator.generate_script_from_custom(
                     title=self.config.title or f"Story: {self.config.prompt}",
                     description=self.config.description or f"An adventure about: {self.config.prompt}",
@@ -190,6 +210,8 @@ class CartoonShortsGenerator:
                 try:
                     total_duration = sum(scene.get('duration', self.config.scene_duration) for scene in script['scenes'])
                     self.config.duration = max(self.config.duration, total_duration)
+                    if original_storyboard:
+                        original_storyboard["total_duration"] = total_duration
                 except Exception:
                     pass
                 # Save script for reuse
@@ -210,11 +232,13 @@ class CartoonShortsGenerator:
                 with open(script_path, 'w', encoding='utf-8') as f:
                     json.dump(script, f, indent=2)
             
-            # Save a human-friendly storyboard alongside the raw script
+            # Save storyboard: use original storyboard if available (same as sent for reel creation),
+            # otherwise use the generated script
             storyboard_path = self.output_dir / "storyboard.json"
             try:
+                storyboard_to_save = original_storyboard if original_storyboard else script
                 with open(storyboard_path, 'w', encoding='utf-8') as f:
-                    json.dump(script, f, indent=2)
+                    json.dump(storyboard_to_save, f, indent=2)
                 logger.info(f"Saved storyboard: {storyboard_path}")
             except Exception as e:
                 logger.warning(f"Failed to save storyboard: {e}")
@@ -377,13 +401,39 @@ class CartoonShortsGenerator:
                         target_duration = actual_scene_durations[i]
                         logger.info(f"🎬 Scene {i+1}: Using narration duration ({target_duration:.2f}s) to calculate frames")
                     
-                    video_path = self.wan_generator.generate_video(
+                    # Extract scene metadata for best frame extraction
+                    scene_id = scene.get('id', f"scene_{i+1}")
+                    visual_reference = scene.get('visual_reference', None)
+                    best_frame_filename = scene.get('best_frame_filename', None)
+                    # Generate slug from story title (sanitized for filename)
+                    story_title = script.get('title', 'story')
+                    slug = "".join(c for c in story_title if c.isalnum() or c in (' ', '-', '_')).strip().replace(' ', '_').lower()[:50]
+                    
+                    # Generate video with optional best frame extraction
+                    result = self.wan_generator.generate_video(
                         prompt=prompt,
                         output_path=str(clip_path),
                         seed=self.config.wan_seed,
                         negative_prompt=negative_prompt or None,
-                        duration=target_duration  # Pass narration duration to calculate frames
+                        duration=target_duration,  # Pass narration duration to calculate frames
+                        scene_id=scene_id,
+                        visual_reference=visual_reference,
+                        slug=slug,
+                        best_frame_filename=best_frame_filename
                     )
+                    
+                    # Handle return type: dict (with metadata) or string (backward compatible)
+                    if isinstance(result, dict):
+                        video_path = result['video_path']
+                        # Store metadata for downstream article generation
+                        if 'best_frame_path' in result:
+                            scene['best_frame_path'] = result['best_frame_path']
+                            scene['scene_id'] = result['scene_id']
+                            scene['visual_reference'] = result['visual_reference']
+                            logger.info(f"📸 Scene {i+1}: Best frame saved: {result['best_frame_path']}")
+                    else:
+                        # Backward compatibility: result is a string
+                        video_path = result
                     
                     # Get actual video duration
                     actual_duration = self.video_processor.get_video_duration(str(video_path))
@@ -547,6 +597,42 @@ class CartoonShortsGenerator:
                 music_file = self.config.music_path or background_music
                 
                 reel_output = self.output_dir / "final_reel.mp4"
+                
+                # Extract hook texts from storyboard
+                top_hook = None
+                bottom_hook = None
+                scene_hooks = []  # List of (start_time, end_time, hook_text) tuples
+                
+                if self.config.add_hooks:
+                    # Try to load storyboard to get hook texts
+                    storyboard_path = self.output_dir / "storyboard.json"
+                    if storyboard_path.exists():
+                        try:
+                            with open(storyboard_path, 'r', encoding='utf-8') as f:
+                                storyboard_data = json.load(f)
+                            top_hook = storyboard_data.get('top_hook_text')
+                            bottom_hook = storyboard_data.get('bottom_hook_text')
+                        except Exception as e:
+                            logger.warning(f"Could not load storyboard for hook texts: {e}")
+                    
+                    # Extract from config if not in storyboard
+                    if not top_hook:
+                        top_hook = self.config.top_hook_text
+                    if not bottom_hook:
+                        bottom_hook = self.config.bottom_hook_text
+                
+                # Extract scene hook_text from script (always, not just when add_hooks is True)
+                for i, scene in enumerate(script['scenes']):
+                    hook_text = scene.get('hook_text')
+                    if hook_text:
+                        # Calculate timing for this scene (accounting for pauses between scenes)
+                        scene_duration = scene.get('duration', 8)
+                        start_time = sum(s.get('duration', 8) for s in script['scenes'][:i])
+                        # Add pause duration for each previous scene (except before first scene)
+                        start_time += self.config.scene_pause_duration * i
+                        end_time = start_time + scene_duration
+                        scene_hooks.append((start_time, end_time, hook_text))
+                
                 try:
                     create_reel(
                         stitched_video=str(stitched_output),
@@ -559,7 +645,11 @@ class CartoonShortsGenerator:
                         out_fps=self.config.reel_fps,
                         voice_volume=self.config.voice_volume,
                         music_volume=self.config.music_volume,
-                        verbose=self.config.verbose_ffmpeg
+                        verbose=self.config.verbose_ffmpeg,
+                        add_hooks=self.config.add_hooks,
+                        top_hook_text=top_hook,
+                        bottom_hook_text=bottom_hook,
+                        scene_hooks=scene_hooks
                     )
                     logger.info(f"🎉 Platform-ready reel created: {reel_output}")
                     logger.info(f"📐 Format: {self.config.reel_width}x{self.config.reel_height} @ {self.config.reel_fps}fps")
@@ -789,7 +879,7 @@ class CartoonShortsGenerator:
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(description="Generate platform-ready vertical Reels/Shorts videos")
-    parser.add_argument("--prompt", required=True, help="Story prompt (e.g., 'A baby lion opens a smoothie shop in the jungle')")
+    parser.add_argument("--prompt", required=False, help="Story prompt (e.g., 'A baby lion opens a smoothie shop in the jungle') - not required with --gen-bulk")
     parser.add_argument("--duration", type=int, default=30, help="Video duration in seconds")
     parser.add_argument("--video-format", choices=["shorts", "normal"], default="shorts", 
                        help="Video format: 'shorts' for 9:16 YouTube Shorts, 'normal' for 16:9 standard videos")
@@ -811,6 +901,12 @@ def main():
     parser.add_argument("--music-volume", type=float, default=0.12, help="Background music volume (0.0-1.0, default: 0.12)")
     parser.add_argument("--voice-volume", type=float, default=1.0, help="Voice volume (0.0-1.0, default: 1.0)")
     parser.add_argument("--verbose-ffmpeg", action="store_true", help="Print FFmpeg commands for debugging")
+    parser.add_argument("--auto-sub", action="store_true", help="Enable automatic subtitle generation (disabled by default)")
+    parser.add_argument("--add-hooks", action="store_true", help="Enable hook text rendering (top_hook_text, bottom_hook_text from storyboard, and scene hook_text)")
+    
+    # Bulk generation arguments
+    parser.add_argument("--gen-bulk", action="store_true", help="Enable bulk generation from a single storyboard JSON file with multiple stories")
+    parser.add_argument("--storyboard", type=str, help="Path to storyboard JSON file containing a 'stories' array (required with --gen-bulk)")
     
     args = parser.parse_args()
     
@@ -823,6 +919,188 @@ def main():
         logger.info("Please set the following environment variables:")
         for var in missing_vars:
             logger.info(f"  {var}")
+        sys.exit(1)
+    
+    # Bulk generation mode
+    if args.gen_bulk:
+        if not args.storyboard:
+            logger.error("❌ --storyboard is required when using --gen-bulk")
+            sys.exit(1)
+        
+        storyboard_file = Path(args.storyboard)
+        if not storyboard_file.exists() or not storyboard_file.is_file():
+            logger.error(f"❌ Storyboard file does not exist: {storyboard_file}")
+            sys.exit(1)
+        
+        # Load the storyboard JSON file
+        try:
+            with open(storyboard_file, 'r', encoding='utf-8') as f:
+                storyboard_data = json.load(f)
+        except json.JSONDecodeError as e:
+            logger.error(f"❌ Invalid JSON in storyboard file: {e}")
+            sys.exit(1)
+        except Exception as e:
+            logger.error(f"❌ Failed to read storyboard file: {e}")
+            sys.exit(1)
+        
+        # Extract stories array
+        stories = storyboard_data.get('stories', [])
+        if not stories:
+            logger.error(f"❌ No 'stories' array found in storyboard file. Expected format: {{'stories': [...]}}")
+            sys.exit(1)
+        
+        logger.info(f"📁 Found {len(stories)} stories in {storyboard_file.name}")
+        
+        # Initialize pipelines once (singleton pattern ensures they're shared)
+        logger.info("🔄 Initializing pipelines (will be reused for all stories)...")
+        base_config = VideoConfig(
+            prompt="",  # Will be overridden per story
+            duration=args.duration,
+            video_format=args.video_format,
+            output_path=args.output,
+            style=args.style,
+            voice_id=args.voice,
+            language=args.language,
+            enable_prompt_enhancement=False,
+            scene_pause_duration=args.scene_pause,
+            add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
+            add_hooks=args.add_hooks,  # Enable hook text rendering
+            create_reel=not args.no_reel and (args.format == "reel" or args.vertical),
+            vertical_mode=args.vertical_mode,
+            reel_width=args.out_width,
+            reel_height=args.out_height,
+            reel_fps=args.out_fps,
+            music_path=args.music,
+            music_volume=args.music_volume,
+            voice_volume=args.voice_volume,
+            verbose_ffmpeg=args.verbose_ffmpeg
+        )
+        
+        # Pre-initialize generator to load pipelines once (WAN and TTS use singletons)
+        logger.info("📦 Loading WAN pipeline (singleton - will be reused)...")
+        logger.info("📦 Loading TTS model (singleton - will be reused)...")
+        temp_generator = CartoonShortsGenerator(base_config)
+        logger.info("✅ Pipelines initialized and ready for bulk generation")
+        
+        # Process each story in the stories array
+        successful = []
+        failed = []
+        
+        for i, story in enumerate(stories, 1):
+            logger.info(f"\n{'='*70}")
+            logger.info(f"Processing story {i}/{len(stories)}")
+            logger.info(f"{'='*70}")
+            
+            try:
+                # Use story title if available, otherwise use top-level title, or fallback to Story_{i}
+                title = story.get('title') or storyboard_data.get('title') or f'Story_{i}'
+                description = story.get('description', '') or storyboard_data.get('description', '')
+                scenes = story.get('scenes', [])
+                total_duration = story.get('total_duration', args.duration)
+                
+                if not scenes:
+                    logger.warning(f"⚠️ No scenes found in story {i}, skipping")
+                    failed.append((title, "No scenes found"))
+                    continue
+                
+                # Calculate scene duration if not provided in each scene
+                # Use total_duration divided by number of scenes, or use scene's own duration
+                for scene in scenes:
+                    if 'duration' not in scene:
+                        scene['duration'] = total_duration // len(scenes)
+                
+                # Create output folder by title (sanitize filename)
+                safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '-', '_')).strip()
+                safe_title = safe_title.replace(' ', '_')[:50]  # Limit length
+                if not safe_title:
+                    safe_title = f"Story_{i}"  # Fallback to index
+                output_folder = Path(args.output) / safe_title
+                output_folder.mkdir(parents=True, exist_ok=True)
+                
+                logger.info(f"📁 Output folder: {output_folder}")
+                logger.info(f"📋 Title: {title}")
+                logger.info(f"📝 Description: {description}")
+                logger.info(f"🎬 Scenes: {len(scenes)}")
+                logger.info(f"⏱️ Total duration: {total_duration}s")
+                
+                # Normalize scenes (handle characters if present)
+                # Check if there's a cast at the story level or file level
+                cast_list = story.get('cast', []) or storyboard_data.get('cast', []) or []
+                name_to_cast = {}
+                for entry in cast_list:
+                    if isinstance(entry, dict) and entry.get('name'):
+                        name_to_cast[entry['name']] = entry
+                    elif isinstance(entry, str):
+                        name_to_cast[entry] = {"name": entry, "role": "character"}
+                
+                normalized_scenes = []
+                for scene in scenes:
+                    scene_copy = dict(scene)
+                    scene_chars = scene_copy.get('characters', [])
+                    structured_chars = []
+                    for ch in scene_chars:
+                        if isinstance(ch, dict):
+                            structured_chars.append(ch)
+                        elif isinstance(ch, str):
+                            base = name_to_cast.get(ch, {"name": ch, "role": "character"})
+                            structured_chars.append({
+                                "name": base.get("name", ch),
+                                "role": base.get("role", "character")
+                            })
+                    scene_copy['characters'] = structured_chars[:2]  # Limit to 2 characters
+                    normalized_scenes.append(scene_copy)
+                
+                # Update generator config and output directory (reuse same instance)
+                # This ensures WAN and TTS pipelines are truly reused (not reloaded)
+                temp_generator.config.prompt = title
+                temp_generator.config.title = title
+                temp_generator.config.description = description
+                temp_generator.config.custom_scenes = normalized_scenes
+                temp_generator.config.duration = total_duration
+                # Use scene duration from first scene if available, otherwise calculate
+                if normalized_scenes and 'duration' in normalized_scenes[0]:
+                    temp_generator.config.scene_duration = normalized_scenes[0].get('duration', 8)
+                else:
+                    temp_generator.config.scene_duration = total_duration // len(normalized_scenes) if normalized_scenes else 8
+                temp_generator.config.output_path = str(output_folder)
+                temp_generator.output_dir = output_folder
+                temp_generator.output_dir.mkdir(parents=True, exist_ok=True)
+                
+                # Update voice synthesizer language if needed
+                if args.language != temp_generator.config.language:
+                    temp_generator.config.language = args.language
+                    # Note: TTS model is already loaded, language change will be handled during synthesis
+                
+                # Generate video using the same generator instance
+                output_path = temp_generator.generate()
+                successful.append((title, output_path))
+                logger.info(f"✅ Successfully generated: {output_path}")
+                
+            except Exception as e:
+                logger.error(f"❌ Failed to process story {i} ({title if 'title' in locals() else 'Unknown'}): {e}")
+                import traceback
+                logger.error(traceback.format_exc())
+                failed.append((title if 'title' in locals() else f"Story_{i}", str(e)))
+        
+        # Print summary
+        logger.info(f"\n{'='*70}")
+        logger.info("BULK GENERATION SUMMARY")
+        logger.info(f"{'='*70}")
+        logger.info(f"✅ Successful: {len(successful)}/{len(stories)}")
+        for title, output in successful:
+            logger.info(f"   ✓ {title} -> {output}")
+        
+        if failed:
+            logger.info(f"\n❌ Failed: {len(failed)}/{len(stories)}")
+            for title, error in failed:
+                logger.info(f"   ✗ {title}: {error}")
+        
+        logger.info(f"{'='*70}")
+        sys.exit(0 if not failed else 1)
+    
+    # Single generation mode (existing logic)
+    if not args.prompt:
+        logger.error("❌ --prompt is required when not using --gen-bulk")
         sys.exit(1)
     
     # Determine if reel should be created
@@ -839,6 +1117,8 @@ def main():
         language=args.language,
         enable_prompt_enhancement=False,  # Prompt enhancement disabled
         scene_pause_duration=args.scene_pause,
+        add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
+        add_hooks=args.add_hooks,  # Enable hook text rendering
         create_reel=create_reel,
         vertical_mode=args.vertical_mode,
         reel_width=args.out_width,

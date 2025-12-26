@@ -1,0 +1,53 @@
+{
+  "stories": [
+    {
+      "title": "How Silence Became a Weapon in World War II",
+      "description": "A real WWII tactic where doing nothing on the radio misled enemy intelligence.",
+      "total_duration": 32,
+      "aspect_ratio": "9:16",
+      "scenes": [
+        {
+          "id": "scene_01_hook_how",
+          "duration": 5,
+          "hook_text": "This really happened in WWII",
+          "visual_prompt": "Wide cinematic establishing shot of a foggy European battlefield at dawn, abandoned radio equipment in the foreground, muted colors, slow cinematic camera drift",
+          "visual_reference": "ww2 battlefield radio fog",
+          "negative_prompt": "text, watermark, logo, modern objects, cartoon",
+          "narration": "How did complete radio silence confuse enemy armies during World War Two?"
+        },
+        {
+          "id": "scene_02_mystery",
+          "duration": 7,
+          "visual_prompt": "Quiet military command tent at night, radios powered on but untouched, indicator lights glowing faintly, canvas gently moving in the wind",
+          "visual_reference": "ww2 command tent radio night",
+          "negative_prompt": "text, watermark, logo, cartoon",
+          "narration": "German intelligence closely tracked Allied radio signals to predict every major move."
+        },
+        {
+          "id": "scene_03_escalation",
+          "duration": 8,
+          "visual_prompt": "Allied radio operators sitting still with hands away from controls, ticking clocks, shadows stretching across detailed military maps",
+          "visual_reference": "ww2 radio operators waiting",
+          "negative_prompt": "text, watermark, logo, gore, cartoon",
+          "narration": "Then, without warning, entire Allied units stopped transmitting altogether."
+        },
+        {
+          "id": "scene_04_explanation",
+          "duration": 7,
+          "visual_prompt": "Montage of enemy analysts listening to static-filled radios, confused expressions, maps showing misplaced troop expectations",
+          "visual_reference": "ww2 intelligence analysts radio",
+          "negative_prompt": "text, watermark, logo, fantasy elements",
+          "narration": "The silence itself became the signal, convincing the enemy that a massive attack was being hidden elsewhere."
+        },
+        {
+          "id": "scene_05_lingering_end",
+          "duration": 5,
+          "visual_prompt": "Quiet wide shot of radios sitting unused as the sun rises over a calm battlefield, reflective mood, slow fade feeling",
+          "visual_reference": "ww2 battlefield calm sunrise",
+          "negative_prompt": "text, watermark, logo",
+          "narration": "In war, even silence can be carefully planned—and incredibly powerful."
+        }
+      ]
+    }
+  ]
+}

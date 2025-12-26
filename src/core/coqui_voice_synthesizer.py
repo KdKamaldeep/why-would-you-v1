@@ -16,6 +16,45 @@ from typing import List, Optional, Dict, Any
 from pathlib import Path
 import torch
 from pydantic import BaseModel
+import threading
+import time
+
+# Configure TTS_HOME BEFORE any TTS imports
+# TTS reads TTS_HOME when the module is first imported, so we must set it here
+def _configure_tts_cache():
+    """Configure TTS_HOME to use workspace folder if available."""
+    # Force set TTS_HOME to workspace if available (even if already set)
+    workspace_tts_dir = Path("/workspace/.cache/tts")
+    workspace_exists = Path("/workspace").exists()
+    
+    if workspace_exists:
+        # Always use workspace if it exists (override any existing TTS_HOME)
+        workspace_tts_dir.mkdir(parents=True, exist_ok=True)
+        os.environ["TTS_HOME"] = str(workspace_tts_dir)
+        print(f"[TTS_CONFIG] TTS_HOME set to workspace: {workspace_tts_dir}")
+        logging.getLogger(__name__).info(f"📁 TTS model cache configured to: {workspace_tts_dir}")
+        return str(workspace_tts_dir)
+    elif "TTS_HOME" not in os.environ:
+        # Use default location only if workspace doesn't exist and TTS_HOME not set
+        local_tts_dir = Path.home() / ".local" / "share" / "tts"
+        local_tts_dir.mkdir(parents=True, exist_ok=True)
+        os.environ["TTS_HOME"] = str(local_tts_dir)
+        print(f"[TTS_CONFIG] TTS_HOME set to default: {local_tts_dir}")
+        logging.getLogger(__name__).info(f"📁 TTS model cache using default: {local_tts_dir}")
+        return str(local_tts_dir)
+    else:
+        # TTS_HOME already set, log it
+        existing_home = os.environ["TTS_HOME"]
+        print(f"[TTS_CONFIG] TTS_HOME already set to: {existing_home}")
+        logging.getLogger(__name__).info(f"📁 TTS model cache using existing TTS_HOME: {existing_home}")
+        return existing_home
+
+# Configure TTS cache directory IMMEDIATELY (before any TTS imports)
+_configure_tts_cache()
+
+# Verify TTS_HOME is set correctly
+_tts_home_verify = os.environ.get("TTS_HOME", "NOT SET")
+print(f"[TTS_CONFIG] Verification - TTS_HOME = {_tts_home_verify}")
 
 # Suppress torchaudio deprecation warnings
 warnings.filterwarnings("ignore", message=".*torchaudio.load.*")
@@ -41,6 +80,147 @@ warnings.filterwarnings("ignore", message=".*The attention mask and the pad toke
 warnings.filterwarnings("ignore", message=".*Using the model-agnostic default.*")
 
 logger = logging.getLogger(__name__)
+
+# Global singleton TTS instance
+_tts_instance = None
+_tts_model_cache = {}
+
+# Cache for speaker WAV conditioning latents (keyed by file path + language)
+_speaker_wav_cache = {}
+
+
+def get_tts_instance(config: Optional["CoquiVoiceConfig"] = None, force_reload: bool = False):
+    """
+    Get or initialize the global TTS instance (singleton pattern).
+    
+    Args:
+        config: Configuration for voice synthesis. Only used on first load.
+        force_reload: Force reload of the TTS model even if already loaded.
+        
+    Returns:
+        TTS API instance or None if loading fails
+    """
+    global _tts_instance, _tts_model_cache
+    
+    if _tts_instance is not None and not force_reload:
+        logger.info("♻️ Reusing existing TTS instance (singleton) - model already loaded")
+        return _tts_instance
+    
+    if config is None:
+        default_model = _get_default_tts_model_path()
+        config = CoquiVoiceConfig(model_name=default_model)
+    elif config.model_name is None or config.model_name == "models/tts/XTTS-v2":
+        config.model_name = _get_default_tts_model_path()
+    
+    # Create cache key based on model and device
+    device = "cuda" if config.gpu and torch.cuda.is_available() else "cpu"
+    cache_key = f"{config.model_name}_{device}"
+    
+    # Check if model is already cached
+    if cache_key in _tts_model_cache and not force_reload:
+        logger.info(f"♻️ Reusing cached TTS model: {cache_key}")
+        _tts_instance = _tts_model_cache[cache_key]
+        return _tts_instance
+    
+    try:
+        # Ensure TTS_HOME is set before importing TTS
+        if "TTS_HOME" not in os.environ:
+            _configure_tts_cache()
+        
+        tts_home = os.environ.get("TTS_HOME", "")
+        if tts_home:
+            logger.info(f"📁 TTS_HOME is set to: {tts_home}")
+            Path(tts_home).mkdir(parents=True, exist_ok=True)
+        
+        from TTS.api import TTS
+        
+        device = "cuda" if config.gpu and torch.cuda.is_available() else "cpu"
+        lang = (config.language or "en").lower()
+        
+        # Helper to check if a path is a valid model directory
+        def is_valid_model_path(path: Path) -> bool:
+            """Check if path contains a valid TTS model."""
+            if not path.exists() or not path.is_dir():
+                return False
+            return any([
+                (path / "config.json").exists(),
+                (path / "model.pth").exists(),
+                (path / "vocab.json").exists(),
+                any(path.glob("*.pth")),
+                any(path.glob("*.pt")),
+                (path / "model_file.pth").exists(),
+            ])
+        
+        # Build prioritized list - ONLY XTTS-v2 models
+        model_priority = []
+        
+        workspace_model_path = Path("/workspace/models/tts/XTTS-v2")
+        if is_valid_model_path(workspace_model_path):
+            model_priority.append(str(workspace_model_path))
+            logger.info(f"Found workspace cache: {workspace_model_path}")
+        
+        tts_home = os.environ.get("TTS_HOME", "")
+        if tts_home:
+            tts_home_path = Path(tts_home)
+            for possible_path in [
+                tts_home_path / "tts_models" / "multilingual" / "multi-dataset" / "xtts_v2",
+                tts_home_path / "coqui" / "XTTS-v2",
+                tts_home_path / "XTTS-v2",
+            ]:
+                if is_valid_model_path(possible_path):
+                    model_priority.append(str(possible_path))
+                    logger.info(f"Found TTS_HOME cache: {possible_path}")
+                    break
+        
+        local_model_path = Path("models/tts/XTTS-v2")
+        if is_valid_model_path(local_model_path):
+            model_priority.append(str(local_model_path))
+            logger.info(f"Found local cache: {local_model_path}")
+        
+        # 4. Final fallback: Online model identifier
+        model_priority.append("tts_models/multilingual/multi-dataset/xtts_v2")
+        
+        logger.info(f"📦 Loading TTS model (singleton - will be reused)...")
+        logger.info(f"🔍 Model priority list: {model_priority}")
+        
+        # Try loading models in priority order
+        tts_model = None
+        last_error = None
+        
+        for model_path in model_priority:
+            try:
+                logger.info(f"Attempting to load TTS model: {model_path}")
+                # Explicitly specify GPU device if available
+                if device == "cuda" and torch.cuda.is_available():
+                    tts_model = TTS(model_path, progress_bar=config.progress_bar).to(device)
+                    logger.info(f"✅ TTS model loaded and moved to GPU: {device}")
+                else:
+                    tts_model = TTS(model_path, progress_bar=config.progress_bar)
+                    logger.info(f"✅ TTS model loaded on CPU")
+                logger.info(f"✅ Successfully loaded TTS model: {model_path}")
+                break
+            except Exception as e:
+                last_error = e
+                logger.warning(f"Failed to load model {model_path}: {e}")
+                continue
+        
+        if tts_model is None:
+            raise RuntimeError(f"Failed to load any TTS model. Last error: {last_error}")
+        
+        # Cache the instance
+        _tts_instance = tts_model
+        _tts_model_cache[cache_key] = tts_model
+        logger.info(f"✅ TTS model loaded and cached (singleton): {cache_key}")
+        logger.info(f"📦 TTS pipeline initialized ONCE - will be reused for all subsequent generations")
+        
+        return _tts_instance
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to load TTS model: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return None
+
 
 # Patch for PyTorch 2.6 weights_only issue
 def _patch_torch_load():
@@ -125,43 +305,184 @@ class CoquiVoiceSynthesizer:
         # Create voice directory if it doesn't exist
         os.makedirs(self.config.voice_dir, exist_ok=True)
         
-        # Initialize TTS model
-        self.tts = None
-        self._load_model()
+        # Initialize TTS model using singleton pattern
+        self.tts = get_tts_instance(self.config)
+        if self.tts is None:
+            raise RuntimeError("Failed to initialize TTS model")
         
         logger.info(f"Coqui TTS initialized with model: {self.config.model_name}")
         logger.info(f"GPU enabled: {self.config.gpu}")
+        
+        # Verify and ensure model is on GPU
+        if self.config.gpu and torch.cuda.is_available():
+            try:
+                # Try to move model to GPU explicitly
+                if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+                    self.tts.synthesizer.model = self.tts.synthesizer.model.cuda()
+                    model_device = next(self.tts.synthesizer.model.parameters()).device
+                    logger.info(f"✅ TTS model moved to GPU: {model_device}")
+                elif hasattr(self.tts, 'model'):
+                    self.tts.model = self.tts.model.cuda()
+                    model_device = next(self.tts.model.parameters()).device
+                    logger.info(f"✅ TTS model moved to GPU: {model_device}")
+                else:
+                    # Try to move TTS object itself
+                    try:
+                        self.tts = self.tts.to("cuda")
+                        logger.info(f"✅ TTS object moved to GPU")
+                    except:
+                        logger.warning("Could not move TTS to GPU - may use CPU for inference")
+            except Exception as e:
+                logger.warning(f"Could not move TTS model to GPU: {e}")
+        
+        # Verify model device
+        if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+            model_device = next(self.tts.synthesizer.model.parameters()).device
+            logger.info(f"TTS model device: {model_device}")
+        elif hasattr(self.tts, 'model'):
+            model_device = next(self.tts.model.parameters()).device
+            logger.info(f"TTS model device: {model_device}")
+        
         logger.info(f"Voice directory: {self.config.voice_dir}")
+        logger.info(f"Language: {self.config.language}")
+        
+        # Cache for speaker WAV conditioning latents (per instance, keyed by file path + language)
+        self._speaker_latents_cache = {}
+    
+    def _get_cached_speaker_latents(self, speaker_wav_path: str, language: str):
+        """
+        Get cached conditioning latents for a speaker WAV file, or compute and cache them.
+        For XTTS models, this avoids re-encoding the speaker WAV on every call.
+        
+        Args:
+            speaker_wav_path: Path to speaker WAV file
+            language: Language code
+            
+        Returns:
+            Tuple of (gpt_cond_latent, speaker_embedding) or None if caching not supported
+        """
+        cache_key = f"{speaker_wav_path}_{language}"
+        
+        # Check cache first
+        if cache_key in self._speaker_latents_cache:
+            logger.info(f"♻️ Using cached speaker conditioning latents for: {speaker_wav_path}")
+            return self._speaker_latents_cache[cache_key]
+        
+        # Try to get conditioning latents from XTTS model
+        try:
+            # For XTTS models, access the underlying model to get conditioning latents
+            if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+                model = self.tts.synthesizer.model
+                if hasattr(model, 'get_conditioning_latents'):
+                    logger.info(f"📦 Computing and caching speaker conditioning latents for: {speaker_wav_path}")
+                    latents = model.get_conditioning_latents(speaker_wav_path)
+                    self._speaker_latents_cache[cache_key] = latents
+                    logger.info(f"✅ Cached speaker conditioning latents (will reuse on next call)")
+                    return latents
+            # Alternative: Check if model has get_conditioning_latents method directly
+            elif hasattr(self.tts, 'model') and hasattr(self.tts.model, 'get_conditioning_latents'):
+                logger.info(f"📦 Computing and caching speaker conditioning latents for: {speaker_wav_path}")
+                latents = self.tts.model.get_conditioning_latents(speaker_wav_path)
+                self._speaker_latents_cache[cache_key] = latents
+                logger.info(f"✅ Cached speaker conditioning latents (will reuse on next call)")
+                return latents
+            # Check if TTS has get_conditioning_latents directly
+            elif hasattr(self.tts, 'get_conditioning_latents'):
+                logger.info(f"📦 Computing and caching speaker conditioning latents for: {speaker_wav_path}")
+                latents = self.tts.get_conditioning_latents(speaker_wav_path)
+                self._speaker_latents_cache[cache_key] = latents
+                logger.info(f"✅ Cached speaker conditioning latents (will reuse on next call)")
+                return latents
+        except Exception as e:
+            logger.debug(f"Could not cache speaker latents (will encode each time): {e}")
+        
+        return None
     
     def _load_model(self):
         """Load the Coqui TTS model - prioritize XTTS-v2 from workspace cache, download if needed"""
         try:
+            # Ensure TTS_HOME is set before importing TTS
+            # TTS reads TTS_HOME when the module is first imported
+            if "TTS_HOME" not in os.environ:
+                _configure_tts_cache()
+            
+            # Verify TTS_HOME is set correctly
+            tts_home = os.environ.get("TTS_HOME", "")
+            if tts_home:
+                logger.info(f"📁 TTS_HOME is set to: {tts_home}")
+                # Ensure directory exists
+                Path(tts_home).mkdir(parents=True, exist_ok=True)
+            else:
+                logger.warning("⚠️ TTS_HOME not set, TTS will use default location")
+            
             from TTS.api import TTS
+            
+            # After import, verify TTS is using the correct cache
+            # TTS stores models in TTS_HOME/tts_models/...
+            if tts_home:
+                expected_cache = Path(tts_home) / "tts_models"
+                logger.info(f"📥 TTS models will be cached in: {expected_cache}")
 
             device = "cuda" if self.config.gpu and torch.cuda.is_available() else "cpu"
             lang = (self.config.language or "en").lower()
             
+            # Helper to check if a path is a valid model directory
+            def is_valid_model_path(path: Path) -> bool:
+                """Check if path contains a valid TTS model."""
+                if not path.exists() or not path.is_dir():
+                    return False
+                # Check for common model indicator files
+                return any([
+                    (path / "config.json").exists(),
+                    (path / "model.pth").exists(),
+                    (path / "vocab.json").exists(),
+                    any(path.glob("*.pth")),
+                    any(path.glob("*.pt")),
+                    (path / "model_file.pth").exists(),
+                ])
+            
             # Build prioritized list - ONLY XTTS-v2 models, no fallback to other models
             model_priority = []
             
-            # 1. First priority: Workspace cache if it exists
+            # 1. First priority: Workspace explicit cache if it exists
             workspace_model_path = Path("/workspace/models/tts/XTTS-v2")
-            if workspace_model_path.exists():
+            if is_valid_model_path(workspace_model_path):
                 model_priority.append(str(workspace_model_path))
                 logger.info(f"Found workspace cache: {workspace_model_path}")
             
-            # 2. Second priority: Local cache
+            # 2. Second priority: TTS_HOME cache (configured to workspace if available)
+            tts_home = os.environ.get("TTS_HOME", "")
+            if tts_home:
+                tts_home_path = Path(tts_home)
+                # Check common TTS model paths in TTS_HOME
+                for possible_path in [
+                    tts_home_path / "tts_models" / "multilingual" / "multi-dataset" / "xtts_v2",
+                    tts_home_path / "coqui" / "XTTS-v2",
+                    tts_home_path / "XTTS-v2",
+                ]:
+                    if is_valid_model_path(possible_path):
+                        model_priority.append(str(possible_path))
+                        logger.info(f"Found TTS_HOME cache: {possible_path}")
+                        break
+            
+            # 3. Third priority: Local cache
             local_model_path = Path("models/tts/XTTS-v2")
-            if local_model_path.exists():
+            if is_valid_model_path(local_model_path):
                 model_priority.append(str(local_model_path))
                 logger.info(f"Found local cache: {local_model_path}")
             
             # 3. Third priority: Download XTTS-v2 (will download on first use)
+            # Models will be downloaded to TTS_HOME (configured to workspace if available)
             # Try different XTTS-v2 model identifiers
             model_priority.extend([
-                "coqui/XTTS-v2",  # Coqui's XTTS-v2
-                "tts_models/multilingual/multi-dataset/xtts_v2",  # HuggingFace XTTS-v2
+                "coqui/XTTS-v2",  # Coqui's XTTS-v2 (downloads to TTS_HOME)
+                "tts_models/multilingual/multi-dataset/xtts_v2",  # HuggingFace XTTS-v2 (downloads to TTS_HOME)
             ])
+            
+            # Log where models will be downloaded
+            tts_home = os.environ.get("TTS_HOME", "")
+            if tts_home:
+                logger.info(f"📥 TTS models will download to: {tts_home}")
             
             logger.info(f"Loading TTS model for language: {lang}")
             logger.info(f"Model priority list: {model_priority}")
@@ -235,6 +556,45 @@ class CoquiVoiceSynthesizer:
             raise
 
     
+    def _tts_call_with_timeout(self, timeout_seconds: int = 300, **kwargs):
+        """
+        Call TTS synthesis with timeout protection.
+        
+        Args:
+            timeout_seconds: Maximum time to wait for synthesis (default: 5 minutes)
+            **kwargs: Arguments to pass to tts_to_file
+            
+        Returns:
+            True if successful, False if timeout
+        """
+        result = [None]
+        exception = [None]
+        
+        def _call_tts():
+            try:
+                self.tts.tts_to_file(**kwargs)
+                result[0] = True
+            except Exception as e:
+                exception[0] = e
+                result[0] = False
+        
+        thread = threading.Thread(target=_call_tts, daemon=True)
+        thread.start()
+        thread.join(timeout=timeout_seconds)
+        
+        if thread.is_alive():
+            logger.error(f"❌ TTS synthesis timed out after {timeout_seconds} seconds")
+            logger.error("This may indicate:")
+            logger.error("  1. Model is stuck in inference")
+            logger.error("  2. Speaker WAV file is corrupted or incompatible")
+            logger.error("  3. GPU/CPU resource issues")
+            raise TimeoutError(f"TTS synthesis timed out after {timeout_seconds} seconds")
+        
+        if exception[0] is not None:
+            raise exception[0]
+        
+        return result[0]
+    
     def synthesize_voice(self, 
                         narration_lines: List[str], 
                         output_path: str,
@@ -301,41 +661,8 @@ class CoquiVoiceSynthesizer:
             logger.info(f"Original lines: {len(narration_lines)}, Cleaned lines: {len(cleaned_lines)}")
             logger.info(f"Synthesizing voice for text: {full_text[:100]}...")
             
-            # Ensure minimum text length for TTS models
-            min_text_length = 50  # Increased minimum characters needed for kernel size
-            original_text = full_text.strip()
-            
-            if len(original_text) < min_text_length:
-                logger.info(f"Text too short ({len(original_text)} chars), padding to minimum length")
-                
-                # Create a more substantial padding strategy
-                if self.config.language == "hi":
-                    # For Hindi, add more context and repetition
-                    padding_parts = [
-                        original_text,
-                        "यह एक छोटा वाक्य है।",  # "This is a short sentence."
-                        original_text,
-                        "धन्यवाद।"  # "Thank you."
-                    ]
-                else:
-                    # For English, add more context and repetition
-                    padding_parts = [
-                        original_text,
-                        "This is a short sentence.",
-                        original_text,
-                        "Thank you for listening."
-                    ]
-                
-                # Join with appropriate separators
-                if self.config.language == "hi":
-                    full_text = "। ".join(padding_parts) + "।"
-                else:
-                    full_text = ". ".join(padding_parts) + "."
-                
-                logger.info(f"Padded short text to {len(full_text)} characters")
-                logger.info(f"Padded text: {full_text[:100]}...")
-            else:
-                full_text = original_text
+            # Use text as-is without any padding or modifications
+            full_text = full_text.strip()
             
             model_name_lower = (getattr(self.config, 'model_name', '') or '').lower()
 
@@ -383,24 +710,104 @@ class CoquiVoiceSynthesizer:
                 def _xtts_call(speaker_value: Optional[str]) -> None:
                     # Avoid passing progress_bar to suppress model_kwargs warnings
                     if speaker_wav_arg is not None:
-                        # Reference voice provided: do not pass speaker token
+                        # Validate speaker_wav file before using
+                        if not os.path.exists(speaker_wav_arg):
+                            raise FileNotFoundError(f"Speaker WAV file not found: {speaker_wav_arg}")
+                        
+                        # Try to use cached conditioning latents to avoid re-encoding
+                        cached_latents = self._get_cached_speaker_latents(speaker_wav_arg, self.config.language)
+                        
                         logger.info(f"XTTS synthesis with speaker_wav: {speaker_wav_arg}")
-                        self.tts.tts_to_file(
-                            text=full_text,
-                            file_path=output_path,
-                            speaker_wav=speaker_wav_arg,
-                            language=self.config.language,
-                        )
+                        logger.info(f"Text length: {len(full_text)} characters")
+                        
+                        start_time = time.time()
+                        try:
+                            # If we have cached latents, try to use them directly with the model
+                            if cached_latents is not None:
+                                try:
+                                    # Access the underlying model to use cached latents
+                                    if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+                                        model = self.tts.synthesizer.model
+                                        # Use model's inference with cached latents
+                                        # This bypasses the speaker_wav encoding step
+                                        logger.info("Using cached speaker conditioning latents (skipping re-encoding)")
+                                        wav = model.inference(
+                                            full_text,
+                                            self.config.language,
+                                            cached_latents[0],  # gpt_cond_latent
+                                            cached_latents[1],  # speaker_embedding
+                                        )
+                                        # Save the generated audio
+                                        import soundfile as sf
+                                        sf.write(output_path, wav, samplerate=22050)
+                                    elif hasattr(self.tts, 'model') and hasattr(self.tts.model, 'inference'):
+                                        logger.info("Using cached speaker conditioning latents (skipping re-encoding)")
+                                        wav = self.tts.model.inference(
+                                            full_text,
+                                            self.config.language,
+                                            cached_latents[0],  # gpt_cond_latent
+                                            cached_latents[1],  # speaker_embedding
+                                        )
+                                        import soundfile as sf
+                                        sf.write(output_path, wav, samplerate=22050)
+                                    else:
+                                        # Fall back to standard call if model structure is different
+                                        raise AttributeError("Model structure not recognized for cached latents")
+                                except Exception as e:
+                                    logger.warning(f"Failed to use cached latents, falling back to speaker_wav: {e}")
+                                    # Fall back to standard call
+                                    self.tts.tts_to_file(
+                                        text=full_text,
+                                        file_path=output_path,
+                                        speaker_wav=speaker_wav_arg,
+                                        language=self.config.language,
+                                    )
+                            else:
+                                # No cached latents - standard call (will encode speaker_wav)
+                                # Ensure GPU is used for inference
+                                if torch.cuda.is_available() and self.config.gpu:
+                                    # Force GPU context for inference
+                                    with torch.cuda.device(0):
+                                        self.tts.tts_to_file(
+                                            text=full_text,
+                                            file_path=output_path,
+                                            speaker_wav=speaker_wav_arg,
+                                            language=self.config.language,
+                                        )
+                                else:
+                                    self.tts.tts_to_file(
+                                        text=full_text,
+                                        file_path=output_path,
+                                        speaker_wav=speaker_wav_arg,
+                                        language=self.config.language,
+                                    )
+                            elapsed = time.time() - start_time
+                            logger.info(f"✅ TTS synthesis completed in {elapsed:.2f} seconds")
+                        except Exception as e:
+                            logger.error(f"TTS synthesis error: {e}")
+                            raise
                     else:
                         # No reference: pass an explicit speaker token
                         chosen_speaker = speaker_value or self.config.speaker or "default"
                         logger.info(f"XTTS synthesis with speaker: {chosen_speaker}")
-                        self.tts.tts_to_file(
-                            text=full_text,
-                            file_path=output_path,
-                            speaker=chosen_speaker,
-                            language=self.config.language,
-                        )
+                        
+                        # Ensure GPU is used for inference
+                        if torch.cuda.is_available() and self.config.gpu:
+                            # Force GPU context for inference
+                            with torch.cuda.device(0):
+                                self.tts.tts_to_file(
+                                    text=full_text,
+                                    file_path=output_path,
+                                    speaker=chosen_speaker,
+                                    language=self.config.language,
+                                )
+                        else:
+                            self.tts.tts_to_file(
+                                text=full_text,
+                                file_path=output_path,
+                                speaker=chosen_speaker,
+                                language=self.config.language,
+                            )
 
                 # Try multiple synthesis strategies
                 synthesis_success = False
@@ -439,50 +846,8 @@ class CoquiVoiceSynthesizer:
                         synthesis_errors.append(f"Default speaker synthesis failed: {error_msg}")
                         logger.warning(f"XTTS default speaker synthesis failed: {error_msg}")
                 
-                # Strategy 4: Try with longer text if kernel size error
-                if not synthesis_success and any("kernel size" in err.lower() for err in synthesis_errors):
-                    try:
-                        # Create a more substantial extended text for kernel size issues
-                        if self.config.language == "hi":
-                            extended_parts = [
-                                full_text,
-                                "यह एक लंबा वाक्य है जो टेक्स्ट-टू-स्पीच मॉडल के लिए पर्याप्त लंबाई प्रदान करता है।",
-                                full_text,
-                                "धन्यवाद और शुभकामनाएं।"
-                            ]
-                            extended_text = "। ".join(extended_parts) + "।"
-                        else:
-                            extended_parts = [
-                                full_text,
-                                "This is a longer sentence that provides sufficient length for the text-to-speech model.",
-                                full_text,
-                                "Thank you and best wishes."
-                            ]
-                            extended_text = ". ".join(extended_parts) + "."
-                        
-                        logger.info(f"Retrying with extended text length: {len(extended_text)} characters")
-                        logger.info(f"Extended text: {extended_text[:100]}...")
-                        
-                        if speaker_wav_arg is not None:
-                            self.tts.tts_to_file(
-                                text=extended_text,
-                                file_path=output_path,
-                                speaker_wav=speaker_wav_arg,
-                                language=self.config.language,
-                            )
-                        else:
-                            self.tts.tts_to_file(
-                                text=extended_text,
-                                file_path=output_path,
-                                speaker="default",
-                                language=self.config.language,
-                            )
-                        synthesis_success = True
-                        logger.info("✅ XTTS synthesis successful with extended text")
-                    except Exception as e:
-                        error_msg = str(e)
-                        synthesis_errors.append(f"Extended text synthesis failed: {error_msg}")
-                        logger.warning(f"XTTS extended text synthesis failed: {error_msg}")
+                # Strategy 4: If all strategies fail, raise the error
+                # No longer adding padding text - use original text as-is
                 
                 if not synthesis_success:
                     logger.error(f"All XTTS synthesis strategies failed: {synthesis_errors}")
@@ -515,36 +880,8 @@ class CoquiVoiceSynthesizer:
                     error_msg = str(e)
                     logger.warning(f"Whole-text synthesis failed: {error_msg}")
                     
-                # Fallback 1: retry with extended text for kernel size issues
-                if not synthesis_success:
-                    try:
-                        if self.config.language == "hi":
-                            extended_parts = [
-                                full_text,
-                                "यह एक लंबा वाक्य है जो टेक्स्ट-टू-स्पीच मॉडल के लिए पर्याप्त लंबाई प्रदान करता है।",
-                                full_text,
-                                "धन्यवाद और शुभकामनाएं।"
-                            ]
-                            extended_text = "। ".join(extended_parts) + "।"
-                        else:
-                            extended_parts = [
-                                full_text,
-                                "This is a longer sentence that provides sufficient length for the text-to-speech model.",
-                                full_text,
-                                "Thank you and best wishes."
-                            ]
-                            extended_text = ". ".join(extended_parts) + "."
-
-                        logger.info(f"Non-XTTS retrying with extended text length: {len(extended_text)} characters")
-                        self._safe_tts_to_file_non_xtts(
-                            text=extended_text,
-                            file_path=output_path,
-                            speaker=current_speaker
-                        )
-                        synthesis_success = True
-                        logger.info("✅ Non-XTTS synthesis successful with extended text")
-                    except Exception as e2:
-                        logger.warning(f"Extended-text synthesis failed: {e2}")
+                # Fallback 1: If whole-text synthesis failed, try sentence-by-sentence
+                # No longer adding padding text - use original text as-is
 
                 # Fallback 2: split into sentences and concatenate
                 if not synthesis_success:
