@@ -86,6 +86,10 @@ class VideoConfig:
     wan_seed: Optional[int] = None  # WAN random seed (optional)
     # Audio settings
     skip_audio: bool = False  # Skip audio generation entirely
+    # Hook text settings
+    add_hooks: bool = False  # Enable hook text rendering (top_hook_text, bottom_hook_text, scene hook_text)
+    top_hook_text: Optional[str] = None  # Top hook text to display on black area when upscaling
+    bottom_hook_text: Optional[str] = None  # Bottom hook text to display on black area when upscaling
     # Reel/Shorts rendering settings
     create_reel: bool = True  # Create platform-ready reel (default: True for vertical format)
     vertical_mode: str = "pad"  # "pad" (safe) or "crop" (fills frame)
@@ -168,6 +172,7 @@ class CartoonShortsGenerator:
                 return str(final_output)
             # Step 1: Generate story
             script_path = self.output_dir / "script.json"
+            original_storyboard = None  # Store original storyboard for saving later
             # Prioritize custom_scenes (from storyboard) over reusing existing script
             if self.config.custom_scenes and len(self.config.custom_scenes) > 0:
                 logger.info("Step 1: Using custom storyboard scenes provided by user...")
@@ -180,6 +185,21 @@ class CartoonShortsGenerator:
                     except Exception as e:
                         logger.warning(f"Could not remove old script.json: {e}")
                 
+                # Store original storyboard structure (same as sent for reel creation)
+                original_storyboard = {
+                    "title": self.config.title or f"Story: {self.config.prompt}",
+                    "description": self.config.description or f"An adventure about: {self.config.prompt}",
+                    "scenes": self.config.custom_scenes
+                }
+                # Add total_duration if available from config
+                if hasattr(self.config, 'duration') and self.config.duration:
+                    original_storyboard["total_duration"] = self.config.duration
+                # Add hook texts from config if present
+                if self.config.top_hook_text:
+                    original_storyboard["top_hook_text"] = self.config.top_hook_text
+                if self.config.bottom_hook_text:
+                    original_storyboard["bottom_hook_text"] = self.config.bottom_hook_text
+                
                 script = self.script_generator.generate_script_from_custom(
                     title=self.config.title or f"Story: {self.config.prompt}",
                     description=self.config.description or f"An adventure about: {self.config.prompt}",
@@ -190,6 +210,8 @@ class CartoonShortsGenerator:
                 try:
                     total_duration = sum(scene.get('duration', self.config.scene_duration) for scene in script['scenes'])
                     self.config.duration = max(self.config.duration, total_duration)
+                    if original_storyboard:
+                        original_storyboard["total_duration"] = total_duration
                 except Exception:
                     pass
                 # Save script for reuse
@@ -210,11 +232,13 @@ class CartoonShortsGenerator:
                 with open(script_path, 'w', encoding='utf-8') as f:
                     json.dump(script, f, indent=2)
             
-            # Save a human-friendly storyboard alongside the raw script
+            # Save storyboard: use original storyboard if available (same as sent for reel creation),
+            # otherwise use the generated script
             storyboard_path = self.output_dir / "storyboard.json"
             try:
+                storyboard_to_save = original_storyboard if original_storyboard else script
                 with open(storyboard_path, 'w', encoding='utf-8') as f:
-                    json.dump(script, f, indent=2)
+                    json.dump(storyboard_to_save, f, indent=2)
                 logger.info(f"Saved storyboard: {storyboard_path}")
             except Exception as e:
                 logger.warning(f"Failed to save storyboard: {e}")
@@ -377,13 +401,39 @@ class CartoonShortsGenerator:
                         target_duration = actual_scene_durations[i]
                         logger.info(f"🎬 Scene {i+1}: Using narration duration ({target_duration:.2f}s) to calculate frames")
                     
-                    video_path = self.wan_generator.generate_video(
+                    # Extract scene metadata for best frame extraction
+                    scene_id = scene.get('id', f"scene_{i+1}")
+                    visual_reference = scene.get('visual_reference', None)
+                    best_frame_filename = scene.get('best_frame_filename', None)
+                    # Generate slug from story title (sanitized for filename)
+                    story_title = script.get('title', 'story')
+                    slug = "".join(c for c in story_title if c.isalnum() or c in (' ', '-', '_')).strip().replace(' ', '_').lower()[:50]
+                    
+                    # Generate video with optional best frame extraction
+                    result = self.wan_generator.generate_video(
                         prompt=prompt,
                         output_path=str(clip_path),
                         seed=self.config.wan_seed,
                         negative_prompt=negative_prompt or None,
-                        duration=target_duration  # Pass narration duration to calculate frames
+                        duration=target_duration,  # Pass narration duration to calculate frames
+                        scene_id=scene_id,
+                        visual_reference=visual_reference,
+                        slug=slug,
+                        best_frame_filename=best_frame_filename
                     )
+                    
+                    # Handle return type: dict (with metadata) or string (backward compatible)
+                    if isinstance(result, dict):
+                        video_path = result['video_path']
+                        # Store metadata for downstream article generation
+                        if 'best_frame_path' in result:
+                            scene['best_frame_path'] = result['best_frame_path']
+                            scene['scene_id'] = result['scene_id']
+                            scene['visual_reference'] = result['visual_reference']
+                            logger.info(f"📸 Scene {i+1}: Best frame saved: {result['best_frame_path']}")
+                    else:
+                        # Backward compatibility: result is a string
+                        video_path = result
                     
                     # Get actual video duration
                     actual_duration = self.video_processor.get_video_duration(str(video_path))
@@ -547,6 +597,42 @@ class CartoonShortsGenerator:
                 music_file = self.config.music_path or background_music
                 
                 reel_output = self.output_dir / "final_reel.mp4"
+                
+                # Extract hook texts from storyboard
+                top_hook = None
+                bottom_hook = None
+                scene_hooks = []  # List of (start_time, end_time, hook_text) tuples
+                
+                if self.config.add_hooks:
+                    # Try to load storyboard to get hook texts
+                    storyboard_path = self.output_dir / "storyboard.json"
+                    if storyboard_path.exists():
+                        try:
+                            with open(storyboard_path, 'r', encoding='utf-8') as f:
+                                storyboard_data = json.load(f)
+                            top_hook = storyboard_data.get('top_hook_text')
+                            bottom_hook = storyboard_data.get('bottom_hook_text')
+                        except Exception as e:
+                            logger.warning(f"Could not load storyboard for hook texts: {e}")
+                    
+                    # Extract from config if not in storyboard
+                    if not top_hook:
+                        top_hook = self.config.top_hook_text
+                    if not bottom_hook:
+                        bottom_hook = self.config.bottom_hook_text
+                
+                # Extract scene hook_text from script (always, not just when add_hooks is True)
+                for i, scene in enumerate(script['scenes']):
+                    hook_text = scene.get('hook_text')
+                    if hook_text:
+                        # Calculate timing for this scene (accounting for pauses between scenes)
+                        scene_duration = scene.get('duration', 8)
+                        start_time = sum(s.get('duration', 8) for s in script['scenes'][:i])
+                        # Add pause duration for each previous scene (except before first scene)
+                        start_time += self.config.scene_pause_duration * i
+                        end_time = start_time + scene_duration
+                        scene_hooks.append((start_time, end_time, hook_text))
+                
                 try:
                     create_reel(
                         stitched_video=str(stitched_output),
@@ -559,7 +645,11 @@ class CartoonShortsGenerator:
                         out_fps=self.config.reel_fps,
                         voice_volume=self.config.voice_volume,
                         music_volume=self.config.music_volume,
-                        verbose=self.config.verbose_ffmpeg
+                        verbose=self.config.verbose_ffmpeg,
+                        add_hooks=self.config.add_hooks,
+                        top_hook_text=top_hook,
+                        bottom_hook_text=bottom_hook,
+                        scene_hooks=scene_hooks
                     )
                     logger.info(f"🎉 Platform-ready reel created: {reel_output}")
                     logger.info(f"📐 Format: {self.config.reel_width}x{self.config.reel_height} @ {self.config.reel_fps}fps")
@@ -812,6 +902,7 @@ def main():
     parser.add_argument("--voice-volume", type=float, default=1.0, help="Voice volume (0.0-1.0, default: 1.0)")
     parser.add_argument("--verbose-ffmpeg", action="store_true", help="Print FFmpeg commands for debugging")
     parser.add_argument("--auto-sub", action="store_true", help="Enable automatic subtitle generation (disabled by default)")
+    parser.add_argument("--add-hooks", action="store_true", help="Enable hook text rendering (top_hook_text, bottom_hook_text from storyboard, and scene hook_text)")
     
     # Bulk generation arguments
     parser.add_argument("--gen-bulk", action="store_true", help="Enable bulk generation from a single storyboard JSON file with multiple stories")
@@ -873,6 +964,7 @@ def main():
             enable_prompt_enhancement=False,
             scene_pause_duration=args.scene_pause,
             add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
+            add_hooks=args.add_hooks,  # Enable hook text rendering
             create_reel=not args.no_reel and (args.format == "reel" or args.vertical),
             vertical_mode=args.vertical_mode,
             reel_width=args.out_width,
@@ -900,8 +992,9 @@ def main():
             logger.info(f"{'='*70}")
             
             try:
-                title = story.get('title', f'Story_{i}')
-                description = story.get('description', '')
+                # Use story title if available, otherwise use top-level title, or fallback to Story_{i}
+                title = story.get('title') or storyboard_data.get('title') or f'Story_{i}'
+                description = story.get('description', '') or storyboard_data.get('description', '')
                 scenes = story.get('scenes', [])
                 total_duration = story.get('total_duration', args.duration)
                 
@@ -1025,6 +1118,7 @@ def main():
         enable_prompt_enhancement=False,  # Prompt enhancement disabled
         scene_pause_duration=args.scene_pause,
         add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
+        add_hooks=args.add_hooks,  # Enable hook text rendering
         create_reel=create_reel,
         vertical_mode=args.vertical_mode,
         reel_width=args.out_width,

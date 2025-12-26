@@ -173,17 +173,22 @@ class ScriptGenerator:
                 continue
             duration = int(scene.get("duration", default_scene_duration))
             total_duration += duration
-            normalized_scenes.append({
-                "duration": duration,
-                "description": scene.get("description", visual_prompt),
-                "visual_prompt": visual_prompt,
-                "negative_prompt": scene.get("negative_prompt", "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly, dark, scary, violent, adult content, nsfw"),
-                "narration": scene.get("narration", scene.get("subtitle", "")),
-                "subtitle": scene.get("subtitle", scene.get("narration", "")) or f"Scene {idx+1}",
-                "characters": scene.get("characters", [])[:2],  # ensure at most two
-                "voice": scene.get("voice"),  # preserve voice property for TTS
-                "motion_prompt": scene.get("motion_prompt")  # preserve motion prompt for animation
-            })
+            
+            # Preserve all original fields by starting with a copy of the scene
+            normalized_scene = dict(scene)
+            
+            # Overwrite/ensure required fields exist with proper defaults
+            normalized_scene["duration"] = duration
+            normalized_scene["description"] = scene.get("description", visual_prompt)
+            normalized_scene["visual_prompt"] = visual_prompt
+            normalized_scene["negative_prompt"] = scene.get("negative_prompt", "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly, dark, scary, violent, adult content, nsfw")
+            normalized_scene["narration"] = scene.get("narration", scene.get("subtitle", ""))
+            normalized_scene["subtitle"] = scene.get("subtitle", scene.get("narration", "")) or f"Scene {idx+1}"
+            # Ensure characters is limited to 2
+            if "characters" in normalized_scene:
+                normalized_scene["characters"] = normalized_scene["characters"][:2]
+            
+            normalized_scenes.append(normalized_scene)
 
         if not normalized_scenes:
             logger.warning("No valid custom scenes provided; falling back to default script generation")

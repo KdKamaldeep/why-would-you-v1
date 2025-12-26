@@ -1,38 +1,249 @@
-[
-  {
-    "duration": 5,
-    "description": "The Hook: Desert Mystery",
-    "visual_prompt": "Cinematic vertical 9:16. A massive, swirling sandstorm in the deep Sahara desert. The wind picks up fine grains of golden sand, revealing the corner of a carved stone pillar buried underneath. Harsh, dramatic sunlight creating long shadows. 8k, hyper-realistic sand physics, grit and texture.",
-    "negative_prompt": "blurry sand, flat lighting, modern vehicles, plastic, text, watermark",
-    "motion_hint": "A powerful horizontal pan as the sand blows across the hidden ruins.",
-    "motion_strength": 0.7,
-    "narration": "Did you know that the largest desert on Earth was a lush green paradise just five thousand years ago?"
-  },
-  {
-    "duration": 8,
-    "description": "The Discovery: The Lost Lake",
-    "visual_prompt": "Cinematic overhead drone shot. A transition from dry, cracked desert floor to a prehistoric lush river valley with deep blue water and giant green ferns. Ancient stone huts line the shore. Ethereal, shimmering heat haze effect. Vibrant greens and deep blues.",
-    "negative_prompt": "low resolution, 2d map, cartoon, dry desert, blurry water",
-    "motion_hint": "A slow, sweeping aerial flyover of the prehistoric lake.",
-    "motion_strength": 0.5,
-    "narration": "Hidden beneath the dunes of the Sahara lie the skeletons of massive lakes and river systems that once sustained entire civilizations."
-  },
-  {
-    "duration": 8,
-    "description": "Counter-Intuitive Science: Forbidden Cave Art",
-    "visual_prompt": "Extreme macro shot inside a dark, cool cave. A flashlight beam sweeps across a wall to reveal ancient, vivid paintings of people swimming and hunting hippos in the middle of the desert. The rock texture is rough and detailed. Dust particles glint in the flashlight beam.",
-    "negative_prompt": "modern graffiti, bright white light, blurry paintings, distorted people",
-    "motion_hint": "Steady flashlight movement revealing the art from left to right.",
-    "motion_strength": 0.4,
-    "narration": "Scientists have found cave paintings deep in the dry heat showing people swimming, proving that our world changes faster than historians ever expected."
-  },
-  {
-    "duration": 6,
-    "description": "The Conclusion: Hidden Future",
-    "visual_prompt": "Cinematic medium shot. An explorer's hand brushes sand off an ancient, ornate clay pot half-buried in a dune. The sun is setting behind a distant pyramid-shaped mountain. Soft, warm lighting.",
-    "negative_prompt": "extra fingers, distorted hand, plastic bottle, modern watch",
-    "motion_hint": "Slow push in on the hand clearing the sand.",
-    "motion_strength": 0.3,
-    "narration": "The desert is not just a graveyard of the past. It is a warning about the future of our planet."
-  }
-]
+{
+  "stories": [
+    {
+      "title": "The Bronze Age Internet",
+      "slug": "bronze-age-global-connection",
+      "description": "How ancient civilizations were globally connected 3,000 years ago.",
+      "total_duration": 28,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 7,
+          "visual_prompt": "Cinematic high-speed drone flight over a 3D relief map of the Mediterranean. Glowing golden circuit-like lines pulse and race across the sea, connecting Egypt and Greece. Hyper-realistic architectural lighting with deep shadows.",
+          "visual_reference": "A glowing map showing trade connections.",
+          "negative_prompt": "text, watermark, modern borders, blurry, flat lighting",
+          "fps_hint": 24,
+          "best_frame_filename": "bronze_age_01.png",
+          "narration": "Did you know that 3,000 years ago, the world was already globally connected through a massive trade network?"
+        },
+        {
+          "id": "scene_02",
+          "duration": 7,
+          "visual_prompt": "Low-angle tracking shot of a wooden merchant ship crashing through heavy turquoise waves. Water sprays the camera lens, and the wooden mast creaks as it tilts sharply into the wind while the sun glints off the water.",
+          "visual_reference": "Ancient ship sailing through rough seas.",
+          "negative_prompt": "text, watermark, modern engines, metal ships, calm water",
+          "fps_hint": 24,
+          "best_frame_filename": "bronze_age_02.png",
+          "narration": "Civilizations moved tin and copper across thousands of miles. Without this 'global internet,' the Bronze Age would never have happened."
+        },
+        {
+          "id": "scene_03",
+          "duration": 7,
+          "visual_prompt": "Macro slow-motion close-up of molten orange bronze being poured into a stone mold. Bright sparks fly toward the camera, and thick steam rises in curls. The camera moves in a slow circular orbit around the cooling metal.",
+          "visual_reference": "Molten bronze being poured in an ancient forge.",
+          "negative_prompt": "text, watermark, electricity, modern tools, cold metal",
+          "fps_hint": 24,
+          "best_frame_filename": "bronze_age_03.png",
+          "narration": "Technology and art spread between continents faster than we ever imagined, linking distant cultures through shared innovation."
+        },
+        {
+          "id": "scene_04",
+          "duration": 7,
+          "visual_prompt": "A fast cinematic pan across the sun-bleached ruins of a palace at sunset. Long, dramatic shadows rotate across the stone pillars as the camera rises rapidly toward a deep purple sky filled with stars.",
+          "visual_reference": "Ancient ruins with a cinematic sunset.",
+          "negative_prompt": "text, watermark, tourists, modern clothes, flat light",
+          "fps_hint": 24,
+          "best_frame_filename": "bronze_age_04.png",
+          "narration": "When the system collapsed, it triggered the first global dark age, proving that even the greatest empires depend on each other."
+        }
+      ]
+    },
+    {
+      "title": "The Diamond Rain Planets",
+      "slug": "diamond-rain-planets",
+      "description": "The science behind diamond rain on gas giants.",
+      "total_duration": 28,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 7,
+          "visual_prompt": "First-person POV camera plunging at high speed through swirling, deep-blue methane clouds. Violent flashes of purple lightning illuminate the dark, foggy gas-scape. The camera shakes from turbulence.",
+          "visual_reference": "Diving into a blue, stormy gas giant atmosphere.",
+          "negative_prompt": "text, watermark, sun, bright light, cartoon, clear sky",
+          "fps_hint": 24,
+          "best_frame_filename": "diamond_01.png",
+          "narration": "Did you know that on Neptune, it literally rains diamonds? Deep in the atmosphere, gravity transforms carbon into solid gems."
+        },
+        {
+          "id": "scene_02",
+          "duration": 7,
+          "visual_prompt": "The camera moves vertically downward, following a deluge of raw, sparkling diamonds falling like hailstones through a pitch-black void. The gems collide and shatter into smaller, glowing shards.",
+          "visual_reference": "Diamonds falling through space like rain.",
+          "negative_prompt": "text, watermark, water droplets, blue sky, rain clouds",
+          "fps_hint": 24,
+          "best_frame_filename": "diamond_02.png",
+          "narration": "These diamonds sink for thousands of miles, falling through the crushing pressure of the planet's interior."
+        },
+        {
+          "id": "scene_03",
+          "duration": 7,
+          "visual_prompt": "The camera skims centimeters above a rippling, metallic sea of liquid carbon. Giant diamond 'icebergs' bob and rotate slowly in the thick, reflective black liquid, catching the light of distant lightning.",
+          "visual_reference": "Liquid carbon sea with floating diamond chunks.",
+          "negative_prompt": "text, watermark, blue water, boat, beach",
+          "fps_hint": 24,
+          "best_frame_filename": "diamond_03.png",
+          "narration": "At the planet's core, they may form massive icebergs floating on liquid seas. Gems that are rare on Earth are common in the deep cold of space."
+        },
+        {
+          "id": "scene_04",
+          "duration": 7,
+          "visual_prompt": "A rapid zoom-out from the dark, pressurized surface into the frozen void of space, revealing the entire blue-glowing sphere of Neptune spinning. A telescope lens enters the frame as a reflection.",
+          "visual_reference": "Neptune in space with telescope reflection.",
+          "negative_prompt": "text, watermark, Earth, sun, moon",
+          "fps_hint": 24,
+          "best_frame_filename": "diamond_04.png",
+          "narration": "It is a sparkling secret hidden 2 billion miles away, reminding us that the universe is far more precious than we imagined."
+        }
+      ]
+    },
+    {
+      "title": "The Great Emu War",
+      "slug": "the-great-emu-war",
+      "description": "Australia's military struggle against birds.",
+      "total_duration": 28,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 7,
+          "visual_prompt": "Low-angle high-speed tracking shot through dry, yellow grass. The camera mimics the bobbing motion of a running emu. Large dust clouds rise in the background under a harsh Australian sun.",
+          "visual_reference": "Ground-level view of a running emu.",
+          "negative_prompt": "text, watermark, modern cars, green grass, slow motion",
+          "fps_hint": 24,
+          "best_frame_filename": "emu_war_01.png",
+          "narration": "Did you know that in 1932, the Australian military declared war on emus—and lost? Soldiers expected an easy win against 20,000 birds."
+        },
+        {
+          "id": "scene_02",
+          "duration": 7,
+          "visual_prompt": "Fast cinematic pan from a soldier’s boots up to a vintage Lewis machine gun. The gun barrel shakes and vibrates violently as it fires toward the horizon, with brass shell casings flying out.",
+          "visual_reference": "Soldier firing a machine gun in the outback.",
+          "negative_prompt": "text, watermark, modern camouflage, laser, high-tech",
+          "fps_hint": 24,
+          "best_frame_filename": "emu_war_02.png",
+          "narration": "But the emus were faster and smarter. They split into guerrilla groups, making it impossible for the heavy machine guns to hit their mark."
+        },
+        {
+          "id": "scene_03",
+          "duration": 7,
+          "visual_prompt": "Tracking shot from the side of a bouncing military truck on a rocky road. A soldier struggles to aim while emus in the background easily sprint past the vehicle, their feathers ruffling in the wind.",
+          "visual_reference": "Bumpy truck chase scene.",
+          "negative_prompt": "text, watermark, paved roads, modern trucks, city",
+          "fps_hint": 24,
+          "best_frame_filename": "emu_war_03.png",
+          "narration": "Even on trucks, the soldiers couldn't keep up with the birds' speed. After weeks of wasted ammo, the army retreated in total defeat."
+        },
+        {
+          "id": "scene_04",
+          "duration": 7,
+          "visual_prompt": "Slow cinematic tilt-up from a rusty, abandoned ammo shell in the sand to a lone emu standing defiantly under a massive orange sun. The camera zooms slowly into the bird's eye.",
+          "visual_reference": "Abandoned shell with emu at sunset.",
+          "negative_prompt": "text, watermark, modern buildings, rain, snow",
+          "fps_hint": 24,
+          "best_frame_filename": "emu_war_04.png",
+          "narration": "Nature 1, Military 0. The feathered victors still rule the outback today, the only birds to ever win a war."
+        }
+      ]
+    },
+    {
+      "title": "The Immortal Jellyfish",
+      "slug": "immortal-jellyfish",
+      "description": "The biological secret of the creature that lives forever.",
+      "total_duration": 28,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 7,
+          "visual_prompt": "Slow, ethereal 360-degree orbit around a tiny, glowing translucent jellyfish. Its tentacles trail behind like glowing silk threads in a dark abyss, pulsing with bioluminescent light.",
+          "visual_reference": "Bioluminescent jellyfish in the dark.",
+          "negative_prompt": "text, watermark, sharks, sunlight, cartoon, boat",
+          "fps_hint": 24,
+          "best_frame_filename": "jellyfish_01.png",
+          "narration": "Did you know there’s a creature on Earth that can live forever? The Immortal Jellyfish has mastered the secret of eternal life."
+        },
+        {
+          "id": "scene_02",
+          "duration": 7,
+          "visual_prompt": "Macro close-up of the jellyfish bell pulsing violently, then rapidly shrinking and folding in on itself. The translucent tissue morphs into a blob-like shape in real-time.",
+          "visual_reference": "Jellyfish body contracting.",
+          "negative_prompt": "text, watermark, bubbles, fish, static, blood",
+          "fps_hint": 24,
+          "best_frame_filename": "jellyfish_02.png",
+          "narration": "When threatened or aged, it doesn't die. It reverts its cells back to a juvenile state, essentially hitting 'undo' on its life cycle."
+        },
+        {
+          "id": "scene_03",
+          "duration": 7,
+          "visual_prompt": "Microscopic camera flight through a glowing cellular mesh. Cells are seen dividing and morphing in a fluid, kaleidoscopic motion with neon colors pulsing through the tissue.",
+          "visual_reference": "Abstract cellular transformation.",
+          "negative_prompt": "text, watermark, viruses, dark background, static",
+          "fps_hint": 24,
+          "best_frame_filename": "jellyfish_03.png",
+          "narration": "This process, called transdifferentiation, lets it rebuild its body from scratch. It can repeat this cycle an infinite number of times."
+        },
+        {
+          "id": "scene_04",
+          "duration": 7,
+          "visual_prompt": "A dramatic cinematic dolly-back from one glowing jellyfish until it is lost in the total blackness of the deep ocean, surrounded by a swarm of glowing lights.",
+          "visual_reference": "Jellyfish disappearing into the dark swarm.",
+          "negative_prompt": "text, watermark, blurry, colorful fish, bubbles",
+          "fps_hint": 24,
+          "best_frame_filename": "jellyfish_04.png",
+          "narration": "Eternal life isn't a myth—it’s drifting right beneath the waves, a silent master of time itself."
+        }
+      ]
+    },
+    {
+      "title": "Roman Concrete Secrets",
+      "slug": "roman-concrete-mystery",
+      "description": "How ancient engineering outlasts modern technology.",
+      "total_duration": 28,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 7,
+          "visual_prompt": "Sweeping low-to-high drone shot circling the Pantheon’s massive concrete dome. The camera tilts down to show the solid stone texture with no cracks after 2,000 years.",
+          "visual_reference": "Wide shot of the Pantheon.",
+          "negative_prompt": "text, watermark, modern cars, street signs, people",
+          "fps_hint": 24,
+          "best_frame_filename": "roman_01.png",
+          "narration": "Did you know Roman concrete is actually stronger than the concrete we use today? It gets tougher as it ages."
+        },
+        {
+          "id": "scene_02",
+          "duration": 7,
+          "visual_prompt": "Macro time-lapse shot of a small crack in a stone wall. Tiny white lime crystals grow like frost, filling the gap and fusing the stone together until the crack disappears.",
+          "visual_reference": "Self-healing concrete crystals.",
+          "negative_prompt": "text, watermark, dirt, mold, falling rocks, blurry",
+          "fps_hint": 24,
+          "best_frame_filename": "roman_02.png",
+          "narration": "The secret is 'self-healing.' When a crack forms, the mix reacts with water to seal itself shut, making structures virtually permanent."
+        },
+        {
+          "id": "scene_03",
+          "duration": 7,
+          "visual_prompt": "The camera skims above a Roman harbor pier submerged in turquoise water. Rough waves crash around the stone, but the seawater only makes the chemical bond stronger.",
+          "visual_reference": "Roman pier in the ocean.",
+          "negative_prompt": "text, watermark, plastic, modern boats, rusted metal",
+          "fps_hint": 24,
+          "best_frame_filename": "roman_03.png",
+          "narration": "Seawater triggers a reaction that makes the concrete rock-hard. While modern bridges crumble in 50 years, Roman structures stand for millennia."
+        },
+        {
+          "id": "scene_04",
+          "duration": 7,
+          "visual_prompt": "Low-angle rotating shot around a giant Roman column against a bright sun flare. The camera looks up as the sun wipes across the lens, revealing a clear blue sky.",
+          "visual_reference": "Roman column looking up at the sun.",
+          "negative_prompt": "text, watermark, clouds, rain, birds, blurry",
+          "fps_hint": 24,
+          "best_frame_filename": "roman_04.png",
+          "narration": "We are only now rediscovering their lost formulas. The future of building might just be hidden in our ancient past."
+        }
+      ]
+    }
+  ]
+}
