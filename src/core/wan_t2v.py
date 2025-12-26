@@ -6,6 +6,12 @@ Handles text-to-video generation using Wan-AI/Wan2.1-T2V-14B-Diffusers
 
 import os
 import logging
+
+# Set CUDA allocator config early (before torch import if possible, but setting here still helps)
+# This helps with memory fragmentation, especially for large models like 14B
+if 'PYTORCH_CUDA_ALLOC_CONF' not in os.environ:
+    os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+
 import torch
 from pathlib import Path
 from typing import Optional, Dict, Any, Union
@@ -117,6 +123,21 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         
         # Enable memory optimizations if available
         if device == 'cuda':
+            # Enable VAE slicing and tiling for memory efficiency during decode
+            try:
+                if hasattr(_wan_pipeline, 'enable_vae_slicing'):
+                    _wan_pipeline.enable_vae_slicing()
+                    logger.info("✅ Enabled VAE slicing for memory efficiency")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not enable VAE slicing: {e}")
+            
+            try:
+                if hasattr(_wan_pipeline, 'enable_vae_tiling'):
+                    _wan_pipeline.enable_vae_tiling()
+                    logger.info("✅ Enabled VAE tiling for memory efficiency")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not enable VAE tiling: {e}")
+            
             try:
                 if hasattr(_wan_pipeline, 'enable_memory_efficient_attention'):
                     _wan_pipeline.enable_memory_efficient_attention()
@@ -130,6 +151,13 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
                     logger.info("✅ Enabled xformers memory efficient attention")
             except Exception as e:
                 logger.info("ℹ️ xFormers not available; continuing without it")
+            
+            # Configure CUDA allocator for expandable segments (helps with fragmentation)
+            if 'PYTORCH_CUDA_ALLOC_CONF' not in os.environ:
+                os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+                logger.info("✅ Set PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True for better memory management")
+            else:
+                logger.info(f"ℹ️ PYTORCH_CUDA_ALLOC_CONF already set: {os.environ.get('PYTORCH_CUDA_ALLOC_CONF')}")
         
         logger.info("✅ WAN 2.1 T2V pipeline loaded successfully")
         logger.info("📦 WAN pipeline initialized ONCE - will be reused for all subsequent generations")
@@ -276,28 +304,44 @@ class WanT2VGenerator:
                 guidance_scale=self.guidance_scale
             )
             
+            # Clear memory BEFORE VAE decode (which may happen in export_to_video or frames extraction)
+            # This is critical for 14B model to prevent OOM during VAE decode
+            logger.info("🧹 Clearing GPU cache before VAE decode/video export...")
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()  # Wait for all GPU operations to complete
+                torch.cuda.empty_cache()  # Clear cache before decode
+            gc.collect()  # Force Python garbage collection
+            
             # Extract frames
             frames = output.frames[0]
             
-            # Export to video
+            # Clear output object to free memory before VAE decode
+            del output
+            output = None
+            
+            # Additional memory clearing before export (VAE decode may happen here)
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
+                torch.cuda.empty_cache()
+            gc.collect()
+            
+            # Export to video (this may internally call VAE decode)
             from diffusers.utils import export_to_video
             
             output_path = Path(output_path)
             output_path.parent.mkdir(parents=True, exist_ok=True)
             
-            logger.info(f"💾 Saving video to: {output_path}")
+            logger.info(f"💾 Saving video to: {output_path} (VAE decode will occur now)...")
             export_to_video(frames, str(output_path), fps=self.fps)
             
-            # Explicitly delete frames and output to free memory
+            # Explicitly delete frames to free memory after video export
             del frames
-            del output
             frames = None
-            output = None
             
-            # Clear GPU cache after generation
+            # Clear GPU cache after video export
             if torch.cuda.is_available():
-                torch.cuda.empty_cache()
                 torch.cuda.synchronize()  # Wait for all GPU operations to complete
+                torch.cuda.empty_cache()
             gc.collect()  # Force Python garbage collection
             
             logger.info(f"✅ Video generated successfully: {output_path}")
