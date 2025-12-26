@@ -1,71 +1,51 @@
 {
   "stories": [
     {
-      "title": "Hidden Gas Risks Inside Your Home",
-      "slug": "hidden-home-gas-risks-safety",
-      "description": "Overlooked gas-related hazards in homes that can silently become dangerous if ignored.",
-      "total_duration": 64,
-      "aspect_ratio": "16:9",
+      "title": "How Silence Became a Weapon in World War II",
+      "description": "A real WWII tactic where doing nothing on the radio misled enemy intelligence.",
+      "total_duration": 32,
+      "aspect_ratio": "9:16",
       "scenes": [
         {
-          "id": "scene_01_gas_intro",
+          "id": "scene_01_hook_how",
+          "duration": 5,
+          "hook_text": "This really happened in WWII",
+          "visual_prompt": "Wide cinematic establishing shot of a foggy European battlefield at dawn, abandoned radio equipment in the foreground, muted colors, slow cinematic camera drift",
+          "visual_reference": "ww2 battlefield radio fog",
+          "negative_prompt": "text, watermark, logo, modern objects, cartoon",
+          "narration": "How did complete radio silence confuse enemy armies during World War Two?"
+        },
+        {
+          "id": "scene_02_mystery",
+          "duration": 7,
+          "visual_prompt": "Quiet military command tent at night, radios powered on but untouched, indicator lights glowing faintly, canvas gently moving in the wind",
+          "visual_reference": "ww2 command tent radio night",
+          "negative_prompt": "text, watermark, logo, cartoon",
+          "narration": "German intelligence closely tracked Allied radio signals to predict every major move."
+        },
+        {
+          "id": "scene_03_escalation",
           "duration": 8,
-          "visual_prompt": "A slow cinematic pan across a modern kitchen and living area at dawn. Soft daylight enters through windows, curtains gently sway, appliances sit quietly. The camera glides smoothly, creating a calm and trustworthy atmosphere.",
-          "visual_reference": "A clean modern home interior with gas appliances.",
-          "negative_prompt": "text, watermark, fire, smoke, dark, scary",
-          "fps_hint": 24,
-          "best_frame_filename": "hidden_gas_risks__scene_1.png",
-          "narration": "Gas-powered homes feel comfortable and efficient, but some risks remain completely invisible."
+          "visual_prompt": "Allied radio operators sitting still with hands away from controls, ticking clocks, shadows stretching across detailed military maps",
+          "visual_reference": "ww2 radio operators waiting",
+          "negative_prompt": "text, watermark, logo, gore, cartoon",
+          "narration": "Then, without warning, entire Allied units stopped transmitting altogether."
         },
         {
-          "id": "scene_02_gas_leak_sources",
-          "duration": 11,
-          "visual_prompt": "A slow push-in shot toward a gas stove connection behind the appliance. The camera focuses on metal pipes and valves, with subtle ambient vibration and shallow depth of field.",
-          "visual_reference": "Gas pipe connection behind a kitchen stove.",
-          "negative_prompt": "text, watermark, flames, sparks, rust",
-          "fps_hint": 24,
-          "best_frame_filename": "hidden_gas_risks__scene_2.png",
-          "narration": "Loose fittings, aging pipes, or worn seals can slowly release gas without any visible warning."
+          "id": "scene_04_explanation",
+          "duration": 7,
+          "visual_prompt": "Montage of enemy analysts listening to static-filled radios, confused expressions, maps showing misplaced troop expectations",
+          "visual_reference": "ww2 intelligence analysts radio",
+          "negative_prompt": "text, watermark, logo, fantasy elements",
+          "narration": "The silence itself became the signal, convincing the enemy that a massive attack was being hidden elsewhere."
         },
         {
-          "id": "scene_03_poor_ventilation",
-          "duration": 11,
-          "visual_prompt": "The camera tilts upward from a gas heater toward a partially blocked ventilation opening. Warm air subtly distorts the background, and dust particles float gently in the light.",
-          "visual_reference": "Indoor gas heater with ventilation opening above.",
-          "negative_prompt": "text, watermark, fire, smoke",
-          "fps_hint": 24,
-          "best_frame_filename": "hidden_gas_risks__scene_3.png",
-          "narration": "Poor ventilation can allow dangerous gases to build up indoors, especially during colder months."
-        },
-        {
-          "id": "scene_04_unnoticed_signs",
-          "duration": 10,
-          "visual_prompt": "A slow orbit shot around a quiet hallway where a carbon monoxide detector is mounted. The camera circles gently as a small indicator light blinks steadily.",
-          "visual_reference": "Carbon monoxide detector installed on a hallway wall.",
-          "negative_prompt": "text, watermark, broken device",
-          "fps_hint": 24,
-          "best_frame_filename": "hidden_gas_risks__scene_4.png",
-          "narration": "Headaches, dizziness, or fatigue are often ignored signs of gas exposure inside the home."
-        },
-        {
-          "id": "scene_05_detection_and_checks",
-          "duration": 12,
-          "visual_prompt": "A close-up shot of a hand pressing the test button on a carbon monoxide detector. The camera holds steady, with a slight handheld realism as the indicator responds.",
-          "visual_reference": "A person testing a carbon monoxide alarm.",
-          "negative_prompt": "text, watermark, alarm damage",
-          "fps_hint": 24,
-          "best_frame_filename": "hidden_gas_risks__scene_5.png",
-          "narration": "Regular testing of gas and carbon monoxide detectors helps catch problems before they become emergencies."
-        },
-        {
-          "id": "scene_06_safe_home_conclusion",
-          "duration": 12,
-          "visual_prompt": "A wide dolly-out shot revealing a well-ventilated, organized home with windows slightly open and appliances neatly maintained. Soft afternoon light fills the space, creating a reassuring final mood.",
-          "visual_reference": "A well-maintained home with proper ventilation and safety devices.",
-          "negative_prompt": "text, watermark, clutter, dark, unsafe",
-          "fps_hint": 24,
-          "best_frame_filename": "hidden_gas_risks__scene_6.png",
-          "narration": "Routine inspections and proper ventilation keep invisible gas risks from becoming real dangers."
+          "id": "scene_05_lingering_end",
+          "duration": 5,
+          "visual_prompt": "Quiet wide shot of radios sitting unused as the sun rises over a calm battlefield, reflective mood, slow fade feeling",
+          "visual_reference": "ww2 battlefield calm sunrise",
+          "negative_prompt": "text, watermark, logo",
+          "narration": "In war, even silence can be carefully planned—and incredibly powerful."
         }
       ]
     }
