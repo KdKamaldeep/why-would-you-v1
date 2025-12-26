@@ -1,67 +1,74 @@
 {
   "stories": [
     {
-      "title": "How an Entire City Vanished Overnight",
-      "description": "A real historical mystery where an entire settlement disappeared without a trace.",
-      "total_duration": 58,
-      "aspect_ratio": "9:16",
+      "title": "How Smart Thermostats Cut Heating Costs",
+      "category": "smart-devices",
+      "description": "This story explains how smart thermostats reduce heating costs by learning habits and controlling temperature efficiently.",
+      "total_duration":  FiftyTwo,
+      "aspect_ratio": "16:9",
       "scenes": [
         {
-          "id": "scene_01_hook_how",
-          "duration": 4,
-          "hook_text": "How an Entire City Vanished Overnight",
-          "visual_prompt": "Wide cinematic shot of an early colonial settlement at dawn, wooden houses, dirt paths, mist drifting slowly, quiet and empty atmosphere",
-          "visual_reference": "roanoke colony illustration empty",
-          "negative_prompt": "text, watermark, logo, modern buildings, cartoon",
-          "narration": "How can an entire town disappear… without a single body left behind?"
-        },
-        {
-          "id": "scene_02_historical_setup",
+          "id": "scene_01_overview",
           "duration": 7,
-          "visual_prompt": "Colonial era village slowly fading into silence, doors open, tools left behind, fog thickening, sense of abandonment",
-          "visual_reference": "abandoned colonial village fog",
-          "negative_prompt": "text, watermark, logo, people moving, cartoon",
-          "narration": "In the year 1590, English settlers returned to their colony in America… and found nothing."
+          "visual_prompt": "Quiet living room in winter, thermostat mounted on wall, soft morning light, calm environment, slow ambient motion, subtle camera drift",
+          "visual_reference": "A wall-mounted smart thermostat in a calm living room",
+          "negative_prompt": "text, watermark",
+          "best_frame_filename": "how-smart-thermostats-cut-heating-costs__scene_01.png",
+          "narration": "Heating systems often run longer than needed, quietly wasting energy throughout the day."
         },
         {
-          "id": "scene_03_mystery_escalation",
+          "id": "scene_02_main_system",
           "duration": 8,
-          "visual_prompt": "Close-up of empty houses, extinguished fires, overturned furniture, nature slowly reclaiming the settlement",
-          "visual_reference": "abandoned village historical mystery",
-          "negative_prompt": "text, watermark, logo, gore, cartoon",
-          "narration": "No signs of a struggle. No graves. No message. Just silence where over a hundred people once lived."
+          "visual_prompt": "Smart thermostat screen glowing softly, temperature adjusting slightly, gentle movement, stable framing",
+          "visual_reference": "A thermostat display changing temperature",
+          "negative_prompt": "text, watermark",
+          "best_frame_filename": "how-smart-thermostats-cut-heating-costs__scene_02.png",
+          "narration": "Smart thermostats automatically adjust temperature, reducing heat when comfort is not required."
         },
         {
-          "id": "scene_04_single_clue",
-          "duration": 9,
-          "visual_prompt": "Close-up of an old wooden post with the word 'CROATOAN' carved deeply, dramatic lighting, historical realism",
-          "visual_reference": "croatoan carved post",
-          "negative_prompt": "text overlay, watermark, logo, modern fonts",
-          "narration": "The only clue was one word carved into wood: Croatoan."
-        },
-        {
-          "id": "scene_05_explanation_theories",
-          "duration": 12,
-          "visual_prompt": "Slow montage of colonial maps, Native American villages, storms over the sea, time passing visually",
-          "visual_reference": "roanoke colony map illustration",
-          "negative_prompt": "text, watermark, logo, fantasy creatures",
-          "narration": "Historians believe the settlers may have joined a nearby tribe, died from disease, or been forced to flee. But no theory explains everything."
-        },
-        {
-          "id": "scene_06_wonder_historical_weight",
-          "duration": 10,
-          "visual_prompt": "Wide shot of overgrown ruins blending into forest, sunlight breaking through trees, quiet and reflective mood",
-          "visual_reference": "lost colony ruins forest",
-          "negative_prompt": "text, watermark, logo, people, cartoon",
-          "narration": "Over four hundred years later, the fate of these people remains unknown. A real mystery, frozen in history."
-        },
-        {
-          "id": "scene_07_lingering_end",
+          "id": "scene_03_internal_change",
           "duration": 8,
-          "visual_prompt": "Slow fade to an empty shoreline at dusk, waves gently moving, sense of unanswered questions",
-          "visual_reference": "empty coastline dusk mystery",
-          "negative_prompt": "text, watermark, logo, modern boats",
-          "narration": "They didn’t leave in fear. They didn’t leave in chaos. They just… vanished."
+          "visual_prompt": "Time passing from day to night inside a home, lights dimming, heating subtly lowering, smooth transition",
+          "visual_reference": "A home interior transitioning from day to night",
+          "negative_prompt": "text, watermark",
+          "best_frame_filename": "how-smart-thermostats-cut-heating-costs__scene_03.png",
+          "narration": "By learning daily routines, the system predicts when heating can safely turn down."
+        },
+        {
+          "id": "scene_04_connection_flow",
+          "duration": 7,
+          "visual_prompt": "Smartphone resting on table with thermostat app open, slow directional motion, minimal graphics",
+          "visual_reference": "A phone displaying temperature controls connected to the thermostat",
+          "negative_prompt": "text, watermark",
+          "best_frame_filename": "how-smart-thermostats-cut-heating-costs__scene_04.png",
+          "narration": "Sensors and mobile controls allow adjustments even when no one is home."
+        },
+        {
+          "id": "scene_05_supporting_system",
+          "duration": 7,
+          "visual_prompt": "Outdoor temperature changing from cold to milder conditions, subtle activity, steady framing",
+          "visual_reference": "Outdoor weather shifting gradually",
+          "negative_prompt": "text, watermark",
+          "best_frame_filename": "how-smart-thermostats-cut-heating-costs__scene_05.png",
+          "narration": "Weather data helps the thermostat respond efficiently to changing outdoor conditions."
+        },
+        {
+          "id": "scene_06_daily_use",
+          "duration": 7,
+          "visual_prompt": "Family returning home, warm lights turning on, heating gently increasing, calm atmosphere",
+          "visual_reference": "People entering a comfortably warm home",
+          "negative_prompt": "text, watermark",
+          "best_frame_filename": "how-smart-thermostats-cut-heating-costs__scene_06.png",
+          "narration": "Heating increases only when needed, keeping rooms comfortable without unnecessary energy use."
+        },
+        {
+          "id": "scene_07_calm_outcome",
+          "duration": 8,
+          "visual_prompt": "Thermostat steady at an efficient temperature, quiet home at night, slow camera drift, relaxed lighting",
+          "visual_reference": "A thermostat holding a stable temperature in a peaceful home",
+          "negative_prompt": "text, watermark",
+          "best_frame_filename": "how-smart-thermostats-cut-heating-costs__scene_07.png",
+          "narration": "Through small, intelligent adjustments, smart thermostats lower heating costs while maintaining everyday comfort."
         }
       ]
     }
