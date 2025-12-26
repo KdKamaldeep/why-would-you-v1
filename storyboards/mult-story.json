@@ -1,76 +1,65 @@
 {
-  "stories": [
+  "title": "How an Entire City Vanished Overnight",
+  "description": "A real historical mystery where an entire settlement disappeared without a trace.",
+  "total_duration": 58,
+  "aspect_ratio": "9:16",
+  "scenes": [
     {
-      "title": "How Smart Lights Actually Work",
-      "category": "smart-devices",
-      "description": "A visual explanation of how smart lighting works inside a home and what changes when you use it.",
-      "total_duration": 68,
-      "aspect_ratio": "16:9",
-      "scenes": [
-        {
-          "id": "scene_01_home_lighting_overview",
-          "duration": 8,
-          "visual_prompt": "Wide interior view of a modern home during early evening, multiple rooms softly illuminated, gradual light intensity shift across rooms, slow cinematic camera drift, subtle shadow movement on walls",
-          "visual_reference": "A home interior with multiple rooms softly lit during the evening.",
-          "negative_prompt": "text, watermark, futuristic sci-fi, people, hands",
-          "best_frame_filename": "how-smart-lights-work__scene_01_home_lighting_overview.png",
-          "narration": "Lighting quietly shapes how a home feels throughout the day and night."
-        },
-        {
-          "id": "scene_02_traditional_light_switch",
-          "duration": 10,
-          "visual_prompt": "Close view of a traditional wall light switch mounted on a wall, room light softly brightening and dimming on its own, stable framing, gentle ambient shadow changes",
-          "visual_reference": "A traditional wall light switch controlling a room light.",
-          "negative_prompt": "text, watermark, branded switch, hands, fingers",
-          "best_frame_filename": "how-smart-lights-work__scene_02_traditional_light_switch.png",
-          "narration": "In most homes, lights respond only when a wall switch is used."
-        },
-        {
-          "id": "scene_03_smart_light_bulb",
-          "duration": 10,
-          "visual_prompt": "Smart light bulb installed in a ceiling fixture, brightness gradually increasing then softening, smooth light diffusion, realistic home interior, slight camera parallax",
-          "visual_reference": "A smart light bulb installed in a ceiling fixture with adjustable brightness.",
-          "negative_prompt": "text, watermark, flashy colors, people",
-          "best_frame_filename": "how-smart-lights-work__scene_03_smart_light_bulb.png",
-          "narration": "Smart lights adjust brightness and color without changing the fixture itself."
-        },
-        {
-          "id": "scene_04_wireless_signal_flow",
-          "duration": 10,
-          "visual_prompt": "Home interior with lights visible across rooms, soft glowing signal waves flowing slowly through the air toward fixtures, subtle pulsing motion, calm realistic environment",
-          "visual_reference": "Wireless signals connecting lights inside a home.",
-          "negative_prompt": "text, watermark, abstract graphics, people",
-          "best_frame_filename": "how-smart-lights-work__scene_04_wireless_signal_flow.png",
-          "narration": "Commands are sent wirelessly, allowing lights to respond without physical switches."
-        },
-        {
-          "id": "scene_05_home_network_connection",
-          "duration": 10,
-          "visual_prompt": "Home router resting on a shelf, indicator lights blinking in slow repeating rhythm, soft ambient room lighting, static camera with subtle depth-of-field breathing",
-          "visual_reference": "A home router connecting smart devices within the house.",
-          "negative_prompt": "text, watermark, technical overlays, people",
-          "best_frame_filename": "how-smart-lights-work__scene_05_home_network_connection.png",
-          "narration": "Most smart lights communicate through the home network to stay connected."
-        },
-        {
-          "id": "scene_06_daily_lighting_routine",
-          "duration": 10,
-          "visual_prompt": "Living room lighting smoothly transitioning from cool daylight tones to warm evening tones, shadows slowly stretching, calm atmosphere, gentle camera drift",
-          "visual_reference": "Living room lights adjusting automatically as the time of day changes.",
-          "negative_prompt": "text, watermark, dramatic mood, people",
-          "best_frame_filename": "how-smart-lights-work__scene_06_daily_lighting_routine.png",
-          "narration": "Over time, smart lighting becomes part of a daily home routine."
-        },
-        {
-          "id": "scene_07_calm_smart_home",
-          "duration": 10,
-          "visual_prompt": "Wide modern home interior at night, balanced smart lighting across rooms, steady ambient glow, slow cinematic camera drift, calm settled atmosphere",
-          "visual_reference": "A calm home interior with balanced smart lighting throughout the space.",
-          "negative_prompt": "text, watermark, clutter, people",
-          "best_frame_filename": "how-smart-lights-work__scene_07_calm_smart_home.png",
-          "narration": "Smart lighting quietly adapts to support comfort without constant attention."
-        }
-      ]
+      "id": "scene_01_hook_how",
+      "duration": 4,
+      "hook_text": "How an Entire City Vanished Overnight",
+      "visual_prompt": "Wide cinematic shot of an early colonial settlement at dawn, wooden houses, dirt paths, mist drifting slowly, quiet and empty atmosphere",
+      "visual_reference": "roanoke colony illustration empty",
+      "negative_prompt": "text, watermark, logo, modern buildings, cartoon",
+      "narration": "How can an entire town disappear… without a single body left behind?"
+    },
+    {
+      "id": "scene_02_historical_setup",
+      "duration": 7,
+      "visual_prompt": "Colonial era village slowly fading into silence, doors open, tools left behind, fog thickening, sense of abandonment",
+      "visual_reference": "abandoned colonial village fog",
+      "negative_prompt": "text, watermark, logo, people moving, cartoon",
+      "narration": "In the year 1590, English settlers returned to their colony in America… and found nothing."
+    },
+    {
+      "id": "scene_03_mystery_escalation",
+      "duration": 8,
+      "visual_prompt": "Close-up of empty houses, extinguished fires, overturned furniture, nature slowly reclaiming the settlement",
+      "visual_reference": "abandoned village historical mystery",
+      "negative_prompt": "text, watermark, logo, gore, cartoon",
+      "narration": "No signs of a struggle. No graves. No message. Just silence where over a hundred people once lived."
+    },
+    {
+      "id": "scene_04_single_clue",
+      "duration": 9,
+      "visual_prompt": "Close-up of an old wooden post with the word 'CROATOAN' carved deeply, dramatic lighting, historical realism",
+      "visual_reference": "croatoan carved post",
+      "negative_prompt": "text overlay, watermark, logo, modern fonts",
+      "narration": "The only clue was one word carved into wood: Croatoan."
+    },
+    {
+      "id": "scene_05_explanation_theories",
+      "duration": 12,
+      "visual_prompt": "Slow montage of colonial maps, Native American villages, storms over the sea, time passing visually",
+      "visual_reference": "roanoke colony map illustration",
+      "negative_prompt": "text, watermark, logo, fantasy creatures",
+      "narration": "Historians believe the settlers may have joined a nearby tribe, died from disease, or been forced to flee. But no theory explains everything."
+    },
+    {
+      "id": "scene_06_wonder_historical_weight",
+      "duration": 10,
+      "visual_prompt": "Wide shot of overgrown ruins blending into forest, sunlight breaking through trees, quiet and reflective mood",
+      "visual_reference": "lost colony ruins forest",
+      "negative_prompt": "text, watermark, logo, people, cartoon",
+      "narration": "Over four hundred years later, the fate of these people remains unknown. A real mystery, frozen in history."
+    },
+    {
+      "id": "scene_07_lingering_end",
+      "duration": 8,
+      "visual_prompt": "Slow fade to an empty shoreline at dusk, waves gently moving, sense of unanswered questions",
+      "visual_reference": "empty coastline dusk mystery",
+      "negative_prompt": "text, watermark, logo, modern boats",
+      "narration": "They didn’t leave in fear. They didn’t leave in chaos. They just… vanished."
     }
   ]
 }

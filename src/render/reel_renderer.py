@@ -336,16 +336,18 @@ def mix_audio(
                     f"borderw=2:bordercolor=black"
                 )
         
-        # Scene hook texts (always show if present, minimal style at bottom)
+        # Scene hook texts (always show if present, bold style at top with white background)
         if has_scene_hooks:
             for start_time, end_time, hook_text in scene_hooks:
-                # Minimal style: small font, bottom of video (not black area), semi-transparent
+                # Bold, catchy style: large font, top of video, white background, black text
+                # Large font size + thick border creates bold appearance
                 drawtext_filters.append(
                     f"drawtext=text='{escape_text(hook_text)}':"
-                    f"fontsize=32:fontcolor=white@0.9:"
-                    f"x=(w-text_w)/2:y=h-th-30:"
+                    f"fontsize=56:fontcolor=black:"
+                    f"x=(w-text_w)/2:y=100:"
                     f"enable='between(t,{start_time},{end_time})':"
-                    f"box=1:boxcolor=black@0.5:boxborderw=3"
+                    f"box=1:boxcolor=white:boxborderw=12:"
+                    f"borderw=4:bordercolor=black"
                 )
         
         if drawtext_filters:
