@@ -9,8 +9,9 @@ import logging
 
 # Set CUDA allocator config early (before torch import if possible, but setting here still helps)
 # This helps with memory fragmentation, especially for large models like 14B
-if 'PYTORCH_CUDA_ALLOC_CONF' not in os.environ:
-    os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
+# Use new PYTORCH_ALLOC_CONF (PYTORCH_CUDA_ALLOC_CONF is deprecated)
+if 'PYTORCH_ALLOC_CONF' not in os.environ:
+    os.environ['PYTORCH_ALLOC_CONF'] = 'expandable_segments:True'
 
 import torch
 from pathlib import Path
@@ -185,11 +186,12 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
                 logger.info("ℹ️ xFormers not available; continuing without it")
             
             # Configure CUDA allocator for expandable segments (helps with fragmentation)
-            if 'PYTORCH_CUDA_ALLOC_CONF' not in os.environ:
-                os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
-                logger.info("✅ Set PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True for better memory management")
+            # Use new PYTORCH_ALLOC_CONF (PYTORCH_CUDA_ALLOC_CONF is deprecated)
+            if 'PYTORCH_ALLOC_CONF' not in os.environ:
+                os.environ['PYTORCH_ALLOC_CONF'] = 'expandable_segments:True'
+                logger.info("✅ Set PYTORCH_ALLOC_CONF=expandable_segments:True for better memory management")
             else:
-                logger.info(f"ℹ️ PYTORCH_CUDA_ALLOC_CONF already set: {os.environ.get('PYTORCH_CUDA_ALLOC_CONF')}")
+                logger.info(f"ℹ️ PYTORCH_ALLOC_CONF already set: {os.environ.get('PYTORCH_ALLOC_CONF')}")
         
         logger.info("✅ WAN 2.1 T2V pipeline loaded successfully")
         logger.info("📦 WAN pipeline initialized ONCE - will be reused for all subsequent generations")
@@ -416,7 +418,8 @@ class WanT2VGenerator:
                     # Convert to numpy and scale from [-1, 1] to [0, 255]
                     frames_np = ((frames_tensor.float() + 1.0) / 2.0 * 255.0).clamp(0, 255).byte().numpy()
                     # Convert to list of frames: [B, T, H, W, C] -> list of [H, W, C]
-                    frames = [frames_np[0, t] for t in range(frames_np.shape[1])]
+                    # Use .copy() to ensure each frame is a proper numpy array (not a view)
+                    frames = [np.array(frames_np[0, t], dtype=np.uint8).copy() for t in range(frames_np.shape[1])]
                     
                     # Clean up latents
                     del latents
@@ -431,10 +434,28 @@ class WanT2VGenerator:
                     logger.warning(f"⚠️ CPU VAE decode failed: {e}, falling back to default output")
                     # Fallback: use frames from output (already decoded)
                     frames = output.frames[0] if hasattr(output, 'frames') else output[0]
+                    # Ensure frames is a list of numpy arrays
+                    if isinstance(frames, np.ndarray):
+                        # If it's a single array with shape [T, H, W, C], convert to list
+                        if len(frames.shape) == 4:
+                            frames = [np.array(frames[t], dtype=np.uint8).copy() for t in range(frames.shape[0])]
+                        else:
+                            frames = [frames]
+                    elif not isinstance(frames, list):
+                        frames = [frames]
             else:
                 # Fallback: use frames from output (already decoded)
                 logger.info("ℹ️ Using pre-decoded frames from pipeline output")
                 frames = output.frames[0] if hasattr(output, 'frames') else output[0]
+                # Ensure frames is a list of numpy arrays
+                if isinstance(frames, np.ndarray):
+                    # If it's a single array with shape [T, H, W, C], convert to list
+                    if len(frames.shape) == 4:
+                        frames = [np.array(frames[t], dtype=np.uint8).copy() for t in range(frames.shape[0])]
+                    else:
+                        frames = [frames]
+                elif not isinstance(frames, list):
+                    frames = [frames]
             
             # Clean up output object
             del output
@@ -445,6 +466,9 @@ class WanT2VGenerator:
             
             output_path = Path(output_path)
             output_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Ensure all frames are proper numpy arrays with uint8 dtype
+            frames = [np.array(frame, dtype=np.uint8) if not isinstance(frame, np.ndarray) or frame.dtype != np.uint8 else frame for frame in frames]
             
             logger.info(f"💾 Saving video to: {output_path}...")
             export_to_video(frames, str(output_path), fps=self.fps)
