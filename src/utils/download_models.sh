@@ -49,8 +49,8 @@ else
 
     # Prefer huggingface-cli if available; otherwise, fall back to Python API
     if command -v huggingface-cli >/dev/null 2>&1; then
-        echo "⬇️  Using huggingface-cli to download Wan-AI/Wan2.1-T2V-1.3B-Diffusers..."
-        huggingface-cli download Wan-AI/Wan2.1-T2V-1.3B-Diffusers \
+        echo "⬇️  Using huggingface-cli to download Wan-AI/Wan2.1-T2V-14B-Diffusers..."
+        huggingface-cli download Wan-AI/Wan2.1-T2V-14B-Diffusers \
             --local-dir "$TARGET_WAN_DIR" \
             --local-dir-use-symlinks False
     if [ $? -eq 0 ]; then
@@ -66,7 +66,7 @@ else
 
     if [ "${USE_PYTHON_FALLBACK}" = "1" ]; then
         if command -v python3 >/dev/null 2>&1; then
-            echo "⬇️  Using Python (huggingface_hub) to download Wan-AI/Wan2.1-T2V-1.3B-Diffusers..."
+            echo "⬇️  Using Python (huggingface_hub) to download Wan-AI/Wan2.1-T2V-14B-Diffusers..."
             python3 - <<'PY'
 import sys
 from pathlib import Path
@@ -81,7 +81,7 @@ target_dir = Path("models/wan-2.1-t2v")
 target_dir.mkdir(parents=True, exist_ok=True)
 try:
     snapshot_download(
-        repo_id="Wan-AI/Wan2.1-T2V-1.3B-Diffusers",
+        repo_id="Wan-AI/Wan2.1-T2V-14B-Diffusers",
         local_dir=str(target_dir),
         local_dir_use_symlinks=False,
         resume_download=True,
@@ -178,7 +178,7 @@ echo "============================================================"
 echo ""
 echo "📊 Downloaded Models Summary:"
 echo "  ├── 🎬 WAN 2.1 Text-to-Video:"
-echo "  │   └── Wan-AI/Wan2.1-T2V-1.3B-Diffusers: models/wan-2.1-t2v"
+echo "  │   └── Wan-AI/Wan2.1-T2V-14B-Diffusers: models/wan-2.1-t2v"
 echo "  │       (Downloads automatically from Hugging Face on first use)"
 echo "  └── 🔊 TTS Models:"
 echo "      └── Coqui XTTS v2: models/tts/XTTS-v2"
@@ -202,7 +202,7 @@ echo ""
 echo "💡 Hardware Requirements:"
 echo "  • GPU recommended: CUDA-capable GPU with 8GB+ VRAM for best performance"
 echo "  • CPU supported: Will run on CPU but will be very slow (bfloat16 not available)"
-echo "  • Model size: ~1.3B parameters, downloads ~5GB from Hugging Face"
+echo "  • Model size: ~14B parameters, downloads larger size from Hugging Face"
 
 echo ""
 echo "🎉 YOUR VIDEO GENERATOR IS READY!"

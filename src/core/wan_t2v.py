@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 WAN 2.1 Text-to-Video Generator Module
-Handles text-to-video generation using Wan-AI/Wan2.1-T2V-1.3B-Diffusers
+Handles text-to-video generation using Wan-AI/Wan2.1-T2V-14B-Diffusers
 """
 
 import os
@@ -62,7 +62,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
     try:
         from diffusers import AutoencoderKLWan, WanPipeline
         
-        model_id = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
+        model_id = "Wan-AI/Wan2.1-T2V-14B-Diffusers"
         
         # Configure Hugging Face cache directory to use /workspace if available
         # This is important for RunPod and similar environments with attached disks
