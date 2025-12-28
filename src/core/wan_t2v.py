@@ -182,8 +182,22 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             torch.cuda.empty_cache()
             gc.collect()
         
-        # Load VAE (without device_map as AutoencoderKLWan doesn't support it)
-        # Load to CPU first, then offloading will handle device placement
+        # Load pipeline first (without VAE to avoid meta tensor issues with pre-loaded VAE)
+        # enable_model_cpu_offload() will handle device placement and memory management
+        logger.info("📦 Loading WAN pipeline...")
+        _wan_pipeline = WanPipeline.from_pretrained(
+            model_id,
+            torch_dtype=torch_dtype,
+            cache_dir=cache_dir
+        )
+        
+        # Enable automatic CPU <-> GPU offloading BEFORE loading VAE
+        # This handles device placement automatically and avoids meta tensor issues
+        # It will move components to GPU when needed and back to CPU when done
+        _wan_pipeline.enable_model_cpu_offload()
+        
+        # Load VAE separately and assign it after offload is enabled
+        # This avoids meta tensor issues that occur when passing VAE to from_pretrained
         logger.info("📦 Loading WAN VAE...")
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
@@ -191,22 +205,8 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             torch_dtype=vae_dtype,
             cache_dir=cache_dir
         )
-        # VAE will be moved by enable_model_cpu_offload()
-        
-        # Load pipeline without device_map or low_cpu_mem_usage to avoid meta tensor issues
-        # enable_model_cpu_offload() will handle device placement and memory management
-        logger.info("📦 Loading WAN pipeline...")
-        _wan_pipeline = WanPipeline.from_pretrained(
-            model_id,
-            vae=_wan_vae,
-            torch_dtype=torch_dtype,
-            cache_dir=cache_dir
-        )
-        
-        # Enable automatic CPU <-> GPU offloading
-        # This handles device placement automatically and avoids meta tensor issues
-        # It will move components to GPU when needed and back to CPU when done
-        _wan_pipeline.enable_model_cpu_offload()
+        # Assign VAE to pipeline (offload will handle its device placement)
+        _wan_pipeline.vae = _wan_vae
         
         # Enable memory optimizations if available
         if device == 'cuda':
