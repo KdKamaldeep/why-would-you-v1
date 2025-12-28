@@ -181,8 +181,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             model_id,
             subfolder="vae",
             torch_dtype=vae_dtype,
-            cache_dir=cache_dir,
-            low_cpu_mem_usage=False  # Disable meta tensor loading to avoid materialization issues
+            cache_dir=cache_dir
         )
         _wan_vae = _wan_vae.to(device)
         
@@ -192,11 +191,9 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             model_id,
             vae=_wan_vae,
             torch_dtype=torch_dtype,
-            cache_dir=cache_dir,
-            low_cpu_mem_usage=False  # Disable meta tensor loading to avoid materialization issues
+            cache_dir=cache_dir
         )
-        
-        # Move to device
+        # Move to device after loading (this ensures all weights are materialized)
         _wan_pipeline = _wan_pipeline.to(device)
         
         # Enable memory optimizations if available
