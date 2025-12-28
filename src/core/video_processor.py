@@ -546,8 +546,27 @@ class VideoProcessor:
             
             # Add audio mixing filter
             # Convert SFX volume from dB to linear scale for volume filter
+            # Note: dB values from JSON are typically negative (e.g., -28dB)
+            # These are relative attenuation values, so we need to make them audible
             import math
-            sfx_volume_linear = 10 ** (sfx_volume_db / 20.0) if sfx_volume_db else 1.0  # dB to linear
+            if sfx_volume_db:
+                # Convert dB to linear: negative dB values become < 1.0 (attenuation)
+                # For mixing with narration, we want SFX to be audible but not overwhelming
+                # If volume is negative dB (typical range -40 to -10), convert and boost slightly
+                if sfx_volume_db < 0:
+                    # Convert negative dB to linear (e.g., -28dB = 0.0398)
+                    base_volume = 10 ** (sfx_volume_db / 20.0)
+                    # Boost to make it audible (multiply by a factor to make it noticeable)
+                    # Typical range: -30dB (0.0316) -> 0.3, -20dB (0.1) -> 0.5, -10dB (0.316) -> 0.8
+                    boost_factor = max(3.0, abs(sfx_volume_db) / 15.0)  # Adaptive boost
+                    sfx_volume_linear = min(1.0, base_volume * boost_factor)
+                else:
+                    # Positive dB (amplification) - cap at 2.0x
+                    sfx_volume_linear = min(2.0, 10 ** (sfx_volume_db / 20.0))
+            else:
+                sfx_volume_linear = 0.3  # Default: 30% volume if not specified
+            
+            logger.info(f"🔊 SFX volume: {sfx_volume_db}dB -> {sfx_volume_linear:.3f} linear (boosted for audibility)")
             
             if have_sfx:
                 # Mix narration and SFX only (no background music)
@@ -557,7 +576,7 @@ class VideoProcessor:
                     '-map', '0:v',
                     '-map', '[aout]'
                 ])
-                logger.info(f"🔊 Mixing narration + SFX (no background music)")
+                logger.info(f"🔊 Mixing narration (85%) + SFX ({sfx_volume_linear*100:.1f}%)")
             elif have_music:
                 # Fallback: if music is provided but no SFX, mix narration and music
                 filter_complex = f'[1:a]volume=0.85[a_narration];[{music_input_idx}:a]volume=0.15[a_music];[a_narration][a_music]amix=inputs=2:duration=longest:dropout_transition=0,apad[aout]'

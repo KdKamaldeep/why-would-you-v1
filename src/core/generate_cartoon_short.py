@@ -284,8 +284,31 @@ class CartoonShortsGenerator:
                 # Generate audio clips from each scene's narration
                 for i, scene in enumerate(script['scenes']):
                     scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
-                    narration_text = scene.get('narration', '')
-                    logger.info(f"🎵 Scene {i+1}: Processing narration ({len(narration_text)} characters)")
+                    
+                    # Check if voice_segments exist - if so, use them for more precise narration
+                    voice_segments = scene.get('voice_segments', [])
+                    if voice_segments and isinstance(voice_segments, list) and len(voice_segments) > 0:
+                        # Use voice_segments text instead of full narration
+                        # Combine all segment texts with pauses
+                        narration_texts = []
+                        for seg in voice_segments:
+                            if isinstance(seg, dict) and 'text' in seg:
+                                narration_texts.append(seg['text'])
+                        
+                        if narration_texts:
+                            # Join segments with natural pauses (period + space)
+                            narration_text = '. '.join(narration_texts)
+                            if narration_text and not narration_text.endswith('.'):
+                                narration_text += '.'
+                            logger.info(f"🎵 Scene {i+1}: Using voice_segments ({len(voice_segments)} segments, {len(narration_text)} chars)")
+                        else:
+                            # Fallback to full narration if voice_segments are invalid
+                            narration_text = scene.get('narration', '')
+                            logger.info(f"🎵 Scene {i+1}: voice_segments found but invalid, using narration ({len(narration_text)} chars)")
+                    else:
+                        # No voice_segments - use full narration text
+                        narration_text = scene.get('narration', '')
+                        logger.info(f"🎵 Scene {i+1}: Processing narration ({len(narration_text)} characters)")
                     
                     # Get voice file from scene if available
                     voice_file = None
