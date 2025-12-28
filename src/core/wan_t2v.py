@@ -80,6 +80,22 @@ if hasattr(torch, 'distributed') and not hasattr(torch.distributed, 'device_mesh
     
     torch.distributed.device_mesh = DummyDeviceMeshModule
 
+# Workaround for diffusers compatibility: add dummy RMSNorm to torch.nn
+# This prevents AttributeError when diffusers tries to access torch.nn.RMSNorm
+# which is not available in older PyTorch versions (< 2.4.0)
+if hasattr(torch, 'nn') and not hasattr(torch.nn, 'RMSNorm'):
+    # Create a dummy RMSNorm class that matches the expected interface
+    class DummyRMSNorm(torch.nn.Module):
+        def __init__(self, *args, **kwargs):
+            super().__init__()
+            # Create a simple layer norm as fallback
+            self.norm = torch.nn.LayerNorm(kwargs.get('normalized_shape', args[0] if args else 1))
+        
+        def forward(self, x):
+            return self.norm(x)
+    
+    torch.nn.RMSNorm = DummyRMSNorm
+
 logger = logging.getLogger(__name__)
 
 # Global singleton instance
