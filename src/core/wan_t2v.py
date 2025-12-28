@@ -23,9 +23,22 @@ if not hasattr(torch, 'xpu'):
         @staticmethod
         def empty_cache():
             pass
+        
         @staticmethod
         def is_available():
             return False
+        
+        @staticmethod
+        def device_count():
+            return 0
+        
+        @staticmethod
+        def get_device_name(device=None):
+            return "XPU not available"
+        
+        @staticmethod
+        def current_device():
+            return None
     
     torch.xpu = DummyXPU()
 
