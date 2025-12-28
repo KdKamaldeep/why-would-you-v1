@@ -549,36 +549,28 @@ class VideoProcessor:
             import math
             sfx_volume_linear = 10 ** (sfx_volume_db / 20.0) if sfx_volume_db else 1.0  # dB to linear
             
-            if have_sfx or have_music:
-                # Build complex filter for mixing multiple audio tracks
-                filter_parts = []
-                filter_parts.append(f'[1:a]volume=0.85[a_narration]')  # Narration at 85%
-                
-                if have_sfx:
-                    filter_parts.append(f'[{sfx_input_idx}:a]volume={sfx_volume_linear:.3f}[a_sfx]')
-                
-                if have_music:
-                    filter_parts.append(f'[{music_input_idx}:a]volume=0.15[a_music]')
-                
-                # Mix all audio tracks
-                mix_inputs = '[a_narration]'
-                mix_count = 1
-                if have_sfx:
-                    mix_inputs += '[a_sfx]'
-                    mix_count += 1
-                if have_music:
-                    mix_inputs += '[a_music]'
-                    mix_count += 1
-                
-                filter_complex = ';'.join(filter_parts) + f';{mix_inputs}amix=inputs={mix_count}:duration=longest:dropout_transition=0,apad[aout]'
+            if have_sfx:
+                # Mix narration and SFX only (no background music)
+                filter_complex = f'[1:a]volume=0.85[a_narration];[{sfx_input_idx}:a]volume={sfx_volume_linear:.3f}[a_sfx];[a_narration][a_sfx]amix=inputs=2:duration=longest:dropout_transition=0,apad[aout]'
                 cmd.extend([
                     '-filter_complex', filter_complex,
                     '-map', '0:v',
                     '-map', '[aout]'
                 ])
+                logger.info(f"🔊 Mixing narration + SFX (no background music)")
+            elif have_music:
+                # Fallback: if music is provided but no SFX, mix narration and music
+                filter_complex = f'[1:a]volume=0.85[a_narration];[{music_input_idx}:a]volume=0.15[a_music];[a_narration][a_music]amix=inputs=2:duration=longest:dropout_transition=0,apad[aout]'
+                cmd.extend([
+                    '-filter_complex', filter_complex,
+                    '-map', '0:v',
+                    '-map', '[aout]'
+                ])
+                logger.info(f"🔊 Mixing narration + music (legacy mode)")
             else:
                 # Single narration track: pad with silence to ensure full coverage
                 cmd.extend(['-map', '0:v', '-map', '1:a', '-af', 'apad'])
+                logger.info(f"🔊 Using narration only (no SFX, no music)")
             
             # Add subtitle overlay if provided
             if subtitles_path and os.path.exists(subtitles_path):

@@ -591,20 +591,12 @@ class CartoonShortsGenerator:
             else:
                 logger.info("Step 5: Subtitles disabled; skipping SRT generation and overlay")
             
-            # Step 6: Select background music
-            logger.info("Step 6: Adding background music...")
-            background_music = self._get_background_music()
-            if background_music:
-                logger.info(f"🎵 Background music selected: {background_music}")
-            else:
-                logger.info("🎵 No background music found - proceeding without music")
-            
-            # Step 7: Compile final video
-            logger.info("Step 7: Compiling final video...")
+            # Step 6: Compile final video (skipping background music - using SFX only)
+            logger.info("Step 6: Compiling final video...")
             logger.info(f"🎬 Compiling {len(final_clips)} video clips...")
             logger.info(f"🎵 Using {len(final_audio_paths)} audio clips...")
             logger.info(f"📝 Subtitles: {'Enabled' if self.config.add_subtitles else 'Disabled'}")
-            logger.info(f"🎵 Background music: {'Yes' if background_music else 'No'}")
+            logger.info(f"🔊 SFX: Enabled (no background music)")
             logger.info(f"📁 Final output: {final_output}")
             
             # Compile stitched video (keep existing output)
@@ -635,9 +627,9 @@ class CartoonShortsGenerator:
                 self.video_processor.compile_final_video(
                     final_clips,
                     final_audio_paths,  # Pass audio paths with pauses included
-                    background_music,
-                    str(subtitles_path) if self.config.add_subtitles else None,
-                    str(stitched_output),
+                    background_music=None,  # Skip background music - use SFX only
+                    subtitles_path=str(subtitles_path) if self.config.add_subtitles else None,
+                    output_path=str(stitched_output),
                     sfx_paths=final_sfx_paths if not self.config.skip_audio else None,
                     sfx_volumes=final_sfx_volumes if not self.config.skip_audio else None
                 )
@@ -671,8 +663,8 @@ class CartoonShortsGenerator:
                     else:
                         voice_audio_path = final_audio_paths[0] if final_audio_paths[0] else None
                 
-                # Use configured music path or fallback to background_music
-                music_file = self.config.music_path or background_music
+                # Skip background music - use SFX only
+                music_file = None
                 
                 reel_output = self.output_dir / "final_reel.mp4"
                 
@@ -850,18 +842,14 @@ class CartoonShortsGenerator:
                 else:
                     logger.info("Step 7: Subtitles disabled; skipping SRT generation and overlay")
                 
-                # Step 8: Select background music
-                logger.info("Step 8: Adding background music...")
-                background_music = self._get_background_music()
-                
-                # Step 9: Compile final video
-                logger.info("Step 9: Compiling final video...")
+                # Step 8: Compile final video (skipping background music)
+                logger.info("Step 8: Compiling final video...")
                 self.video_processor.compile_final_video(
                     final_clips,
                     scene_audio_paths,  # Pass audio paths directly - compile_final_video will handle concatenation
-                    background_music,
-                    str(subtitles_path) if self.config.add_subtitles else None,
-                    str(final_output),
+                    background_music=None,  # Skip background music
+                    subtitles_path=str(subtitles_path) if self.config.add_subtitles else None,
+                    output_path=str(final_output),
                     sfx_paths=None,  # Fallback mode doesn't support SFX
                     sfx_volumes=None
                 )
