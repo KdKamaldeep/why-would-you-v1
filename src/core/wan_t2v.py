@@ -183,40 +183,29 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             gc.collect()
         
         # Load VAE (without device_map as AutoencoderKLWan doesn't support it)
-        # Load to CPU first to avoid meta tensor issues, then offloading will handle it
+        # Load to CPU first, then offloading will handle device placement
         logger.info("📦 Loading WAN VAE...")
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
             subfolder="vae",
             torch_dtype=vae_dtype,
-            cache_dir=cache_dir,
-            low_cpu_mem_usage=True
+            cache_dir=cache_dir
         )
         # VAE will be moved by enable_model_cpu_offload()
         
-        # Load pipeline with device mapping (use "cuda" if available, otherwise rely on CPU offload)
+        # Load pipeline without device_map or low_cpu_mem_usage to avoid meta tensor issues
+        # enable_model_cpu_offload() will handle device placement and memory management
         logger.info("📦 Loading WAN pipeline...")
-        if device == 'cuda' and torch.cuda.is_available():
-            _wan_pipeline = WanPipeline.from_pretrained(
-                model_id,
-                vae=_wan_vae,
-                torch_dtype=torch_dtype,
-                cache_dir=cache_dir,
-                low_cpu_mem_usage=True,
-                device_map="cuda"
-            )
-        else:
-            # Load without device_map for CPU, rely on enable_model_cpu_offload()
-            _wan_pipeline = WanPipeline.from_pretrained(
-                model_id,
-                vae=_wan_vae,
-                torch_dtype=torch_dtype,
-                cache_dir=cache_dir,
-                low_cpu_mem_usage=True
-            )
+        _wan_pipeline = WanPipeline.from_pretrained(
+            model_id,
+            vae=_wan_vae,
+            torch_dtype=torch_dtype,
+            cache_dir=cache_dir
+        )
         
         # Enable automatic CPU <-> GPU offloading
         # This handles device placement automatically and avoids meta tensor issues
+        # It will move components to GPU when needed and back to CPU when done
         _wan_pipeline.enable_model_cpu_offload()
         
         # Enable memory optimizations if available
