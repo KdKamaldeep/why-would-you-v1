@@ -194,16 +194,26 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         )
         # VAE will be moved by enable_model_cpu_offload()
         
-        # Load pipeline with automatic device mapping
+        # Load pipeline with device mapping (use "cuda" if available, otherwise rely on CPU offload)
         logger.info("📦 Loading WAN pipeline...")
-        _wan_pipeline = WanPipeline.from_pretrained(
-            model_id,
-            vae=_wan_vae,
-            torch_dtype=torch_dtype,
-            cache_dir=cache_dir,
-            low_cpu_mem_usage=True,
-            device_map="auto"
-        )
+        if device == 'cuda' and torch.cuda.is_available():
+            _wan_pipeline = WanPipeline.from_pretrained(
+                model_id,
+                vae=_wan_vae,
+                torch_dtype=torch_dtype,
+                cache_dir=cache_dir,
+                low_cpu_mem_usage=True,
+                device_map="cuda"
+            )
+        else:
+            # Load without device_map for CPU, rely on enable_model_cpu_offload()
+            _wan_pipeline = WanPipeline.from_pretrained(
+                model_id,
+                vae=_wan_vae,
+                torch_dtype=torch_dtype,
+                cache_dir=cache_dir,
+                low_cpu_mem_usage=True
+            )
         
         # Enable automatic CPU <-> GPU offloading
         # This handles device placement automatically and avoids meta tensor issues
