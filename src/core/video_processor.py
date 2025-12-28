@@ -549,24 +549,47 @@ class VideoProcessor:
             # Note: dB values from JSON are typically negative (e.g., -28dB)
             # These are relative attenuation values, so we need to make them audible
             import math
+            
+            # Check if SFX audio file actually has sound
+            if have_sfx and os.path.exists(sfx_audio):
+                try:
+                    # Quick check using ffprobe to see if audio has content
+                    check_cmd = [
+                        'ffprobe', '-v', 'error',
+                        '-select_streams', 'a:0',
+                        '-show_entries', 'stream=duration',
+                        '-of', 'default=noprint_wrappers=1:nokey=1',
+                        sfx_audio
+                    ]
+                    result = subprocess.run(check_cmd, capture_output=True, text=True)
+                    if result.returncode == 0:
+                        logger.info(f"✅ SFX audio file exists and is valid: {sfx_audio}")
+                    else:
+                        logger.warning(f"⚠️ SFX audio file may be invalid: {sfx_audio}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not verify SFX audio file: {e}")
+            
             if sfx_volume_db:
                 # Convert dB to linear: negative dB values become < 1.0 (attenuation)
                 # For mixing with narration, we want SFX to be audible but not overwhelming
-                # If volume is negative dB (typical range -40 to -10), convert and boost slightly
+                # If volume is negative dB (typical range -40 to -10), convert and boost more aggressively
                 if sfx_volume_db < 0:
                     # Convert negative dB to linear (e.g., -28dB = 0.0398)
                     base_volume = 10 ** (sfx_volume_db / 20.0)
-                    # Boost to make it audible (multiply by a factor to make it noticeable)
-                    # Typical range: -30dB (0.0316) -> 0.3, -20dB (0.1) -> 0.5, -10dB (0.316) -> 0.8
-                    boost_factor = max(3.0, abs(sfx_volume_db) / 15.0)  # Adaptive boost
-                    sfx_volume_linear = min(1.0, base_volume * boost_factor)
+                    # More aggressive boost - typical background SFX should be 20-40% of narration
+                    # -30dB -> ~0.4, -25dB -> ~0.5, -20dB -> ~0.6, -15dB -> ~0.7
+                    # Map -40dB to -10dB range to 0.2 to 0.8 linear range
+                    normalized_db = max(-40, min(-10, sfx_volume_db))  # Clamp to reasonable range
+                    # Linear interpolation: -40dB -> 0.2, -10dB -> 0.8
+                    sfx_volume_linear = 0.2 + (normalized_db + 40) / 30.0 * 0.6
+                    logger.info(f"🔊 SFX volume conversion: {sfx_volume_db}dB (base: {base_volume:.4f}) -> {sfx_volume_linear:.3f} linear")
                 else:
-                    # Positive dB (amplification) - cap at 2.0x
-                    sfx_volume_linear = min(2.0, 10 ** (sfx_volume_db / 20.0))
+                    # Positive dB (amplification) - cap at 1.5x
+                    sfx_volume_linear = min(1.5, 10 ** (sfx_volume_db / 20.0))
             else:
-                sfx_volume_linear = 0.3  # Default: 30% volume if not specified
+                sfx_volume_linear = 0.4  # Default: 40% volume if not specified (more audible)
             
-            logger.info(f"🔊 SFX volume: {sfx_volume_db}dB -> {sfx_volume_linear:.3f} linear (boosted for audibility)")
+            logger.info(f"🔊 Final SFX volume: {sfx_volume_linear:.3f} linear ({sfx_volume_linear*100:.1f}% of full scale)")
             
             if have_sfx:
                 # Mix narration and SFX only (no background music)

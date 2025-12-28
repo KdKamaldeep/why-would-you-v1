@@ -180,6 +180,24 @@ class SFXGenerator:
             # Ensure audio is in the right range [-1, 1]
             audio = np.clip(audio, -1.0, 1.0)
             
+            # Check if audio has actual content (not silent)
+            max_amplitude = np.max(np.abs(audio))
+            if max_amplitude < 0.001:
+                logger.warning(f"⚠️ Generated SFX appears to be silent (max amplitude: {max_amplitude:.6f})")
+                logger.warning(f"   This might indicate an issue with AudioLDM generation for prompt: '{prompt}'")
+            else:
+                logger.info(f"✅ SFX has audio content (max amplitude: {max_amplitude:.4f})")
+            
+            # Normalize audio to ensure it's audible (but not clipping)
+            # Boost quiet audio to make it more audible
+            if max_amplitude > 0:
+                target_peak = 0.8  # Target 80% peak to avoid clipping
+                if max_amplitude < target_peak:
+                    gain = target_peak / max_amplitude
+                    audio = audio * gain
+                    audio = np.clip(audio, -1.0, 1.0)
+                    logger.info(f"🔊 Boosted SFX audio by {gain:.2f}x to improve audibility")
+            
             # Save initial audio
             temp_audio = str(output_path).replace('.wav', '_temp.wav')
             sf.write(temp_audio, audio, 16000)  # AudioLDM uses 16kHz

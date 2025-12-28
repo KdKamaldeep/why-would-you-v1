@@ -288,19 +288,36 @@ class CartoonShortsGenerator:
                     # Check if voice_segments exist - if so, use them for more precise narration
                     voice_segments = scene.get('voice_segments', [])
                     if voice_segments and isinstance(voice_segments, list) and len(voice_segments) > 0:
-                        # Use voice_segments text instead of full narration
-                        # Combine all segment texts with pauses
+                        # Use voice_segments text and timing info
                         narration_texts = []
                         for seg in voice_segments:
                             if isinstance(seg, dict) and 'text' in seg:
-                                narration_texts.append(seg['text'])
+                                text = seg['text']
+                                # Add pauses based on timing between segments
+                                start_ms = seg.get('start_ms', 0)
+                                end_ms = seg.get('end_ms', 0)
+                                duration_ms = end_ms - start_ms if end_ms > start_ms else 0
+                                
+                                narration_texts.append(text)
+                                
+                                # Calculate pause between this segment and next
+                                # We'll add pauses as SSML breaks later or use natural pauses
                         
                         if narration_texts:
-                            # Join segments with natural pauses (period + space)
+                            # Join segments with natural pauses
+                            # For now, use simple period spacing - timing will be handled by TTS natural pacing
                             narration_text = '. '.join(narration_texts)
                             if narration_text and not narration_text.endswith('.'):
                                 narration_text += '.'
-                            logger.info(f"🎵 Scene {i+1}: Using voice_segments ({len(voice_segments)} segments, {len(narration_text)} chars)")
+                            
+                            # Log timing info
+                            total_segments = len(voice_segments)
+                            if total_segments > 0:
+                                first_start = voice_segments[0].get('start_ms', 0) / 1000.0
+                                last_end = voice_segments[-1].get('end_ms', 0) / 1000.0
+                                logger.info(f"🎵 Scene {i+1}: Using voice_segments ({total_segments} segments, {len(narration_text)} chars, timing: {first_start:.2f}s-{last_end:.2f}s)")
+                            else:
+                                logger.info(f"🎵 Scene {i+1}: Using voice_segments ({total_segments} segments, {len(narration_text)} chars)")
                         else:
                             # Fallback to full narration if voice_segments are invalid
                             narration_text = scene.get('narration', '')
