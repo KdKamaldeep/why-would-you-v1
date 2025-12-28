@@ -28,6 +28,7 @@ done
 echo "📁 Creating directories..."
 mkdir -p models
 mkdir -p models/tts
+mkdir -p models/audiocraft
 
 echo "✅ Directories created"
 
@@ -180,8 +181,14 @@ echo "📊 Downloaded Models Summary:"
 echo "  ├── 🎬 WAN 2.1 Text-to-Video:"
 echo "  │   └── Wan-AI/Wan2.1-T2V-1.3B-Diffusers: models/wan-2.1-t2v"
 echo "  │       (Downloads automatically from Hugging Face on first use)"
-echo "  └── 🔊 TTS Models:"
-echo "      └── Coqui XTTS v2: models/tts/XTTS-v2"
+echo "  ├── 🔊 TTS Models:"
+echo "  │   └── Coqui XTTS v2: models/tts/XTTS-v2"
+echo "  ├── 🎵 Music Generation (MusicGen):"
+echo "  │   └── facebook/musicgen-medium: models/audiocraft/musicgen-medium"
+echo "  │       (Downloads automatically from Hugging Face on first use)"
+echo "  └── 🔊 Sound Effects (AudioGen):"
+echo "      └── facebook/audiogen-medium: models/audiocraft/audiogen-medium"
+echo "          (Downloads automatically from Hugging Face on first use)"
 
 echo ""
 echo "🎬 FEATURES ENABLED:"
@@ -189,6 +196,8 @@ echo "  ✅ WAN 2.1 Text-to-Video Generation"
 echo "  ✅ Direct text-to-video (no image generation step)"
 echo "  ✅ Multi-scene video stitching"
 echo "  ✅ Coqui TTS voice synthesis"
+echo "  ✅ MusicGen background music generation"
+echo "  ✅ AudioGen sound effects generation"
 echo "  ✅ FFmpeg video processing"
 
 echo ""

@@ -23,6 +23,8 @@ TTS==0.22.0
 torchcodec>=0.8.0  # Required for XTTS models (media loading/decoding)
 librosa>=0.10.0
 soundfile>=0.12.0
+# Audio generation (MusicGen and AudioGen)
+audiocraft>=1.2.0  # Meta's AudioCraft for music and SFX generation
 # Additional audio processing for better language support
 numpy>=1.24.0
 scipy>=1.10.0
