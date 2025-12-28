@@ -181,8 +181,10 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             model_id,
             subfolder="vae",
             torch_dtype=vae_dtype,
-            cache_dir=cache_dir
+            cache_dir=cache_dir,
+            low_cpu_mem_usage=False  # Disable meta tensor loading to avoid materialization issues
         )
+        _wan_vae = _wan_vae.to(device)
         
         # Load pipeline
         logger.info("📦 Loading WAN pipeline...")
@@ -190,7 +192,8 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             model_id,
             vae=_wan_vae,
             torch_dtype=torch_dtype,
-            cache_dir=cache_dir
+            cache_dir=cache_dir,
+            low_cpu_mem_usage=False  # Disable meta tensor loading to avoid materialization issues
         )
         
         # Move to device
