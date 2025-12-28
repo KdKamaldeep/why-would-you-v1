@@ -66,6 +66,20 @@ if not hasattr(torch, 'xpu'):
     
     torch.xpu = DummyXPU()
 
+# Workaround for diffusers compatibility: add dummy device_mesh module to torch.distributed
+# This prevents AttributeError when diffusers tries to access torch.distributed.device_mesh
+# which is not available in older PyTorch versions
+if hasattr(torch, 'distributed') and not hasattr(torch.distributed, 'device_mesh'):
+    class DummyDeviceMesh:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    # Create a dummy module-like object with DeviceMesh class
+    class DummyDeviceMeshModule:
+        DeviceMesh = DummyDeviceMesh
+    
+    torch.distributed.device_mesh = DummyDeviceMeshModule
+
 logger = logging.getLogger(__name__)
 
 # Global singleton instance
