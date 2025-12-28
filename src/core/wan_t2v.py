@@ -182,16 +182,17 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             torch.cuda.empty_cache()
             gc.collect()
         
-        # Load VAE with automatic device mapping
+        # Load VAE (without device_map as AutoencoderKLWan doesn't support it)
+        # Load to CPU first to avoid meta tensor issues, then offloading will handle it
         logger.info("📦 Loading WAN VAE...")
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
             subfolder="vae",
             torch_dtype=vae_dtype,
             cache_dir=cache_dir,
-            low_cpu_mem_usage=True,
-            device_map="auto"
+            low_cpu_mem_usage=True
         )
+        # VAE will be moved by enable_model_cpu_offload()
         
         # Load pipeline with automatic device mapping
         logger.info("📦 Loading WAN pipeline...")
