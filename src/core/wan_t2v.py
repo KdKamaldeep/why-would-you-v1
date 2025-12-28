@@ -15,6 +15,20 @@ import tempfile
 import cv2
 import numpy as np
 
+# Workaround for diffusers compatibility: add dummy xpu attribute if it doesn't exist
+# This prevents AttributeError when diffusers tries to access torch.xpu on systems without Intel XPU
+# (e.g., NVIDIA GPUs like L40S don't need XPU support)
+if not hasattr(torch, 'xpu'):
+    class DummyXPU:
+        @staticmethod
+        def empty_cache():
+            pass
+        @staticmethod
+        def is_available():
+            return False
+    
+    torch.xpu = DummyXPU()
+
 logger = logging.getLogger(__name__)
 
 # Global singleton instance
