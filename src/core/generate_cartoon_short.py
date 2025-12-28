@@ -32,6 +32,7 @@ from .script_generator import ScriptGenerator
 from .wan_t2v import WanT2VGenerator
 from .coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 from .video_processor import VideoProcessor, VideoConfig as VPConfig
+from .sfx_generator import SFXGenerator
 
 
 # Load environment variables
@@ -100,8 +101,6 @@ class VideoConfig:
     music_volume: float = 0.12  # Music volume (0.0-1.0)
     voice_volume: float = 1.0  # Voice volume (0.0-1.0)
     verbose_ffmpeg: bool = False  # Print FFmpeg commands
-    # Audio profile settings (from storyboard)
-    audio_profile: Optional[DictType] = None  # Contains: music, music_volume (dB), voice_priority, sfx_enabled, tts_style, speech_rate
 
     def __post_init__(self):
         """Set dimensions based on video format."""
@@ -147,6 +146,9 @@ class CartoonShortsGenerator:
         self.voice_synthesizer = CoquiVoiceSynthesizer(
             CoquiVoiceConfig(language=config.language)
         )
+        
+        # Initialize SFX generator
+        self.sfx_generator = SFXGenerator()
 
         
         # Create video config for processor
@@ -201,9 +203,6 @@ class CartoonShortsGenerator:
                     original_storyboard["top_hook_text"] = self.config.top_hook_text
                 if self.config.bottom_hook_text:
                     original_storyboard["bottom_hook_text"] = self.config.bottom_hook_text
-                # Add audio_profile if present
-                if self.config.audio_profile:
-                    original_storyboard["audio_profile"] = self.config.audio_profile
                 
                 script = self.script_generator.generate_script_from_custom(
                     title=self.config.title or f"Story: {self.config.prompt}",
@@ -282,8 +281,7 @@ class CartoonShortsGenerator:
                 scene_audio_paths = []
                 actual_scene_durations = []  # Track actual audio durations
                 
-                # Generate audio clips from each scene's narration and SFX
-                scene_sfx_paths = []  # Store SFX paths for later mixing
+                # Generate audio clips from each scene's narration
                 for i, scene in enumerate(script['scenes']):
                     scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
                     narration_text = scene.get('narration', '')
@@ -322,76 +320,18 @@ class CartoonShortsGenerator:
                     
                     scene_audio_paths.append(str(scene_audio))
                     logger.info(f"Scene {i+1}: Audio clip ready: {scene_audio}")
-                    
-                    # Get actual narration duration for this scene
-                    narration_duration = self.video_processor.get_audio_duration(str(scene_audio))
-                    actual_scene_durations.append(narration_duration)
-                    logger.info(f"📏 Scene {i+1}: Narration duration: {narration_duration:.2f}s")
-                    
-                    # Generate SFX if enabled and present in scene (using actual narration duration)
-                    scene_sfx_path = None
-                    audio_profile = self.config.audio_profile
-                    if audio_profile and audio_profile.get('sfx_enabled') and scene.get('sfx'):
-                        try:
-                            from .sfx_generator import SFXGenerator
-                            
-                            sfx_config = scene['sfx']
-                            sfx_prompt = sfx_config.get('prompt')  # Use prompt instead of type
-                            
-                            if sfx_prompt:
-                                logger.info(f"🔊 Scene {i+1}: Generating SFX with prompt '{sfx_prompt}' (duration: {narration_duration:.2f}s from narration)...")
-                                
-                                sfx_gen = SFXGenerator(model_size="medium")
-                                sfx_output = self.output_dir / f"sfx_scene_{i+1}.wav"
-                                
-                                # Check if already generated (cached)
-                                if self.config.reuse_existing and sfx_output.exists():
-                                    logger.info(f"♻️ Scene {i+1}: Reusing existing SFX: {sfx_output}")
-                                    scene_sfx_path = str(sfx_output)
-                                else:
-                                    generated_sfx = sfx_gen.generate_sfx(
-                                        prompt=sfx_prompt,  # Use prompt directly
-                                        duration=narration_duration,  # Use actual narration duration
-                                        output_path=str(sfx_output),
-                                        use_cache=False
-                                    )
-                                    scene_sfx_path = generated_sfx
-                                    logger.info(f"✅ Scene {i+1}: SFX generated: {scene_sfx_path}")
-                        except ImportError:
-                            logger.warning(f"⚠️ Scene {i+1}: SFXGenerator not available (audiocraft not installed). Skipping SFX.")
-                        except Exception as e:
-                            logger.warning(f"⚠️ Scene {i+1}: SFX generation failed: {e}. Continuing without SFX.")
-                    
-                    scene_sfx_paths.append(scene_sfx_path)  # None if no SFX
-                    
-                    # Mix SFX with voice audio if SFX was generated
-                    if scene_sfx_path and Path(scene_sfx_path).exists():
-                        try:
-                            # Get SFX volume from scene config (in dB, convert to linear)
-                            sfx_volume_db = scene.get('sfx', {}).get('volume', -30)
-                            sfx_volume_linear = 10 ** (sfx_volume_db / 20)
-                            
-                            # Mix SFX with voice audio
-                            mixed_audio_path = str(self.output_dir / f"mixed_audio_scene_{i+1}.aac")
-                            logger.info(f"🔊 Scene {i+1}: Mixing voice and SFX (SFX volume: {sfx_volume_db}dB = {sfx_volume_linear:.3f}x)...")
-                            
-                            self.video_processor.mix_audio_files(
-                                audio1_path=str(scene_audio),  # Voice (full volume)
-                                audio2_path=scene_sfx_path,    # SFX (at specified volume)
-                                output_path=mixed_audio_path,
-                                volume1=1.0,  # Voice at full volume
-                                volume2=sfx_volume_linear  # SFX at calculated volume
-                            )
-                            
-                            # Replace scene_audio_path with mixed audio
-                            scene_audio_paths[-1] = mixed_audio_path  # Update the last added path
-                            logger.info(f"✅ Scene {i+1}: Voice + SFX mixed: {mixed_audio_path}")
-                        except Exception as e:
-                            logger.warning(f"⚠️ Scene {i+1}: Failed to mix SFX with voice: {e}. Using voice only.")
             
-            # Calculate total audio duration (durations already detected during generation)
+            # Detect length of each audio clip
             if not self.config.skip_audio:
-                total_audio_duration = sum(actual_scene_durations)
+                logger.info("📏 Detecting length of each audio clip...")
+                total_audio_duration = 0
+                for i, scene_audio in enumerate(scene_audio_paths):
+                    logger.info(f"📏 Scene {i+1}: Analyzing audio duration...")
+                    actual_duration = self.video_processor.get_audio_duration(scene_audio)
+                    actual_scene_durations.append(actual_duration)
+                    total_audio_duration += actual_duration
+                    logger.info(f"Scene {i+1}: Audio clip length: {actual_duration:.1f}s")
+                
                 logger.info(f"✅ Generated {len(scene_audio_paths)} audio clips for narration")
                 logger.info(f"📊 Total audio duration: {total_audio_duration:.1f}s")
                 logger.info(f"📊 Average audio duration per scene: {total_audio_duration/len(actual_scene_durations):.1f}s")
@@ -401,6 +341,56 @@ class CartoonShortsGenerator:
                 logger.info(f"✅ Skipped audio generation")
                 logger.info(f"📊 Total scene duration: {total_audio_duration:.1f}s")
                 logger.info(f"📊 Average scene duration: {total_audio_duration/len(actual_scene_durations):.1f}s")
+            
+            # Step 2.5: Generate SFX for each scene
+            scene_sfx_paths = []
+            scene_sfx_volumes = []
+            if not self.config.skip_audio:
+                # Check global SFX setting from audio_profile
+                audio_profile = script.get('audio_profile', {})
+                global_sfx_enabled = audio_profile.get('sfx_enabled', True) if isinstance(audio_profile, dict) else True
+                
+                logger.info(f"Step 2.5: Generating SFX for each scene... (sfx_enabled: {global_sfx_enabled})")
+                for i, scene in enumerate(script['scenes']):
+                    sfx_info = scene.get('sfx', {})
+                    sfx_prompt = sfx_info.get('prompt', None) if isinstance(sfx_info, dict) else None
+                    sfx_volume = sfx_info.get('volume', -30) if isinstance(sfx_info, dict) else -30  # Default volume in dB
+                    # Use global setting
+                    sfx_enabled = global_sfx_enabled
+                    
+                    if sfx_prompt and sfx_enabled:
+                        # Get narration duration for this scene
+                        if i < len(actual_scene_durations):
+                            narration_duration = actual_scene_durations[i]
+                        else:
+                            narration_duration = scene.get('duration', self.config.scene_duration)
+                        
+                        scene_sfx = self.output_dir / f"sfx_scene_{i+1}.wav"
+                        logger.info(f"🔊 Scene {i+1}: Generating SFX - '{sfx_prompt}' (duration: {narration_duration:.2f}s, volume: {sfx_volume}dB)")
+                        
+                        if not (self.config.reuse_existing and scene_sfx.exists()):
+                            generated_sfx = self.sfx_generator.generate_sfx(
+                                prompt=sfx_prompt,
+                                duration=narration_duration,  # Match narration duration
+                                output_path=str(scene_sfx)
+                            )
+                            scene_sfx = Path(generated_sfx)
+                            logger.info(f"🔊 Scene {i+1}: SFX generation completed: {scene_sfx}")
+                        else:
+                            logger.info(f"🔊 Scene {i+1}: Reusing existing SFX: {scene_sfx}")
+                        
+                        scene_sfx_paths.append(str(scene_sfx))
+                        scene_sfx_volumes.append(sfx_volume)
+                    else:
+                        # No SFX for this scene
+                        scene_sfx_paths.append(None)
+                        scene_sfx_volumes.append(None)
+                        logger.info(f"🔊 Scene {i+1}: No SFX specified (sfx_enabled={sfx_enabled})")
+            else:
+                # Skip SFX generation if audio is skipped
+                scene_sfx_paths = [None] * len(script['scenes'])
+                scene_sfx_volumes = [None] * len(script['scenes'])
+                logger.info("🔊 Skipped SFX generation (audio generation skipped)")
             
             # Step 3: Generate videos directly from prompts using WAN T2V
             logger.info("Step 3: Generating videos with WAN 2.1 T2V...")
@@ -555,7 +545,7 @@ class CartoonShortsGenerator:
                 logger.info(f"⏸️ Adding {self.config.scene_pause_duration:.2f}s pauses between scenes")
                 
                 for i, (video_clip, audio_clip) in enumerate(zip(video_clips, scene_audio_paths)):
-                    # Add scene video and audio (audio already contains voice+SFX if SFX was enabled)
+                    # Add scene video and audio
                     final_clips.append(video_clip)
                     final_audio_paths.append(audio_clip)
                     
@@ -601,7 +591,7 @@ class CartoonShortsGenerator:
             else:
                 logger.info("Step 5: Subtitles disabled; skipping SRT generation and overlay")
             
-            # Step 6: Generate or select background music
+            # Step 6: Select background music
             logger.info("Step 6: Adding background music...")
             background_music = self._get_background_music()
             if background_music:
@@ -620,12 +610,36 @@ class CartoonShortsGenerator:
             # Compile stitched video (keep existing output)
             stitched_output = self.output_dir / "stitched.mp4"
             try:
+                # Prepare SFX paths and volumes for compilation (matching final_clips order)
+                final_sfx_paths = []
+                final_sfx_volumes = []
+                if not self.config.skip_audio:
+                    # Match SFX to scenes (accounting for pauses)
+                    sfx_idx = 0
+                    for i, (video_clip, audio_clip) in enumerate(zip(video_clips, scene_audio_paths)):
+                        if i < len(scene_sfx_paths):
+                            final_sfx_paths.append(scene_sfx_paths[i])
+                            final_sfx_volumes.append(scene_sfx_volumes[i])
+                        else:
+                            final_sfx_paths.append(None)
+                            final_sfx_volumes.append(None)
+                        
+                        # Add SFX for pauses (silence)
+                        if self.config.scene_pause_duration > 0 and i < len(video_clips) - 1:
+                            final_sfx_paths.append(None)
+                            final_sfx_volumes.append(None)
+                else:
+                    final_sfx_paths = [None] * len(final_clips)
+                    final_sfx_volumes = [None] * len(final_clips)
+                
                 self.video_processor.compile_final_video(
                     final_clips,
                     final_audio_paths,  # Pass audio paths with pauses included
                     background_music,
                     str(subtitles_path) if self.config.add_subtitles else None,
-                    str(stitched_output)
+                    str(stitched_output),
+                    sfx_paths=final_sfx_paths if not self.config.skip_audio else None,
+                    sfx_volumes=final_sfx_volumes if not self.config.skip_audio else None
                 )
                 logger.info(f"✅ Stitched video created: {stitched_output}")
             except Exception as e:
@@ -659,15 +673,6 @@ class CartoonShortsGenerator:
                 
                 # Use configured music path or fallback to background_music
                 music_file = self.config.music_path or background_music
-                
-                # Get music volume from audio_profile if available (convert dB to linear)
-                music_vol = self.config.music_volume  # Default linear volume
-                audio_profile = self.config.audio_profile
-                if audio_profile and 'music_volume' in audio_profile:
-                    # Convert dB to linear: linear = 10^(db/20)
-                    music_vol_db = audio_profile['music_volume']
-                    music_vol = 10 ** (music_vol_db / 20)
-                    logger.info(f"🎵 Using music volume from audio_profile: {music_vol_db}dB = {music_vol:.3f}x")
                 
                 reel_output = self.output_dir / "final_reel.mp4"
                 
@@ -717,7 +722,7 @@ class CartoonShortsGenerator:
                         out_height=self.config.reel_height,
                         out_fps=self.config.reel_fps,
                         voice_volume=self.config.voice_volume,
-                        music_volume=music_vol,  # Use calculated music volume from audio_profile
+                        music_volume=self.config.music_volume,
                         verbose=self.config.verbose_ffmpeg,
                         add_hooks=self.config.add_hooks,
                         top_hook_text=top_hook,
@@ -856,7 +861,9 @@ class CartoonShortsGenerator:
                     scene_audio_paths,  # Pass audio paths directly - compile_final_video will handle concatenation
                     background_music,
                     str(subtitles_path) if self.config.add_subtitles else None,
-                    str(final_output)
+                    str(final_output),
+                    sfx_paths=None,  # Fallback mode doesn't support SFX
+                    sfx_volumes=None
                 )
                 
                 # Step 10: Generate metadata

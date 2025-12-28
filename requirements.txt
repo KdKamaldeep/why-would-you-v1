@@ -23,12 +23,6 @@ TTS==0.22.0
 torchcodec>=0.8.0  # Required for XTTS models (media loading/decoding)
 librosa>=0.10.0
 soundfile>=0.12.0
-# Audio generation (MusicGen and AudioGen) - Optional
-# audiocraft requires PyAV which needs pkg-config to build from source
-# Linux: Install system deps first: sudo apt-get install pkg-config libavcodec-dev libavformat-dev libavutil-dev libswscale-dev
-# Then: pip install audiocraft>=1.2.0
-# Windows: See INSTALL_AUDIOCRAFT.md for installation instructions
-audiocraft>=1.2.0  # Uncomment this line after installing system dependencies on Linux, or follow INSTALL_AUDIOCRAFT.md
 # Additional audio processing for better language support
 numpy>=1.24.0
 scipy>=1.10.0

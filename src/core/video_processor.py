@@ -6,7 +6,7 @@ Video Processor Module - Handles video processing and compilation using FFmpeg
 import os
 import logging
 import subprocess
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
@@ -244,40 +244,6 @@ class VideoProcessor:
             logger.error(f"Error fitting audio to duration: {e}")
             return input_audio
 
-    def mix_audio_files(self, audio1_path: str, audio2_path: str, output_path: str, volume1: float = 1.0, volume2: float = 1.0) -> str:
-        """
-        Mix two audio files together with specified volumes.
-        
-        Args:
-            audio1_path: Path to first audio file
-            audio2_path: Path to second audio file  
-            output_path: Path to output mixed audio file
-            volume1: Volume multiplier for first audio (default: 1.0)
-            volume2: Volume multiplier for second audio (default: 1.0)
-            
-        Returns:
-            Path to output mixed audio file
-        """
-        try:
-            cmd = [
-                'ffmpeg', '-y',
-                '-i', audio1_path,
-                '-i', audio2_path,
-                '-filter_complex', f'[0:a]volume={volume1}[a1];[1:a]volume={volume2}[a2];[a1][a2]amix=inputs=2:duration=longest[a]',
-                '-map', '[a]',
-                '-c:a', 'aac',
-                '-b:a', self.config.audio_bitrate,
-                '-ar', '48000',
-                output_path
-            ]
-            subprocess.run(cmd, check=True, capture_output=True)
-            logger.info(f"Mixed audio files: {audio1_path} + {audio2_path} -> {output_path}")
-            return output_path
-        except Exception as e:
-            logger.error(f"Error mixing audio files: {e}")
-            # Return first audio as fallback
-            return audio1_path
-    
     def concat_audios(self, audio_files: List[str], output_audio: str) -> str:
         """Concatenate multiple audio files into one AAC file."""
         try:
@@ -427,7 +393,7 @@ class VideoProcessor:
             logger.error(f"Error creating silent audio: {e}")
             return ""
 
-    def compile_final_video(self, clips: List[str], narration_audio: Union[str, List[str]], background_music: str = None, subtitles_path: str = None, output_path: str = "output/final_short.mp4") -> str:
+    def compile_final_video(self, clips: List[str], narration_audio: Union[str, List[str]], background_music: str = None, subtitles_path: str = None, output_path: str = "output/final_short.mp4", sfx_paths: Optional[List[str]] = None, sfx_volumes: Optional[List[float]] = None) -> str:
         """Compile final video with all components."""
         try:
             # Create concat file for video clips
@@ -475,6 +441,22 @@ class VideoProcessor:
             if isinstance(narration_audio, list):
                 merged_narration = 'merged_narration.aac'
                 narration_audio = self.concat_audios(narration_audio, merged_narration)
+            
+            # Handle SFX: concatenate SFX files if provided
+            sfx_audio = None
+            sfx_volume_db = -30  # Default SFX volume in dB
+            if sfx_paths:
+                # Filter out None values and concatenate valid SFX files
+                valid_sfx = [sfx for sfx in sfx_paths if sfx and os.path.exists(sfx)]
+                if valid_sfx:
+                    merged_sfx = 'merged_sfx.wav'
+                    sfx_audio = self.concat_audios(valid_sfx, merged_sfx)
+                    # Use average volume from non-None volumes, or default
+                    if sfx_volumes:
+                        valid_volumes = [v for v in sfx_volumes if v is not None and isinstance(v, (int, float))]
+                        if valid_volumes:
+                            sfx_volume_db = sum(valid_volumes) / len(valid_volumes)
+                    logger.info(f"🔊 Concatenated {len(valid_sfx)} SFX files into: {sfx_audio} (volume: {sfx_volume_db}dB)")
             
             # Probe narration audio duration
             narration_duration = None
@@ -546,18 +528,51 @@ class VideoProcessor:
 
             # Prepare audio inputs
             audio_inputs = ['-i', narration_audio]
+            input_index = 2  # Start from 2 (0=video, 1=narration)
+            have_sfx = bool(sfx_audio and os.path.exists(sfx_audio))
             have_music = bool(background_music and os.path.exists(background_music))
+            
+            if have_sfx:
+                audio_inputs.extend(['-i', sfx_audio])
+                sfx_input_idx = input_index
+                input_index += 1
             if have_music:
                 audio_inputs.extend(['-i', background_music])
+                music_input_idx = input_index
+                input_index += 1
             
             # Build FFmpeg command
             cmd = ['ffmpeg', '-y', '-i', temp_video] + audio_inputs
             
             # Add audio mixing filter
-            if have_music:
-                # Mix narration and bgm to the longest, then pad to ensure audio covers full video duration
+            # Convert SFX volume from dB to linear scale for volume filter
+            import math
+            sfx_volume_linear = 10 ** (sfx_volume_db / 20.0) if sfx_volume_db else 1.0  # dB to linear
+            
+            if have_sfx or have_music:
+                # Build complex filter for mixing multiple audio tracks
+                filter_parts = []
+                filter_parts.append(f'[1:a]volume=0.85[a_narration]')  # Narration at 85%
+                
+                if have_sfx:
+                    filter_parts.append(f'[{sfx_input_idx}:a]volume={sfx_volume_linear:.3f}[a_sfx]')
+                
+                if have_music:
+                    filter_parts.append(f'[{music_input_idx}:a]volume=0.15[a_music]')
+                
+                # Mix all audio tracks
+                mix_inputs = '[a_narration]'
+                mix_count = 1
+                if have_sfx:
+                    mix_inputs += '[a_sfx]'
+                    mix_count += 1
+                if have_music:
+                    mix_inputs += '[a_music]'
+                    mix_count += 1
+                
+                filter_complex = ';'.join(filter_parts) + f';{mix_inputs}amix=inputs={mix_count}:duration=longest:dropout_transition=0,apad[aout]'
                 cmd.extend([
-                    '-filter_complex', '[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad[aout]',
+                    '-filter_complex', filter_complex,
                     '-map', '0:v',
                     '-map', '[aout]'
                 ])

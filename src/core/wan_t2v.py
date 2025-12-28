@@ -15,94 +15,6 @@ import tempfile
 import cv2
 import numpy as np
 
-# Workaround for diffusers compatibility: add dummy xpu attribute if it doesn't exist
-# This prevents AttributeError when diffusers tries to access torch.xpu on systems without Intel XPU
-# (e.g., NVIDIA GPUs like L40S don't need XPU support)
-if not hasattr(torch, 'xpu'):
-    class DummyXPU:
-        @staticmethod
-        def empty_cache():
-            pass
-        
-        @staticmethod
-        def is_available():
-            return False
-        
-        @staticmethod
-        def device_count():
-            return 0
-        
-        @staticmethod
-        def get_device_name(device=None):
-            return "XPU not available"
-        
-        @staticmethod
-        def current_device():
-            return None
-        
-        @staticmethod
-        def manual_seed(seed):
-            pass  # No-op for XPU
-        
-        @staticmethod
-        def manual_seed_all(seed):
-            pass  # No-op for XPU
-        
-        @staticmethod
-        def synchronize(device=None):
-            pass  # No-op for XPU
-        
-        @staticmethod
-        def set_device(device):
-            pass  # No-op for XPU
-        
-        @staticmethod
-        def get_device(device=None):
-            return None
-        
-        @staticmethod
-        def is_initialized():
-            return False
-    
-    torch.xpu = DummyXPU()
-
-# Workaround for diffusers compatibility: add dummy device_mesh module to torch.distributed
-# This prevents AttributeError when diffusers tries to access torch.distributed.device_mesh
-# which is not available in older PyTorch versions
-if hasattr(torch, 'distributed') and not hasattr(torch.distributed, 'device_mesh'):
-    class DummyDeviceMesh:
-        def __init__(self, *args, **kwargs):
-            pass
-    
-    # Create a dummy module-like object with DeviceMesh class
-    class DummyDeviceMeshModule:
-        DeviceMesh = DummyDeviceMesh
-    
-    torch.distributed.device_mesh = DummyDeviceMeshModule
-
-# Workaround for diffusers compatibility: add dummy RMSNorm to torch.nn
-# This prevents AttributeError when diffusers tries to access torch.nn.RMSNorm
-# which is not available in older PyTorch versions (< 2.4.0)
-if hasattr(torch, 'nn') and not hasattr(torch.nn, 'RMSNorm'):
-    # Create a dummy RMSNorm class that matches the expected interface
-    # This is a simplified RMSNorm implementation using LayerNorm as fallback
-    class DummyRMSNorm(torch.nn.Module):
-        def __init__(self, normalized_shape, eps=1e-6, *args, **kwargs):
-            super().__init__()
-            self.normalized_shape = normalized_shape
-            self.eps = eps
-            # Use LayerNorm as a reasonable fallback - it will create real tensors
-            # normalized_shape can be int or tuple/list
-            if isinstance(normalized_shape, (list, tuple)):
-                self.norm = torch.nn.LayerNorm(normalized_shape, eps=eps, **kwargs)
-            else:
-                self.norm = torch.nn.LayerNorm(normalized_shape, eps=eps, **kwargs)
-        
-        def forward(self, x):
-            return self.norm(x)
-    
-    torch.nn.RMSNorm = DummyRMSNorm
-
 logger = logging.getLogger(__name__)
 
 # Global singleton instance
@@ -182,22 +94,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             torch.cuda.empty_cache()
             gc.collect()
         
-        # Load pipeline first (without VAE to avoid meta tensor issues with pre-loaded VAE)
-        # enable_model_cpu_offload() will handle device placement and memory management
-        logger.info("📦 Loading WAN pipeline...")
-        _wan_pipeline = WanPipeline.from_pretrained(
-            model_id,
-            torch_dtype=torch_dtype,
-            cache_dir=cache_dir
-        )
-        
-        # Enable automatic CPU <-> GPU offloading BEFORE loading VAE
-        # This handles device placement automatically and avoids meta tensor issues
-        # It will move components to GPU when needed and back to CPU when done
-        _wan_pipeline.enable_model_cpu_offload()
-        
-        # Load VAE separately and assign it after offload is enabled
-        # This avoids meta tensor issues that occur when passing VAE to from_pretrained
+        # Load VAE
         logger.info("📦 Loading WAN VAE...")
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
@@ -205,8 +102,18 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             torch_dtype=vae_dtype,
             cache_dir=cache_dir
         )
-        # Assign VAE to pipeline (offload will handle its device placement)
-        _wan_pipeline.vae = _wan_vae
+        
+        # Load pipeline
+        logger.info("📦 Loading WAN pipeline...")
+        _wan_pipeline = WanPipeline.from_pretrained(
+            model_id,
+            vae=_wan_vae,
+            torch_dtype=torch_dtype,
+            cache_dir=cache_dir
+        )
+        
+        # Move to device
+        _wan_pipeline = _wan_pipeline.to(device)
         
         # Enable memory optimizations if available
         if device == 'cuda':

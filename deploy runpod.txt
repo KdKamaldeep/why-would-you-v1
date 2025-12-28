@@ -1,18 +1,7 @@
 ssh-keygen -t rsa -b 4096 -C "kdkamaldeep2@gmail.com" && cat ~/.ssh/id_rsa.pub
 
 apt update
-apt install -y \
-  libavdevice-dev \
-  libavformat-dev \
-  libavcodec-dev \
-  libavutil-dev \
-  libswscale-dev \
-  libswresample-dev \
-  pkg-config \
-  ffmpeg
-
-# Install AudioCraft
-#pip install audiocraft>=1.2.0
+apt install ffmpeg -y
 
 python -m src.interfaces.simple_cartoon_generator --prompt "Girl sitting in bar talking about drinks"
 python -m src.interfaces.simple_cartoon_generator --help

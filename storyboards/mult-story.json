@@ -1,6 +1,5 @@
 {
-  "stories":
-  [{
+  "stories":[{
   "title": "Hidden Electrical Dangers Inside Your Walls",
   "description": "A calm explainer video describing electrical hazards that develop behind walls and how to recognize early warning signs.",
   "aspect_ratio": "16:9",
@@ -43,6 +42,180 @@
           "text": "They’re hidden inside the walls",
           "start_ms": 4200,
           "end_ms": 5800
+        }
+      ]
+    },
+
+    {
+      "id": "scene_02_hidden_systems",
+      "duration": 12,
+      "time_range": { "start": 6, "end": 18 },
+      "visual_prompt": "Cutaway view of an interior wall revealing electrical wiring behind drywall, clean technical visualization",
+      "narration": "Electrical systems are designed to stay out of sight. But over time, wiring can degrade without showing obvious warning signs.",
+      "sfx": {
+        "prompt": "low electrical humming, ambient electrical noise, subtle background sound",
+        "volume": -30
+      },
+      "voice_segments": [
+        {
+          "text": "Electrical systems are designed to stay hidden",
+          "start_ms": 200,
+          "end_ms": 3000
+        },
+        {
+          "text": "Over time, wiring can slowly degrade",
+          "start_ms": 3300,
+          "end_ms": 6000
+        },
+        {
+          "text": "Often without obvious warning signs",
+          "start_ms": 6300,
+          "end_ms": 9000
+        }
+      ]
+    },
+
+    {
+      "id": "scene_03_aging_wiring",
+      "duration": 14,
+      "time_range": { "start": 18, "end": 32 },
+      "visual_prompt": "Close-up of old electrical wiring with cracked insulation, realistic detail",
+      "narration": "In older homes, wire insulation can dry out, crack, or become brittle. When this happens, heat can build up silently.",
+      "sfx": {
+        "prompt": "subtle creaking sound, quiet, ambient",
+        "volume": -30
+      },
+      "voice_segments": [
+        {
+          "text": "Older wiring insulation can break down",
+          "start_ms": 200,
+          "end_ms": 3000
+        },
+        {
+          "text": "Cracks and brittleness develop silently",
+          "start_ms": 3300,
+          "end_ms": 6000
+        },
+        {
+          "text": "Heat can build up unnoticed",
+          "start_ms": 6300,
+          "end_ms": 9000
+        }
+      ]
+    },
+
+    {
+      "id": "scene_04_overloaded_circuits",
+      "duration": 16,
+      "time_range": { "start": 32, "end": 48 },
+      "visual_prompt": "Electrical junction box overloaded with multiple cables, neutral lighting",
+      "narration": "Modern homes use more electricity than they once did. When too many devices draw power from a single circuit, wires can overheat before breakers respond.",
+      "sfx": {
+        "prompt": "low frequency humming, electrical hum, background noise",
+        "volume": -29
+      },
+      "voice_segments": [
+        {
+          "text": "Modern homes use far more electricity",
+          "start_ms": 200,
+          "end_ms": 3000
+        },
+        {
+          "text": "Too many devices can overload circuits",
+          "start_ms": 3300,
+          "end_ms": 6500
+        },
+        {
+          "text": "Wires may overheat before breakers respond",
+          "start_ms": 6800,
+          "end_ms": 11000
+        }
+      ]
+    },
+
+    {
+      "id": "scene_05_poor_repairs",
+      "duration": 14,
+      "time_range": { "start": 48, "end": 62 },
+      "visual_prompt": "Unsafe DIY electrical wiring repair with loose taped connections",
+      "narration": "Improper or unsafe DIY electrical repairs are another common hidden risk. Loose connections create resistance, which produces heat behind walls.",
+      "sfx": {
+        "prompt": "light tactile noise, subtle texture sound, quiet",
+        "volume": -31
+      },
+      "voice_segments": [
+        {
+          "text": "Unsafe DIY electrical repairs are common",
+          "start_ms": 200,
+          "end_ms": 3200
+        },
+        {
+          "text": "Loose connections create resistance",
+          "start_ms": 3500,
+          "end_ms": 6200
+        },
+        {
+          "text": "Resistance produces hidden heat",
+          "start_ms": 6500,
+          "end_ms": 9000
+        }
+      ]
+    },
+
+    {
+      "id": "scene_06_warning_signs",
+      "duration": 16,
+      "time_range": { "start": 62, "end": 78 },
+      "visual_prompt": "Flickering lights, dimming lamp, warm wall surface",
+      "narration": "Early warning signs can include flickering lights, warm wall surfaces, or unusual buzzing sounds.",
+      "sfx": {
+        "prompt": "very soft buzzing sound, quiet electrical buzz, subtle",
+        "volume": -32
+      },
+      "voice_segments": [
+        {
+          "text": "Some warning signs are easy to miss",
+          "start_ms": 200,
+          "end_ms": 3000
+        },
+        {
+          "text": "Flickering lights or warm wall surfaces",
+          "start_ms": 3300,
+          "end_ms": 6500
+        },
+        {
+          "text": "Buzzing sounds should not be ignored",
+          "start_ms": 6800,
+          "end_ms": 10000
+        }
+      ]
+    },
+
+    {
+      "id": "scene_07_closing",
+      "duration": 12,
+      "time_range": { "start": 78, "end": 90 },
+      "visual_prompt": "Professional electrician inspecting residential wiring calmly",
+      "narration": "Most hidden electrical dangers can be identified early with proper inspection. Addressing problems early helps keep homes safe and reliable.",
+      "sfx": {
+        "prompt": "calm resolution tone, peaceful ambient sound, soft ending",
+        "volume": -30
+      },
+      "voice_segments": [
+        {
+          "text": "Most hidden electrical dangers are preventable",
+          "start_ms": 200,
+          "end_ms": 3200
+        },
+        {
+          "text": "Early inspection makes a difference",
+          "start_ms": 3500,
+          "end_ms": 6000
+        },
+        {
+          "text": "It helps keep homes safe and reliable",
+          "start_ms": 6300,
+          "end_ms": 9500
         }
       ]
     }
