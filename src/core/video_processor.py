@@ -244,6 +244,40 @@ class VideoProcessor:
             logger.error(f"Error fitting audio to duration: {e}")
             return input_audio
 
+    def mix_audio_files(self, audio1_path: str, audio2_path: str, output_path: str, volume1: float = 1.0, volume2: float = 1.0) -> str:
+        """
+        Mix two audio files together with specified volumes.
+        
+        Args:
+            audio1_path: Path to first audio file
+            audio2_path: Path to second audio file  
+            output_path: Path to output mixed audio file
+            volume1: Volume multiplier for first audio (default: 1.0)
+            volume2: Volume multiplier for second audio (default: 1.0)
+            
+        Returns:
+            Path to output mixed audio file
+        """
+        try:
+            cmd = [
+                'ffmpeg', '-y',
+                '-i', audio1_path,
+                '-i', audio2_path,
+                '-filter_complex', f'[0:a]volume={volume1}[a1];[1:a]volume={volume2}[a2];[a1][a2]amix=inputs=2:duration=longest[a]',
+                '-map', '[a]',
+                '-c:a', 'aac',
+                '-b:a', self.config.audio_bitrate,
+                '-ar', '48000',
+                output_path
+            ]
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"Mixed audio files: {audio1_path} + {audio2_path} -> {output_path}")
+            return output_path
+        except Exception as e:
+            logger.error(f"Error mixing audio files: {e}")
+            # Return first audio as fallback
+            return audio1_path
+    
     def concat_audios(self, audio_files: List[str], output_audio: str) -> str:
         """Concatenate multiple audio files into one AAC file."""
         try:

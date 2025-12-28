@@ -648,6 +648,7 @@ Storyboard Cast Format (with face images):
             scene_duration = data.get('scene_duration', 8)
             top_hook_text = data.get('top_hook_text')
             bottom_hook_text = data.get('bottom_hook_text')
+            audio_profile = data.get('audio_profile')  # Extract audio_profile from storyboard
             
             # Filter scenes based on --scene argument
             if args.scene:
@@ -724,7 +725,8 @@ Storyboard Cast Format (with face images):
                 music_path=args.music,
                 music_volume=args.music_volume,
                 voice_volume=args.voice_volume,
-                verbose_ffmpeg=args.verbose_ffmpeg
+                verbose_ffmpeg=args.verbose_ffmpeg,
+                audio_profile=audio_profile  # Pass audio_profile from storyboard
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
