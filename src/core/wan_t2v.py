@@ -39,6 +39,30 @@ if not hasattr(torch, 'xpu'):
         @staticmethod
         def current_device():
             return None
+        
+        @staticmethod
+        def manual_seed(seed):
+            pass  # No-op for XPU
+        
+        @staticmethod
+        def manual_seed_all(seed):
+            pass  # No-op for XPU
+        
+        @staticmethod
+        def synchronize(device=None):
+            pass  # No-op for XPU
+        
+        @staticmethod
+        def set_device(device):
+            pass  # No-op for XPU
+        
+        @staticmethod
+        def get_device(device=None):
+            return None
+        
+        @staticmethod
+        def is_initialized():
+            return False
     
     torch.xpu = DummyXPU()
 
