@@ -185,10 +185,14 @@ def mix_audio(
         logger.info("📐 Converting video to vertical format first...")
         # If we need hook texts on black areas, we'll add them in mix_audio filter_complex
         # Otherwise just do the normal vertical conversion
-        make_vertical(str(video_path), temp_vertical, mode, out_w, out_h, fps, verbose)
-        video_path = Path(temp_vertical)
+        # Ensure video_path is absolute
+        video_path_abs = str(Path(video_path).resolve())
+        make_vertical(video_path_abs, temp_vertical, mode, out_w, out_h, fps, verbose)
+        video_path = Path(temp_vertical).resolve()  # Use absolute path
     else:
         temp_vertical = None
+        # Ensure video_path is absolute
+        video_path = Path(video_path).resolve() if isinstance(video_path, (str, Path)) else video_path
     
     logger.info(f"🎵 Mixing audio: voice={voice_wav is not None}, music={music_path is not None}")
     logger.info(f"🔊 Volume levels: voice={voice_vol}, music={music_vol}")
@@ -234,9 +238,14 @@ def mix_audio(
         
         # Create a concat file with the video repeated
         loop_concat_file = str(output_path.parent / "_loop_concat.txt")
+        # Ensure video_path is absolute to avoid path resolution issues
+        video_path_abs = Path(video_path).resolve()
+        video_path_str = str(video_path_abs).replace('\\', '/')  # Use forward slashes for FFmpeg
+        
         with open(loop_concat_file, 'w') as f:
             for _ in range(loops_needed):
-                f.write(f"file '{video_path}'\n")
+                # Use absolute path to ensure FFmpeg can find the file
+                f.write(f"file '{video_path_str}'\n")
         
         # Create looped video
         looped_video = str(output_path.parent / "_temp_looped.mp4")

@@ -285,44 +285,75 @@ class CartoonShortsGenerator:
                 for i, scene in enumerate(script['scenes']):
                     scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
                     
-                    # Check if voice_segments exist - if so, use them for more precise narration
+                    # Check if voice_segments exist - if so, use them for more precise narration with timing
                     voice_segments = scene.get('voice_segments', [])
+                    use_voice_segments = False
+                    narration_segments_with_timing = []
+                    
                     if voice_segments and isinstance(voice_segments, list) and len(voice_segments) > 0:
-                        # Use voice_segments text and timing info
-                        narration_texts = []
-                        for seg in voice_segments:
+                        use_voice_segments = True
+                        # Build narration with timing information using SSML breaks
+                        from ..utils.narration_converter import NarrationConverter
+                        converter = NarrationConverter()
+                        
+                        narration_parts = []
+                        for idx, seg in enumerate(voice_segments):
                             if isinstance(seg, dict) and 'text' in seg:
                                 text = seg['text']
-                                # Add pauses based on timing between segments
                                 start_ms = seg.get('start_ms', 0)
                                 end_ms = seg.get('end_ms', 0)
                                 duration_ms = end_ms - start_ms if end_ms > start_ms else 0
                                 
-                                narration_texts.append(text)
+                                # Calculate pause before this segment (gap from previous segment)
+                                pause_before_ms = 0
+                                if idx > 0:
+                                    prev_seg = voice_segments[idx - 1]
+                                    prev_end_ms = prev_seg.get('end_ms', 0) if isinstance(prev_seg, dict) else 0
+                                    pause_before_ms = max(0, start_ms - prev_end_ms)
                                 
-                                # Calculate pause between this segment and next
-                                # We'll add pauses as SSML breaks later or use natural pauses
+                                # Store segment info with timing
+                                narration_segments_with_timing.append({
+                                    'text': text,
+                                    'start_ms': start_ms,
+                                    'end_ms': end_ms,
+                                    'duration_ms': duration_ms,
+                                    'pause_before_ms': pause_before_ms
+                                })
+                                
+                                # Build SSML with timing breaks
+                                if pause_before_ms > 50:  # Only add pause if > 50ms
+                                    # Convert pause to SSML break
+                                    pause_sec = pause_before_ms / 1000.0
+                                    pause_ms_str = f"{int(pause_sec * 1000)}ms"
+                                    narration_parts.append(f'<break time="{pause_ms_str}"/>')
+                                
+                                # Add the segment text
+                                narration_parts.append(text)
                         
-                        if narration_texts:
-                            # Join segments with natural pauses
-                            # For now, use simple period spacing - timing will be handled by TTS natural pacing
-                            narration_text = '. '.join(narration_texts)
-                            if narration_text and not narration_text.endswith('.'):
-                                narration_text += '.'
+                        if narration_parts:
+                            # Join with SSML breaks for precise timing
+                            narration_text = ' '.join(narration_parts)
+                            
+                            # Wrap in SSML speak tags if we have breaks
+                            if '<break' in narration_text:
+                                narration_text = f'<speak>{narration_text}</speak>'
                             
                             # Log timing info
-                            total_segments = len(voice_segments)
+                            total_segments = len(narration_segments_with_timing)
                             if total_segments > 0:
-                                first_start = voice_segments[0].get('start_ms', 0) / 1000.0
-                                last_end = voice_segments[-1].get('end_ms', 0) / 1000.0
-                                logger.info(f"🎵 Scene {i+1}: Using voice_segments ({total_segments} segments, {len(narration_text)} chars, timing: {first_start:.2f}s-{last_end:.2f}s)")
-                            else:
-                                logger.info(f"🎵 Scene {i+1}: Using voice_segments ({total_segments} segments, {len(narration_text)} chars)")
+                                first_start = narration_segments_with_timing[0]['start_ms'] / 1000.0
+                                last_end = narration_segments_with_timing[-1]['end_ms'] / 1000.0
+                                total_duration_ms = last_end - first_start
+                                logger.info(f"🎵 Scene {i+1}: Using voice_segments with timing ({total_segments} segments)")
+                                logger.info(f"   Timing: {first_start:.2f}s-{last_end:.2f}s (total: {total_duration_ms:.2f}s)")
+                                logger.info(f"   Segments: {[(s['start_ms']/1000.0, s['end_ms']/1000.0) for s in narration_segments_with_timing[:3]]}...")
                         else:
-                            # Fallback to full narration if voice_segments are invalid
+                            # Fallback if no valid segments
+                            use_voice_segments = False
                             narration_text = scene.get('narration', '')
-                            logger.info(f"🎵 Scene {i+1}: voice_segments found but invalid, using narration ({len(narration_text)} chars)")
-                    else:
+                            logger.warning(f"🎵 Scene {i+1}: voice_segments found but invalid, using narration ({len(narration_text)} chars)")
+                    
+                    if not use_voice_segments:
                         # No voice_segments - use full narration text
                         narration_text = scene.get('narration', '')
                         logger.info(f"🎵 Scene {i+1}: Processing narration ({len(narration_text)} characters)")
@@ -346,6 +377,12 @@ class CartoonShortsGenerator:
                         logger.info(f"🎵 Scene {i+1}: Generating new audio clip...")
                         final_voice_file = voice_file or self.config.voice_id or None
                         logger.info(f"🎵 Scene {i+1}: Final voice_clone_audio parameter: {final_voice_file}")
+                        
+                        # Check if narration text contains SSML (from voice_segments timing)
+                        use_ssml_timing = use_voice_segments and narration_segments_with_timing
+                        if use_ssml_timing:
+                            logger.info(f"🎵 Scene {i+1}: Using SSML timing breaks from voice_segments")
+                        
                         generated_audio = self.voice_synthesizer.synthesize_voice(
                             [narration_text],
                             str(scene_audio),
@@ -355,6 +392,13 @@ class CartoonShortsGenerator:
                         # Use actual generated path (may switch extension on fallback)
                         scene_audio = Path(generated_audio)
                         logger.info(f"🎵 Scene {i+1}: Audio generation completed: {scene_audio}")
+                        
+                        # If we used voice_segments with timing, log the expected vs actual timing
+                        if use_ssml_timing and narration_segments_with_timing:
+                            actual_duration = self.video_processor.get_audio_duration(str(scene_audio))
+                            expected_duration = (narration_segments_with_timing[-1]['end_ms'] - narration_segments_with_timing[0]['start_ms']) / 1000.0
+                            timing_diff = abs(actual_duration - expected_duration)
+                            logger.info(f"🎵 Scene {i+1}: Timing check - Expected: {expected_duration:.2f}s, Actual: {actual_duration:.2f}s, Diff: {timing_diff:.2f}s")
                     else:
                         logger.info(f"🎵 Scene {i+1}: Reusing existing audio: {scene_audio}")
                     
