@@ -323,7 +323,12 @@ class CartoonShortsGenerator:
                     scene_audio_paths.append(str(scene_audio))
                     logger.info(f"Scene {i+1}: Audio clip ready: {scene_audio}")
                     
-                    # Generate SFX if enabled and present in scene
+                    # Get actual narration duration for this scene
+                    narration_duration = self.video_processor.get_audio_duration(str(scene_audio))
+                    actual_scene_durations.append(narration_duration)
+                    logger.info(f"📏 Scene {i+1}: Narration duration: {narration_duration:.2f}s")
+                    
+                    # Generate SFX if enabled and present in scene (using actual narration duration)
                     scene_sfx_path = None
                     audio_profile = self.config.audio_profile
                     if audio_profile and audio_profile.get('sfx_enabled') and scene.get('sfx'):
@@ -331,11 +336,10 @@ class CartoonShortsGenerator:
                             from .sfx_generator import SFXGenerator
                             
                             sfx_config = scene['sfx']
-                            sfx_type = sfx_config.get('type')
-                            scene_duration = scene.get('duration', self.config.scene_duration)
+                            sfx_prompt = sfx_config.get('prompt')  # Use prompt instead of type
                             
-                            if sfx_type:
-                                logger.info(f"🔊 Scene {i+1}: Generating SFX '{sfx_type}' ({scene_duration}s)...")
+                            if sfx_prompt:
+                                logger.info(f"🔊 Scene {i+1}: Generating SFX with prompt '{sfx_prompt}' (duration: {narration_duration:.2f}s from narration)...")
                                 
                                 sfx_gen = SFXGenerator(model_size="medium")
                                 sfx_output = self.output_dir / f"sfx_scene_{i+1}.wav"
@@ -346,8 +350,8 @@ class CartoonShortsGenerator:
                                     scene_sfx_path = str(sfx_output)
                                 else:
                                     generated_sfx = sfx_gen.generate_sfx(
-                                        prompt=sfx_type,
-                                        duration=scene_duration,
+                                        prompt=sfx_prompt,  # Use prompt directly
+                                        duration=narration_duration,  # Use actual narration duration
                                         output_path=str(sfx_output),
                                         use_cache=False
                                     )
@@ -385,17 +389,9 @@ class CartoonShortsGenerator:
                         except Exception as e:
                             logger.warning(f"⚠️ Scene {i+1}: Failed to mix SFX with voice: {e}. Using voice only.")
             
-            # Detect length of each audio clip
+            # Calculate total audio duration (durations already detected during generation)
             if not self.config.skip_audio:
-                logger.info("📏 Detecting length of each audio clip...")
-                total_audio_duration = 0
-                for i, scene_audio in enumerate(scene_audio_paths):
-                    logger.info(f"📏 Scene {i+1}: Analyzing audio duration...")
-                    actual_duration = self.video_processor.get_audio_duration(scene_audio)
-                    actual_scene_durations.append(actual_duration)
-                    total_audio_duration += actual_duration
-                    logger.info(f"Scene {i+1}: Audio clip length: {actual_duration:.1f}s")
-                
+                total_audio_duration = sum(actual_scene_durations)
                 logger.info(f"✅ Generated {len(scene_audio_paths)} audio clips for narration")
                 logger.info(f"📊 Total audio duration: {total_audio_duration:.1f}s")
                 logger.info(f"📊 Average audio duration per scene: {total_audio_duration/len(actual_scene_durations):.1f}s")

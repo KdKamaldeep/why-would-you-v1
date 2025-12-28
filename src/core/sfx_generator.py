@@ -133,36 +133,6 @@ class SFXGenerator:
             self.model = get_audiogen_instance(model_size=self.model_size, device=self.device)
         return self.model
     
-    def _enhance_sfx_prompt(self, prompt: str) -> str:
-        """
-        Enhance SFX prompt for better generation quality.
-        
-        Args:
-            prompt: Simple SFX type (e.g., "room_tone")
-            
-        Returns:
-            Enhanced prompt
-        """
-        # Map common SFX types to better prompts
-        prompt_map = {
-            "room_tone": "room tone, ambient background, quiet indoor environment, subtle",
-            "low_electrical_ambience": "low electrical humming, ambient electrical noise, subtle background sound",
-            "subtle_creak": "subtle creaking sound, quiet, ambient",
-            "low_frequency_hum": "low frequency humming, electrical hum, background noise",
-            "light_tactile_noise": "light tactile noise, subtle texture sound, quiet",
-            "very_soft_buzz": "very soft buzzing sound, quiet electrical buzz, subtle",
-            "calm_resolution_tone": "calm resolution tone, peaceful ambient sound, soft ending"
-        }
-        
-        # Use mapped prompt if available, otherwise use original
-        enhanced = prompt_map.get(prompt.lower(), prompt)
-        
-        # If original prompt is already descriptive, use it
-        if len(prompt.split()) > 2:
-            enhanced = prompt
-        
-        return enhanced
-    
     def generate_sfx(
         self,
         prompt: str,
@@ -193,11 +163,9 @@ class SFXGenerator:
         try:
             model = self._get_model()
             
-            # Enhance prompt
-            enhanced_prompt = self._enhance_sfx_prompt(prompt)
-            
+            # Use prompt directly (no enhancement needed - user provides descriptive prompt)
             logger.info(f"🔊 Generating SFX...")
-            logger.info(f"   Prompt: {prompt} -> {enhanced_prompt}")
+            logger.info(f"   Prompt: {prompt}")
             logger.info(f"   Duration: {duration:.1f}s")
             
             # Set generation parameters
@@ -209,9 +177,9 @@ class SFXGenerator:
                 cfg_coef=3.0
             )
             
-            # Generate audio
+            # Generate audio using the prompt directly
             with torch.no_grad():
-                wav = model.generate([enhanced_prompt], progress=True)
+                wav = model.generate([prompt], progress=True)
             
             # Convert tensor to numpy and save
             import soundfile as sf
