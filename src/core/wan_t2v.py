@@ -85,11 +85,18 @@ if hasattr(torch, 'distributed') and not hasattr(torch.distributed, 'device_mesh
 # which is not available in older PyTorch versions (< 2.4.0)
 if hasattr(torch, 'nn') and not hasattr(torch.nn, 'RMSNorm'):
     # Create a dummy RMSNorm class that matches the expected interface
+    # This is a simplified RMSNorm implementation using LayerNorm as fallback
     class DummyRMSNorm(torch.nn.Module):
-        def __init__(self, *args, **kwargs):
+        def __init__(self, normalized_shape, eps=1e-6, *args, **kwargs):
             super().__init__()
-            # Create a simple layer norm as fallback
-            self.norm = torch.nn.LayerNorm(kwargs.get('normalized_shape', args[0] if args else 1))
+            self.normalized_shape = normalized_shape
+            self.eps = eps
+            # Use LayerNorm as a reasonable fallback - it will create real tensors
+            # normalized_shape can be int or tuple/list
+            if isinstance(normalized_shape, (list, tuple)):
+                self.norm = torch.nn.LayerNorm(normalized_shape, eps=eps, **kwargs)
+            else:
+                self.norm = torch.nn.LayerNorm(normalized_shape, eps=eps, **kwargs)
         
         def forward(self, x):
             return self.norm(x)
@@ -175,26 +182,31 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             torch.cuda.empty_cache()
             gc.collect()
         
-        # Load VAE
+        # Load VAE with automatic device mapping
         logger.info("📦 Loading WAN VAE...")
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
             subfolder="vae",
             torch_dtype=vae_dtype,
-            cache_dir=cache_dir
+            cache_dir=cache_dir,
+            low_cpu_mem_usage=True,
+            device_map="auto"
         )
-        _wan_vae = _wan_vae.to(device)
         
-        # Load pipeline
+        # Load pipeline with automatic device mapping
         logger.info("📦 Loading WAN pipeline...")
         _wan_pipeline = WanPipeline.from_pretrained(
             model_id,
             vae=_wan_vae,
             torch_dtype=torch_dtype,
-            cache_dir=cache_dir
+            cache_dir=cache_dir,
+            low_cpu_mem_usage=True,
+            device_map="auto"
         )
-        # Move to device after loading (this ensures all weights are materialized)
-        _wan_pipeline = _wan_pipeline.to(device)
+        
+        # Enable automatic CPU <-> GPU offloading
+        # This handles device placement automatically and avoids meta tensor issues
+        _wan_pipeline.enable_model_cpu_offload()
         
         # Enable memory optimizations if available
         if device == 'cuda':
