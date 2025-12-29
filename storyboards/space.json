@@ -1,0 +1,43 @@
+{
+  "stories": [
+    {
+      "title": "The Signal from Sector 7",
+      "description": "Deep space explorers discover an ancient, pulsating beacon on a desolate moon that seems to respond to human thought.",
+      "scenes": [
+        {
+          "id": "hook_001",
+          "duration": 3,
+          "visual_prompt": "Extreme close-up of a human eye widening in terror, the pupil reflecting a pulsating alien monolith glowing with intense blue geometric light, cinematic motion blur, 8k, Wan 2.1",
+          "visual_reference": "psychological thriller, high-impact opening",
+          "negative_prompt": "blurry, low quality, static, cartoon",
+          "narration": "They said Sector 7 was dead space. They were wrong. Something just woke up."
+        },
+        {
+          "id": "scene_001",
+          "duration": 5,
+          "visual_prompt": "Cinematic wide shot, a sleek chrome spacecraft descending onto a jagged, obsidian-colored moon surface under a violet nebula sky, hyper-realistic, 8k, Wan 2.1",
+          "visual_reference": "sci-fi concept art, interstellar aesthetic",
+          "negative_prompt": "bright sunlight, vegetation, low resolution, blurry, water",
+          "narration": "In the silent vacuum of Sector 7, a rhythmic pulse began to echo through the hull of the Icarus."
+        },
+        {
+          "id": "scene_002",
+          "duration": 6,
+          "visual_prompt": "Close up of a glowing blue monolith half-buried in volcanic sand, intricate geometric patterns shifting on its surface, bioluminescent particles floating around it",
+          "visual_reference": "ancient alien technology, glowing runes",
+          "negative_prompt": "rust, stone texture, humans, daylight",
+          "narration": "It wasn't a distress call. It was a countdown, etched in light and older than the stars themselves."
+        },
+        {
+          "id": "scene_003",
+          "duration": 7,
+          "visual_prompt": "An astronaut in a high-tech suit reaching out to touch the monolith, the reflection of the glowing patterns dancing on their visor, dramatic lighting",
+          "visual_reference": "first contact cinematography",
+          "negative_prompt": "cracked glass, simple suit, cartoonish",
+          "narration": "As Commander Sarah reached out, the beacon didn't just glow—it whispered her name directly into her mind."
+        }
+      ],
+      "total_duration": 21
+    }
+  ]
+}
