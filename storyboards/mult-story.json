@@ -1,51 +1,67 @@
 {
   "stories": [
     {
-      "title": "How Silence Became a Weapon in World War II",
-      "description": "A real WWII tactic where doing nothing on the radio misled enemy intelligence.",
-      "total_duration": 32,
+      "title": "Hidden Electrical Dangers Inside Your Walls",
+      "description": "Common household electrical hazards that develop silently behind walls and often go unnoticed until serious damage occurs.",
+      "total_duration": 42,
       "aspect_ratio": "9:16",
       "scenes": [
         {
           "id": "scene_01_hook_how",
-          "duration": 5,
-          "hook_text": "This really happened in WWII",
-          "visual_prompt": "Wide cinematic establishing shot of a foggy European battlefield at dawn, abandoned radio equipment in the foreground, muted colors, slow cinematic camera drift",
-          "visual_reference": "ww2 battlefield radio fog",
-          "negative_prompt": "text, watermark, logo, modern objects, cartoon",
-          "narration": "How did complete radio silence confuse enemy armies during World War Two?"
+          "duration": 6,
+          "hook_text": "This danger is already inside your home",
+          "visual_prompt": "Quiet modern home interior at night, empty room, soft warm lighting, static tripod framing, very slow subtle push-in, calm but uneasy atmosphere",
+          "visual_reference": "Establishes that hidden electrical dangers exist inside normal homes without visible warning signs",
+          "negative_prompt": "hands, people, text, watermark, logo, cartoon, fast motion",
+          "narration": "Some of the most dangerous electrical problems are completely invisible."
         },
         {
-          "id": "scene_02_mystery",
-          "duration": 7,
-          "visual_prompt": "Quiet military command tent at night, radios powered on but untouched, indicator lights glowing faintly, canvas gently moving in the wind",
-          "visual_reference": "ww2 command tent radio night",
-          "negative_prompt": "text, watermark, logo, cartoon",
-          "narration": "German intelligence closely tracked Allied radio signals to predict every major move."
+          "id": "scene_02_hidden_location",
+          "duration": 6,
+          "visual_prompt": "Interior wall with light switch and power socket, minimal modern design, neutral lighting, locked-off camera, completely stable frame",
+          "visual_reference": "Shows common areas where people expect electrical danger, highlighting that the real risk is not visible here",
+          "negative_prompt": "hands, people, text, watermark, logo, cartoon",
+          "narration": "They don’t appear at switches or sockets where people expect them."
         },
         {
-          "id": "scene_03_escalation",
-          "duration": 8,
-          "visual_prompt": "Allied radio operators sitting still with hands away from controls, ticking clocks, shadows stretching across detailed military maps",
-          "visual_reference": "ww2 radio operators waiting",
-          "negative_prompt": "text, watermark, logo, gore, cartoon",
-          "narration": "Then, without warning, entire Allied units stopped transmitting altogether."
+          "id": "scene_03_inside_walls",
+          "duration": 6,
+          "visual_prompt": "Cutaway view of a wall revealing electrical wiring behind drywall, clean technical visualization, slow left-to-right camera slide, stable motion",
+          "visual_reference": "Reveals electrical wiring hidden inside walls where heat buildup and insulation failure can occur unseen",
+          "negative_prompt": "hands, people, text, watermark, logo, fantasy",
+          "narration": "Most electrical hazards stay hidden deep inside walls."
         },
         {
-          "id": "scene_04_explanation",
-          "duration": 7,
-          "visual_prompt": "Montage of enemy analysts listening to static-filled radios, confused expressions, maps showing misplaced troop expectations",
-          "visual_reference": "ww2 intelligence analysts radio",
-          "negative_prompt": "text, watermark, logo, fantasy elements",
-          "narration": "The silence itself became the signal, convincing the enemy that a massive attack was being hidden elsewhere."
+          "id": "scene_04_aging_and_overload",
+          "duration": 6,
+          "visual_prompt": "Old electrical wiring bundled inside wall cavity, cracked insulation and crowded cables, macro perspective, slow gentle push-in",
+          "visual_reference": "Illustrates the danger of aging wires and overloaded circuits that can slowly build heat and trigger electrical fires",
+          "negative_prompt": "hands, people, sparks, fire, text, watermark, logo",
+          "narration": "Aging wires and overloaded circuits can quietly build heat over time."
         },
         {
-          "id": "scene_05_lingering_end",
-          "duration": 5,
-          "visual_prompt": "Quiet wide shot of radios sitting unused as the sun rises over a calm battlefield, reflective mood, slow fade feeling",
-          "visual_reference": "ww2 battlefield calm sunrise",
-          "negative_prompt": "text, watermark, logo",
-          "narration": "In war, even silence can be carefully planned—and incredibly powerful."
+          "id": "scene_05_diy_risk",
+          "duration": 6,
+          "visual_prompt": "Unsafe DIY electrical repair with taped and loose wires, object-only close-up, static camera, no people visible",
+          "visual_reference": "Shows the risk of improper DIY electrical repairs that increase resistance and overheating behind walls",
+          "negative_prompt": "hands, people, text, watermark, logo",
+          "narration": "Improper DIY repairs often increase the danger instead of fixing it."
+        },
+        {
+          "id": "scene_06_warning_signs",
+          "duration": 6,
+          "visual_prompt": "Flickering ceiling light and subtle warm wall glow near an outlet, locked-off camera, no camera movement",
+          "visual_reference": "Demonstrates early warning signs of hidden electrical danger such as overheating wires causing flickering lights and warm walls",
+          "negative_prompt": "hands, people, text, watermark, logo",
+          "narration": "Flickering lights or warm walls are early warning signs."
+        },
+        {
+          "id": "scene_07_lingering_end",
+          "duration": 6,
+          "visual_prompt": "Residential electrical panel and wiring, clean and orderly, calm reassuring lighting, static inspection-style shot, quiet atmosphere",
+          "visual_reference": "Represents prevention of hidden electrical dangers through inspection and early detection before failure occurs",
+          "negative_prompt": "hands, people, text, watermark, logo",
+          "narration": "Most electrical dangers are preventable if they’re found early."
         }
       ]
     }
