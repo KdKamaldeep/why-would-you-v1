@@ -70,3 +70,8 @@ export TRANSFORMERS_CACHE=/workspace/.cache/huggingface/transformers
 export DIFFUSERS_CACHE=/workspace/.cache/huggingface/diffusers
 export XDG_CACHE_HOME=/workspace/.cache
 mkdir -p "$HF_HUB_CACHE" "$TRANSFORMERS_CACHE" "$DIFFUSERS_CACHE"
+
+New topics for january
+Hidden Carbon Monoxide Sources Inside Your Home
+Hidden Water Leaks That Slowly Destroy Homes
+Hidden Mold Growth Behind Walls
