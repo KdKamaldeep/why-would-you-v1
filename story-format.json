@@ -1,0 +1,18 @@
+{
+  "stories":[{
+	  
+  "title": "The Ghost Planes That Never Landed",
+  "description": "Aircraft that vanished mid-mission, leaving only sightings and unanswered reports.",
+  "scenes": [
+    {
+      "id": "",
+      "duration": 0,
+      "visual_prompt": "wan 2.1 prompt using 1.3B parameters",
+	  "visual_reference": "",
+      "negative_prompt": "",
+      "narration": ""	  
+    }
+  ],
+  "total_duration": 0
+}]
+}
