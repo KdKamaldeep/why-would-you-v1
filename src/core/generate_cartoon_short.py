@@ -550,8 +550,14 @@ class CartoonShortsGenerator:
             # Compile stitched video (keep existing output)
             stitched_output = self.output_dir / "stitched.mp4"
             try:
+                # Ensure all clip paths are strings
+                final_clips_str = [str(clip) for clip in final_clips]
+                logger.info(f"🔗 Preparing to concatenate {len(final_clips_str)} clips:")
+                for i, clip in enumerate(final_clips_str, 1):
+                    logger.info(f"   {i}. {clip}")
+                
                 self.video_processor.compile_final_video(
-                    final_clips,
+                    final_clips_str,
                     final_audio_paths,  # Pass audio paths with pauses included
                     background_music=None,  # No background music - Veo videos have SFX
                     subtitles_path=str(subtitles_path) if self.config.add_subtitles else None,

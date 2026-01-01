@@ -565,26 +565,52 @@ class VideoProcessor:
         """Compile final video with all components."""
         try:
             # Create concat file for video clips
+            # Use absolute paths to avoid issues
             concat_file = "concat_list.txt"
             with open(concat_file, 'w') as f:
                 for clip in clips:
-                    f.write(f"file '{clip}'\n")
+                    # Convert to absolute path
+                    abs_clip = os.path.abspath(clip)
+                    # Escape single quotes in path for ffmpeg
+                    escaped_path = abs_clip.replace("'", "'\\''")
+                    f.write(f"file '{escaped_path}'\n")
+            
+            logger.info(f"📋 Created concat file with {len(clips)} clips")
+            for i, clip in enumerate(clips, 1):
+                logger.info(f"   {i}. {os.path.abspath(clip)}")
             
             # Concatenate video clips
+            # Use re-encoding instead of copy to handle different codecs from Veo
             temp_video = "temp_video.mp4"
             cmd = [
                 'ffmpeg', '-y',
                 '-f', 'concat',
                 '-safe', '0',
                 '-i', concat_file,
-                '-c', 'copy',
+                '-c:v', self.config.codec,
+                '-preset', self.config.preset,
+                '-crf', str(self.config.crf),
+                '-c:a', 'aac',
+                '-b:a', self.config.audio_bitrate,
+                '-pix_fmt', 'yuv420p',
                 '-movflags', '+faststart',  # Ensure moov atom is at front
                 temp_video
             ]
             
+            # Add tune parameter
+            if self.config.codec == 'libx264':
+                cmd.extend(['-tune', 'film'])
+            elif self.config.codec == 'libx265':
+                cmd.extend(['-tune', self.config.tune])
+            
+            if self.config.codec == 'libx265':
+                cmd.extend(['-tag:v', 'hvc1'])
+            
+            logger.info(f"🔗 Concatenating {len(clips)} video clips...")
             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
             if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
                 error_msg = result.stderr if result.stderr else "Unknown error"
+                logger.error(f"❌ FFmpeg concat error: {error_msg}")
                 raise RuntimeError(f"Failed to concatenate videos. FFmpeg error: {error_msg}")
             
             # Verify temp video was created successfully
