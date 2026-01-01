@@ -1,29 +1,21 @@
 {
   "stories": [
     {
-      "title": "The 500-Year-Old Astronaut",
-      "description": "Medieval painting containing modern technology.",
-      "total_duration": 19,
+      "title": "The Fake Invasion",
+      "total_duration": 18,
       "scenes": [
         {
           "id": "h1_HOOK",
           "duration": 5,
-          "speed_factor": 1.5,
-          "transition": "swipe_up",
-          "zoom_direction": "in",
-          "visual_prompt": " Sudden, aggressive dolly-zoom into an ancient oil painting. A knight in rusted armor suddenly shifts his weight and his gauntlet tightens around a glowing, vibrating smartphone. Intense anamorphic blue lens flares blast across the screen to grab attention. Flickering candlelight, hyper-realistic canvas textures, 4K HDR.",
-          "negative_prompt": "static, boring, slow start, blurry, bare hands",
-          "narration": "Historians just found a 500-year-old painting that shouldn't exist."
+          "speed_factor": 1.6,
+          "visual_prompt": "Fast glitch-cut between real steel tanks and a giant rubber tank being 'punched' and denting like a balloon. High-contrast military green and bright red text overlays. Audio: A loud, jarring 'POP' sound effect followed by a distorted air-raid siren.",
+          "narration": "Everything you were taught about D-Day is a lie. Why would the Allies win a war with... inflatable toys?"
         },
         {
           "id": "s2",
-          "duration": 4,
-          "speed_factor": 1.5,
-          "transition": "swipe_left",
-          "zoom_direction": "out",
-          "visual_prompt": "Microscopic camera racing through the paint cracks. Glowing fiber-optic 'veins' pulse with blue light, pushing through the oil pigment like a liquid virus. The paint literally peels back to reveal shifting circuit boards. High-speed fluid dynamics, photorealistic.",
-          "negative_prompt": "static, cartoon, 2D, low detail",
-          "narration": "Under a microscope, the 'paint' isn't pigment—it's liquid silicon."
+          "duration": 13,
+          "visual_prompt": "A shadowy room filled with artists painting fake shadows onto wooden airplanes. One artist looks at the camera and shushes. Audio: Orchestral tension building quickly.",
+          "narration": "Meet the Ghost Army. They used 1,000 rubber tanks and giant speakers to trick Hitler into defending the wrong beach. Why would you fire a bullet when you can fire an illusion?"
         }
       ]
     }
