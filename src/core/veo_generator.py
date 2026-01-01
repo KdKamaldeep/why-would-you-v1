@@ -124,7 +124,7 @@ class VeoGenerator:
             
             # Generate video using Veo API
             # Use the stable Veo 3.1 model
-            model_id = "veo-3.1-generate-001"
+            model_id = "veo-3.1-fast-generate-preview"
             
             # Supported aspect ratios: "9:16" or "16:9"
             aspect_ratio = "9:16" if self.height > self.width else "16:9"
