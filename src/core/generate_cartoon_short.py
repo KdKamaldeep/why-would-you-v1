@@ -403,11 +403,20 @@ class CartoonShortsGenerator:
                 
                 # Generate video with WAN
                 try:
-                    # Calculate target duration from narration if available
-                    target_duration = None
-                    if not self.config.skip_audio and i < len(actual_scene_durations):
-                        target_duration = actual_scene_durations[i]
-                        logger.info(f"🎬 Scene {i+1}: Using narration duration ({target_duration:.2f}s) to calculate frames")
+                    # Get num_frames from scene, fallback to command-line config
+                    scene_num_frames = scene.get('num_frames', None)
+                    if scene_num_frames is None:
+                        # Check generation_profile for num_frames
+                        generation_profile = script.get('generation_profile', {})
+                        scene_num_frames = generation_profile.get('num_frames', None)
+                    
+                    # Use scene num_frames if available, otherwise use command-line default
+                    num_frames_to_use = scene_num_frames if scene_num_frames is not None else self.config.wan_num_frames
+                    
+                    if scene_num_frames is not None:
+                        logger.info(f"🎬 Scene {i+1}: Using num_frames from scene: {scene_num_frames}")
+                    else:
+                        logger.info(f"🎬 Scene {i+1}: Using num_frames from command-line: {num_frames_to_use}")
                     
                     # Extract scene metadata for best frame extraction
                     scene_id = scene.get('id', f"scene_{i+1}")
@@ -423,7 +432,7 @@ class CartoonShortsGenerator:
                         output_path=str(clip_path),
                         seed=self.config.wan_seed,
                         negative_prompt=negative_prompt or None,
-                        duration=target_duration,  # Pass narration duration to calculate frames
+                        num_frames=num_frames_to_use,  # Use num_frames from scene or command-line
                         scene_id=scene_id,
                         visual_reference=visual_reference,
                         slug=slug,

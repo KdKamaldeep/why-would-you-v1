@@ -34,10 +34,10 @@ python -m src.interfaces.simple_cartoon_generator \
  
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
-  --storyboard storyboards/winter.json \
+  --storyboard storyboards/wife.json \
   --wan-width 768 \
   --wan-height 1344 \
-  --wan-num-frames 49 \
+  --wan-num-frames 25 \
   --wan-fps 12 \
   --wan-steps 24 \
   --wan-guidance 6 \
@@ -73,8 +73,9 @@ mkdir -p "$HF_HUB_CACHE" "$TRANSFORMERS_CACHE" "$DIFFUSERS_CACHE"
 
 
 python scripts/test_wan.py \
-  --prompt "Wide cinematic shot of lush green countryside at early morning. Multiple natural elements: tall trees gently swaying in the wind, rolling grassy hills, a narrow dirt path leading into the distance, wildflowers in the foreground moving softly, light fog drifting between trees, sun rays breaking through clouds, birds flying calmly across the sky. Camera: slow smooth forward dolly, natural motion, realistic depth, soft atmospheric haze, rich green tones, filmic lighting, high quality, 720p." \
-  --out outputs/test_greenery_wide.mp4 \
+  --prompt "Wide cinematic view of deep space filled with glowing nebula clouds and distant stars. An abrupt, aggressive camera push-in toward a massive alien battleship creates a strong zoom-shock feeling, as if the viewer is suddenly pulled into a space war. The motion rapidly eases and settles into slow cinematic forward drift. Multiple fantasy starships emerge from hyperspace light portals, energy engines glowing. Epic lighting, high contrast, grand scale, fantasy sci-fi style, 720p.
+" \
+  --out outputs/space.mp4 \
   --width 1280 \
   --height 704 \
   --num-frames 49 \

@@ -219,6 +219,7 @@ class WanT2VGenerator:
                       seed: Optional[int] = None,
                       negative_prompt: Optional[str] = None,
                       duration: Optional[float] = None,
+                      num_frames: Optional[int] = None,
                       scene_id: Optional[str] = None,
                       visual_reference: Optional[str] = None,
                       slug: Optional[str] = None,
@@ -232,7 +233,8 @@ class WanT2VGenerator:
             output_path: Path to save the output MP4 file
             seed: Random seed for reproducibility (optional)
             negative_prompt: Override default negative prompt (optional)
-            duration: Target duration in seconds. If provided, num_frames will be calculated from this.
+            duration: Target duration in seconds (deprecated - use num_frames instead).
+            num_frames: Number of frames to generate. If provided, this takes precedence over duration calculation.
                       If None, uses the default num_frames from initialization.
             scene_id: Scene identifier for frame extraction (optional)
             visual_reference: Visual reference description from storyboard (optional)
@@ -255,20 +257,9 @@ class WanT2VGenerator:
         if self.pipeline is None:
             raise RuntimeError("WAN pipeline not available. Cannot generate video.")
         
-        # Calculate num_frames from duration if provided
-        num_frames_to_use = self.num_frames
-        if duration is not None and duration > 0:
-            # Calculate frames needed: duration * fps, rounded up to ensure we cover the full duration
-            calculated_frames = int(duration * self.fps) + 1
-            # Use the maximum of calculated frames and provided num_frames to ensure minimum video length
-            num_frames_to_use = max(calculated_frames, self.num_frames)
-            logger.info(f"📏 Target duration: {duration:.2f}s")
-            logger.info(f"🎞️ Calculated frames: {calculated_frames} @ {self.fps}fps (~{calculated_frames/self.fps:.2f}s)")
-            if calculated_frames < self.num_frames:
-                logger.info(f"⚠️ Calculated frames ({calculated_frames}) is less than minimum ({self.num_frames}), using minimum")
-            logger.info(f"✅ Using {num_frames_to_use} frames (ensures minimum video length)")
-        else:
-            logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
+        # Use num_frames from scene/command-line if provided, otherwise use default
+        num_frames_to_use = num_frames if num_frames is not None else self.num_frames
+        logger.info(f"🎞️ Using {num_frames_to_use} frames @ {self.fps}fps (~{num_frames_to_use/self.fps:.2f}s)")
         
         try:
             # Determine mode: T2V (text-only) or TI2V (text + image)

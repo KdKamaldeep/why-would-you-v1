@@ -2,27 +2,30 @@
   "stories": [
     {
       "title": "Cold Hands Surprise",
-      "description": "A light, playful moment between a husband and wife at home that ends with a funny surprise.",
+      "description": "A playful, relatable moment between a husband and wife that ends with a funny surprise.",
       "scenes": [
         {
           "id": "home_scene_01_setup",
           "duration": 4,
-          "visual_prompt": "Wide cinematic indoor shot of a cozy modern living room connected to a kitchen. Multiple elements: a wife standing at the kitchen sink washing dishes, warm indoor lighting, soft reflections on plates, water running gently. In the background, the husband sits relaxed on a sofa, focused on his smartphone, casual posture. Camera: slow steady forward dolly, calm domestic atmosphere, natural colors, realistic home environment, 720p.",
-          "visual_reference": "SETUP: Show normal home life. Wife doing chores, husband distracted on his phone.",
+          "num_frames": 49,
+          "visual_prompt": "Wide cinematic indoor shot of a cozy modern living room connected to a kitchen. Multiple elements: a wife standing at the kitchen sink washing dishes, warm indoor lighting, soft reflections on plates, water running gently. In the background, the husband sits relaxed on a sofa, focused on his smartphone. Camera: slow steady forward dolly, calm domestic atmosphere, natural colors, realistic home environment, 720p.",
+          "visual_reference": "SETUP: Normal home life. Wife doing chores, husband distracted on his phone.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
           "narration": "She was busy. He was distracted."
         },
         {
           "id": "home_scene_02_approach",
-          "duration": 4,
-          "visual_prompt": "Wide cinematic shot inside the living room. The wife quietly turns off the tap, wipes her hands, and looks toward her husband with a playful expression. She slowly walks toward him while he remains focused on his phone. Camera: slow smooth lateral movement following her approach, natural body motion, soft lighting, realistic facial expressions, 720p.",
+          "duration": 3,
+          "num_frames": 25,
+          "visual_prompt": "Medium-wide cinematic shot inside the living room. The wife quietly turns off the tap, wipes her hands, and looks toward her husband with a playful expression. She slowly walks toward him while he remains focused on his phone. Camera: slow smooth lateral movement following her approach, natural body motion, soft lighting, realistic facial expressions, 720p.",
           "visual_reference": "BUILD-UP: Wife notices husband ignoring her and decides to surprise him.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
           "narration": "She had an idea."
         },
         {
           "id": "home_scene_03_prank",
-          "duration": 4,
+          "duration": 3,
+          "num_frames": 25,
           "visual_prompt": "Medium cinematic shot of the couple on the sofa. The wife gently slips her cold hands under the husband’s t-shirt from the side. Multiple elements: husband reacting with sudden shock, shoulders jumping slightly, phone almost slipping, wife smiling mischievously. Camera: stable framing with slight natural reaction movement, realistic expressions, playful mood, warm indoor lighting, 720p.",
           "visual_reference": "PAYOFF: The cold-hands prank. Focus on expressions and reaction, not fast motion.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, exaggerated reactions, oversaturated, blurry, low quality, flicker, jitter",
@@ -31,13 +34,14 @@
         {
           "id": "home_scene_04_reaction",
           "duration": 4,
+          "num_frames": 49,
           "visual_prompt": "Wide cinematic shot of the couple laughing together on the sofa. Multiple elements: husband laughing in surprise, wife pulling her hands back and laughing, phone resting on the couch, warm cozy lighting filling the room. Camera: slow gentle pull-back, calm and happy mood, realistic emotions, natural colors, 720p.",
           "visual_reference": "ENDING: Light-hearted moment and shared laughter.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
           "narration": "Sometimes, love is just a small surprise."
         }
       ],
-      "total_duration": 16
+      "total_duration": 14
     }
   ]
 }
