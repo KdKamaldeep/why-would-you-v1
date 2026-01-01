@@ -456,23 +456,13 @@ class CartoonShortsGenerator:
                     actual_duration = self.video_processor.get_video_duration(str(video_path))
                     logger.info(f"✅ Scene {i+1}: Video generated ({actual_duration:.2f}s)")
                     
-                    # If we have narration and video doesn't match exactly, sync them
+                    # If we have narration, sync video to match audio clip length exactly
                     if not self.config.skip_audio and i < len(actual_scene_durations):
                         target_audio_duration = actual_scene_durations[i]
                         duration_diff = abs(actual_duration - target_audio_duration)
                         
-                        # Calculate frames from audio duration
-                        calculated_frames_from_audio = int(target_audio_duration * self.config.wan_fps) + 1
-                        # Calculate frames in generated video
-                        frames_in_video = int(actual_duration * self.config.wan_fps) + 1
-                        
-                        # Don't sync if calculated frames from audio < frames in video
-                        # This preserves the original video when it was generated with more frames than audio requires
-                        if calculated_frames_from_audio < frames_in_video:
-                            logger.info(f"⏭️ Scene {i+1}: Skipping sync - calculated frames from audio ({calculated_frames_from_audio}) < video frames ({frames_in_video})")
-                            logger.info(f"✅ Scene {i+1}: Using original video ({actual_duration:.2f}s) - audio ({target_audio_duration:.2f}s) will be handled during compilation")
-                        elif duration_diff > 0.1:  # If difference > 0.1s, sync them
-                            logger.info(f"🎬 Scene {i+1}: Syncing video ({actual_duration:.2f}s) to audio ({target_audio_duration:.2f}s)")
+                        if duration_diff > 0.1:  # If difference > 0.1s, sync them
+                            logger.info(f"🎬 Scene {i+1}: Syncing video ({actual_duration:.2f}s) to match audio ({target_audio_duration:.2f}s)")
                             synced_video_path = str(clip_path).replace('.mp4', '_synced.mp4')
                             
                             if actual_duration < target_audio_duration:
@@ -482,6 +472,7 @@ class CartoonShortsGenerator:
                                     target_audio_duration,
                                     synced_video_path
                                 )
+                                logger.info(f"🎬 Scene {i+1}: Extended video from {actual_duration:.2f}s to {target_audio_duration:.2f}s")
                             else:
                                 # Video is longer than audio - trim to match
                                 cmd = [
@@ -496,7 +487,7 @@ class CartoonShortsGenerator:
                             
                             video_path = synced_video_path
                             actual_duration = target_audio_duration
-                            logger.info(f"✅ Scene {i+1}: Video synced to audio ({actual_duration:.2f}s)")
+                            logger.info(f"✅ Scene {i+1}: Video synced to audio length ({actual_duration:.2f}s)")
                         else:
                             logger.info(f"✅ Scene {i+1}: Video duration ({actual_duration:.2f}s) already matches audio ({target_audio_duration:.2f}s)")
                     
