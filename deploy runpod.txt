@@ -70,3 +70,16 @@ export TRANSFORMERS_CACHE=/workspace/.cache/huggingface/transformers
 export DIFFUSERS_CACHE=/workspace/.cache/huggingface/diffusers
 export XDG_CACHE_HOME=/workspace/.cache
 mkdir -p "$HF_HUB_CACHE" "$TRANSFORMERS_CACHE" "$DIFFUSERS_CACHE"
+
+
+python scripts/test_wan.py \
+  --prompt "A close-up cinematic shot of an elderly fisherman with a weathered face and deep wrinkles, wearing a yellow raincoat. He is looking out at a stormy sea, rain droplets dripping off his hat. The lighting is moody and blue-toned, with high-speed camera capturing the fine mist in the air. 720p, high quality, realistic skin textures." \
+  --out outputs/test_wan.mp4 \
+  --width 1280 \
+  --height 704 \
+  --num-frames 49 \
+  --fps 24 \
+  --steps 24 \
+  --guidance 6.0 \
+  --seed 42 \
+  --negative-prompt "text, subtitles, watermark, blurry, low quality"

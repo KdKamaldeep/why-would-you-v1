@@ -245,14 +245,6 @@ class WanT2VGenerator:
         else:
             logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
         
-        # Enforce minimum of 72 frames for WAN 2.2 (if less than 72, use 72; if more, keep the higher value)
-        MIN_FRAMES = 72
-        if num_frames_to_use < MIN_FRAMES:
-            logger.info(f"⚠️ Calculated frames ({num_frames_to_use}) is below minimum ({MIN_FRAMES}), enforcing minimum to {MIN_FRAMES}")
-            num_frames_to_use = MIN_FRAMES
-        else:
-            logger.info(f"✅ Using {num_frames_to_use} frames (meets minimum requirement of {MIN_FRAMES})")
-        
         try:
             # Determine mode: T2V (text-only) or TI2V (text + image)
             mode = "TI2V" if image is not None else "T2V"
