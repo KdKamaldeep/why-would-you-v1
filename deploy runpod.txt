@@ -35,12 +35,12 @@ python -m src.interfaces.simple_cartoon_generator \
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
   --storyboard storyboards/mult-story.json \
-  --wan-width 720 \
+  --wan-width 704 \
   --wan-height 1280 \
-  --wan-num-frames 72 \
+  --wan-num-frames 49 \
   --wan-fps 12 \
-  --wan-steps 30 \
-  --wan-guidance 5 \
+  --wan-steps 24 \
+  --wan-guidance 6 \
   --gen-bulk
     
 
@@ -73,13 +73,13 @@ mkdir -p "$HF_HUB_CACHE" "$TRANSFORMERS_CACHE" "$DIFFUSERS_CACHE"
 
 
 python scripts/test_wan.py \
-  --prompt "A close-up cinematic shot of an elderly fisherman with a weathered face and deep wrinkles, wearing a yellow raincoat. He is looking out at a stormy sea, rain droplets dripping off his hat. The lighting is moody and blue-toned, with high-speed camera capturing the fine mist in the air. 720p, high quality, realistic skin textures." \
-  --out outputs/test_wan.mp4 \
+  --prompt "Wide cinematic shot of lush green countryside at early morning. Multiple natural elements: tall trees gently swaying in the wind, rolling grassy hills, a narrow dirt path leading into the distance, wildflowers in the foreground moving softly, light fog drifting between trees, sun rays breaking through clouds, birds flying calmly across the sky. Camera: slow smooth forward dolly, natural motion, realistic depth, soft atmospheric haze, rich green tones, filmic lighting, high quality, 720p." \
+  --out outputs/test_greenery_wide.mp4 \
   --width 1280 \
   --height 704 \
-  --num-frames 25 \
-  --fps 24 \
+  --num-frames 49 \
+  --fps 12 \
   --steps 24 \
   --guidance 6.0 \
   --seed 42 \
-  --negative-prompt "text, subtitles, watermark, blurry, low quality"
+  --negative-prompt "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter"
