@@ -260,9 +260,13 @@ class WanT2VGenerator:
         if duration is not None and duration > 0:
             # Calculate frames needed: duration * fps, rounded up to ensure we cover the full duration
             calculated_frames = int(duration * self.fps) + 1
-            num_frames_to_use = calculated_frames
+            # Use the maximum of calculated frames and provided num_frames to ensure minimum video length
+            num_frames_to_use = max(calculated_frames, self.num_frames)
             logger.info(f"📏 Target duration: {duration:.2f}s")
             logger.info(f"🎞️ Calculated frames: {calculated_frames} @ {self.fps}fps (~{calculated_frames/self.fps:.2f}s)")
+            if calculated_frames < self.num_frames:
+                logger.info(f"⚠️ Calculated frames ({calculated_frames}) is less than minimum ({self.num_frames}), using minimum")
+            logger.info(f"✅ Using {num_frames_to_use} frames (ensures minimum video length)")
         else:
             logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
         
