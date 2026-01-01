@@ -162,8 +162,32 @@ class VeoGenerator:
             
             logger.info(f"💾 Downloading video to: {output_path}")
             
-            # Use the specific download method for generated videos
-            self.client.files.download(file=generated_video.video, path=str(output_path))
+            # Download the video file
+            # The download method returns file content, we need to save it manually
+            try:
+                # Method 1: download returns content (no path parameter)
+                video_content = self.client.files.download(file=generated_video.video)
+                with open(output_path, 'wb') as f:
+                    f.write(video_content)
+            except (TypeError, AttributeError) as e:
+                # Method 2: file might have a URI or different structure
+                if hasattr(generated_video.video, 'uri'):
+                    # Download from URI
+                    import requests
+                    logger.info(f"📥 Downloading from URI: {generated_video.video.uri}")
+                    response = requests.get(generated_video.video.uri)
+                    response.raise_for_status()
+                    with open(output_path, 'wb') as f:
+                        f.write(response.content)
+                elif hasattr(generated_video.video, 'name'):
+                    # Try using file name
+                    video_content = self.client.files.download(name=generated_video.video.name)
+                    with open(output_path, 'wb') as f:
+                        f.write(video_content)
+                else:
+                    logger.error(f"❌ Could not determine download method. Video object: {generated_video.video}")
+                    logger.error(f"❌ Error: {e}")
+                    raise RuntimeError(f"Could not determine how to download the video file: {e}")
             
             logger.info(f"✅ Video generated successfully: {output_path}")
             
