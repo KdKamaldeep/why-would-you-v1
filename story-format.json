@@ -1,18 +1,43 @@
 {
-  "stories":[{
-	  
-  "title": "The Ghost Planes That Never Landed",
-  "description": "Aircraft that vanished mid-mission, leaving only sightings and unanswered reports.",
-  "scenes": [
+  "stories": [
     {
-      "id": "",
-      "duration": 0,
-      "visual_prompt": "wan 2.1 prompt using 1.3B parameters",
-	  "visual_reference": "",
-      "negative_prompt": "",
-      "narration": ""	  
+      "title": "{{STORY_TITLE}}",
+      "description": "{{SHORT_DESCRIPTION_FOR_YOUTUBE}}",
+      "scenes": [
+        {
+          "id": "scene_01_hook",
+          "duration": 4,
+          "visual_prompt": "{{WIDE_CINEMATIC_SCENE_DESCRIPTION}}. First 1–2 seconds: sudden fast camera push-in (zoom shock) toward the main subject, creating immediate impact, then motion quickly stabilizes into slow cinematic movement. {{ENVIRONMENT_DETAILS}}, cinematic lighting, high quality, 720p.",
+          "visual_reference": "HOOK: First 1–2 seconds must visually interrupt scrolling using sudden camera movement or contrast change. Then settle into calm motion.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "{{SHORT_HOOK_LINE_3_TO_6_WORDS}}"
+        },
+        {
+          "id": "scene_02_context",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic shot expanding on the topic. {{MULTIPLE_ELEMENTS_RELATED_TO_TOPIC}}. Camera: slow steady dolly or gentle pan, smooth motion, realistic depth, balanced composition, cinematic lighting, 720p.",
+          "visual_reference": "Explain the main idea visually. Add depth and scale, but keep motion slow and controlled for stability.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "{{MAIN_FACT_OR_CONTEXT_LINE}}"
+        },
+        {
+          "id": "scene_03_example",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic scene showing a concrete example. {{SPECIFIC_EXAMPLE_OR_EVENT}}. Camera: slow controlled movement, stable framing, realistic motion, cinematic contrast, 720p.",
+          "visual_reference": "Show a clear example or consequence that supports the fact or story.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "{{SUPPORTING_EXPLANATION_LINE}}"
+        },
+        {
+          "id": "scene_04_reveal",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic closing shot. {{EMOTIONAL_OR_THOUGHT_PROVOKING_VISUAL}}. Camera: slow gentle push-in or pull-back, calm mood, cinematic lighting, realistic textures, 720p.",
+          "visual_reference": "Final emotional or thought-provoking reveal. Encourage replay and reflection.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "{{FINAL_REFRAME_OR_IMPACT_LINE}}"
+        }
+      ],
+      "total_duration": 16
     }
-  ],
-  "total_duration": 0
-}]
+  ]
 }

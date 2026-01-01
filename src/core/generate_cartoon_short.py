@@ -451,7 +451,18 @@ class CartoonShortsGenerator:
                     if not self.config.skip_audio and i < len(actual_scene_durations):
                         target_audio_duration = actual_scene_durations[i]
                         duration_diff = abs(actual_duration - target_audio_duration)
-                        if duration_diff > 0.1:  # If difference > 0.1s, sync them
+                        
+                        # Calculate frames from audio duration
+                        calculated_frames_from_audio = int(target_audio_duration * self.config.wan_fps) + 1
+                        # Calculate frames in generated video
+                        frames_in_video = int(actual_duration * self.config.wan_fps) + 1
+                        
+                        # Don't sync if calculated frames from audio < frames in video
+                        # This preserves the original video when it was generated with more frames than audio requires
+                        if calculated_frames_from_audio < frames_in_video:
+                            logger.info(f"⏭️ Scene {i+1}: Skipping sync - calculated frames from audio ({calculated_frames_from_audio}) < video frames ({frames_in_video})")
+                            logger.info(f"✅ Scene {i+1}: Using original video ({actual_duration:.2f}s) - audio ({target_audio_duration:.2f}s) will be handled during compilation")
+                        elif duration_diff > 0.1:  # If difference > 0.1s, sync them
                             logger.info(f"🎬 Scene {i+1}: Syncing video ({actual_duration:.2f}s) to audio ({target_audio_duration:.2f}s)")
                             synced_video_path = str(clip_path).replace('.mp4', '_synced.mp4')
                             
