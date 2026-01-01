@@ -126,13 +126,13 @@ class VeoGenerator:
             resolution = "1080p" if max(self.width, self.height) >= 1080 else "720p"
             
             # Generate video using Veo API
+            # Note: duration is not a valid parameter for GenerateVideosConfig
             operation = self.client.models.generate_videos(
                 model="veo-2",
                 prompt=full_prompt,
                 config=genai.types.GenerateVideosConfig(
                     aspect_ratio=aspect_ratio,
-                    resolution=resolution,
-                    duration=int(target_duration) if target_duration else self.duration
+                    resolution=resolution
                 ),
             )
             

@@ -482,7 +482,7 @@ Storyboard Cast Format (with face images):
                 )
                 
                 # Pre-initialize generator to load pipelines once
-                print("📦 Loading WAN pipeline (singleton - will be reused)...")
+                print("📦 Loading Veo generator (will be reused)...")
                 print("📦 Loading TTS model (singleton - will be reused)...")
                 temp_generator = CartoonShortsGenerator(base_config)
                 print("✅ Pipelines initialized and ready for bulk generation")
