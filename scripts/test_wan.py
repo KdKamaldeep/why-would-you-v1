@@ -6,10 +6,20 @@ Test script for WAN 2.2 Text-Image-to-Video generation
 import sys
 import os
 import argparse
+import logging
 from pathlib import Path
 
 # Add src to Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+# Configure logging to display in console
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)  # Output to console
+    ]
+)
 
 def main():
     """Main function to test WAN T2V generation."""

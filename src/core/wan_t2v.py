@@ -6,6 +6,7 @@ Supports both text-to-video (T2V) and text-image-to-video (TI2V) modes
 """
 
 import os
+os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True,max_split_size_mb:128"
 import logging
 import torch
 from pathlib import Path
@@ -84,7 +85,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         if device == 'cuda' and torch.cuda.is_available():
             # Use bfloat16 on CUDA for maximum quality (full BF16 for 48GB+ VRAM)
             torch_dtype = torch.bfloat16
-            vae_dtype = torch.float16  # VAE also in BF16 for maximum quality
+            vae_dtype = torch.float16  # VAE in FP16 for decode VRAM stability
             logger.info("✅ Using full BF16 precision on CUDA for maximum quality (48GB+ VRAM optimized)")
         else:
             torch_dtype = torch.float32
@@ -101,11 +102,11 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         # The 16x16x4 compression ratio provides 64x overall compression (4x temporal, 16x spatial)
         logger.info("📦 Loading WAN 2.2 VAE with 16x16x4 compression ratio...")
         logger.info("📦 VAE: wan2.2_vae.safetensors (temporal: 4x, spatial: 16x16 = 64x total)")
-        logger.info(f"📦 VAE dtype: {vae_dtype} (BF16 for maximum quality)")
+        logger.info(f"📦 VAE dtype: FP16 (optimal for decode VRAM stability)")
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
             subfolder="vae",
-            torch_dtype=vae_dtype,  # BF16 for maximum quality
+            torch_dtype=torch.float16,  # FP16 for decode VRAM stability
             cache_dir=cache_dir
         )
         
@@ -121,19 +122,23 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         # Move to device
         _wan_pipeline = _wan_pipeline.to(device)
         
+        # Offload VAE to CPU when idle to reduce peak VRAM overlap
+        if device == 'cuda':
+            _wan_pipeline.vae.to("cpu")
+            logger.info("💾 VAE offloaded to CPU (will be moved to GPU only during inference)")
+        
         # Enable VAE optimizations (slicing and tiling for memory efficiency)
+        # Enable directly on VAE object, not pipeline wrapper
         if device == 'cuda':
             try:
-                if hasattr(_wan_pipeline, 'enable_vae_slicing'):
-                    _wan_pipeline.enable_vae_slicing()
-                    logger.info("✅ Enabled VAE slicing (temporal chunking for memory efficiency)")
+                _wan_pipeline.vae.enable_slicing()
+                logger.info("✅ Enabled VAE slicing (temporal chunking for memory efficiency)")
             except Exception as e:
                 logger.warning(f"⚠️ Could not enable VAE slicing: {e}")
             
             try:
-                if hasattr(_wan_pipeline, 'enable_vae_tiling'):
-                    _wan_pipeline.enable_vae_tiling()
-                    logger.info("✅ Enabled VAE tiling (spatial chunking for 720p+ resolution)")
+                _wan_pipeline.vae.enable_tiling()
+                logger.info("✅ Enabled VAE tiling (spatial chunking for 720p+ resolution)")
             except Exception as e:
                 logger.warning(f"⚠️ Could not enable VAE tiling: {e}")
         
@@ -174,7 +179,7 @@ class WanT2VGenerator:
     def __init__(self, 
                  width: int = 1280,
                  height: int = 720,
-                 num_frames: int = 72,
+                 num_frames: int = 25,
                  fps: int = 24,
                  num_inference_steps: int = 30,
                  guidance_scale: float = 6.0,
@@ -186,7 +191,7 @@ class WanT2VGenerator:
         Args:
             width: Video width (default: 1280 for 720p)
             height: Video height (default: 720 for 720p)
-            num_frames: Number of frames to generate (default: 72 for 3s @ 24fps)
+            num_frames: Number of frames to generate (default: 25)
             fps: Frames per second for output video (default: 24)
             num_inference_steps: Number of denoising steps (default: 30)
             guidance_scale: Guidance scale for prompt adherence (default: 6.0)
@@ -314,6 +319,13 @@ class WanT2VGenerator:
                 torch.cuda.empty_cache()
                 gc.collect()
             
+            # Move VAE to GPU only for inference
+            if self.device == 'cuda' and torch.cuda.is_available():
+                self.pipeline.vae.to(self.device)
+                torch.cuda.empty_cache()
+                gc.collect()
+                logger.info("🚀 VAE moved to GPU for inference")
+            
             # Generate video (T2V or TI2V mode)
             # Optimized for 720p (1280x720) @ 24fps with 16x16x4 VAE compression
             logger.info("🎬 Running inference (optimized for 720p @ 24fps)...")
@@ -412,6 +424,13 @@ class WanT2VGenerator:
                 # Direct export for smaller videos
                 logger.info("✅ Using direct export (no slicing needed)")
                 export_to_video(frames, str(output_path), fps=self.fps)
+            
+            # Move VAE back to CPU after saving/export is done
+            if self.device == 'cuda' and torch.cuda.is_available():
+                self.pipeline.vae.to("cpu")
+                torch.cuda.empty_cache()
+                gc.collect()
+                logger.info("💾 VAE moved back to CPU (idle)")
             
             # Explicitly delete frames and output to free memory
             del frames

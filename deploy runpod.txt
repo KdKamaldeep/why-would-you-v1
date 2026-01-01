@@ -77,7 +77,7 @@ python scripts/test_wan.py \
   --out outputs/test_wan.mp4 \
   --width 1280 \
   --height 704 \
-  --num-frames 49 \
+  --num-frames 25 \
   --fps 24 \
   --steps 24 \
   --guidance 6.0 \
