@@ -147,7 +147,8 @@ class VeoGenerator:
             logger.info("⏳ Video generation started. Polling for completion...")
             while not operation.done:
                 time.sleep(10)  # Wait 10 seconds between checks
-                operation = self.client.operations.get(name=operation.name)
+                # Pass the operation object directly (not name=operation.name)
+                operation = self.client.operations.get(operation)
                 logger.info("⏳ Still generating... (checking every 10 seconds)")
             
             if operation.result:
