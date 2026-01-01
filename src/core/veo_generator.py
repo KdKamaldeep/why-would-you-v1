@@ -127,7 +127,8 @@ class VeoGenerator:
             
             # Generate video using Veo API
             # Note: duration is not a valid parameter for GenerateVideosConfig
-            operation = self.client.models.generate_videos(
+            logger.info("⏳ Generating video (this may take a while)...")
+            result = self.client.models.generate_videos(
                 model="veo-3.0-fast-generate-001",
                 prompt=full_prompt,
                 config=genai.types.GenerateVideosConfig(
@@ -136,12 +137,17 @@ class VeoGenerator:
                 ),
             )
             
-            # Wait for the video to be generated
-            logger.info("⏳ Waiting for video generation to complete...")
-            result = operation.result()
+            # Check if result is an operation (async) or direct result
+            if result is None:
+                raise RuntimeError("Veo API returned None - check your API key and model access")
+            
+            # If it's an operation object, wait for it to complete
+            if hasattr(result, 'result') and callable(result.result):
+                logger.info("⏳ Waiting for video generation to complete...")
+                result = result.result()
             
             # Check if we have generated videos
-            if not result.generated_videos or len(result.generated_videos) == 0:
+            if not hasattr(result, 'generated_videos') or not result.generated_videos or len(result.generated_videos) == 0:
                 raise RuntimeError("Veo did not return any videos in the response")
             
             # Get the first generated video
