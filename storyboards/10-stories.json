@@ -11,8 +11,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_up",
           "zoom_direction": "in",
-          "visual_prompt": "Cinematic shot of an ancient oil painting from the 1500s where a knight's hand is visibly moving to grip a glowing glass smartphone, candlelight flickering rapidly, shadows dancing across the cracked canvas, 4k.",
-          "negative_prompt": "static, still image, photograph, clean",
+          "visual_prompt": "Cinematic shot of an ancient oil painting from the 1500s; a heavy iron gauntlet is partially visible as a glowing glass smartphone vibrates in a knight's grip, candlelight flickering rapidly, shadows dancing across the cracked canvas, 4k.",
+          "negative_prompt": "static, still image, photograph, clean, bare hands, fingers",
           "narration": "Historians just found a 500-year-old painting that shouldn't exist."
         },
         {
@@ -41,7 +41,7 @@
           "speed_factor": 1.5,
           "transition": "swipe_down",
           "zoom_direction": "out",
-          "visual_prompt": "The painted figure suddenly turning its head to stare at the camera as the entire canvas begins to vibrate and hum with golden light, paint chips flying off in slow motion.",
+          "visual_prompt": "The painted figure's head suddenly snaps to stare at the camera as the entire canvas begins to vibrate and hum with golden light, paint chips flying off in slow motion.",
           "negative_prompt": "static, dead, bright, unmoving",
           "narration": "We aren't discovering history. We're rebooting it."
         }
@@ -115,8 +115,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_up",
           "zoom_direction": "out",
-          "visual_prompt": "A shadow on a brick wall suddenly detaching its arms and reaching out toward the camera in 3D, the bricks cracking as the shadow claws at them.",
-          "negative_prompt": "flat, 2d, normal, unmoving",
+          "visual_prompt": "A shadow on a brick wall suddenly detaches its upper body and reaches toward the camera, the bricks cracking as the silhouette moves with jagged force.",
+          "negative_prompt": "flat, 2d, normal, unmoving, fingers, hands",
           "narration": "Thousands are reporting 'Lagging Shadows' that move seconds after they do."
         },
         {
@@ -135,7 +135,7 @@
           "speed_factor": 1.2,
           "transition": "swipe_down",
           "zoom_direction": "out",
-          "visual_prompt": "The shadow lunging off the wall and materializing into a dark silhouette that grabs the camera lens, screen shaking and glitching into black.",
+          "visual_prompt": "The shadow lunging off the wall and materializing into a dark silhouette that strikes the camera lens, screen shaking and glitching into black.",
           "negative_prompt": "static, light, simple, no motion",
           "narration": "Check your wall. Is your shadow still yours?"
         }
@@ -172,8 +172,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_up",
           "zoom_direction": "in",
-          "visual_prompt": "Macro shot of a robotic snowflake landing on a warm hand, its mechanical legs twitching as it unfolds into a tiny glowing microchip before melting.",
-          "negative_prompt": "real snow, blurry, water, unmoving",
+          "visual_prompt": "Macro shot of a robotic snowflake landing on a dark surface, its mechanical legs twitching as it unfolds into a tiny glowing microchip before disintegrating.",
+          "negative_prompt": "real snow, blurry, water, unmoving, hands",
           "narration": "The 'weather' is a climate-control machine that's starting to fail."
         },
         {
@@ -209,8 +209,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_left",
           "zoom_direction": "in",
-          "visual_prompt": "A close-up of a stethoscope on marble skin, the stone surface rippling and pulsing like a heartbeat, monitor lines in the background jumping frantically.",
-          "negative_prompt": "doctor, hospital, plastic, static",
+          "visual_prompt": "A close-up of a stethoscope pressed against rippling marble skin that pulses like a heartbeat, monitor lines in the background jumping frantically.",
+          "negative_prompt": "doctor, hospital, plastic, static, fingers",
           "narration": "This 2,000-year-old marble has a resting heart rate of sixty beats per minute."
         },
         {
@@ -219,7 +219,7 @@
           "speed_factor": 1.2,
           "transition": "swipe_right",
           "zoom_direction": "out",
-          "visual_prompt": "A stone eyelid suddenly snapping open to reveal a wet, blinking human eye that darts around the room in a panic, cinematic horror closeup.",
+          "visual_prompt": "A stone eyelid suddenly snaps open to reveal a wet, blinking human eye that darts around the room in a panic, cinematic horror closeup.",
           "negative_prompt": "closed eye, stone eye, blurry, static",
           "narration": "It’s not a sculpture. It’s a person trapped in a 'mineral stasis' we don't understand."
         },
@@ -229,8 +229,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_up",
           "zoom_direction": "in",
-          "visual_prompt": "The statue's entire arm cracking and shattering as it reaches toward the camera, stone shards flying, the underlying flesh moving beneath the rock.",
-          "negative_prompt": "static, still, light, unbreaking",
+          "visual_prompt": "The statue's entire arm cracking and shattering as it strikes toward the camera, stone shards flying, the underlying flesh moving beneath the rock.",
+          "negative_prompt": "static, still, light, unbreaking, hands, fingers",
           "narration": "And after two thousand years... it's finally waking up."
         }
       ]
