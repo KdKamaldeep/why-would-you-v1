@@ -1,21 +1,30 @@
 {
   "stories": [
     {
-      "title": "The Fake Invasion",
-      "total_duration": 18,
+      "title": "The Secret Bat Bomb",
+      "description": "The bizarre WWII project that attempted to use bats armed with tiny napalm bombs to destroy cities.",
+      "total_duration": 20,
       "scenes": [
         {
           "id": "h1_HOOK",
-          "duration": 5,
-          "speed_factor": 1.6,
-          "visual_prompt": "Fast glitch-cut between real steel tanks and a giant rubber tank being 'punched' and denting like a balloon. High-contrast military green and bright red text overlays. Audio: A loud, jarring 'POP' sound effect followed by a distorted air-raid siren.",
-          "narration": "Everything you were taught about D-Day is a lie. Why would the Allies win a war with... inflatable toys?"
+          "duration": 6,
+          "speed_factor": 1.7,
+          "visual_prompt": "Extreme close-up of a screeching fruit bat. Suddenly, the camera pulls back to reveal a tiny, high-tech timed napalm canister strapped to its chest with a miniature leather harness. The bat's wings flap violently in slow motion. Audio: A piercing, high-frequency bat screech and the mechanical 'click-click-click' of a timer. High-fidelity, 4K HDR.",
+          "narration": "Why would the U.S. military spend millions of dollars to turn thousands of bats into living bombs?"
         },
         {
-          "id": "s2",
-          "duration": 13,
-          "visual_prompt": "A shadowy room filled with artists painting fake shadows onto wooden airplanes. One artist looks at the camera and shushes. Audio: Orchestral tension building quickly.",
-          "narration": "Meet the Ghost Army. They used 1,000 rubber tanks and giant speakers to trick Hitler into defending the wrong beach. Why would you fire a bullet when you can fire an illusion?"
+          "id": "s2_REVEAL",
+          "duration": 7,
+          "speed_factor": 1.3,
+          "visual_prompt": "A cinematic wide shot of a 'bomb' casing opening mid-air, releasing a cloud of thousands of bats over a model Japanese village. The sun is blocked out by the swarm. Below, tiny fires begin to ignite on thatched roofs. Audio: The deafening collective sound of thousands of flapping wings and sudden, distant 'whoosh' sounds of fire igniting.",
+          "narration": "Project X-Ray was real. The plan was for these bats to roost in wooden buildings and ignite simultaneously, creating an unstoppable firestorm."
+        },
+        {
+          "id": "s3_PAYOFF",
+          "duration": 7,
+          "speed_factor": 1.0,
+          "visual_prompt": "A grainy, black-and-white 'top secret' document being stamped with a red 'CANCELLED' mark. In the background, a massive mushroom cloud rises slowly. Audio: A heavy, echoing rubber stamp 'thud' followed by a haunting cinematic drone. The final frame is the bat staring into the lens.",
+          "narration": "It was actually more effective than the Atomic Bomb in tests. So why would they cancel it? Because the nukes were ready first. Follow for more insane science."
         }
       ]
     }
