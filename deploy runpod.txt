@@ -95,3 +95,10 @@ pip install --upgrade transformers
 
 pip install --upgrade accelerate
 pip install google-genai
+
+
+# Basic usage
+python -m src.interfaces.simple_cartoon_generator --prompt "A cat walks on the grass, realistic"
+
+# With storyboard
+python -m src.interfaces.simple_cartoon_generator --storyboard storyboards/10-stories.json

@@ -8,7 +8,8 @@ diffusers>=0.34.0
 accelerate>=0.33.0
 safetensors>=0.4.0
 huggingface_hub>=0.30.1
-ftfy>=6.1.1  # Required for WAN pipeline text processing
+ftfy>=6.1.1  # Required for WAN pipeline text processing (legacy)
+google-genai>=0.2.0  # Required for Google Veo video generation
 xformers>=0.0.22  # Optimized attention mechanisms for transformers
 imageio
 imageio-ffmpeg

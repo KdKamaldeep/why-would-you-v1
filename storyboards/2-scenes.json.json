@@ -1,0 +1,31 @@
+{
+  "stories": [
+    {
+      "title": "The 500-Year-Old Astronaut",
+      "description": "A medieval painting containing modern technology.",
+      "total_duration": 19,
+      "scenes": [
+        {
+          "id": "h1",
+          "duration": 5,
+          "speed_factor": 1.5,
+          "transition": "swipe_up",
+          "zoom_direction": "in",
+          "visual_prompt": "Ultra-realistic cinematic close-up of a 15th-century oil painting. The knight’s hand, clad in a detailed rusted metal gauntlet, slowly tightens its grip around a modern smartphone. The screen glows intensely, illuminating the cracks in the ancient canvas. Flickering warm candlelight, 4K, high dynamic range.",
+          "negative_prompt": "blurry, low quality, flat lighting, digital illustration, bare hands",
+          "narration": "Historians just found a 500-year-old painting that shouldn't exist."
+        },
+        {
+          "id": "s2",
+          "duration": 4,
+          "speed_factor": 1.5,
+          "transition": "swipe_left",
+          "zoom_direction": "out",
+          "visual_prompt": "A microscopic camera sweep underneath the oil paint layers. Liquid silicon and glowing blue fiber-optic strands pulse and surge like organic veins. The ancient varnish ripples as the technology underneath powers on. Macro cinematography, realistic textures.",
+          "negative_prompt": "static, cartoon, 2D, low detail",
+          "narration": "Under a microscope, the 'paint' isn't pigment—it's liquid silicon."
+        }
+      ]
+    }
+  ]
+}

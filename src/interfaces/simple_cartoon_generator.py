@@ -37,7 +37,7 @@ def check_requirements():
         print("❌ Models directory not found. Please run the model download script first.")
         return False
     
-    # Note: WAN model will be downloaded automatically from Hugging Face when first used
+    # Note: Google Veo uses the genai package and requires GOOGLE_API_KEY (Gemini API key) environment variable
     
     print("✅ All requirements satisfied!")
     return True
@@ -45,15 +45,12 @@ def check_requirements():
 def get_model_path_for_type(model_type: str) -> str | None:
     """
     Legacy function - no longer used.
-    WAN 2.1 T2V is the only model and it downloads automatically from Hugging Face.
+    Google Veo is used via the genai package.
     This function is kept for backward compatibility but always returns None.
     """
-    # WAN 2.1 T2V model is handled automatically by diffusers library
-    # Model ID: Wan-AI/Wan2.1-T2V-1.3B-Diffusers
-    # It downloads automatically on first use to Hugging Face cache
     return None
 
-def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=False, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False):
+def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=False, video_format="shorts", veo_width=768, veo_height=1024, veo_duration=5, veo_negative_prompt="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly", seed=None, google_api_key=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False):
     """Generate a video reel with the given prompt."""
     try:
         # Import the main generator
@@ -68,21 +65,20 @@ def generate_cartoon(prompt, style="realistic", duration=30, language="en", enab
         print(f"🗣️ Language: {language}")
         print(f"✨ Enable Prompt Enhancement: {enable_prompt_enhancement}")
         print(f"📐 Video Format: {video_format}")
-        print(f"🎬 WAN Width: {wan_width}, Height: {wan_height}")
-        print(f"🎞️ WAN Frames: {wan_num_frames} @ {wan_fps}fps")
-        print(f"⚙️ WAN Steps: {wan_steps}, Guidance: {wan_guidance}")
+        print(f"🎬 Veo Width: {veo_width}, Height: {veo_height}")
+        print(f"⏱️ Veo Duration: {veo_duration}s")
         if seed:
             print(f"🎲 Seed: {seed}")
         print("=" * 50)
         
-        print(f"🎬 Starting video generation with WAN 2.1 T2V...")
+        print(f"🎬 Starting video generation with Google Veo...")
         print(f"📝 Prompt: {prompt}")
         print(f"🎨 Style: {style}")
         print(f"⏱️ Duration: {duration} seconds")
         print(f"🗣️ Language: {language}")
         # Prompt enhancement disabled
         print(f"📐 Video format: {video_format}")
-        print(f"🎬 WAN settings: {wan_width}x{wan_height}, {wan_num_frames} frames @ {wan_fps}fps")
+        print(f"🎬 Veo settings: {veo_width}x{veo_height}, {veo_duration}s duration")
         if create_reel:
             print(f"🎬 Reel enabled: {reel_width}x{reel_height} @ {reel_fps}fps, mode={vertical_mode}")
         print("-" * 50)
@@ -97,14 +93,12 @@ def generate_cartoon(prompt, style="realistic", duration=30, language="en", enab
             add_subtitles=auto_sub,  # Only enable if --auto-sub is provided
             language=language,
             enable_prompt_enhancement=enable_prompt_enhancement,
-            wan_width=wan_width,
-            wan_height=wan_height,
-            wan_num_frames=wan_num_frames,
-            wan_fps=wan_fps,
-            wan_steps=wan_steps,
-            wan_guidance=wan_guidance,
-            wan_negative_prompt=wan_negative_prompt,
-            wan_seed=seed,
+            veo_width=veo_width,
+            veo_height=veo_height,
+            veo_duration=veo_duration,
+            veo_negative_prompt=veo_negative_prompt,
+            veo_seed=seed,
+            google_api_key=google_api_key,
             create_reel=create_reel,
             vertical_mode=vertical_mode,
             reel_width=reel_width,
@@ -157,8 +151,8 @@ Examples:
   # Process only the first scene from storyboard
   python simple_cartoon_generator.py --prompt "Magic forest adventure" --storyboard storyboards/tillu.json --scene 1
   
-  # Custom WAN settings
-  python simple_cartoon_generator.py --prompt "Adventure story" --wan-width 832 --wan-height 480 --wan-num-frames 49
+  # Custom Veo settings
+  python simple_cartoon_generator.py --prompt "Adventure story" --veo-width 768 --veo-height 1024 --veo-duration 5
 
 Storyboard Cast Format (with face images):
   {
@@ -184,7 +178,7 @@ Storyboard Cast Format (with face images):
         help="Visual style (realistic, anime, indian, etc.)"
     )
     
-    # Note: --model-type removed (WAN 2.1 is the only model now)
+    # Note: Using Google Veo via genai package
     
     parser.add_argument(
         "--duration", "-d",
@@ -261,45 +255,31 @@ Storyboard Cast Format (with face images):
     )
     
     parser.add_argument(
-        "--wan-width",
+        "--veo-width",
         type=int,
-        default=832,
-        help="WAN video width (default: 832)"
+        default=768,
+        help="Veo video width (default: 768)"
     )
     
     parser.add_argument(
-        "--wan-height",
+        "--veo-height",
         type=int,
-        default=480,
-        help="WAN video height (default: 480)"
+        default=1024,
+        help="Veo video height (default: 1024)"
     )
     
     parser.add_argument(
-        "--wan-num-frames",
+        "--veo-duration",
         type=int,
-        default=49,
-        help="WAN number of frames to generate (default: 49)"
+        default=5,
+        help="Veo video duration in seconds (default: 5)"
     )
     
     parser.add_argument(
-        "--wan-fps",
-        type=int,
-        default=12,
-        help="WAN output FPS (default: 12)"
-    )
-    
-    parser.add_argument(
-        "--wan-steps",
-        type=int,
-        default=30,
-        help="WAN inference steps (default: 30)"
-    )
-    
-    parser.add_argument(
-        "--wan-guidance",
-        type=float,
-        default=6.0,
-        help="WAN guidance scale (default: 6.0)"
+        "--google-api-key",
+        type=str,
+        default=None,
+        help="Google Gemini API key (or set GOOGLE_API_KEY env var)"
     )
     
     parser.add_argument(

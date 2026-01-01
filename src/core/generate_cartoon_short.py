@@ -4,7 +4,7 @@ Cartoon Shorts Generator - A complete CLI tool for creating platform-ready verti
 
 This script follows a specific flow:
 1. Generate 3-scene story with OpenAI GPT-4
-2. Generate videos directly with WAN 2.1 Text-to-Video (T2V)
+2. Generate videos directly with Google Veo Text-to-Video (T2V)
 3. Generate narration with Coqui TTS (XTTS v2)
 4. Stitch scene videos together
 5. Create platform-ready reel (1080×1920, H.264/AAC, 30fps)
@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 
 # Import modular classes
 from .script_generator import ScriptGenerator
-from .wan_t2v import WanT2VGenerator
+from .veo_generator import VeoGenerator
 from .coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 from .video_processor import VideoProcessor, VideoConfig as VPConfig
 
@@ -75,15 +75,13 @@ class VideoConfig:
     enable_prompt_enhancement: bool = True
     # Control pause between scenes (in seconds)
     scene_pause_duration: float = 0.0  # Default 0.0 second pause between scenes (no black screens)
-    # WAN T2V settings
-    wan_width: int = 832  # WAN video width
-    wan_height: int = 480  # WAN video height
-    wan_num_frames: int = 49  # WAN number of frames to generate
-    wan_fps: int = 12  # WAN output FPS
-    wan_steps: int = 30  # WAN inference steps
-    wan_guidance: float = 6.0  # WAN guidance scale
-    wan_negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly"  # WAN negative prompt for realistic videos (excludes non-realistic styles)
-    wan_seed: Optional[int] = None  # WAN random seed (optional)
+    # Google Veo settings
+    veo_width: int = 768  # Veo video width
+    veo_height: int = 1024  # Veo video height
+    veo_duration: int = 5  # Veo video duration in seconds
+    veo_negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly"  # Veo negative prompt for realistic videos (excludes non-realistic styles)
+    veo_seed: Optional[int] = None  # Veo random seed (optional, may not be supported)
+    google_api_key: Optional[str] = None  # Google Gemini API key (or set GOOGLE_API_KEY env var)
     # Audio settings
     skip_audio: bool = False  # Skip audio generation entirely
     # Hook text settings
@@ -105,12 +103,10 @@ class VideoConfig:
         """Set dimensions based on video format."""
         if self.video_format.lower() == "shorts":
             # YouTube Shorts: 9:16 aspect ratio
-            # Note: WAN uses fixed dimensions, but we'll crop/resize in post-processing
             self.width = 768
             self.height = 1024
         elif self.video_format.lower() == "normal":
             # Normal video: 16:9 aspect ratio
-            # Note: WAN uses fixed dimensions, but we'll crop/resize in post-processing
             self.width = 1920
             self.height = 1080
         else:
@@ -130,15 +126,13 @@ class CartoonShortsGenerator:
         # Initialize components using modular classes
         self.script_generator = ScriptGenerator(os.getenv('OPENAI_API_KEY', ''))
         
-        # Initialize WAN T2V generator
-        self.wan_generator = WanT2VGenerator(
-            width=config.wan_width,
-            height=config.wan_height,
-            num_frames=config.wan_num_frames,
-            fps=config.wan_fps,
-            num_inference_steps=config.wan_steps,
-            guidance_scale=config.wan_guidance,
-            negative_prompt=config.wan_negative_prompt
+        # Initialize Google Veo generator
+        self.veo_generator = VeoGenerator(
+            api_key=config.google_api_key,
+            width=config.veo_width,
+            height=config.veo_height,
+            duration=config.veo_duration,
+            negative_prompt=config.veo_negative_prompt
         )
         
         # Initialize Coqui TTS voice synthesizer
@@ -338,8 +332,8 @@ class CartoonShortsGenerator:
                 logger.info(f"📊 Total scene duration: {total_audio_duration:.1f}s")
                 logger.info(f"📊 Average scene duration: {total_audio_duration/len(actual_scene_durations):.1f}s")
             
-            # Step 3: Generate videos directly from prompts using WAN T2V
-            logger.info("Step 3: Generating videos with WAN 2.1 T2V...")
+            # Step 3: Generate videos directly from prompts using Google Veo
+            logger.info("Step 3: Generating videos with Google Veo...")
             logger.info(f"🎬 Total videos to generate: {len(script['scenes'])}")
             video_clips: List[str] = []
             total_video_duration = 0
@@ -411,13 +405,13 @@ class CartoonShortsGenerator:
                 if negative_prompt:
                     logger.info(f"🎬 Scene {i+1}: Using negative prompt ({len(negative_prompt)} characters)")
                 
-                # Generate video with WAN
+                # Generate video with Google Veo
                 try:
                     # Calculate target duration from narration if available
                     target_duration = None
                     if not self.config.skip_audio and i < len(actual_scene_durations):
                         target_duration = actual_scene_durations[i]
-                        logger.info(f"🎬 Scene {i+1}: Using narration duration ({target_duration:.2f}s) to calculate frames")
+                        logger.info(f"🎬 Scene {i+1}: Using narration duration ({target_duration:.2f}s)")
                     
                     # Extract scene metadata for best frame extraction
                     scene_id = scene.get('id', f"scene_{i+1}")
@@ -428,12 +422,12 @@ class CartoonShortsGenerator:
                     slug = "".join(c for c in story_title if c.isalnum() or c in (' ', '-', '_')).strip().replace(' ', '_').lower()[:50]
                     
                     # Generate video with optional best frame extraction
-                    result = self.wan_generator.generate_video(
+                    result = self.veo_generator.generate_video(
                         prompt=prompt,
                         output_path=str(clip_path),
-                        seed=self.config.wan_seed,
+                        seed=self.config.veo_seed,
                         negative_prompt=negative_prompt or None,
-                        duration=target_duration,  # Pass narration duration to calculate frames
+                        duration=target_duration,  # Pass narration duration
                         scene_id=scene_id,
                         visual_reference=visual_reference,
                         slug=slug,
@@ -757,17 +751,17 @@ class CartoonShortsGenerator:
                 else:
                     logger.info(f"🎵 Fallback: Reusing existing single audio: {narration_path}")
                 
-                # Check if narration file exists, otherwise calculate expected duration from WAN settings
+                # Check if narration file exists, otherwise calculate expected duration from Veo settings
                 if narration_path.exists():
                     logger.info("📏 Fallback: Detecting single track duration...")
                     actual_duration = self.video_processor.get_audio_duration(str(narration_path))
                     script['total_duration'] = actual_duration
                     self.config.duration = max(self.config.duration, actual_duration)
                 else:
-                    # Use WAN video duration if audio file doesn't exist (WAN generates fixed duration)
+                    # Use Veo video duration if audio file doesn't exist
                     logger.warning(f"⚠️ Narration file not found: {narration_path}")
-                    logger.info("📏 Using WAN video duration instead (audio will be handled separately)")
-                    actual_duration = (self.config.wan_num_frames / self.config.wan_fps) * len(script['scenes'])
+                    logger.info("📏 Using Veo video duration instead (audio will be handled separately)")
+                    actual_duration = self.config.veo_duration * len(script['scenes'])
                     script['total_duration'] = actual_duration
                     self.config.duration = max(self.config.duration, actual_duration)
                 
@@ -906,7 +900,7 @@ class CartoonShortsGenerator:
         base_prompt = visual_prompt or "Cartoon scene"
         
         # Get the negative prompt from the script, or use default
-        negative_prompt = scene.get('negative_prompt', self.config.wan_negative_prompt)
+        negative_prompt = scene.get('negative_prompt', self.config.veo_negative_prompt)
 
         # Use raw prompt without enhancement
         logger.info(f"🎯 Using raw visual_prompt: {base_prompt}")
@@ -1013,8 +1007,8 @@ def main():
             verbose_ffmpeg=args.verbose_ffmpeg
         )
         
-        # Pre-initialize generator to load pipelines once (WAN and TTS use singletons)
-        logger.info("📦 Loading WAN pipeline (singleton - will be reused)...")
+        # Pre-initialize generator to load pipelines once (Veo and TTS use singletons)
+        logger.info("📦 Loading Veo generator (will be reused)...")
         logger.info("📦 Loading TTS model (singleton - will be reused)...")
         temp_generator = CartoonShortsGenerator(base_config)
         logger.info("✅ Pipelines initialized and ready for bulk generation")
@@ -1088,7 +1082,7 @@ def main():
                     normalized_scenes.append(scene_copy)
                 
                 # Update generator config and output directory (reuse same instance)
-                # This ensures WAN and TTS pipelines are truly reused (not reloaded)
+                # This ensures Veo and TTS pipelines are truly reused (not reloaded)
                 temp_generator.config.prompt = title
                 temp_generator.config.title = title
                 temp_generator.config.description = description
