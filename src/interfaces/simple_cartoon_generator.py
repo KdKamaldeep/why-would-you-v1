@@ -30,14 +30,8 @@ def check_requirements():
         print("❌ OpenAI API key not configured in .env file")
         return False
         
-    # No ElevenLabs key needed; ensure TTS model directory exists if using local models
-    
-    # Check if models directory exists
-    if not Path("models").exists():
-        print("❌ Models directory not found. Please run the model download script first.")
-        return False
-    
-    # Note: WAN model will be downloaded automatically from Hugging Face when first used
+    # No ElevenLabs key needed; TTS and WAN models will be downloaded automatically from Hugging Face when first used
+    # Note: Models directory will be created automatically if needed
     
     print("✅ All requirements satisfied!")
     return True
