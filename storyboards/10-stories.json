@@ -1,4 +1,5 @@
 {
+	"stories"[{
   "story": {
     "title": "World War II in 12 Seconds",
     "description": "A 3-scene mini-story capturing the start, scale, and cost of World War II. Each scene is ~4 seconds using 49 frames at 12 fps.",
@@ -46,4 +47,5 @@
       }
     ]
   }
+}]
 }
