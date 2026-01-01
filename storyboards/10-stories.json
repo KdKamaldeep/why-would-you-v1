@@ -11,8 +11,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_up",
           "zoom_direction": "in",
-          "visual_prompt": "Macro shot of an ancient, cracked oil painting from the 1500s showing a knight holding a glowing glass smartphone, flickering candlelight, cinematic shadows.",
-          "negative_prompt": "modern photography, clean, digital art",
+          "visual_prompt": "Cinematic shot of an ancient oil painting from the 1500s where a knight's hand is visibly moving to grip a glowing glass smartphone, candlelight flickering rapidly, shadows dancing across the cracked canvas, 4k.",
+          "negative_prompt": "static, still image, photograph, clean",
           "narration": "Historians just found a 500-year-old painting that shouldn't exist."
         },
         {
@@ -21,8 +21,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_left",
           "zoom_direction": "out",
-          "visual_prompt": "Extreme close-up of the painting's brushstrokes, the 'phone' in the painting has real glowing pixels under the varnish, microscopic view.",
-          "negative_prompt": "blurry, low res, flat",
+          "visual_prompt": "Macro view of glowing pixels swirling and pulsing like liquid electricity beneath the ancient varnish of a painting, microscopic dust particles floating in the light, high-speed motion.",
+          "negative_prompt": "blurry, static, flat, dead",
           "narration": "Under a microscope, the 'paint' isn't pigment—it's liquid silicon."
         },
         {
@@ -31,8 +31,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_right",
           "zoom_direction": "in",
-          "visual_prompt": "An X-ray scan of the canvas revealing a metallic motherboard hidden behind the portrait of a king, glowing blue lines, high tech.",
-          "negative_prompt": "paper, wood, simple",
+          "visual_prompt": "Dynamic X-ray scan sliding across a canvas, revealing a complex metallic motherboard with blue energy racing through circuits hidden behind a king's portrait, glitching effects.",
+          "negative_prompt": "paper, wood, static, no motion",
           "narration": "The canvas isn't cloth. It's a circuit board waiting to be powered on."
         },
         {
@@ -41,8 +41,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_down",
           "zoom_direction": "out",
-          "visual_prompt": "The painting starting to glow and hum, the figure's eyes moving to look at the camera, dramatic zoom-in, fade to black.",
-          "negative_prompt": "static, dead, bright",
+          "visual_prompt": "The painted figure suddenly turning its head to stare at the camera as the entire canvas begins to vibrate and hum with golden light, paint chips flying off in slow motion.",
+          "negative_prompt": "static, dead, bright, unmoving",
           "narration": "We aren't discovering history. We're rebooting it."
         }
       ]
@@ -58,8 +58,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_left",
           "zoom_direction": "in",
-          "visual_prompt": "A massive metallic hatch at the bottom of the dark blue ocean, covered in giant glowing barnacles, a submarine spotlight hitting the center.",
-          "negative_prompt": "sand, coral, bright beach",
+          "visual_prompt": "A massive metallic hatch at the bottom of the ocean vibrating violently, bubbles blasting out from the edges, submarine spotlights swiveling rapidly across the rusted surface.",
+          "negative_prompt": "sand, coral, static, still water",
           "narration": "The bottom of the Mariana Trench isn't rock. It’s a door."
         },
         {
@@ -68,8 +68,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_down",
           "zoom_direction": "in",
-          "visual_prompt": "Giant mechanical gears grinding deep underwater, stirring up clouds of silt, bioluminescent fish swimming away in fear.",
-          "negative_prompt": "static, bubbles, daylight",
+          "visual_prompt": "Enormous mechanical gears grinding and spinning underwater, creating massive whirlpools of silt and sand, bioluminescent fish darting away in chaotic motion.",
+          "negative_prompt": "static, bubbles, daylight, unmoving gears",
           "narration": "In 2025, sonar detected a massive mechanical 'click' coming from the Earth's crust."
         },
         {
@@ -78,8 +78,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_up",
           "zoom_direction": "out",
-          "visual_prompt": "A POV shot from a submarine looking into a crack in the ocean floor, revealing a bright glowing city miles below the seabed.",
-          "negative_prompt": "darkness, empty, rocks",
+          "visual_prompt": "POV from a fast-moving submersible diving into a massive fissure in the ocean floor, racing toward a sprawling neon city pulsing with light deep below.",
+          "negative_prompt": "darkness, empty, rocks, slow",
           "narration": "Beneath the 'floor' is a second ocean, filled with artificial light."
         },
         {
@@ -88,8 +88,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_right",
           "zoom_direction": "in",
-          "visual_prompt": "The giant hatch slowly beginning to rotate and open, an enormous eye looking up from the darkness, dramatic camera shake.",
-          "negative_prompt": "closing, static, bright",
+          "visual_prompt": "The giant hatch rotating and slamming open, a massive prehistoric eye lashing out from the dark void, water rushing inward with violent force.",
+          "negative_prompt": "closing, static, bright, still",
           "narration": "And something just turned the handle from the other side."
         }
       ]
@@ -105,8 +105,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_right",
           "zoom_direction": "in",
-          "visual_prompt": "A man walking down a sunny street, but his shadow is standing still and looking at him, high contrast, cinematic street photography.",
-          "negative_prompt": "matching shadow, blurry, night",
+          "visual_prompt": "A man running down a street while his shadow remains perfectly still, standing upright and slowly turning its head to watch him run past, high contrast.",
+          "negative_prompt": "matching shadow, blurry, night, static",
           "narration": "What if your shadow isn't a reflection of light, but a separate entity?"
         },
         {
@@ -115,8 +115,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_up",
           "zoom_direction": "out",
-          "visual_prompt": "A close-up of a shadow on a brick wall reaching out a 3D hand that casts its own shadow, surreal glitch aesthetic.",
-          "negative_prompt": "flat, 2d, normal",
+          "visual_prompt": "A shadow on a brick wall suddenly detaching its arms and reaching out toward the camera in 3D, the bricks cracking as the shadow claws at them.",
+          "negative_prompt": "flat, 2d, normal, unmoving",
           "narration": "Thousands are reporting 'Lagging Shadows' that move seconds after they do."
         },
         {
@@ -125,8 +125,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_left",
           "zoom_direction": "in",
-          "visual_prompt": "A dark bedroom, a person sleeping, their shadow sitting up on the wall and watching them, eerie blue moonlight.",
-          "negative_prompt": "bright, morning, happy",
+          "visual_prompt": "In a moonlit bedroom, a shadow figure crawls rapidly across the ceiling while the person below sleeps, the shadow's eyes glowing with a faint blue pulse.",
+          "negative_prompt": "bright, morning, happy, static",
           "narration": "Scientists call it a visual glitch, but why do the shadows look more 'real' than us?"
         },
         {
@@ -135,8 +135,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_down",
           "zoom_direction": "out",
-          "visual_prompt": "The shadow detaching from the wall and stepping into the 3D room, a silhouette walking toward the camera, fade to black.",
-          "negative_prompt": "static, light, simple",
+          "visual_prompt": "The shadow lunging off the wall and materializing into a dark silhouette that grabs the camera lens, screen shaking and glitching into black.",
+          "negative_prompt": "static, light, simple, no motion",
           "narration": "Check your wall. Is your shadow still yours?"
         }
       ]
@@ -152,8 +152,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_down",
           "zoom_direction": "out",
-          "visual_prompt": "A massive white cloud in a blue sky partially evaporating to reveal a giant, rusted iron turbine spinning inside it, cinematic wide shot.",
-          "negative_prompt": "plane, bird, clear sky",
+          "visual_prompt": "A massive cumulonimbus cloud shredding apart to reveal a colossal, spinning iron turbine venting steam and fire into the atmosphere, wide cinematic shot.",
+          "negative_prompt": "plane, bird, clear sky, static cloud",
           "narration": "Clouds aren't water vapor. They're exhaust fumes."
         },
         {
@@ -162,8 +162,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_right",
           "zoom_direction": "in",
-          "visual_prompt": "A lightning bolt striking a cloud and revealing a skeletal metallic framework inside, sparks flying through the mist, high resolution.",
-          "negative_prompt": "natural storm, dark, low res",
+          "visual_prompt": "Lightning arcing across the sky, illuminating a vast network of metallic pipes and pistons hidden inside the clouds, moving in a rhythmic, industrial beat.",
+          "negative_prompt": "natural storm, dark, low res, static",
           "narration": "A pilot just leaked footage of what’s hidden inside a Category 5 hurricane."
         },
         {
@@ -172,8 +172,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_up",
           "zoom_direction": "in",
-          "visual_prompt": "Macro shot of a 'snowflake' landing on a hand, it looks like a tiny microchip made of ice, glowing blue pulse.",
-          "negative_prompt": "real snow, blurry, water",
+          "visual_prompt": "Macro shot of a robotic snowflake landing on a warm hand, its mechanical legs twitching as it unfolds into a tiny glowing microchip before melting.",
+          "negative_prompt": "real snow, blurry, water, unmoving",
           "narration": "The 'weather' is a climate-control machine that's starting to fail."
         },
         {
@@ -182,8 +182,8 @@
           "speed_factor": 1.5,
           "transition": "swipe_left",
           "zoom_direction": "out",
-          "visual_prompt": "The sky peeling back like a wallpaper to reveal a dark cosmic factory above the clouds, cinematic reveal, high contrast.",
-          "negative_prompt": "blue sky, sun, simple",
+          "visual_prompt": "The entire sky tearing open like a digital screen, revealing a dark, infinite factory of gears and lasers hovering above the world, moving parts everywhere.",
+          "negative_prompt": "blue sky, sun, simple, static",
           "narration": "The sky isn't falling. It's being dismantled."
         }
       ]
@@ -199,8 +199,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_up",
           "zoom_direction": "in",
-          "visual_prompt": "A marble Greek statue in a dark museum, the chest slowly rising and falling as if breathing, dust motes dancing in a spotlight.",
-          "negative_prompt": "static, stone, bright gallery",
+          "visual_prompt": "A marble statue's chest heaving with deep, heavy breaths, dust flying off the stone with every exhale, dramatic shadows shifting in a dark museum.",
+          "negative_prompt": "static, stone, bright gallery, no movement",
           "narration": "A security guard at the Louvre just recorded the impossible."
         },
         {
@@ -209,8 +209,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_left",
           "zoom_direction": "in",
-          "visual_prompt": "A stethoscope pressed against the cold marble skin of a statue, the sound wave on a monitor showing a human heartbeat.",
-          "negative_prompt": "doctor, hospital, plastic",
+          "visual_prompt": "A close-up of a stethoscope on marble skin, the stone surface rippling and pulsing like a heartbeat, monitor lines in the background jumping frantically.",
+          "negative_prompt": "doctor, hospital, plastic, static",
           "narration": "This 2,000-year-old marble has a resting heart rate of sixty beats per minute."
         },
         {
@@ -219,8 +219,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_right",
           "zoom_direction": "out",
-          "visual_prompt": "A close-up of the statue's marble eye cracking slightly to reveal a wet, human pupil looking around, cinematic horror.",
-          "negative_prompt": "closed eye, stone eye, blurry",
+          "visual_prompt": "A stone eyelid suddenly snapping open to reveal a wet, blinking human eye that darts around the room in a panic, cinematic horror closeup.",
+          "negative_prompt": "closed eye, stone eye, blurry, static",
           "narration": "It’s not a sculpture. It’s a person trapped in a 'mineral stasis' we don't understand."
         },
         {
@@ -229,8 +229,8 @@
           "speed_factor": 1.2,
           "transition": "swipe_up",
           "zoom_direction": "in",
-          "visual_prompt": "The statue's stone hand slowly cracking and a finger twitching toward the viewer, stone fragments falling, dramatic zoom.",
-          "negative_prompt": "static, still, light",
+          "visual_prompt": "The statue's entire arm cracking and shattering as it reaches toward the camera, stone shards flying, the underlying flesh moving beneath the rock.",
+          "negative_prompt": "static, still, light, unbreaking",
           "narration": "And after two thousand years... it's finally waking up."
         }
       ]
