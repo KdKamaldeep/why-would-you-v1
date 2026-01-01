@@ -392,9 +392,8 @@ Storyboard Cast Format (with face images):
     print(f"🔄 No Reuse: {args.no_reuse}")
     print(f"✨ No Prompt Enhancement: {args.no_prompt_enhancement}")
     print(f"🔍 Check Only: {args.check_only}")
-    print(f"🎬 WAN Width: {args.wan_width}, Height: {args.wan_height}")
-    print(f"🎞️ WAN Frames: {args.wan_num_frames} @ {args.wan_fps}fps")
-    print(f"⚙️ WAN Steps: {args.wan_steps}, Guidance: {args.wan_guidance}")
+    print(f"🎬 Veo Width: {args.veo_width}, Height: {args.veo_height}")
+    print(f"⏱️ Veo Duration: {args.veo_duration}s")
     if args.seed:
         print(f"🎲 Seed: {args.seed}")
     print(f"🔇 Skip Audio: {args.skip_audio}")
@@ -463,14 +462,12 @@ Storyboard Cast Format (with face images):
                     language=args.language,
                     enable_prompt_enhancement=False,
                     add_subtitles=args.auto_sub,  # Only enable if --auto-sub is provided
-                    wan_width=args.wan_width,
-                    wan_height=args.wan_height,
-                    wan_num_frames=args.wan_num_frames,
-                    wan_fps=args.wan_fps,
-                    wan_steps=args.wan_steps,
-                    wan_guidance=args.wan_guidance,
-                    wan_negative_prompt=args.negative_prompt,
-                    wan_seed=args.seed,
+                    veo_width=args.veo_width,
+                    veo_height=args.veo_height,
+                    veo_duration=args.veo_duration,
+                    veo_negative_prompt=args.negative_prompt,
+                    veo_seed=args.seed,
+                    google_api_key=args.google_api_key,
                     skip_audio=args.skip_audio,
                     create_reel=not args.no_reel and (args.format == "reel" or args.vertical),
                     vertical_mode=args.vertical_mode,
@@ -610,9 +607,8 @@ Storyboard Cast Format (with face images):
             print(f"⏱️ Duration: {args.duration}")
             print(f"📐 Video Format: {args.video_format}")
             print(f"🗣️ Language: {args.language}")
-            print(f"🎬 WAN Width: {args.wan_width}, Height: {args.wan_height}")
-            print(f"🎞️ WAN Frames: {args.wan_num_frames} @ {args.wan_fps}fps")
-            print(f"⚙️ WAN Steps: {args.wan_steps}, Guidance: {args.wan_guidance}")
+            print(f"🎬 Veo Width: {args.veo_width}, Height: {args.veo_height}")
+            print(f"⏱️ Veo Duration: {args.veo_duration}s")
             if args.seed:
                 print(f"🎲 Seed: {args.seed}")
             print(f"🔇 Skip Audio: {args.skip_audio}")
@@ -687,14 +683,12 @@ Storyboard Cast Format (with face images):
                 bottom_hook_text=bottom_hook_text,
                 language=args.language,
                 enable_prompt_enhancement=False,  # Prompt enhancement disabled
-                wan_width=args.wan_width,
-                wan_height=args.wan_height,
-                wan_num_frames=args.wan_num_frames,
-                wan_fps=args.wan_fps,
-                wan_steps=args.wan_steps,
-                wan_guidance=args.wan_guidance,
-                wan_negative_prompt=args.negative_prompt,
-                wan_seed=args.seed,
+                veo_width=args.veo_width,
+                veo_height=args.veo_height,
+                veo_duration=args.veo_duration,
+                veo_negative_prompt=args.negative_prompt,
+                veo_seed=args.seed,
+                google_api_key=args.google_api_key,
                 skip_audio=args.skip_audio,
                 create_reel=create_reel,
                 vertical_mode=args.vertical_mode,
@@ -722,14 +716,12 @@ Storyboard Cast Format (with face images):
             args.language, 
             not args.no_prompt_enhancement, 
             args.video_format,
-            args.wan_width,
-            args.wan_height,
-            args.wan_num_frames,
-            args.wan_fps,
-            args.wan_steps,
-            args.wan_guidance,
+            args.veo_width,
+            args.veo_height,
+            args.veo_duration,
             args.negative_prompt,
             args.seed,
+            google_api_key=args.google_api_key,
             create_reel=create_reel,
             vertical_mode=args.vertical_mode,
             reel_width=args.out_width,
