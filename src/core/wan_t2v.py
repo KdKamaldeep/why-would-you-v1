@@ -64,7 +64,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
     try:
         from diffusers import AutoencoderKLWan, WanPipeline
         
-        model_id = "Wan-AI/Wan2.2-TI2V-5B"
+        model_id = "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
         
         # Configure Hugging Face cache directory to use /workspace if available
         # This is important for RunPod and similar environments with attached disks
