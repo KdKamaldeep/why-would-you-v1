@@ -128,7 +128,7 @@ class VeoGenerator:
             # Generate video using Veo API
             # Note: duration is not a valid parameter for GenerateVideosConfig
             operation = self.client.models.generate_videos(
-                model="veo-2",
+                model="veo-3.0-fast-generate-001",
                 prompt=full_prompt,
                 config=genai.types.GenerateVideosConfig(
                     aspect_ratio=aspect_ratio,
