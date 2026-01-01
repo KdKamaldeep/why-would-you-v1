@@ -332,13 +332,13 @@ class CartoonShortsGenerator:
                 logger.info(f"📊 Total audio duration: {total_audio_duration:.1f}s")
                 logger.info(f"📊 Average audio duration per scene: {total_audio_duration/len(actual_scene_durations):.1f}s")
                 
-                # Cleanup Coqui TTS pipeline after audio generation to free VRAM for WAN model
-                logger.info("🧹 Cleaning up Coqui TTS pipeline to free VRAM...")
+                # Move Coqui TTS pipeline to CPU after audio generation to free VRAM for WAN model
+                logger.info("💾 Moving Coqui TTS pipeline to CPU to free VRAM for video generation...")
                 try:
-                    self.voice_synthesizer.cleanup()
-                    logger.info("✅ Coqui TTS pipeline unloaded successfully")
+                    self.voice_synthesizer.move_to_cpu()
+                    logger.info("✅ Coqui TTS pipeline moved to CPU (will be moved back to GPU if needed)")
                 except Exception as e:
-                    logger.warning(f"⚠️ Failed to cleanup TTS pipeline: {e}")
+                    logger.warning(f"⚠️ Failed to move TTS pipeline to CPU: {e}")
             else:
                 # Calculate total duration from scene durations
                 total_audio_duration = sum(actual_scene_durations)
