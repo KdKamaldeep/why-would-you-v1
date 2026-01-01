@@ -112,7 +112,7 @@ class VeoGenerator:
                 logger.info(f"🚫 Negative prompt: {neg_prompt[:100]}{'...' if len(neg_prompt) > 100 else ''}")
             
             # Combine prompt with negative prompt if needed
-            # Note: Veo may handle negative prompts differently, adjust as needed
+            # Note: Effects (speed, zoom, transitions) are already in the prompt, don't add them
             full_prompt = prompt
             if neg_prompt:
                 # Some models support negative prompts in the format, adjust based on Veo's API
