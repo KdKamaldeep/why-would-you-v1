@@ -83,3 +83,6 @@ python scripts/test_wan.py \
   --guidance 6.0 \
   --seed 42 \
   --negative-prompt "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter"
+
+
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
