@@ -105,7 +105,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
             subfolder="vae",
-            torch_dtype=vae_dtype,  # BF16 for maximum quality
+            torch_dtype=torch.float16,  # BF16 for maximum quality
             cache_dir=cache_dir
         )
         
