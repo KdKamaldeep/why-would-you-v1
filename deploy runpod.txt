@@ -18,7 +18,8 @@ python -m src.interfaces.simple_cartoon_generator \
   --wan-fps 12 \
   --wan-steps 30 \
   --wan-guidance 5 \
-  --gen-bulk
+  --gen-bulk \
+  --use-i2v
   
 # With custom WAN settings with 12 steps cause bit slowness
 python -m src.interfaces.simple_cartoon_generator \
@@ -70,3 +71,27 @@ export TRANSFORMERS_CACHE=/workspace/.cache/huggingface/transformers
 export DIFFUSERS_CACHE=/workspace/.cache/huggingface/diffusers
 export XDG_CACHE_HOME=/workspace/.cache
 mkdir -p "$HF_HUB_CACHE" "$TRANSFORMERS_CACHE" "$DIFFUSERS_CACHE"
+
+
+
+python scripts/test_i2v_pipeline.py \
+  --visual-prompt "A serene mountain landscape at dawn, misty valleys, photorealistic" \
+  --motion-prompt "Slow camera pan across the mountains, mist drifting, sun rising"
+  
+  
+python scripts/test_gemini_image.py --prompt "A cat sitting on a windowsill, photorealistic, 8k"
+  
+  
+python scripts/test_i2v_pipeline.py \
+  --visual-prompt "A cat sitting on a windowsill, photorealistic, 8k" \
+  --motion-prompt "The cat looks around, tail swishing, camera slowly zooms in" \
+  --wan-steps 1
+  
+
+wan14B packages
+pip install --upgrade torch torchvision --index-url https://download.pytorch.org/whl/cu124 
+
+pip install --upgrade transformers
+
+pip install --upgrade accelerate
+pip install google-genai

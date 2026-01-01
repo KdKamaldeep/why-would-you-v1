@@ -382,6 +382,24 @@ class CartoonShortsGenerator:
                             existing_video_path = synced_video_path
                             existing_duration = target_audio_duration
                     
+                    # Apply scene effects: speed, pan/zoom, and swipe transitions
+                    speed_factor = scene.get('speed_factor', 1.0)
+                    zoom_direction = scene.get('zoom_direction', 'none')
+                    transition = scene.get('transition', 'none')
+                    
+                    if speed_factor != 1.0 or zoom_direction != 'none' or transition != 'none':
+                        logger.info(f"🎬 Scene {i+1}: Applying effects to existing video - speed={speed_factor}x, zoom={zoom_direction}, transition={transition}")
+                        processed_video_path = str(clip_path).replace('.mp4', '_processed.mp4')
+                        existing_video_path = self.video_processor.apply_scene_effects(
+                            input_video=existing_video_path,
+                            output_video=processed_video_path,
+                            speed_factor=speed_factor,
+                            zoom_direction=zoom_direction,
+                            transition=transition
+                        )
+                        existing_duration = self.video_processor.get_video_duration(existing_video_path)
+                        logger.info(f"✅ Scene {i+1}: Effects applied, new duration: {existing_duration:.2f}s")
+                    
                     video_clips.append(existing_video_path)
                     total_video_duration += existing_duration
                     continue
@@ -471,6 +489,25 @@ class CartoonShortsGenerator:
                             logger.info(f"✅ Scene {i+1}: Video synced to audio ({actual_duration:.2f}s)")
                         else:
                             logger.info(f"✅ Scene {i+1}: Video duration ({actual_duration:.2f}s) already matches audio ({target_audio_duration:.2f}s)")
+                    
+                    # Apply scene effects: speed, pan/zoom, and swipe transitions
+                    speed_factor = scene.get('speed_factor', 1.0)
+                    zoom_direction = scene.get('zoom_direction', 'none')
+                    transition = scene.get('transition', 'none')
+                    
+                    if speed_factor != 1.0 or zoom_direction != 'none' or transition != 'none':
+                        logger.info(f"🎬 Scene {i+1}: Applying effects - speed={speed_factor}x, zoom={zoom_direction}, transition={transition}")
+                        processed_video_path = str(video_path).replace('.mp4', '_processed.mp4')
+                        video_path = self.video_processor.apply_scene_effects(
+                            input_video=str(video_path),
+                            output_video=processed_video_path,
+                            speed_factor=speed_factor,
+                            zoom_direction=zoom_direction,
+                            transition=transition
+                        )
+                        # Update duration after speed adjustment
+                        actual_duration = self.video_processor.get_video_duration(str(video_path))
+                        logger.info(f"✅ Scene {i+1}: Effects applied, new duration: {actual_duration:.2f}s")
                     
                     video_clips.append(video_path)
                     total_video_duration += actual_duration

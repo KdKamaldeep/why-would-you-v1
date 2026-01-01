@@ -393,6 +393,174 @@ class VideoProcessor:
             logger.error(f"Error creating silent audio: {e}")
             return ""
 
+    def apply_scene_effects(self, input_video: str, output_video: str, 
+                           speed_factor: float = 1.0, 
+                           zoom_direction: str = "none",
+                           transition: str = "none") -> str:
+        """
+        Apply speed adjustment, pan/zoom, and swipe transitions to a scene video.
+        
+        Args:
+            input_video: Path to input video
+            output_video: Path to output video
+            speed_factor: Speed multiplier (1.2 or 1.5 to speed up)
+            zoom_direction: "in" or "out" for zoom effects
+            transition: "swipe_up", "swipe_down", "swipe_left", "swipe_right", or "none"
+        
+        Returns:
+            Path to processed video
+        """
+        try:
+            # Get video dimensions
+            probe_cmd = [
+                'ffprobe', '-v', 'error',
+                '-select_streams', 'v:0',
+                '-show_entries', 'stream=width,height',
+                '-of', 'csv=s=x:p=0',
+                input_video
+            ]
+            result = subprocess.run(probe_cmd, check=True, capture_output=True, text=True)
+            width, height = map(int, result.stdout.strip().split('x'))
+            
+            # Get video duration
+            duration = self.get_video_duration(input_video)
+            
+            # Build filter complex for all effects
+            filters = []
+            
+            # 1. Speed adjustment (speed up video)
+            if speed_factor > 1.0:
+                # Speed up video: setpts reduces PTS (makes it faster)
+                # For speed_factor 1.5, we want 1/1.5 = 0.6667
+                pts_factor = 1.0 / speed_factor
+                filters.append(f"setpts={pts_factor:.6f}*PTS")
+            
+            # 2. Pan/Zoom effect using zoompan filter
+            # Calculate frames for zoompan (use fps estimate)
+            # Note: zoompan's 'd' parameter is output frames, so we use original duration
+            # since setpts only changes timestamps, not frame count
+            fps = 30  # Estimate fps
+            # After speed adjustment, output duration = duration / speed_factor
+            # But zoompan processes all input frames, so use original frame count
+            total_frames = int(duration * fps)
+            
+            # Build zoompan filter with zoom and pan combined
+            if zoom_direction in ["in", "out"]:
+                if zoom_direction == "in":
+                    # Progressive zoom in: z increases from 1.0 to 1.3
+                    zoom_expr = "1.0 + (on/d) * 0.3"
+                else:
+                    # Progressive zoom out: z decreases from 1.3 to 1.0
+                    zoom_expr = "1.3 - (on/d) * 0.3"
+                
+                # Add panning based on transition direction
+                if transition == "swipe_left":
+                    # Pan left: x moves from right to left
+                    x_expr = "iw - (iw/zoom) - (on/d) * (iw - iw/zoom)"
+                    y_expr = "ih/2-(ih/zoom/2)"
+                elif transition == "swipe_right":
+                    # Pan right: x moves from left to right
+                    x_expr = "(on/d) * (iw - iw/zoom)"
+                    y_expr = "ih/2-(ih/zoom/2)"
+                elif transition == "swipe_up":
+                    # Pan up: y moves from bottom to top
+                    x_expr = "iw/2-(iw/zoom/2)"
+                    y_expr = "ih - (ih/zoom) - (on/d) * (ih - ih/zoom)"
+                elif transition == "swipe_down":
+                    # Pan down: y moves from top to bottom
+                    x_expr = "iw/2-(iw/zoom/2)"
+                    y_expr = "(on/d) * (ih - ih/zoom)"
+                else:
+                    # No panning, just center zoom
+                    x_expr = "iw/2-(iw/zoom/2)"
+                    y_expr = "ih/2-(ih/zoom/2)"
+                
+                zoom_filter = f"zoompan=z='{zoom_expr}':d={total_frames}:x='{x_expr}':y='{y_expr}':s={width}x{height}"
+                filters.append(zoom_filter)
+            elif transition in ["swipe_left", "swipe_right", "swipe_up", "swipe_down"]:
+                # Pan only (no zoom) - use crop with moving window for smooth panning
+                pan_range = 0.2  # 20% of frame size for panning range
+                crop_w = int(width * (1 - pan_range))
+                crop_h = int(height * (1 - pan_range))
+                
+                if transition == "swipe_left":
+                    # Pan left: crop window moves from right to left
+                    pan_filter = f"crop={crop_w}:{height}:if(gte(t,0), {width - crop_w} - (t/{duration}) * ({width - crop_w}), {width - crop_w}):0"
+                elif transition == "swipe_right":
+                    # Pan right: crop window moves from left to right
+                    pan_filter = f"crop={crop_w}:{height}:if(gte(t,0), (t/{duration}) * ({width - crop_w}), 0):0"
+                elif transition == "swipe_up":
+                    # Pan up: crop window moves from bottom to top
+                    pan_filter = f"crop={width}:{crop_h}:0:if(gte(t,0), {height - crop_h} - (t/{duration}) * ({height - crop_h}), {height - crop_h})"
+                elif transition == "swipe_down":
+                    # Pan down: crop window moves from top to bottom
+                    pan_filter = f"crop={width}:{crop_h}:0:if(gte(t,0), (t/{duration}) * ({height - crop_h}), 0)"
+                
+                filters.append(pan_filter)
+            
+            # Build FFmpeg command
+            cmd = [
+                'ffmpeg', '-y',
+                '-i', input_video
+            ]
+            
+            # Add video filter if we have any effects
+            if filters:
+                filter_chain = ','.join(filters)
+                cmd.extend(['-vf', filter_chain])
+            
+            # Handle audio speed adjustment
+            if speed_factor > 1.0:
+                # Speed up audio to match video
+                # atempo can only go up to 2.0, so chain if needed
+                if speed_factor <= 2.0:
+                    cmd.extend(['-af', f'atempo={speed_factor:.6f}'])
+                else:
+                    # Chain atempo filters for speeds > 2.0
+                    atempo_chain = []
+                    remaining_speed = speed_factor
+                    while remaining_speed > 2.0:
+                        atempo_chain.append('atempo=2.0')
+                        remaining_speed /= 2.0
+                    if remaining_speed > 1.0:
+                        atempo_chain.append(f'atempo={remaining_speed:.6f}')
+                    cmd.extend(['-af', ','.join(atempo_chain)])
+            
+            # Encoding settings
+            cmd.extend([
+                '-c:v', self.config.codec,
+                '-preset', self.config.preset,
+                '-crf', str(self.config.crf),
+                '-c:a', 'aac',
+                '-b:a', self.config.audio_bitrate,
+                '-pix_fmt', 'yuv420p'
+            ])
+            
+            # Add tune parameter
+            if self.config.codec == 'libx264':
+                cmd.extend(['-tune', 'film'])
+            elif self.config.codec == 'libx265':
+                cmd.extend(['-tune', self.config.tune])
+            
+            if self.config.codec == 'libx265':
+                cmd.extend(['-tag:v', 'hvc1'])
+            
+            if self.config.faststart:
+                cmd.extend(['-movflags', '+faststart'])
+            
+            cmd.append(output_video)
+            
+            subprocess.run(cmd, check=True, capture_output=True)
+            logger.info(f"Applied effects to scene: speed={speed_factor}x, zoom={zoom_direction}, transition={transition}")
+            return output_video
+            
+        except Exception as e:
+            logger.error(f"Error applying scene effects: {e}")
+            # Fallback: just copy the original
+            import shutil
+            shutil.copy2(input_video, output_video)
+            return output_video
+
     def compile_final_video(self, clips: List[str], narration_audio: Union[str, List[str]], background_music: str = None, subtitles_path: str = None, output_path: str = "output/final_short.mp4") -> str:
         """Compile final video with all components."""
         try:
