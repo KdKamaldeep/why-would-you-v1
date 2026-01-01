@@ -679,24 +679,39 @@ class VideoProcessor:
                 logger.info(f"✅ Video extended to {video_duration:.2f}s to match narration")
 
             # Prepare audio inputs
+            # Veo videos already have SFX, so we need to mix video audio + narration
+            # No background music - Veo videos include SFX
             audio_inputs = ['-i', narration_audio]
-            have_music = bool(background_music and os.path.exists(background_music))
-            if have_music:
-                audio_inputs.extend(['-i', background_music])
+            
+            # Check if video has audio stream
+            probe_audio_cmd = [
+                'ffprobe', '-v', 'error',
+                '-select_streams', 'a:0',
+                '-show_entries', 'stream=codec_type',
+                '-of', 'default=nw=1:nk=1',
+                temp_video
+            ]
+            has_video_audio = False
+            try:
+                result = subprocess.run(probe_audio_cmd, capture_output=True, text=True)
+                has_video_audio = result.returncode == 0 and 'audio' in result.stdout.lower()
+            except Exception:
+                pass
             
             # Build FFmpeg command
             cmd = ['ffmpeg', '-y', '-i', temp_video] + audio_inputs
             
-            # Add audio mixing filter
-            if have_music:
-                # Mix narration and bgm to the longest, then pad to ensure audio covers full video duration
+            # Mix video audio (SFX from Veo) with narration if video has audio
+            if has_video_audio:
+                # Video audio is input 0:a, narration is input 1:a
+                # Mix them: SFX at lower volume (0.3), narration at higher volume (1.0)
                 cmd.extend([
-                    '-filter_complex', '[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad[aout]',
+                    '-filter_complex', '[0:a]volume=0.3[sfx];[1:a]volume=1.0[voice];[sfx][voice]amix=inputs=2:duration=longest:dropout_transition=2,apad[aout]',
                     '-map', '0:v',
                     '-map', '[aout]'
                 ])
             else:
-                # Single narration track: pad with silence to ensure full coverage
+                # Video has no audio, just use narration
                 cmd.extend(['-map', '0:v', '-map', '1:a', '-af', 'apad'])
             
             # Add subtitle overlay if provided
