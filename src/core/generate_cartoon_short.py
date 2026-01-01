@@ -4,7 +4,7 @@ Cartoon Shorts Generator - A complete CLI tool for creating platform-ready verti
 
 This script follows a specific flow:
 1. Generate 3-scene story with OpenAI GPT-4
-2. Generate videos directly with WAN 2.1 Text-to-Video (T2V)
+2. Generate videos directly with WAN 2.2 Text-Image-to-Video (TI2V-5B)
 3. Generate narration with Coqui TTS (XTTS v2)
 4. Stitch scene videos together
 5. Create platform-ready reel (1080×1920, H.264/AAC, 30fps)
@@ -75,11 +75,11 @@ class VideoConfig:
     enable_prompt_enhancement: bool = True
     # Control pause between scenes (in seconds)
     scene_pause_duration: float = 0.0  # Default 0.0 second pause between scenes (no black screens)
-    # WAN T2V settings
-    wan_width: int = 832  # WAN video width
-    wan_height: int = 480  # WAN video height
-    wan_num_frames: int = 49  # WAN number of frames to generate
-    wan_fps: int = 12  # WAN output FPS
+    # WAN 2.2 TI2V-5B settings (720p @ 24fps)
+    wan_width: int = 1280  # WAN video width (720p)
+    wan_height: int = 720  # WAN video height (720p)
+    wan_num_frames: int = 72  # WAN number of frames to generate (3s @ 24fps)
+    wan_fps: int = 24  # WAN output FPS (24fps for 720p)
     wan_steps: int = 30  # WAN inference steps
     wan_guidance: float = 6.0  # WAN guidance scale
     wan_negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly"  # WAN negative prompt for realistic videos (excludes non-realistic styles)
@@ -339,7 +339,7 @@ class CartoonShortsGenerator:
                 logger.info(f"📊 Average scene duration: {total_audio_duration/len(actual_scene_durations):.1f}s")
             
             # Step 3: Generate videos directly from prompts using WAN T2V
-            logger.info("Step 3: Generating videos with WAN 2.1 T2V...")
+            logger.info("Step 3: Generating videos with WAN 2.2 TI2V-5B...")
             logger.info(f"🎬 Total videos to generate: {len(script['scenes'])}")
             video_clips: List[str] = []
             total_video_duration = 0

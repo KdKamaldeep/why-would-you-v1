@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-WAN 2.1 Text-to-Video Generator Module
-Handles text-to-video generation using Wan-AI/Wan2.1-T2V-1.3B-Diffusers
+WAN 2.2 Text-Image-to-Video Generator Module
+Handles text-to-video generation using Wan-AI/Wan2.2-TI2V-5B
+Supports both text-to-video (T2V) and text-image-to-video (TI2V) modes
 """
 
 import os
@@ -14,6 +15,7 @@ import subprocess
 import tempfile
 import cv2
 import numpy as np
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +64,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
     try:
         from diffusers import AutoencoderKLWan, WanPipeline
         
-        model_id = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
+        model_id = "Wan-AI/Wan2.2-TI2V-5B"
         
         # Configure Hugging Face cache directory to use /workspace if available
         # This is important for RunPod and similar environments with attached disks
@@ -74,8 +76,9 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             default_cache = Path.home() / ".cache" / "huggingface"
             logger.info(f"📁 Using default Hugging Face cache: {default_cache}")
         
-        logger.info(f"🔄 Loading WAN 2.1 T2V model: {model_id}")
+        logger.info(f"🔄 Loading WAN 2.2 TI2V-5B model: {model_id}")
         logger.info(f"💻 Device: {device}")
+        logger.info("📝 Note: Wan2.2-TI2V-5B is a dense model (no MoE expert switching)")
         
         # Determine torch dtype based on device
         if device == 'cuda' and torch.cuda.is_available():
@@ -94,8 +97,9 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             torch.cuda.empty_cache()
             gc.collect()
         
-        # Load VAE
-        logger.info("📦 Loading WAN VAE...")
+        # Load VAE with wan2.2_vae.safetensors (16x16x4 compression ratio)
+        logger.info("📦 Loading WAN 2.2 VAE (16x16x4 compression ratio)...")
+        logger.info("📦 VAE file: wan2.2_vae.safetensors")
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
             subfolder="vae",
@@ -103,8 +107,8 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             cache_dir=cache_dir
         )
         
-        # Load pipeline
-        logger.info("📦 Loading WAN pipeline...")
+        # Load pipeline (dense model - no MoE expert switching needed)
+        logger.info("📦 Loading WAN 2.2 TI2V-5B pipeline (dense architecture)...")
         _wan_pipeline = WanPipeline.from_pretrained(
             model_id,
             vae=_wan_vae,
@@ -131,7 +135,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             except Exception as e:
                 logger.info("ℹ️ xFormers not available; continuing without it")
         
-        logger.info("✅ WAN 2.1 T2V pipeline loaded successfully")
+        logger.info("✅ WAN 2.2 TI2V-5B pipeline loaded successfully")
         logger.info("📦 WAN pipeline initialized ONCE - will be reused for all subsequent generations")
         return _wan_pipeline
         
@@ -147,25 +151,25 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
 
 
 class WanT2VGenerator:
-    """Handles text-to-video generation using WAN 2.1."""
+    """Handles text-to-video and text-image-to-video generation using WAN 2.2 TI2V-5B."""
     
     def __init__(self, 
-                 width: int = 832,
-                 height: int = 480,
-                 num_frames: int = 49,
-                 fps: int = 12,
+                 width: int = 1280,
+                 height: int = 720,
+                 num_frames: int = 72,
+                 fps: int = 24,
                  num_inference_steps: int = 30,
                  guidance_scale: float = 6.0,
                  negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly",
                  device: str = None):
         """
-        Initialize the WAN T2V generator.
+        Initialize the WAN 2.2 TI2V-5B generator.
         
         Args:
-            width: Video width (default: 832)
-            height: Video height (default: 480)
-            num_frames: Number of frames to generate (default: 49)
-            fps: Frames per second for output video (default: 12)
+            width: Video width (default: 1280 for 720p)
+            height: Video height (default: 720 for 720p)
+            num_frames: Number of frames to generate (default: 72 for 3s @ 24fps)
+            fps: Frames per second for output video (default: 24)
             num_inference_steps: Number of denoising steps (default: 30)
             guidance_scale: Guidance scale for prompt adherence (default: 6.0)
             negative_prompt: Negative prompt (default excludes cartoon/anime/illustration for realistic videos)
@@ -195,9 +199,10 @@ class WanT2VGenerator:
                       scene_id: Optional[str] = None,
                       visual_reference: Optional[str] = None,
                       slug: Optional[str] = None,
-                      best_frame_filename: Optional[str] = None) -> Union[str, Dict[str, Any]]:
+                      best_frame_filename: Optional[str] = None,
+                      image: Optional[Union[str, np.ndarray, torch.Tensor]] = None) -> Union[str, Dict[str, Any]]:
         """
-        Generate a video from a text prompt.
+        Generate a video from a text prompt (T2V) or text + image (TI2V).
         
         Args:
             prompt: Text prompt describing the video
@@ -210,6 +215,11 @@ class WanT2VGenerator:
             visual_reference: Visual reference description from storyboard (optional)
             slug: Slug for best frame filename (optional, used if best_frame_filename not provided)
             best_frame_filename: Explicit filename for best frame (optional, takes precedence over slug/scene_id)
+            image: Optional input image for TI2V mode. Can be:
+                   - Path to image file (str)
+                   - numpy array (np.ndarray)
+                   - torch tensor (torch.Tensor)
+                   If None, uses pure T2V mode (text-only)
             
         Returns:
             Dictionary with:
@@ -233,7 +243,7 @@ class WanT2VGenerator:
         else:
             logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
         
-        # Enforce minimum of 72 frames for WAN (if less than 72, use 72; if more, keep the higher value)
+        # Enforce minimum of 72 frames for WAN 2.2 (if less than 72, use 72; if more, keep the higher value)
         MIN_FRAMES = 72
         if num_frames_to_use < MIN_FRAMES:
             logger.info(f"⚠️ Calculated frames ({num_frames_to_use}) is below minimum ({MIN_FRAMES}), enforcing minimum to {MIN_FRAMES}")
@@ -242,15 +252,45 @@ class WanT2VGenerator:
             logger.info(f"✅ Using {num_frames_to_use} frames (meets minimum requirement of {MIN_FRAMES})")
         
         try:
-            logger.info(f"🎬 Generating video with WAN 2.1 T2V...")
+            # Determine mode: T2V (text-only) or TI2V (text + image)
+            mode = "TI2V" if image is not None else "T2V"
+            logger.info(f"🎬 Generating video with WAN 2.2 TI2V-5B ({mode} mode)...")
             logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
-            logger.info(f"📐 Dimensions: {self.width}x{self.height}")
+            logger.info(f"📐 Dimensions: {self.width}x{self.height} (720p)")
+            logger.info(f"🎞️ FPS: {self.fps} (24fps configured)")
             logger.info(f"⚙️ Steps: {self.num_inference_steps}, Guidance: {self.guidance_scale}")
             
             # Use provided negative prompt or default
             neg_prompt = negative_prompt or self.negative_prompt
             if neg_prompt:
                 logger.info(f"🚫 Negative prompt: {neg_prompt[:100]}{'...' if len(neg_prompt) > 100 else ''}")
+            
+            # Process image input for TI2V mode
+            image_input = None
+            if image is not None:
+                logger.info("🖼️ Processing input image for TI2V mode...")
+                
+                if isinstance(image, str):
+                    # Load from file path
+                    image_input = Image.open(image).convert("RGB")
+                    logger.info(f"📷 Loaded image from: {image}")
+                elif isinstance(image, np.ndarray):
+                    # Convert numpy array to PIL Image
+                    image_input = Image.fromarray(image)
+                    logger.info("📷 Converted numpy array to PIL Image")
+                elif isinstance(image, torch.Tensor):
+                    # Convert torch tensor to PIL Image
+                    # Assuming tensor is in [C, H, W] format and normalized [0, 1]
+                    if image.dim() == 3:
+                        image_np = image.cpu().numpy().transpose(1, 2, 0)
+                        if image_np.max() <= 1.0:
+                            image_np = (image_np * 255).astype(np.uint8)
+                        image_input = Image.fromarray(image_np)
+                        logger.info("📷 Converted torch tensor to PIL Image")
+                    else:
+                        logger.warning("⚠️ Unsupported tensor format, skipping image input")
+                else:
+                    logger.warning(f"⚠️ Unsupported image type: {type(image)}, skipping image input")
             
             # Set seed if provided
             if seed is not None:
@@ -264,17 +304,26 @@ class WanT2VGenerator:
                 torch.cuda.empty_cache()
                 gc.collect()
             
-            # Generate video
+            # Generate video (T2V or TI2V mode)
             logger.info("🎬 Running inference...")
-            output = self.pipeline(
-                prompt=prompt,
-                negative_prompt=neg_prompt,
-                height=self.height,
-                width=self.width,
-                num_frames=num_frames_to_use,  # Use calculated frames based on duration
-                num_inference_steps=self.num_inference_steps,
-                guidance_scale=self.guidance_scale
-            )
+            pipeline_kwargs = {
+                "prompt": prompt,
+                "negative_prompt": neg_prompt,
+                "height": self.height,
+                "width": self.width,
+                "num_frames": num_frames_to_use,
+                "num_inference_steps": self.num_inference_steps,
+                "guidance_scale": self.guidance_scale
+            }
+            
+            # Add image input for TI2V mode
+            if image_input is not None:
+                pipeline_kwargs["image"] = image_input
+                logger.info("✅ Using TI2V mode: prompt + image")
+            else:
+                logger.info("✅ Using T2V mode: prompt only")
+            
+            output = self.pipeline(**pipeline_kwargs)
             
             # Extract frames
             frames = output.frames[0]
