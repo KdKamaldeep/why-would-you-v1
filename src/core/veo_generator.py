@@ -11,8 +11,12 @@ from typing import Optional, Dict, Any, Union
 import time
 import subprocess
 import tempfile
-import cv2
-import numpy as np
+try:
+    import cv2
+    import numpy as np
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -118,40 +122,38 @@ class VeoGenerator:
                 # Some models support negative prompts in the format, adjust based on Veo's API
                 full_prompt = f"{prompt}. Avoid: {neg_prompt}"
             
-            # Generate video using Veo
-            logger.info("🎬 Running inference...")
-            
-            # Determine aspect ratio from dimensions
-            aspect_ratio = "9:16" if self.height > self.width else "16:9"
-            resolution = "1080p" if max(self.width, self.height) >= 1080 else "720p"
-            
             # Generate video using Veo API
-            # Note: duration is not a valid parameter for GenerateVideosConfig
-            logger.info("⏳ Generating video (this may take a while)...")
-            result = self.client.models.generate_videos(
-                model="veo-3.0-fast-generate-001",
+            # Use the stable Veo 3.1 model
+            model_id = "veo-3.1-generate-001"
+            
+            # Supported aspect ratios: "9:16" or "16:9"
+            aspect_ratio = "9:16" if self.height > self.width else "16:9"
+            
+            # Note: Veo 3.1 supports 4, 6, or 8 seconds only
+            # You cannot pass arbitrary duration values
+            
+            logger.info("⏳ Starting video generation...")
+            operation = self.client.models.generate_videos(
+                model=model_id,
                 prompt=full_prompt,
                 config=genai.types.GenerateVideosConfig(
                     aspect_ratio=aspect_ratio,
-                    resolution=resolution
+                    resolution="720p",  # Standard supported resolution
+                    negative_prompt=neg_prompt if neg_prompt else None
                 ),
             )
             
-            # Check if result is an operation (async) or direct result
-            if result is None:
-                raise RuntimeError("Veo API returned None - check your API key and model access")
+            # CRITICAL: Polling is required as this is an async operation
+            logger.info("⏳ Video generation started. Polling for completion...")
+            while not operation.done:
+                time.sleep(10)  # Wait 10 seconds between checks
+                operation = self.client.operations.get(name=operation.name)
+                logger.info("⏳ Still generating... (checking every 10 seconds)")
             
-            # If it's an operation object, wait for it to complete
-            if hasattr(result, 'result') and callable(result.result):
-                logger.info("⏳ Waiting for video generation to complete...")
-                result = result.result()
-            
-            # Check if we have generated videos
-            if not hasattr(result, 'generated_videos') or not result.generated_videos or len(result.generated_videos) == 0:
-                raise RuntimeError("Veo did not return any videos in the response")
-            
-            # Get the first generated video
-            generated_video = result.generated_videos[0]
+            if operation.result:
+                generated_video = operation.result.generated_videos[0]
+            else:
+                raise RuntimeError("Generation failed or timed out.")
             
             # Save video to file
             output_path = Path(output_path)
@@ -159,7 +161,7 @@ class VeoGenerator:
             
             logger.info(f"💾 Downloading video to: {output_path}")
             
-            # Download the video file
+            # Use the specific download method for generated videos
             self.client.files.download(file=generated_video.video, path=str(output_path))
             
             logger.info(f"✅ Video generated successfully: {output_path}")
