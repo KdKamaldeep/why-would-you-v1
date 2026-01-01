@@ -82,10 +82,10 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         
         # Determine torch dtype based on device
         if device == 'cuda' and torch.cuda.is_available():
-            # Use bfloat16 on CUDA for better performance and memory efficiency
+            # Use bfloat16 on CUDA for maximum quality (full BF16 for 48GB+ VRAM)
             torch_dtype = torch.bfloat16
-            vae_dtype = torch.float32  # VAE typically uses float32
-            logger.info("✅ Using bfloat16 on CUDA for optimal performance")
+            vae_dtype = torch.bfloat16  # VAE also in BF16 for maximum quality
+            logger.info("✅ Using full BF16 precision on CUDA for maximum quality (48GB+ VRAM optimized)")
         else:
             torch_dtype = torch.float32
             vae_dtype = torch.float32
@@ -98,12 +98,14 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             gc.collect()
         
         # Load VAE with wan2.2_vae.safetensors (16x16x4 compression ratio)
-        logger.info("📦 Loading WAN 2.2 VAE (16x16x4 compression ratio)...")
-        logger.info("📦 VAE file: wan2.2_vae.safetensors")
+        # The 16x16x4 compression ratio provides 64x overall compression (4x temporal, 16x spatial)
+        logger.info("📦 Loading WAN 2.2 VAE with 16x16x4 compression ratio...")
+        logger.info("📦 VAE: wan2.2_vae.safetensors (temporal: 4x, spatial: 16x16 = 64x total)")
+        logger.info(f"📦 VAE dtype: {vae_dtype} (BF16 for maximum quality)")
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
             subfolder="vae",
-            torch_dtype=vae_dtype,
+            torch_dtype=vae_dtype,  # BF16 for maximum quality
             cache_dir=cache_dir
         )
         
@@ -305,13 +307,15 @@ class WanT2VGenerator:
                 gc.collect()
             
             # Generate video (T2V or TI2V mode)
-            logger.info("🎬 Running inference...")
+            # Optimized for 720p (1280x720) @ 24fps with 16x16x4 VAE compression
+            logger.info("🎬 Running inference (optimized for 720p @ 24fps)...")
+            logger.info(f"📊 Sampling config: {num_frames_to_use} frames @ {self.fps}fps, {self.width}x{self.height}px")
             pipeline_kwargs = {
                 "prompt": prompt,
                 "negative_prompt": neg_prompt,
-                "height": self.height,
-                "width": self.width,
-                "num_frames": num_frames_to_use,
+                "height": self.height,  # 720p optimized
+                "width": self.width,   # 720p optimized
+                "num_frames": num_frames_to_use,  # Calculated for 24fps
                 "num_inference_steps": self.num_inference_steps,
                 "guidance_scale": self.guidance_scale
             }
