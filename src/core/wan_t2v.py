@@ -336,13 +336,54 @@ class WanT2VGenerator:
             }
             
             # Add image input for TI2V mode
+            # Check what parameters the pipeline actually accepts
             if image_input is not None:
-                pipeline_kwargs["image"] = image_input
-                logger.info("✅ Using TI2V mode: prompt + image")
+                import inspect
+                try:
+                    sig = inspect.signature(self.pipeline.__call__)
+                    params = list(sig.parameters.keys())
+                    logger.info(f"🔍 Pipeline __call__ parameters: {params}")
+                    
+                    # Try common parameter names for image input in diffusers pipelines
+                    image_param_name = None
+                    for param_name in ["image", "init_image", "input_image", "reference_image", "conditioning_image"]:
+                        if param_name in params:
+                            image_param_name = param_name
+                            logger.info(f"✅ Found image parameter: {image_param_name}")
+                            break
+                    
+                    if image_param_name:
+                        pipeline_kwargs[image_param_name] = image_input
+                        logger.info(f"✅ Using TI2V mode: prompt + {image_param_name}")
+                    else:
+                        logger.warning(f"⚠️ Pipeline does not accept image parameter. Available params: {params}")
+                        logger.warning("⚠️ This version of WAN 2.2 TI2V pipeline may not support image input yet.")
+                        logger.warning("⚠️ Falling back to T2V mode (image will be ignored)")
+                        logger.info("✅ Using T2V mode: prompt only (image not supported by this pipeline version)")
+                        # Remove image from kwargs to avoid errors
+                        image_input = None
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not inspect pipeline signature: {e}")
+                    logger.warning("⚠️ Attempting to use 'image' parameter anyway...")
+                    # Try with 'image' parameter - if it fails, the error will be caught below
+                    pipeline_kwargs["image"] = image_input
+                    logger.info("✅ Attempting TI2V mode: prompt + image")
             else:
                 logger.info("✅ Using T2V mode: prompt only")
             
-            output = self.pipeline(**pipeline_kwargs)
+            try:
+                output = self.pipeline(**pipeline_kwargs)
+            except TypeError as e:
+                if "image" in str(e) or "unexpected keyword argument" in str(e):
+                    logger.error(f"❌ Pipeline does not support image input: {e}")
+                    logger.info("🔄 Retrying without image parameter (T2V mode)...")
+                    # Remove image-related parameters and retry
+                    pipeline_kwargs_retry = {k: v for k, v in pipeline_kwargs.items() 
+                                           if k not in ["image", "init_image", "input_image", "reference_image", "conditioning_image"]}
+                    output = self.pipeline(**pipeline_kwargs_retry)
+                    logger.warning("⚠️ Video generated in T2V mode (image input not supported by this pipeline version)")
+                else:
+                    raise
             
             # Extract frames
             frames = output.frames[0]
