@@ -1,0 +1,47 @@
+{
+  "stories": [
+    {
+      "title": "The Simulation Glitch: Are We NPCs?",
+      "description": "Ever feel like life's a game and you're just an NPC? We've got the receipts. #simulationtheory #glitchinthematrix #genzhumor",
+      "scenes": [
+        {
+          "id": "scene_01_hook",
+          "duration": 4,
+          "num_frames": 96,
+          "visual_prompt": "Extreme close-up, wide cinematic scene of a person's eye, looking directly at the camera. First 1–2 seconds: sudden fast camera push-in (zoom shock) directly into the pupil, then motion quickly stabilizes, and a subtle digital glitch effect (like a faint pixel shift) quickly ripples across the iris. Surreal, high contrast, subtle chromatic aberration, 720p.",
+          "visual_reference": "HOOK: Immediate, disorienting zoom. High eye contact. The glitch effect is key to establishing the 'simulation' theme instantly.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "What if it's all fake?"
+        },
+        {
+          "id": "scene_02_context",
+          "duration": 4,
+          "num_frames": 96,
+          "visual_prompt": "Wide cinematic shot of a perfectly symmetrical, mundane suburban street at golden hour. Identical houses, identical mailboxes. A single, perfectly synchronized lawnmower is cutting grass in the foreground, then another starts up perfectly in sync in the background. Camera: slow steady dolly alongside the sidewalk, smooth motion, realistic depth, unnervingly balanced composition, cinematic lighting, 720p.",
+          "visual_reference": "Context: Visually represent 'mundane repetition' in a slightly unsettling way. The synchronized movement adds to the 'glitch' feel.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "Life feels like a rerun sometimes, right?"
+        },
+        {
+          "id": "scene_03_example",
+          "duration": 4,
+          "num_frames": 96,
+          "visual_prompt": "Wide cinematic scene showing a concrete example. A person trying to walk through a doorway, but they repeatedly bump into an invisible wall or suddenly teleport back a few steps, like a video game character glitching. The background is a slightly distorted, liminal space hallway. Camera: slow controlled movement, stable framing, realistic motion, cinematic contrast, 720p.",
+          "visual_reference": "Example: Direct visual of a 'glitch' in action. The surreal background enhances the feeling of being in a simulation.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "Ever felt like you're stuck in a loop?"
+        },
+        {
+          "id": "scene_04_reveal",
+          "duration": 4,
+          "num_frames": 96,
+          "visual_prompt": "Wide cinematic closing shot. A person in a modern, minimalistic room looking at their reflection in a mirror, but the reflection is slightly delayed or out of sync, and then briefly shows glowing lines of code instead of a face. Camera: slow gentle pull-back, calm but unsettling mood, cinematic lighting, realistic textures, 720p.",
+          "visual_reference": "Final Reveal: A thought-provoking, slightly creepy conclusion that encourages sharing and discussion. The 'code reflection' is the punchline.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "Maybe... you're not the main character."
+        }
+      ],
+      "total_duration": 16
+    }
+  ]
+}
