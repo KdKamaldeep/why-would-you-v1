@@ -1,44 +1,44 @@
 {
   "stories": [
     {
-      "title": "The Last Mana Glitch",
-      "description": "POV: You found the edge of the enchanted map. Exploring the hidden realms of the Aetherial Wilds. 🌿✨ #fantasy #worldbuilding #magic",
+      "title": "Echoes of the Broken Oath",
+      "description": "POV: You're lost in a kingdom that forgot its gods. Survival is the only magic left. ⚔️💀 #darkfantasy #grimdark #wasteland",
       "scenes": [
         {
           "id": "scene_01_hook",
           "duration": 4,
-          "num_frames": 25,
-          "visual_prompt": "An extreme close-up of a glowing, iridescent dragon scale pulsing with teal light. sudden fast camera push-in (zoom shock) into the microscopic textures of the scale, revealing a shimmering galaxy within. Then motion stabilizes into a slow, liquid-like shimmer. Cinematic macro, floating magical embers, ultra-detailed, 720p.",
-          "visual_reference": "HOOK: Use the iridescent textures and 'zoom shock' to grab attention. The 'shimmering galaxy' inside the scale adds a high-fantasy surreal touch.",
+          "num_frames": 49,
+          "visual_prompt": "Extreme close-up, wide cinematic scene of a rusted, cracked gauntlet covered in dried blood, slowly clenching a hilt of a broken sword. First 1–2 seconds: sudden fast camera push-in (zoom shock) into the jagged edge of the broken blade, reflecting a single, flickering torchlight. Then motion stabilizes into a subtle, desperate tremble of the gauntlet. Gritty textures, deep shadows, cinematic macro, 720p.",
+          "visual_reference": "HOOK: Immediate, visceral zoom. Focus on a single, grim detail. The trembling gauntlet conveys desperation and struggle instantly.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "Magic isn't dying. It's evolving."
+          "narration": "In these lands, hope is a forgotten myth."
         },
         {
           "id": "scene_02_context",
           "duration": 4,
           "num_frames": 49,
-          "visual_prompt": "Wide cinematic shot of a floating island suspended by massive glowing violet vines over a sea of clouds. Huge waterfalls flow upward into the sky. Camera: slow steady dolly move through the clouds toward the island, realistic depth, ethereal lighting, dreamlike atmosphere, 720p.",
-          "visual_reference": "Context: Show the 'scale' of the fantasy world. The upward-flowing water creates that 'gravity-defying' fantasy aesthetic Gen-Z loves.",
+          "visual_prompt": "Wide cinematic shot of a desolate, wind-swept wasteland dotted with skeletal trees and the crumbling ruins of colossal, forgotten statues. A perpetual, suffocating dust storm churns in the distance. Camera: slow steady dolly across the bleak landscape, emphasizing the vast emptiness, volumetric dust, muted color palette, epic scale, 720p.",
+          "visual_reference": "Context: Establish the 'grimdark' world. Show the desolation and ancient ruin, hinting at a lost, grander past. The dust storm adds constant, uneasy motion.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "In the Aetherial Wilds, gravity is just a suggestion."
+          "narration": "The kings are dust. The gods are silent."
         },
         {
           "id": "scene_03_example",
           "duration": 4,
           "num_frames": 49,
-          "visual_prompt": "A cinematic shot of an ancient, stone-carved gateway in a dark forest. As the camera approaches, the air inside the archway begins to ripple like water, revealing a hyper-vibrant neon jungle on the other side. Camera: slow controlled movement toward the portal, sharp focus on the ripple effect, cinematic contrast, 720p.",
-          "visual_reference": "Example: A 'portal' shot is a classic high-engagement visual. The contrast between the dark forest and neon jungle is a visual 'pop'.",
+          "visual_prompt": "A cinematic shot of a lone, cloaked figure traversing a treacherous, narrow mountain pass under a blood-red sky. They clutch a dim, flickering lantern. A colossal, shadowy beast's eyes briefly glow from the crags above. Camera: slow controlled movement following the figure, emphasizing their vulnerability against the immense backdrop, high contrast, dramatic chiaroscuro lighting, 720p.",
+          "visual_reference": "Example: Focus on the struggle for survival. The single light source against overwhelming darkness, with a hint of a lurking threat, defines grimdark tension.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "One step and you’re in a different dimension."
+          "narration": "Every shadow holds a hungry truth."
         },
         {
           "id": "scene_04_reveal",
           "duration": 4,
           "num_frames": 49,
-          "visual_prompt": "A silhouette of a person standing at the edge of a cliff, looking at a twin-sun sunset over a crystalline city. Their cloak flows in the wind, and they slowly raise a hand as golden runes begin to circle their wrist. Camera: slow gentle pull-back, epic scale, cinematic lighting, realistic cloth physics, 720p.",
-          "visual_reference": "Final Reveal: The 'Main Character' shot. The glowing runes provide a satisfying, magical payoff for the end of the short.",
+          "visual_prompt": "A wide cinematic closing shot. The cloaked figure from the previous scene finally reaches a precipice, looking down at a vast, glowing chasm where faint, corrupted magical energy pulses rhythmically, illuminating grotesque, ancient structures below. Camera: slow gentle pull-back, revealing the scale of the chasm and the figure's smallness, eerie green/purple glow, oppressive atmosphere, 720p.",
+          "visual_reference": "Final Reveal: End with a sense of unsettling mystery and overwhelming power. The corrupted glow hints at dark magic and a deeper, sinister lore.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "The question is... are you ready to lead?"
+          "narration": "What will you sacrifice to survive this broken world?"
         }
       ],
       "total_duration": 16
