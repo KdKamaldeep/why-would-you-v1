@@ -1,0 +1,51 @@
+{
+  "stories": [
+    {
+      "title": "The Last Dispatch from the Ardennes",
+      "description": "Amidst the brutal winter of the Battle of the Bulge, a lone American radio operator sends a desperate, cryptic final message before vanishing, prompting a perilous search.",
+      "scenes": [
+        {
+          "id": "hook_001",
+          "duration": 4,
+          "visual_prompt": "Extreme close-up, a gloved hand desperately cranking a field radio in a snow-covered, dimly lit foxhole, breath fogging in the freezing air, frantic intensity, 8k, Wan 2.1",
+          "visual_reference": "WW2 war movie opening, tense atmosphere",
+          "negative_prompt": "clear sky, sunlight, modern equipment, peaceful, easy",
+          "narration": "The blizzards of '44 swallowed men whole. But some messages... they just refused to die."
+        },
+        {
+          "id": "scene_001",
+          "duration": 6,
+          "visual_prompt": "Wide shot, a desolate, snow-laden forest in the Ardennes, ghostly white trees under a heavy, overcast sky, abandoned Sherman tank half-buried in snow in the foreground, bleak and cold, 8k, Wan 2.1",
+          "visual_reference": "WW2 winter battlefields, historical accuracy",
+          "negative_prompt": "green trees, sunny, modern vehicles, bustling city",
+          "narration": "December, 1944. The Ardennes Forest was a frozen hell, trapping the Allied lines in a desperate struggle."
+        },
+        {
+          "id": "scene_002",
+          "duration": 7,
+          "visual_prompt": "Medium shot, Private Thomas 'Tommy' Miller, a young, weary American radio operator with tired eyes, hunched over a SCR-300 radio in a makeshift bunker, static hissing softly, faint light from a single lantern, 8k, Wan 2.1",
+          "visual_reference": "WW2 soldier portraits, period accurate equipment",
+          "negative_prompt": "clean uniform, smiling, bright lights, modern technology",
+          "narration": "Private Miller, isolated and freezing, was the only link for his surrounded company. His last words were always the clearest."
+        },
+        {
+          "id": "scene_003",
+          "duration": 8,
+          "visual_prompt": "Close-up, Tommy's hand gripping the microphone, knuckles white, his mouth close to the receiver, the radio's dial flickering, tension palpable as snow drifts through a gap in the bunker wall, 8k, Wan 2.1",
+          "visual_reference": "dramatic war film, desperate communication",
+          "negative_prompt": "relaxed, smiling, clear connection, warm environment",
+          "narration": "Then, through the static, a final, urgent whisper: 'The wolves... they're hunting. North side... the bell...' before silence."
+        },
+        {
+          "id": "scene_004",
+          "duration": 5,
+          "visual_prompt": "Overhead shot, a small group of American soldiers, heavily bundled against the snow, cautiously moving through a dense, snow-covered forest, rifles at the ready, looking for tracks, foreboding atmosphere, 8k, Wan 2.1",
+          "visual_reference": "WW2 patrol, search and rescue",
+          "negative_prompt": "clear path, open field, modern soldiers, tanks",
+          "narration": "No more signals. Just the biting cold and the echoing question: what wolves? And what bell?"
+        }
+      ],
+      "total_duration": 30
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "stories": [
+    {
+      "title": "Winter Strikes Without Warning",
+      "description": "A 4-scene winter mini-story with a strong scroll-stopping hook, calm stillness, and a warm hopeful close.",
+      "scenes": [
+        {
+          "id": "winter_scene_01_hook",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic shot of open countryside at the exact moment winter hits. First 1–2 seconds: a sharp gust of cold wind sweeps across the land, fast-moving snow suddenly fills the air, bare trees shake briefly. Then motion quickly settles into calm snowfall covering fields and trees. Dark storm clouds part slightly, revealing soft winter light. Camera: quick subtle push-in at the start, then slow smooth forward dolly, strong visual contrast, realistic snow physics, cinematic lighting, high quality, 720p.",
+          "visual_reference": "HOOK: Show winter arriving instantly. The first 1–2 seconds must be a sudden snow-and-wind burst that transforms a calm landscape, so viewers stop scrolling even with sound off.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter",
+          "narration": "Winter doesn’t arrive slowly."
+        },
+        {
+          "id": "winter_scene_02_silence",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic countryside covered in fresh snow after the storm. Multiple natural elements: snow-laden trees standing still, frozen fields stretching into the distance, light fog drifting low over the ground, gentle snowflakes falling slowly. Camera: slow steady forward dolly, minimal motion, soft diffused winter light, muted blue-gray tones, peaceful atmosphere, realistic depth, 720p.",
+          "visual_reference": "After the hook, slow the pace. Emphasize quiet and stillness: fresh snow, soft fog, gentle snowfall, calm motion for stable visuals.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter",
+          "narration": "Silence follows, as the world slows down."
+        },
+        {
+          "id": "winter_scene_03_stillness",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic forest scene in deep winter. Multiple elements: tall trees heavy with snow, frozen branches, untouched snow on the forest floor, soft mist drifting between trunks, occasional snowflakes falling. Camera: slow gentle pan to the right, smooth cinematic motion, cool natural tones, realistic lighting, serene and timeless atmosphere, high quality, 720p.",
+          "visual_reference": "Deep winter calm: a snow-covered forest with mist drifting between trunks. Keep motion slow and smooth to avoid jitter.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter",
+          "narration": "Everything rests beneath the cold."
+        },
+        {
+          "id": "winter_scene_04_warmth",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic winter morning after snowfall. Multiple elements: snow-covered hills glowing under soft sunrise light, warm golden sun rays breaking through clouds, gentle steam rising from distant rooftops, long shadows stretching across the snow. Camera: slow gentle push-in, calm and hopeful mood, contrast between cold snow and warm sunlight, realistic textures, filmic lighting, high quality, 720p.",
+          "visual_reference": "Closing beat: warmth returns. Sunrise light over snow with subtle steam in the distance creates hope and emotional payoff.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter",
+          "narration": "Even in winter, warmth finds its way back."
+        }
+      ],
+      "total_duration": 16
+    }
+  ]
+}

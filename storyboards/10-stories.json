@@ -1,0 +1,51 @@
+{
+	"stories":[{
+  
+    "title": "World War II in 12 Seconds",
+    "description": "A 3-scene mini-story capturing the start, scale, and cost of World War II. Each scene is ~4 seconds using 49 frames at 12 fps.",
+    "aspect_ratio": "16:9",
+    "target_scene_duration_sec": 4,
+    "generation_profile": {
+      "width": 1280,
+      "height": 704,
+      "num_frames": 49,
+      "fps": 12,
+      "steps": 24,
+      "guidance": 6.0,
+      "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter, modern objects, futuristic weapons"
+    },
+    "scenes": [
+      {
+        "id": "ww2_scene_01_beginning",
+        "duration": 4,
+        "seed": 101,
+        "best_frame_filename": "ww2_scene_01_beginning.png",
+        "visual_reference": "Establish the start of World War II (1939): a tense wartime Europe atmosphere with troops mobilizing, trucks on muddy roads, smoke on the horizon—sets the context that the world is entering a massive conflict.",
+        "visual_prompt": "Wide cinematic shot of Europe in the early 1940s during World War II. Multiple elements: soldiers marching across muddy ground, military trucks moving slowly on dirt roads, dark storm clouds covering the sky, distant explosions lighting the horizon, smoke rising in the far background. Camera: slow smooth forward dolly, dramatic wartime atmosphere, realistic uniforms and vehicles (era-accurate), muted war-time colors, cinematic lighting, historical realism, 720p.",
+        "narration": "In 1939, the world was pulled into the deadliest war in human history.",
+        "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter, modern objects, futuristic weapons"
+      },
+      {
+        "id": "ww2_scene_02_global_conflict",
+        "duration": 4,
+        "seed": 102,
+        "best_frame_filename": "ww2_scene_02_global_conflict.png",
+        "visual_reference": "Show the scale of the war: combined arms battle with tanks, trenches, and aircraft—communicates that the fight spread globally across land, sea, and sky.",
+        "visual_prompt": "Wide cinematic World War II battlefield scene showing global conflict scale. Multiple elements: tanks advancing across open fields, soldiers taking cover in trenches, fighter planes flying overhead, flags waving in strong wind, smoke and dust filling the air with controlled explosions in the distance. Camera: slow lateral pan (left to right), dynamic but controlled motion, realistic physics, filmic contrast, historical accuracy, 720p.",
+        "narration": "Nations across continents fought on land, sea, and in the skies.",
+        "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter, sci-fi elements, modern vehicles"
+      },
+      {
+        "id": "ww2_scene_03_cost",
+        "duration": 4,
+        "seed": 103,
+        "best_frame_filename": "ww2_scene_03_cost.png",
+        "visual_reference": "Conclude with the cost and aftermath: a ruined city with civilians walking through rubble—communicates loss, devastation, and the war’s lasting impact by 1945.",
+        "visual_prompt": "Wide cinematic aftermath of World War II in a bombed European city. Multiple elements: ruined buildings, shattered streets, rubble piles, light fog or smoke drifting between structures, civilians walking slowly and carefully through debris, a torn flag hanging from a damaged building. Camera: slow gentle push-in, somber mood, muted desaturated tones, realistic dust and haze, filmic lighting, historical realism, 720p.",
+        "narration": "By 1945, millions were lost, and the world was forever changed.",
+        "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter, modern signs, modern clothing, futuristic tech"
+      }
+    ]
+  
+}]
+}

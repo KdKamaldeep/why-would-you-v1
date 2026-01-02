@@ -1,0 +1,59 @@
+{
+  "stories": [
+    {
+      "title": "The Devourer of Worlds",
+      "description": "A cinematic fantasy space war explaining how a conflict began, why a living planet was targeted, and how a forbidden black hole weapon changed the galaxy forever.",
+      "scenes": [
+        {
+          "id": "fantasy_war_scene_01_tension",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic view of deep space filled with glowing nebula clouds and distant stars. An abrupt, aggressive camera push-in toward two opposing fantasy star fleets facing each other across space creates immediate tension. The motion rapidly eases and settles into slow cinematic forward drift. Massive warships hold position, weapons glowing but unfired. Epic lighting, high contrast, grand scale, fantasy sci-fi style, 720p.",
+          "visual_reference": "HOOK + SETUP: Two fleets face each other, signaling a long-standing conflict about to erupt.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter, modern UI, realistic NASA spacecraft",
+          "narration": "The war began long before the first shot."
+        },
+        {
+          "id": "fantasy_war_scene_02_reason",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic scene showing ancient star maps and glowing energy paths across space. Multiple elements: holographic-looking constellations, luminous energy currents connecting star systems, distant fleets moving slowly along these paths. Camera: slow drifting movement through the star map, calm but ominous mood, cinematic lighting, fantasy sci-fi aesthetic, 720p.",
+          "visual_reference": "WHY WAR BEGAN: Show that control over rare cosmic energy routes or power sources caused the conflict.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "Control of power divided the galaxy."
+        },
+        {
+          "id": "fantasy_war_scene_03_beautiful_planet",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic view of a breathtaking fantasy planet rich with life and energy. Multiple elements: vast blue oceans, lush green continents, glowing advanced cities, radiant energy veins visible beneath the planet’s surface, soft clouds wrapping the atmosphere, a warm sun illuminating the world. Camera: slow majestic orbital drift around the planet, calm and beautiful motion, vibrant yet natural colors, cinematic lighting, epic scale, 720p.",
+          "visual_reference": "WHAT WAS AT STAKE: A living planet that holds immense power capable of ending—or winning—the war.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "This world held power beyond imagination."
+        },
+        {
+          "id": "fantasy_war_scene_04_weapon_decision",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic shot of a colossal command ship revealing a forbidden weapon known as the Devourer of Worlds. Multiple elements: a swirling sphere of absolute darkness forming in space, violent gravitational distortion bending nearby stars and light, surrounding allied ships slowly retreating. Camera: slow controlled push-in toward the forming black hole weapon, ominous lighting, epic fantasy scale, 720p.",
+          "visual_reference": "THE DECISION: Leaders choose destruction over letting the enemy claim the planet’s power.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "They chose to destroy what they could not protect."
+        },
+        {
+          "id": "fantasy_war_scene_05_planet_destruction",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic scene of the Devourer of Worlds tearing a living planet apart. Multiple elements: continents stretching and breaking, oceans spiraling into space, atmosphere ripped away into glowing streams, fragments of the planet pulled toward a distant black hole. Camera: slow dramatic pull-back revealing the planet’s destruction at massive scale, tragic lighting, epic fantasy sci-fi mood, 720p.",
+          "visual_reference": "CLIMAX: Show irreversible destruction driven by gravity, not explosions, to emphasize loss.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "In moments, a world was erased."
+        },
+        {
+          "id": "fantasy_war_scene_06_aftermath",
+          "duration": 4,
+          "visual_prompt": "Wide cinematic aftermath of a devastated star system. Multiple elements: shattered starships drifting silently, faint nebula light illuminating debris, the distant black hole fading into darkness, a lone surviving ship slowly leaving the scene. Camera: slow gentle pull-back, somber and reflective mood, cinematic lighting, epic scale, 720p.",
+          "visual_reference": "AFTERMATH: The war continues, but the cost has changed everything.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "Some victories cost everything."
+        }
+      ],
+      "total_duration": 24
+    }
+  ]
+}

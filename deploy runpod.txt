@@ -34,13 +34,13 @@ python -m src.interfaces.simple_cartoon_generator \
  
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
-  --storyboard storyboards/mult-story.json \
-  --wan-width 720 \
-  --wan-height 1280 \
-  --wan-num-frames 72 \
+  --storyboard storyboards/wife.json \
+  --wan-width 768 \
+  --wan-height 1344 \
+  --wan-num-frames 25 \
   --wan-fps 12 \
-  --wan-steps 30 \
-  --wan-guidance 5 \
+  --wan-steps 24 \
+  --wan-guidance 6 \
   --gen-bulk
     
 
