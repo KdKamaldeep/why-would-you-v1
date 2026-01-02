@@ -71,18 +71,7 @@ export DIFFUSERS_CACHE=/workspace/.cache/huggingface/diffusers
 export XDG_CACHE_HOME=/workspace/.cache
 mkdir -p "$HF_HUB_CACHE" "$TRANSFORMERS_CACHE" "$DIFFUSERS_CACHE"
 
-
-python scripts/test_wan.py \
-  --prompt "A first-person POV flying through a dense enchanted forest at night. The plants are bioluminescent, pulsing with soft teal and violet light. Giant translucent mushrooms release glowing spores that swirl as the camera passes. A majestic stag with antlers made of flowering branches stands in a clearing, turning its head to look at the camera. Vibrant colors, smooth camera tracking, dreamlike atmosphere, 8k resolution." \
-  --out outputs/person.mp4 \
-  --width 1280 \
-  --height 704 \
-  --num-frames 96 \
-  --fps 12 \
-  --steps 24 \
-  --guidance 6.0 \
-  --seed 42 \
-  --negative-prompt "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, harsh contrast, flicker, jitter"
-
-
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+New topics for january
+Hidden Carbon Monoxide Sources Inside Your Home
+Hidden Water Leaks That Slowly Destroy Homes
+Hidden Mold Growth Behind Walls
