@@ -1,4 +1,5 @@
 {
+"stories":[{
   "title": "When Dharma Shaped a Civilization",
   "description": "A wide-shot cinematic retelling of Indian history through the calm and righteous presence of Lord Ram.",
   "aspect_ratio": "9:16",
@@ -53,4 +54,5 @@
       "narration": "And that choice shaped a civilization… forever."
     }
   ]
+}]
 }
