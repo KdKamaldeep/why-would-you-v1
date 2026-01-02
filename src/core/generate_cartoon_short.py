@@ -4,7 +4,7 @@ Cartoon Shorts Generator - A complete CLI tool for creating platform-ready verti
 
 This script follows a specific flow:
 1. Generate 3-scene story with OpenAI GPT-4
-2. Generate videos directly with WAN 2.1 Text-to-Video (T2V)
+2. Generate videos directly with WAN 2.2 Text-Image-to-Video (TI2V-5B)
 3. Generate narration with Coqui TTS (XTTS v2)
 4. Stitch scene videos together
 5. Create platform-ready reel (1080×1920, H.264/AAC, 30fps)
@@ -75,11 +75,11 @@ class VideoConfig:
     enable_prompt_enhancement: bool = True
     # Control pause between scenes (in seconds)
     scene_pause_duration: float = 0.0  # Default 0.0 second pause between scenes (no black screens)
-    # WAN T2V settings
-    wan_width: int = 832  # WAN video width
-    wan_height: int = 480  # WAN video height
-    wan_num_frames: int = 49  # WAN number of frames to generate
-    wan_fps: int = 12  # WAN output FPS
+    # WAN 2.2 TI2V-5B settings (720p @ 24fps)
+    wan_width: int = 1280  # WAN video width (720p)
+    wan_height: int = 720  # WAN video height (720p)
+    wan_num_frames: int = 72  # WAN number of frames to generate (3s @ 24fps)
+    wan_fps: int = 24  # WAN output FPS (24fps for 720p)
     wan_steps: int = 30  # WAN inference steps
     wan_guidance: float = 6.0  # WAN guidance scale
     wan_negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly"  # WAN negative prompt for realistic videos (excludes non-realistic styles)
@@ -331,6 +331,14 @@ class CartoonShortsGenerator:
                 logger.info(f"✅ Generated {len(scene_audio_paths)} audio clips for narration")
                 logger.info(f"📊 Total audio duration: {total_audio_duration:.1f}s")
                 logger.info(f"📊 Average audio duration per scene: {total_audio_duration/len(actual_scene_durations):.1f}s")
+                
+                # Move Coqui TTS pipeline to CPU after audio generation to free VRAM for WAN model
+                logger.info("💾 Moving Coqui TTS pipeline to CPU to free VRAM for video generation...")
+                try:
+                    self.voice_synthesizer.move_to_cpu()
+                    logger.info("✅ Coqui TTS pipeline moved to CPU (will be moved back to GPU if needed)")
+                except Exception as e:
+                    logger.warning(f"⚠️ Failed to move TTS pipeline to CPU: {e}")
             else:
                 # Calculate total duration from scene durations
                 total_audio_duration = sum(actual_scene_durations)
@@ -339,7 +347,7 @@ class CartoonShortsGenerator:
                 logger.info(f"📊 Average scene duration: {total_audio_duration/len(actual_scene_durations):.1f}s")
             
             # Step 3: Generate videos directly from prompts using WAN T2V
-            logger.info("Step 3: Generating videos with WAN 2.1 T2V...")
+            logger.info("Step 3: Generating videos with WAN 2.2 TI2V-5B...")
             logger.info(f"🎬 Total videos to generate: {len(script['scenes'])}")
             video_clips: List[str] = []
             total_video_duration = 0
@@ -395,11 +403,20 @@ class CartoonShortsGenerator:
                 
                 # Generate video with WAN
                 try:
-                    # Calculate target duration from narration if available
-                    target_duration = None
-                    if not self.config.skip_audio and i < len(actual_scene_durations):
-                        target_duration = actual_scene_durations[i]
-                        logger.info(f"🎬 Scene {i+1}: Using narration duration ({target_duration:.2f}s) to calculate frames")
+                    # Get num_frames from scene, fallback to command-line config
+                    scene_num_frames = scene.get('num_frames', None)
+                    if scene_num_frames is None:
+                        # Check generation_profile for num_frames
+                        generation_profile = script.get('generation_profile', {})
+                        scene_num_frames = generation_profile.get('num_frames', None)
+                    
+                    # Use scene num_frames if available, otherwise use command-line default
+                    num_frames_to_use = scene_num_frames if scene_num_frames is not None else self.config.wan_num_frames
+                    
+                    if scene_num_frames is not None:
+                        logger.info(f"🎬 Scene {i+1}: Using num_frames from scene: {scene_num_frames}")
+                    else:
+                        logger.info(f"🎬 Scene {i+1}: Using num_frames from command-line: {num_frames_to_use}")
                     
                     # Extract scene metadata for best frame extraction
                     scene_id = scene.get('id', f"scene_{i+1}")
@@ -415,7 +432,7 @@ class CartoonShortsGenerator:
                         output_path=str(clip_path),
                         seed=self.config.wan_seed,
                         negative_prompt=negative_prompt or None,
-                        duration=target_duration,  # Pass narration duration to calculate frames
+                        num_frames=num_frames_to_use,  # Use num_frames from scene or command-line
                         scene_id=scene_id,
                         visual_reference=visual_reference,
                         slug=slug,
@@ -439,12 +456,13 @@ class CartoonShortsGenerator:
                     actual_duration = self.video_processor.get_video_duration(str(video_path))
                     logger.info(f"✅ Scene {i+1}: Video generated ({actual_duration:.2f}s)")
                     
-                    # If we have narration and video doesn't match exactly, sync them
+                    # If we have narration, sync video to match audio clip length exactly
                     if not self.config.skip_audio and i < len(actual_scene_durations):
                         target_audio_duration = actual_scene_durations[i]
                         duration_diff = abs(actual_duration - target_audio_duration)
+                        
                         if duration_diff > 0.1:  # If difference > 0.1s, sync them
-                            logger.info(f"🎬 Scene {i+1}: Syncing video ({actual_duration:.2f}s) to audio ({target_audio_duration:.2f}s)")
+                            logger.info(f"🎬 Scene {i+1}: Syncing video ({actual_duration:.2f}s) to match audio ({target_audio_duration:.2f}s)")
                             synced_video_path = str(clip_path).replace('.mp4', '_synced.mp4')
                             
                             if actual_duration < target_audio_duration:
@@ -454,6 +472,7 @@ class CartoonShortsGenerator:
                                     target_audio_duration,
                                     synced_video_path
                                 )
+                                logger.info(f"🎬 Scene {i+1}: Extended video from {actual_duration:.2f}s to {target_audio_duration:.2f}s")
                             else:
                                 # Video is longer than audio - trim to match
                                 cmd = [
@@ -468,7 +487,7 @@ class CartoonShortsGenerator:
                             
                             video_path = synced_video_path
                             actual_duration = target_audio_duration
-                            logger.info(f"✅ Scene {i+1}: Video synced to audio ({actual_duration:.2f}s)")
+                            logger.info(f"✅ Scene {i+1}: Video synced to audio length ({actual_duration:.2f}s)")
                         else:
                             logger.info(f"✅ Scene {i+1}: Video duration ({actual_duration:.2f}s) already matches audio ({target_audio_duration:.2f}s)")
                     

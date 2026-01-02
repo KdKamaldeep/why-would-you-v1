@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-WAN 2.1 Text-to-Video Generator Module
-Handles text-to-video generation using Wan-AI/Wan2.1-T2V-1.3B-Diffusers
+WAN 2.2 Text-Image-to-Video Generator Module
+Handles text-to-video generation using Wan-AI/Wan2.2-TI2V-5B
+Supports both text-to-video (T2V) and text-image-to-video (TI2V) modes
 """
 
 import os
+os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True,max_split_size_mb:128"
 import logging
 import torch
 from pathlib import Path
@@ -14,6 +16,7 @@ import subprocess
 import tempfile
 import cv2
 import numpy as np
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +65,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
     try:
         from diffusers import AutoencoderKLWan, WanPipeline
         
-        model_id = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
+        model_id = "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
         
         # Configure Hugging Face cache directory to use /workspace if available
         # This is important for RunPod and similar environments with attached disks
@@ -74,15 +77,16 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             default_cache = Path.home() / ".cache" / "huggingface"
             logger.info(f"📁 Using default Hugging Face cache: {default_cache}")
         
-        logger.info(f"🔄 Loading WAN 2.1 T2V model: {model_id}")
+        logger.info(f"🔄 Loading WAN 2.2 TI2V-5B model: {model_id}")
         logger.info(f"💻 Device: {device}")
+        logger.info("📝 Note: Wan2.2-TI2V-5B is a dense model (no MoE expert switching)")
         
         # Determine torch dtype based on device
         if device == 'cuda' and torch.cuda.is_available():
-            # Use bfloat16 on CUDA for better performance and memory efficiency
+            # Use bfloat16 on CUDA for maximum quality (full BF16 for 48GB+ VRAM)
             torch_dtype = torch.bfloat16
-            vae_dtype = torch.float32  # VAE typically uses float32
-            logger.info("✅ Using bfloat16 on CUDA for optimal performance")
+            vae_dtype = torch.float16  # VAE in FP16 for decode VRAM stability
+            logger.info("✅ Using full BF16 precision on CUDA for maximum quality (48GB+ VRAM optimized)")
         else:
             torch_dtype = torch.float32
             vae_dtype = torch.float32
@@ -94,17 +98,20 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             torch.cuda.empty_cache()
             gc.collect()
         
-        # Load VAE
-        logger.info("📦 Loading WAN VAE...")
+        # Load VAE with wan2.2_vae.safetensors (16x16x4 compression ratio)
+        # The 16x16x4 compression ratio provides 64x overall compression (4x temporal, 16x spatial)
+        logger.info("📦 Loading WAN 2.2 VAE with 16x16x4 compression ratio...")
+        logger.info("📦 VAE: wan2.2_vae.safetensors (temporal: 4x, spatial: 16x16 = 64x total)")
+        logger.info(f"📦 VAE dtype: FP16 (optimal for decode VRAM stability)")
         _wan_vae = AutoencoderKLWan.from_pretrained(
             model_id,
             subfolder="vae",
-            torch_dtype=vae_dtype,
+            torch_dtype=torch.float16,  # FP16 for decode VRAM stability
             cache_dir=cache_dir
         )
         
-        # Load pipeline
-        logger.info("📦 Loading WAN pipeline...")
+        # Load pipeline (dense model - no MoE expert switching needed)
+        logger.info("📦 Loading WAN 2.2 TI2V-5B pipeline (dense architecture)...")
         _wan_pipeline = WanPipeline.from_pretrained(
             model_id,
             vae=_wan_vae,
@@ -114,6 +121,26 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         
         # Move to device
         _wan_pipeline = _wan_pipeline.to(device)
+        
+        # Offload VAE to CPU when idle to reduce peak VRAM overlap
+        if device == 'cuda':
+            _wan_pipeline.vae.to("cpu")
+            logger.info("💾 VAE offloaded to CPU (will be moved to GPU only during inference)")
+        
+        # Enable VAE optimizations (slicing and tiling for memory efficiency)
+        # Enable directly on VAE object, not pipeline wrapper
+        if device == 'cuda':
+            try:
+                _wan_pipeline.vae.enable_slicing()
+                logger.info("✅ Enabled VAE slicing (temporal chunking for memory efficiency)")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not enable VAE slicing: {e}")
+            
+            try:
+                _wan_pipeline.vae.enable_tiling()
+                logger.info("✅ Enabled VAE tiling (spatial chunking for 720p+ resolution)")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not enable VAE tiling: {e}")
         
         # Enable memory optimizations if available
         if device == 'cuda':
@@ -131,7 +158,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             except Exception as e:
                 logger.info("ℹ️ xFormers not available; continuing without it")
         
-        logger.info("✅ WAN 2.1 T2V pipeline loaded successfully")
+        logger.info("✅ WAN 2.2 TI2V-5B pipeline loaded successfully")
         logger.info("📦 WAN pipeline initialized ONCE - will be reused for all subsequent generations")
         return _wan_pipeline
         
@@ -147,25 +174,25 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
 
 
 class WanT2VGenerator:
-    """Handles text-to-video generation using WAN 2.1."""
+    """Handles text-to-video and text-image-to-video generation using WAN 2.2 TI2V-5B."""
     
     def __init__(self, 
-                 width: int = 832,
-                 height: int = 480,
-                 num_frames: int = 49,
-                 fps: int = 12,
+                 width: int = 1280,
+                 height: int = 720,
+                 num_frames: int = 25,
+                 fps: int = 24,
                  num_inference_steps: int = 30,
                  guidance_scale: float = 6.0,
                  negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly",
                  device: str = None):
         """
-        Initialize the WAN T2V generator.
+        Initialize the WAN 2.2 TI2V-5B generator.
         
         Args:
-            width: Video width (default: 832)
-            height: Video height (default: 480)
-            num_frames: Number of frames to generate (default: 49)
-            fps: Frames per second for output video (default: 12)
+            width: Video width (default: 1280 for 720p)
+            height: Video height (default: 720 for 720p)
+            num_frames: Number of frames to generate (default: 25)
+            fps: Frames per second for output video (default: 24)
             num_inference_steps: Number of denoising steps (default: 30)
             guidance_scale: Guidance scale for prompt adherence (default: 6.0)
             negative_prompt: Negative prompt (default excludes cartoon/anime/illustration for realistic videos)
@@ -192,24 +219,32 @@ class WanT2VGenerator:
                       seed: Optional[int] = None,
                       negative_prompt: Optional[str] = None,
                       duration: Optional[float] = None,
+                      num_frames: Optional[int] = None,
                       scene_id: Optional[str] = None,
                       visual_reference: Optional[str] = None,
                       slug: Optional[str] = None,
-                      best_frame_filename: Optional[str] = None) -> Union[str, Dict[str, Any]]:
+                      best_frame_filename: Optional[str] = None,
+                      image: Optional[Union[str, np.ndarray, torch.Tensor]] = None) -> Union[str, Dict[str, Any]]:
         """
-        Generate a video from a text prompt.
+        Generate a video from a text prompt (T2V) or text + image (TI2V).
         
         Args:
             prompt: Text prompt describing the video
             output_path: Path to save the output MP4 file
             seed: Random seed for reproducibility (optional)
             negative_prompt: Override default negative prompt (optional)
-            duration: Target duration in seconds. If provided, num_frames will be calculated from this.
+            duration: Target duration in seconds (deprecated - use num_frames instead).
+            num_frames: Number of frames to generate. If provided, this takes precedence over duration calculation.
                       If None, uses the default num_frames from initialization.
             scene_id: Scene identifier for frame extraction (optional)
             visual_reference: Visual reference description from storyboard (optional)
             slug: Slug for best frame filename (optional, used if best_frame_filename not provided)
             best_frame_filename: Explicit filename for best frame (optional, takes precedence over slug/scene_id)
+            image: Optional input image for TI2V mode. Can be:
+                   - Path to image file (str)
+                   - numpy array (np.ndarray)
+                   - torch tensor (torch.Tensor)
+                   If None, uses pure T2V mode (text-only)
             
         Returns:
             Dictionary with:
@@ -222,35 +257,50 @@ class WanT2VGenerator:
         if self.pipeline is None:
             raise RuntimeError("WAN pipeline not available. Cannot generate video.")
         
-        # Calculate num_frames from duration if provided
-        num_frames_to_use = self.num_frames
-        if duration is not None and duration > 0:
-            # Calculate frames needed: duration * fps, rounded up to ensure we cover the full duration
-            calculated_frames = int(duration * self.fps) + 1
-            num_frames_to_use = calculated_frames
-            logger.info(f"📏 Target duration: {duration:.2f}s")
-            logger.info(f"🎞️ Calculated frames: {calculated_frames} @ {self.fps}fps (~{calculated_frames/self.fps:.2f}s)")
-        else:
-            logger.info(f"🎞️ Using default frames: {num_frames_to_use} @ {self.fps}fps (~{num_frames_to_use/self.fps:.1f}s)")
-        
-        # Enforce minimum of 72 frames for WAN (if less than 72, use 72; if more, keep the higher value)
-        MIN_FRAMES = 72
-        if num_frames_to_use < MIN_FRAMES:
-            logger.info(f"⚠️ Calculated frames ({num_frames_to_use}) is below minimum ({MIN_FRAMES}), enforcing minimum to {MIN_FRAMES}")
-            num_frames_to_use = MIN_FRAMES
-        else:
-            logger.info(f"✅ Using {num_frames_to_use} frames (meets minimum requirement of {MIN_FRAMES})")
+        # Use num_frames from scene/command-line if provided, otherwise use default
+        num_frames_to_use = num_frames if num_frames is not None else self.num_frames
+        logger.info(f"🎞️ Using {num_frames_to_use} frames @ {self.fps}fps (~{num_frames_to_use/self.fps:.2f}s)")
         
         try:
-            logger.info(f"🎬 Generating video with WAN 2.1 T2V...")
+            # Determine mode: T2V (text-only) or TI2V (text + image)
+            mode = "TI2V" if image is not None else "T2V"
+            logger.info(f"🎬 Generating video with WAN 2.2 TI2V-5B ({mode} mode)...")
             logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
-            logger.info(f"📐 Dimensions: {self.width}x{self.height}")
+            logger.info(f"📐 Dimensions: {self.width}x{self.height} (720p)")
+            logger.info(f"🎞️ FPS: {self.fps} (24fps configured)")
             logger.info(f"⚙️ Steps: {self.num_inference_steps}, Guidance: {self.guidance_scale}")
             
             # Use provided negative prompt or default
             neg_prompt = negative_prompt or self.negative_prompt
             if neg_prompt:
                 logger.info(f"🚫 Negative prompt: {neg_prompt[:100]}{'...' if len(neg_prompt) > 100 else ''}")
+            
+            # Process image input for TI2V mode
+            image_input = None
+            if image is not None:
+                logger.info("🖼️ Processing input image for TI2V mode...")
+                
+                if isinstance(image, str):
+                    # Load from file path
+                    image_input = Image.open(image).convert("RGB")
+                    logger.info(f"📷 Loaded image from: {image}")
+                elif isinstance(image, np.ndarray):
+                    # Convert numpy array to PIL Image
+                    image_input = Image.fromarray(image)
+                    logger.info("📷 Converted numpy array to PIL Image")
+                elif isinstance(image, torch.Tensor):
+                    # Convert torch tensor to PIL Image
+                    # Assuming tensor is in [C, H, W] format and normalized [0, 1]
+                    if image.dim() == 3:
+                        image_np = image.cpu().numpy().transpose(1, 2, 0)
+                        if image_np.max() <= 1.0:
+                            image_np = (image_np * 255).astype(np.uint8)
+                        image_input = Image.fromarray(image_np)
+                        logger.info("📷 Converted torch tensor to PIL Image")
+                    else:
+                        logger.warning("⚠️ Unsupported tensor format, skipping image input")
+                else:
+                    logger.warning(f"⚠️ Unsupported image type: {type(image)}, skipping image input")
             
             # Set seed if provided
             if seed is not None:
@@ -264,29 +314,118 @@ class WanT2VGenerator:
                 torch.cuda.empty_cache()
                 gc.collect()
             
-            # Generate video
-            logger.info("🎬 Running inference...")
-            output = self.pipeline(
-                prompt=prompt,
-                negative_prompt=neg_prompt,
-                height=self.height,
-                width=self.width,
-                num_frames=num_frames_to_use,  # Use calculated frames based on duration
-                num_inference_steps=self.num_inference_steps,
-                guidance_scale=self.guidance_scale
-            )
+            # Move VAE to GPU only for inference
+            if self.device == 'cuda' and torch.cuda.is_available():
+                self.pipeline.vae.to(self.device)
+                torch.cuda.empty_cache()
+                gc.collect()
+                logger.info("🚀 VAE moved to GPU for inference")
+            
+            # Generate video (T2V or TI2V mode)
+            # Optimized for 720p (1280x720) @ 24fps with 16x16x4 VAE compression
+            logger.info("🎬 Running inference (optimized for 720p @ 24fps)...")
+            logger.info(f"📊 Sampling config: {num_frames_to_use} frames @ {self.fps}fps, {self.width}x{self.height}px")
+            pipeline_kwargs = {
+                "prompt": prompt,
+                "negative_prompt": neg_prompt,
+                "height": self.height,  # 720p optimized
+                "width": self.width,   # 720p optimized
+                "num_frames": num_frames_to_use,  # Calculated for 24fps
+                "num_inference_steps": self.num_inference_steps,
+                "guidance_scale": self.guidance_scale
+            }
+            
+            # Add image input for TI2V mode
+            if image_input is not None:
+                pipeline_kwargs["image"] = image_input
+                logger.info("✅ Using TI2V mode: prompt + image")
+            else:
+                logger.info("✅ Using T2V mode: prompt only")
+            
+            output = self.pipeline(**pipeline_kwargs)
             
             # Extract frames
             frames = output.frames[0]
             
-            # Export to video
+            # Export to video with slicing/chunking for memory efficiency
             from diffusers.utils import export_to_video
             
             output_path = Path(output_path)
             output_path.parent.mkdir(parents=True, exist_ok=True)
             
+            # Enable slicing for large videos (720p @ 24fps can be memory-intensive)
+            # Process frames in chunks to avoid OOM errors
+            num_frames = len(frames)
+            chunk_size = 100  # Process 100 frames at a time (adjust based on VRAM)
+            
             logger.info(f"💾 Saving video to: {output_path}")
-            export_to_video(frames, str(output_path), fps=self.fps)
+            logger.info(f"📊 Total frames: {num_frames}, Chunk size: {chunk_size}")
+            
+            if num_frames > chunk_size:
+                # Use chunked export for large videos
+                logger.info(f"🔪 Using chunked export (slicing enabled) for {num_frames} frames")
+                # Convert frames to numpy if needed and process in chunks
+                
+                # Ensure frames are in the right format
+                if isinstance(frames, torch.Tensor):
+                    frames_np = frames.cpu().numpy()
+                elif isinstance(frames, list):
+                    frames_np = np.array([np.array(f) for f in frames])
+                else:
+                    frames_np = np.array(frames)
+                
+                # Process in chunks to save memory
+                temp_dir = tempfile.mkdtemp(prefix="wan_export_")
+                chunk_files = []
+                
+                try:
+                    for i in range(0, num_frames, chunk_size):
+                        chunk_end = min(i + chunk_size, num_frames)
+                        chunk = frames_np[i:chunk_end]
+                        chunk_file = os.path.join(temp_dir, f"chunk_{i:04d}.mp4")
+                        chunk_files.append(chunk_file)
+                        
+                        logger.info(f"📦 Processing chunk {i//chunk_size + 1}/{(num_frames-1)//chunk_size + 1}: frames {i}-{chunk_end-1}")
+                        export_to_video(chunk, chunk_file, fps=self.fps)
+                    
+                    # Concatenate chunks using FFmpeg
+                    logger.info("🔗 Concatenating video chunks...")
+                    concat_file = os.path.join(temp_dir, "concat_list.txt")
+                    with open(concat_file, 'w') as f:
+                        for chunk_file in chunk_files:
+                            f.write(f"file '{os.path.abspath(chunk_file)}'\n")
+                    
+                    cmd = [
+                        'ffmpeg', '-y',
+                        '-f', 'concat',
+                        '-safe', '0',
+                        '-i', concat_file,
+                        '-c', 'copy',  # Fast copy without re-encoding
+                        str(output_path)
+                    ]
+                    subprocess.run(cmd, check=True, capture_output=True, text=True)
+                    
+                    # Clean up temp files
+                    import shutil
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                    logger.info("✅ Chunked export completed successfully")
+                except Exception as e:
+                    # Fallback to direct export if chunking fails
+                    logger.warning(f"⚠️ Chunked export failed: {e}, falling back to direct export")
+                    import shutil
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                    export_to_video(frames, str(output_path), fps=self.fps)
+            else:
+                # Direct export for smaller videos
+                logger.info("✅ Using direct export (no slicing needed)")
+                export_to_video(frames, str(output_path), fps=self.fps)
+            
+            # Move VAE back to CPU after saving/export is done
+            if self.device == 'cuda' and torch.cuda.is_available():
+                self.pipeline.vae.to("cpu")
+                torch.cuda.empty_cache()
+                gc.collect()
+                logger.info("💾 VAE moved back to CPU (idle)")
             
             # Explicitly delete frames and output to free memory
             del frames

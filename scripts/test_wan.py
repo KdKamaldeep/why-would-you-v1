@@ -1,24 +1,40 @@
 #!/usr/bin/env python3
 """
-Test script for WAN 2.1 Text-to-Video generation
+Test script for WAN 2.2 Text-Image-to-Video generation
 """
 
 import sys
 import os
 import argparse
+import logging
 from pathlib import Path
 
 # Add src to Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
+# Configure logging to display in console
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)  # Output to console
+    ]
+)
+
 def main():
     """Main function to test WAN T2V generation."""
-    parser = argparse.ArgumentParser(description="Test WAN 2.1 Text-to-Video generation")
+    parser = argparse.ArgumentParser(description="Test WAN 2.2 Text-Image-to-Video generation")
     parser.add_argument(
         "--prompt",
         type=str,
         default="A cat walks on the grass, realistic",
         help="Text prompt for video generation (default: 'A cat walks on the grass, realistic')"
+    )
+    parser.add_argument(
+        "--image",
+        type=str,
+        default=None,
+        help="Optional input image path for TI2V mode (default: None, uses T2V mode)"
     )
     parser.add_argument(
         "--out",
@@ -29,26 +45,26 @@ def main():
     parser.add_argument(
         "--width",
         type=int,
-        default=832,
-        help="Video width (default: 832)"
+        default=1280,
+        help="Video width (default: 1280 for 720p)"
     )
     parser.add_argument(
         "--height",
         type=int,
-        default=480,
-        help="Video height (default: 480)"
+        default=720,
+        help="Video height (default: 720 for 720p)"
     )
     parser.add_argument(
         "--num-frames",
         type=int,
-        default=49,
-        help="Number of frames to generate (default: 49)"
+        default=72,
+        help="Number of frames to generate (default: 72 for 3s @ 24fps)"
     )
     parser.add_argument(
         "--fps",
         type=int,
-        default=12,
-        help="Output FPS (default: 12)"
+        default=24,
+        help="Output FPS (default: 24)"
     )
     parser.add_argument(
         "--steps",
@@ -77,10 +93,14 @@ def main():
     
     args = parser.parse_args()
     
-    print("🧪 Testing WAN 2.1 Text-to-Video Generation")
+    print("🧪 Testing WAN 2.2 Text-Image-to-Video Generation")
     print("=" * 60)
     print(f"📝 Prompt: {args.prompt}")
-    print(f"📐 Dimensions: {args.width}x{args.height}")
+    if args.image:
+        print(f"🖼️ Image: {args.image} (TI2V mode)")
+    else:
+        print(f"🖼️ Image: None (T2V mode)")
+    print(f"📐 Dimensions: {args.width}x{args.height} (720p)")
     print(f"🎞️ Frames: {args.num_frames} @ {args.fps}fps (~{args.num_frames/args.fps:.1f}s)")
     print(f"⚙️ Steps: {args.steps}, Guidance: {args.guidance}")
     if args.seed:
@@ -122,7 +142,8 @@ def main():
             prompt=args.prompt,
             output_path=args.out,
             seed=args.seed,
-            negative_prompt=args.negative_prompt
+            negative_prompt=args.negative_prompt,
+            image=args.image  # Pass image for TI2V mode if provided
         )
         
         print("\n" + "=" * 60)

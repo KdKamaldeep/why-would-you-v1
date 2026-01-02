@@ -1,0 +1,43 @@
+{
+  "stories": [
+    {
+      "title": "Your Brain Is Weird",
+      "description": "Strange facts you were never told.",
+      "scenes": [
+        {
+          "id": "scene_01_hook",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Extreme close-up of human eyes staring straight ahead. Person blinks once. Camera perfectly still. Neutral background. Realistic skin texture, natural lighting, 720p.",
+          "negative_prompt": "cartoon, fantasy, text overlay, watermark",
+          "narration": "Your brain lies to you."
+        },
+        {
+          "id": "scene_02_fact_1",
+          "duration": 4,
+          "num_frames": 49,
+          "visual_prompt": "Realistic shot of a person walking into a room, stopping suddenly, looking confused. Focus on body language, face partially visible. Natural indoor lighting, steady camera, 720p.",
+          "negative_prompt": "comedy exaggeration, cartoon",
+          "narration": "That moment you forget why you entered a room?"
+        },
+        {
+          "id": "scene_03_fact_2",
+          "duration": 5,
+          "num_frames": 49,
+          "visual_prompt": "Realistic close shot of a phone in hand. Person unlocks phone, stares at screen without moving, then locks it again. Calm environment, low motion, realistic lighting, 720p.",
+          "negative_prompt": "text overlay, fantasy glow",
+          "narration": "Your brain thinks the task is already done."
+        },
+        {
+          "id": "scene_04_payoff",
+          "duration": 6,
+          "num_frames": 25,
+          "visual_prompt": "Realistic medium shot of a person sitting quietly, staring ahead. Soft ambient light. No phone visible. Subtle breathing motion. Calm, neutral setting, 720p.",
+          "negative_prompt": "dramatic emotion, cinematic exaggeration",
+          "narration": "That’s why it happens."
+        }
+      ],
+      "total_duration": 17
+    }
+  ]
+}

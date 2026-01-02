@@ -1,0 +1,33 @@
+{
+  "stories": [
+    {
+      "title": "Cold Hands Surprise",
+      "description": "A playful moment where a wife surprises her distracted husband at home.",
+      "scenes": [
+        {
+          "id": "scene_01_setup",
+          "scene_type": "wide_domestic",
+          "duration": 2,
+          "num_frames": 25,
+          "seed": 777,
+          "visual_prompt": "The wife is an Indian woman in her early 30s, medium height, slim build, warm brown skin tone, long straight black hair tied loosely, wearing a light pastel kurti and dark leggings. The husband is an Indian man in his early 30s, average build, short black hair, light stubble, wearing a plain solid-color t-shirt and jeans. Warm indoor evening lighting in the same cozy living room connected to a kitchen. The wife stands at the kitchen sink washing dishes while the husband sits on the sofa, relaxed and focused on his smartphone. Camera is static with very gentle natural drift, calm domestic mood, realistic home environment, cinematic lighting, 720p.",
+          "visual_reference": "SETUP: Normal home moment. Wife busy, husband distracted.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "He didn’t notice her."
+        },
+        {
+          "id": "scene_02_prank",
+          "scene_type": "close_action",
+          "duration": 2,
+          "num_frames": 25,
+          "seed": 777,
+          "visual_prompt": "The wife is an Indian woman in her early 30s, medium height, slim build, warm brown skin tone, long straight black hair tied loosely, wearing a light pastel kurti and dark leggings. The husband is an Indian man in his early 30s, average build, short black hair, light stubble, wearing a plain solid-color t-shirt and jeans. Warm indoor evening lighting in the same cozy living room. The wife quietly steps beside the husband and gently slips her cold hands under his t-shirt. The husband reacts in sudden surprise, shoulders jumping slightly, phone shifting in his hand, while the wife smiles playfully. Camera remains stable, realistic expressions, playful mood, cinematic lighting, 720p.",
+          "visual_reference": "PAYOFF: Cold-hands prank and shocked reaction.",
+          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, exaggerated motion, oversaturated, blurry, low quality, flicker, jitter",
+          "narration": "That shocked him."
+        }
+      ],
+      "total_duration": 4
+    }
+  ]
+}

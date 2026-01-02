@@ -1168,6 +1168,58 @@ class CoquiVoiceSynthesizer:
     
 
     
+    def move_to_cpu(self):
+        """Move TTS model to CPU to free VRAM."""
+        try:
+            if self.tts is None:
+                return
+            
+            if torch.cuda.is_available():
+                # Move model to CPU
+                if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+                    self.tts.synthesizer.model = self.tts.synthesizer.model.cpu()
+                    logger.info("✅ TTS model moved to CPU")
+                elif hasattr(self.tts, 'model'):
+                    self.tts.model = self.tts.model.cpu()
+                    logger.info("✅ TTS model moved to CPU")
+                else:
+                    try:
+                        self.tts = self.tts.to("cpu")
+                        logger.info("✅ TTS object moved to CPU")
+                    except:
+                        logger.warning("⚠️ Could not move TTS to CPU")
+                
+                # Clear CUDA cache
+                torch.cuda.empty_cache()
+                import gc
+                gc.collect()
+                logger.info("💾 TTS pipeline offloaded to CPU (VRAM freed)")
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to move TTS to CPU: {e}")
+    
+    def move_to_gpu(self):
+        """Move TTS model back to GPU when needed."""
+        try:
+            if self.tts is None:
+                return
+            
+            if self.config.gpu and torch.cuda.is_available():
+                # Move model back to GPU
+                if hasattr(self.tts, 'synthesizer') and hasattr(self.tts.synthesizer, 'model'):
+                    self.tts.synthesizer.model = self.tts.synthesizer.model.cuda()
+                    logger.info("✅ TTS model moved back to GPU")
+                elif hasattr(self.tts, 'model'):
+                    self.tts.model = self.tts.model.cuda()
+                    logger.info("✅ TTS model moved back to GPU")
+                else:
+                    try:
+                        self.tts = self.tts.to("cuda")
+                        logger.info("✅ TTS object moved back to GPU")
+                    except:
+                        logger.warning("⚠️ Could not move TTS to GPU")
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to move TTS to GPU: {e}")
+    
     def cleanup(self):
         """Clean up resources"""
         try:
