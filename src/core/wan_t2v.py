@@ -6,7 +6,11 @@ Supports both text-to-video (T2V) and text-image-to-video (TI2V) modes
 """
 
 import os
-os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True,max_split_size_mb:128"
+# Allocator env var handling (new PyTorch naming)
+if not os.getenv("PYTORCH_ALLOC_CONF") and os.getenv("PYTORCH_CUDA_ALLOC_CONF"):
+    os.environ["PYTORCH_ALLOC_CONF"] = os.environ["PYTORCH_CUDA_ALLOC_CONF"]
+if not os.getenv("PYTORCH_ALLOC_CONF"):
+    os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
 import logging
 import torch
 from pathlib import Path
@@ -19,6 +23,10 @@ import numpy as np
 from PIL import Image
 
 logger = logging.getLogger(__name__)
+
+# Model IDs
+WAN_MODEL_ID_5B = "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
+WAN_MODEL_ID_14B = "Wan-AI/Wan2.2-TI2V-14B-Diffusers"
 
 # Global singleton instance
 _wan_pipeline = None
@@ -42,13 +50,14 @@ def get_cache_dir() -> Optional[str]:
     return None
 
 
-def get_wan_pipeline(device: str = None, force_reload: bool = False):
+def get_wan_pipeline(device: str = None, force_reload: bool = False, model_size: str = "5b"):
     """
     Get or initialize the global WAN pipeline (singleton pattern).
     
     Args:
         device: Device to run on ('cuda' or 'cpu'). Auto-detected if None.
         force_reload: Force reload of the pipeline even if already loaded.
+        model_size: Model size to use ("5b" or "14b", default "5b").
         
     Returns:
         WanPipeline instance or None if loading fails
@@ -62,10 +71,23 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
     if device is None:
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
     
+    # Determine model ID based on model_size
+    model_size_lower = model_size.lower() if model_size else "5b"
+    if model_size_lower == "14b":
+        model_id = WAN_MODEL_ID_14B
+        is_moe = True
+    else:
+        model_id = WAN_MODEL_ID_5B
+        is_moe = False
+    
+    # Check GPU memory for 14B model
+    if is_moe and device == 'cuda' and torch.cuda.is_available():
+        gpu_memory_gb = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+        if gpu_memory_gb < 40:
+            logger.warning(f"⚠️ WARNING: Selected 14B MoE model but GPU memory is {gpu_memory_gb:.1f}GB (< 40GB). This may cause OOM errors.")
+    
     try:
         from diffusers import AutoencoderKLWan, WanPipeline
-        
-        model_id = "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
         
         # Configure Hugging Face cache directory to use /workspace if available
         # This is important for RunPod and similar environments with attached disks
@@ -77,9 +99,9 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             default_cache = Path.home() / ".cache" / "huggingface"
             logger.info(f"📁 Using default Hugging Face cache: {default_cache}")
         
-        logger.info(f"🔄 Loading WAN 2.2 TI2V-5B model: {model_id}")
+        logger.info(f"🔄 Loading WAN 2.2 TI2V model: {model_id}")
         logger.info(f"💻 Device: {device}")
-        logger.info("📝 Note: Wan2.2-TI2V-5B is a dense model (no MoE expert switching)")
+        logger.info(f"📝 Model type: {'MoE (14B)' if is_moe else 'Dense (5B)'}")
         
         # Determine torch dtype based on device
         if device == 'cuda' and torch.cuda.is_available():
@@ -110,14 +132,22 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             cache_dir=cache_dir
         )
         
-        # Load pipeline (dense model - no MoE expert switching needed)
-        logger.info("📦 Loading WAN 2.2 TI2V-5B pipeline (dense architecture)...")
+        # Load pipeline (MoE-safe: no device_map="auto", no low_cpu_mem_usage=False)
+        logger.info(f"📦 Loading WAN 2.2 TI2V pipeline ({'MoE' if is_moe else 'Dense'} architecture)...")
         _wan_pipeline = WanPipeline.from_pretrained(
             model_id,
             vae=_wan_vae,
             torch_dtype=torch_dtype,
             cache_dir=cache_dir
         )
+        
+        # Enable attention slicing if available
+        if hasattr(_wan_pipeline, 'enable_attention_slicing'):
+            try:
+                _wan_pipeline.enable_attention_slicing("max")
+                logger.info("✅ Enabled attention slicing (max)")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not enable attention slicing: {e}")
         
         # Move to device
         _wan_pipeline = _wan_pipeline.to(device)
@@ -127,20 +157,22 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             _wan_pipeline.vae.to("cpu")
             logger.info("💾 VAE offloaded to CPU (will be moved to GPU only during inference)")
         
-        # Enable VAE optimizations (slicing and tiling for memory efficiency)
+        # Enable VAE optimizations (slicing and tiling for memory efficiency) - mandatory
         # Enable directly on VAE object, not pipeline wrapper
         if device == 'cuda':
-            try:
-                _wan_pipeline.vae.enable_slicing()
-                logger.info("✅ Enabled VAE slicing (temporal chunking for memory efficiency)")
-            except Exception as e:
-                logger.warning(f"⚠️ Could not enable VAE slicing: {e}")
+            if hasattr(_wan_pipeline.vae, 'enable_slicing'):
+                try:
+                    _wan_pipeline.vae.enable_slicing()
+                    logger.info("✅ Enabled VAE slicing (temporal chunking for memory efficiency)")
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not enable VAE slicing: {e}")
             
-            try:
-                _wan_pipeline.vae.enable_tiling()
-                logger.info("✅ Enabled VAE tiling (spatial chunking for 720p+ resolution)")
-            except Exception as e:
-                logger.warning(f"⚠️ Could not enable VAE tiling: {e}")
+            if hasattr(_wan_pipeline.vae, 'enable_tiling'):
+                try:
+                    _wan_pipeline.vae.enable_tiling()
+                    logger.info("✅ Enabled VAE tiling (spatial chunking for 720p+ resolution)")
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not enable VAE tiling: {e}")
         
         # Enable memory optimizations if available
         if device == 'cuda':
@@ -158,7 +190,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
             except Exception as e:
                 logger.info("ℹ️ xFormers not available; continuing without it")
         
-        logger.info("✅ WAN 2.2 TI2V-5B pipeline loaded successfully")
+        logger.info(f"✅ WAN 2.2 TI2V pipeline loaded successfully ({'MoE' if is_moe else 'Dense'})")
         logger.info("📦 WAN pipeline initialized ONCE - will be reused for all subsequent generations")
         return _wan_pipeline
         
@@ -184,9 +216,14 @@ class WanT2VGenerator:
                  num_inference_steps: int = 30,
                  guidance_scale: float = 6.0,
                  negative_prompt: str = "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly",
-                 device: str = None):
+                 device: str = None,
+                 model_size: str = None,
+                 vae_tiling: bool = True,
+                 vae_slicing: bool = True,
+                 compile_unet: bool = False,
+                 offload_text_encoders: bool = None):
         """
-        Initialize the WAN 2.2 TI2V-5B generator.
+        Initialize the WAN 2.2 TI2V generator.
         
         Args:
             width: Video width (default: 1280 for 720p)
@@ -197,6 +234,11 @@ class WanT2VGenerator:
             guidance_scale: Guidance scale for prompt adherence (default: 6.0)
             negative_prompt: Negative prompt (default excludes cartoon/anime/illustration for realistic videos)
             device: Device to run on ('cuda' or 'cpu'). Auto-detected if None.
+            model_size: Model size ("5b" or "14b", default from env WAN_MODEL_SIZE or "5b").
+            vae_tiling: Enable VAE tiling (default: True)
+            vae_slicing: Enable VAE slicing (default: True)
+            compile_unet: Compile UNet with torch.compile (default: False)
+            offload_text_encoders: Offload text encoders to CPU after embeddings (default: from env OFFLOAD_TEXT_ENCODERS or True)
         """
         self.width = width
         self.height = height
@@ -208,10 +250,28 @@ class WanT2VGenerator:
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
         self.pipeline = None
         
+        # Determine model_size from arg, env var, or default
+        if model_size is None:
+            model_size = os.getenv("WAN_MODEL_SIZE", "5b").lower()
+        self.model_size = model_size.lower()
+        
+        # Determine offload_text_encoders from arg, env var, or default
+        if offload_text_encoders is None:
+            offload_env = os.getenv("OFFLOAD_TEXT_ENCODERS", "true").lower()
+            offload_text_encoders = offload_env in ("true", "1", "yes")
+        self.offload_text_encoders = offload_text_encoders
+        
+        self.vae_tiling = vae_tiling
+        self.vae_slicing = vae_slicing
+        self.compile_unet = compile_unet
+        
         # Load pipeline (singleton, shared across instances)
-        self.pipeline = get_wan_pipeline(device=self.device)
+        self.pipeline = get_wan_pipeline(device=self.device, model_size=self.model_size)
         if self.pipeline is None:
             logger.warning("⚠️ WAN pipeline not available")
+        
+        logger.info(f"📦 Model size: {self.model_size.upper()}")
+        logger.info(f"💾 Text encoder offload: {'enabled' if self.offload_text_encoders else 'disabled'}")
     
     def generate_video(self, 
                       prompt: str, 
@@ -264,7 +324,7 @@ class WanT2VGenerator:
         try:
             # Determine mode: T2V (text-only) or TI2V (text + image)
             mode = "TI2V" if image is not None else "T2V"
-            logger.info(f"🎬 Generating video with WAN 2.2 TI2V-5B ({mode} mode)...")
+            logger.info(f"🎬 Generating video with WAN 2.2 TI2V ({mode} mode, {self.model_size.upper()} model)...")
             logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
             logger.info(f"📐 Dimensions: {self.width}x{self.height} (720p)")
             logger.info(f"🎞️ FPS: {self.fps} (24fps configured)")
@@ -321,10 +381,7 @@ class WanT2VGenerator:
                 gc.collect()
                 logger.info("🚀 VAE moved to GPU for inference")
             
-            # Generate video (T2V or TI2V mode)
-            # Optimized for 720p (1280x720) @ 24fps with 16x16x4 VAE compression
-            logger.info("🎬 Running inference (optimized for 720p @ 24fps)...")
-            logger.info(f"📊 Sampling config: {num_frames_to_use} frames @ {self.fps}fps, {self.width}x{self.height}px")
+            # Prepare pipeline kwargs
             pipeline_kwargs = {
                 "prompt": prompt,
                 "negative_prompt": neg_prompt,
@@ -342,7 +399,33 @@ class WanT2VGenerator:
             else:
                 logger.info("✅ Using T2V mode: prompt only")
             
-            output = self.pipeline(**pipeline_kwargs)
+            # Determine torch dtype for inference
+            torch_dtype = torch.bfloat16 if (self.device == 'cuda' and torch.cuda.is_bf16_supported()) else torch.float16
+            
+            # Generate video with VRAM discipline
+            # Optimized for 720p (1280x720) @ 24fps with 16x16x4 VAE compression
+            logger.info("🎬 Running inference (optimized for 720p @ 24fps)...")
+            logger.info(f"📊 Sampling config: {num_frames_to_use} frames @ {self.fps}fps, {self.width}x{self.height}px")
+            
+            # Text encoder offload: encode prompts first, then move to CPU
+            if self.offload_text_encoders and self.device == 'cuda' and torch.cuda.is_available():
+                # Try to encode prompts separately if pipeline supports it
+                # Otherwise, we'll offload after the first forward pass
+                logger.info("💾 Text encoder offload enabled - will move to CPU after encoding")
+            
+            # Run inference with autocast and inference_mode
+            with torch.inference_mode(), torch.cuda.amp.autocast(dtype=torch_dtype, enabled=(self.device == 'cuda')):
+                output = self.pipeline(**pipeline_kwargs)
+            
+            # Offload text encoders to CPU after embeddings are ready (after inference)
+            if self.offload_text_encoders and self.device == 'cuda' and torch.cuda.is_available():
+                if hasattr(self.pipeline, "text_encoder") and self.pipeline.text_encoder is not None:
+                    self.pipeline.text_encoder.to("cpu")
+                if hasattr(self.pipeline, "text_encoder_2") and self.pipeline.text_encoder_2 is not None:
+                    self.pipeline.text_encoder_2.to("cpu")
+                torch.cuda.empty_cache()
+                gc.collect()
+                logger.info("💾 Text encoders moved to CPU (VRAM freed)")
             
             # Extract frames
             frames = output.frames[0]

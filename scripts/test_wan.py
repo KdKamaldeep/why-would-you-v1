@@ -90,6 +90,13 @@ def main():
         default="text, subtitles, watermark, blurry, low quality",
         help="Negative prompt (default: 'text, subtitles, watermark, blurry, low quality')"
     )
+    parser.add_argument(
+        "--model-size",
+        type=str,
+        choices=["5b", "14b"],
+        default="5b",
+        help="Model size: '5b' for dense 5B model or '14b' for MoE 14B model (default: '5b')"
+    )
     
     args = parser.parse_args()
     
@@ -125,7 +132,8 @@ def main():
             fps=args.fps,
             num_inference_steps=args.steps,
             guidance_scale=args.guidance,
-            negative_prompt=args.negative_prompt
+            negative_prompt=args.negative_prompt,
+            model_size=args.model_size
         )
         
         if not generator.is_available():
