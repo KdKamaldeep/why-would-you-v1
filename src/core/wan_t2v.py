@@ -2,7 +2,8 @@
 """
 WAN 2.2 Text-Image-to-Video Generator Module
 Handles text-to-video generation using Wan-AI/Wan2.2-TI2V-5B
-Supports both text-to-video (T2V) and text-image-to-video (TI2V) modes
+Supports both text-to-video (T2V) and image-to-video (I2V) modes
+Uses WanImageToVideoPipeline for I2V mode and WanPipeline for T2V mode
 """
 
 import os
@@ -20,8 +21,9 @@ from PIL import Image
 
 logger = logging.getLogger(__name__)
 
-# Global singleton instance
-_wan_pipeline = None
+# Global singleton instances (separate for T2V and I2V)
+_wan_pipeline_t2v = None
+_wan_pipeline_i2v = None
 _wan_vae = None
 
 
@@ -42,28 +44,49 @@ def get_cache_dir() -> Optional[str]:
     return None
 
 
-def get_wan_pipeline(device: str = None, force_reload: bool = False):
+def get_wan_pipeline(device: str = None, force_reload: bool = False, use_i2v: bool = False):
     """
     Get or initialize the global WAN pipeline (singleton pattern).
     
     Args:
         device: Device to run on ('cuda' or 'cpu'). Auto-detected if None.
         force_reload: Force reload of the pipeline even if already loaded.
+        use_i2v: If True, load WanImageToVideoPipeline for I2V mode. If False, load WanPipeline for T2V mode.
         
     Returns:
-        WanPipeline instance or None if loading fails
+        WanPipeline or WanImageToVideoPipeline instance or None if loading fails
     """
-    global _wan_pipeline, _wan_vae
+    global _wan_pipeline_t2v, _wan_pipeline_i2v, _wan_vae
     
-    if _wan_pipeline is not None and not force_reload:
-        logger.info("♻️ Reusing existing WAN pipeline (singleton) - model already loaded")
-        return _wan_pipeline
+    # Select the appropriate pipeline based on mode
+    if use_i2v:
+        if _wan_pipeline_i2v is not None and not force_reload:
+            logger.info("♻️ Reusing existing WAN I2V pipeline (singleton) - model already loaded")
+            return _wan_pipeline_i2v
+        pipeline_var = "_wan_pipeline_i2v"
+        pipeline_name = "I2V"
+    else:
+        if _wan_pipeline_t2v is not None and not force_reload:
+            logger.info("♻️ Reusing existing WAN T2V pipeline (singleton) - model already loaded")
+            return _wan_pipeline_t2v
+        pipeline_var = "_wan_pipeline_t2v"
+        pipeline_name = "T2V"
     
     if device is None:
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
     
     try:
         from diffusers import AutoencoderKLWan, WanPipeline
+        # Import WanImageToVideoPipeline for I2V mode
+        try:
+            from diffusers import WanImageToVideoPipeline
+            i2v_available = True
+        except ImportError:
+            logger.warning("⚠️ WanImageToVideoPipeline not available in this diffusers version. I2V mode will not work.")
+            i2v_available = False
+            if use_i2v:
+                logger.error("❌ Cannot use I2V mode: WanImageToVideoPipeline not available")
+                return None
         
         model_id = "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
         
@@ -79,6 +102,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         
         logger.info(f"🔄 Loading WAN 2.2 TI2V-5B model: {model_id}")
         logger.info(f"💻 Device: {device}")
+        logger.info(f"🎬 Mode: {pipeline_name} ({'Image-to-Video' if use_i2v else 'Text-to-Video'})")
         logger.info("📝 Note: Wan2.2-TI2V-5B is a dense model (no MoE expert switching)")
         
         # Determine torch dtype based on device
@@ -100,44 +124,57 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         
         # Load VAE with wan2.2_vae.safetensors (16x16x4 compression ratio)
         # The 16x16x4 compression ratio provides 64x overall compression (4x temporal, 16x spatial)
-        logger.info("📦 Loading WAN 2.2 VAE with 16x16x4 compression ratio...")
-        logger.info("📦 VAE: wan2.2_vae.safetensors (temporal: 4x, spatial: 16x16 = 64x total)")
-        logger.info(f"📦 VAE dtype: FP16 (optimal for decode VRAM stability)")
-        _wan_vae = AutoencoderKLWan.from_pretrained(
-            model_id,
-            subfolder="vae",
-            torch_dtype=torch.float16,  # FP16 for decode VRAM stability
-            cache_dir=cache_dir
-        )
+        # VAE is shared between T2V and I2V pipelines
+        if _wan_vae is None:
+            logger.info("📦 Loading WAN 2.2 VAE with 16x16x4 compression ratio...")
+            logger.info("📦 VAE: wan2.2_vae.safetensors (temporal: 4x, spatial: 16x16 = 64x total)")
+            logger.info(f"📦 VAE dtype: FP16 (optimal for decode VRAM stability)")
+            _wan_vae = AutoencoderKLWan.from_pretrained(
+                model_id,
+                subfolder="vae",
+                torch_dtype=torch.float16,  # FP16 for decode VRAM stability
+                cache_dir=cache_dir
+            )
+        else:
+            logger.info("♻️ Reusing existing VAE (shared between T2V and I2V pipelines)")
         
-        # Load pipeline (dense model - no MoE expert switching needed)
-        logger.info("📦 Loading WAN 2.2 TI2V-5B pipeline (dense architecture)...")
-        _wan_pipeline = WanPipeline.from_pretrained(
-            model_id,
-            vae=_wan_vae,
-            torch_dtype=torch_dtype,
-            cache_dir=cache_dir
-        )
+        # Load appropriate pipeline based on mode
+        if use_i2v and i2v_available:
+            logger.info("📦 Loading WAN 2.2 TI2V-5B I2V pipeline (dense architecture)...")
+            pipeline = WanImageToVideoPipeline.from_pretrained(
+                model_id,
+                vae=_wan_vae,
+                torch_dtype=torch_dtype,
+                cache_dir=cache_dir
+            )
+        else:
+            logger.info("📦 Loading WAN 2.2 TI2V-5B T2V pipeline (dense architecture)...")
+            pipeline = WanPipeline.from_pretrained(
+                model_id,
+                vae=_wan_vae,
+                torch_dtype=torch_dtype,
+                cache_dir=cache_dir
+            )
         
         # Move to device
-        _wan_pipeline = _wan_pipeline.to(device)
+        pipeline = pipeline.to(device)
         
         # Offload VAE to CPU when idle to reduce peak VRAM overlap
         if device == 'cuda':
-            _wan_pipeline.vae.to("cpu")
+            pipeline.vae.to("cpu")
             logger.info("💾 VAE offloaded to CPU (will be moved to GPU only during inference)")
         
         # Enable VAE optimizations (slicing and tiling for memory efficiency)
         # Enable directly on VAE object, not pipeline wrapper
         if device == 'cuda':
             try:
-                _wan_pipeline.vae.enable_slicing()
+                pipeline.vae.enable_slicing()
                 logger.info("✅ Enabled VAE slicing (temporal chunking for memory efficiency)")
             except Exception as e:
                 logger.warning(f"⚠️ Could not enable VAE slicing: {e}")
             
             try:
-                _wan_pipeline.vae.enable_tiling()
+                pipeline.vae.enable_tiling()
                 logger.info("✅ Enabled VAE tiling (spatial chunking for 720p+ resolution)")
             except Exception as e:
                 logger.warning(f"⚠️ Could not enable VAE tiling: {e}")
@@ -145,22 +182,30 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False):
         # Enable memory optimizations if available
         if device == 'cuda':
             try:
-                if hasattr(_wan_pipeline, 'enable_memory_efficient_attention'):
-                    _wan_pipeline.enable_memory_efficient_attention()
+                if hasattr(pipeline, 'enable_memory_efficient_attention'):
+                    pipeline.enable_memory_efficient_attention()
                     logger.info("✅ Enabled memory efficient attention")
             except Exception as e:
                 logger.warning(f"⚠️ Could not enable memory efficient attention: {e}")
             
             try:
-                if hasattr(_wan_pipeline, 'enable_xformers_memory_efficient_attention'):
-                    _wan_pipeline.enable_xformers_memory_efficient_attention()
+                if hasattr(pipeline, 'enable_xformers_memory_efficient_attention'):
+                    pipeline.enable_xformers_memory_efficient_attention()
                     logger.info("✅ Enabled xformers memory efficient attention")
             except Exception as e:
                 logger.info("ℹ️ xFormers not available; continuing without it")
         
-        logger.info("✅ WAN 2.2 TI2V-5B pipeline loaded successfully")
+        # Store pipeline in appropriate global variable
+        if use_i2v:
+            globals()[pipeline_var] = pipeline
+            _wan_pipeline_i2v = pipeline
+        else:
+            globals()[pipeline_var] = pipeline
+            _wan_pipeline_t2v = pipeline
+        
+        logger.info(f"✅ WAN 2.2 TI2V-5B {pipeline_name} pipeline loaded successfully")
         logger.info("📦 WAN pipeline initialized ONCE - will be reused for all subsequent generations")
-        return _wan_pipeline
+        return pipeline
         
     except ImportError as e:
         logger.error(f"❌ diffusers library not available or WAN not supported: {e}")
@@ -263,7 +308,7 @@ class WanT2VGenerator:
         
         try:
             # Determine mode: T2V (text-only) or TI2V (text + image)
-            mode = "TI2V" if image is not None else "T2V"
+            mode = "I2V" if image is not None else "T2V"
             logger.info(f"🎬 Generating video with WAN 2.2 TI2V-5B ({mode} mode)...")
             logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
             logger.info(f"📐 Dimensions: {self.width}x{self.height} (720p)")
@@ -275,10 +320,11 @@ class WanT2VGenerator:
             if neg_prompt:
                 logger.info(f"🚫 Negative prompt: {neg_prompt[:100]}{'...' if len(neg_prompt) > 100 else ''}")
             
-            # Process image input for TI2V mode
+            # Process image input for I2V mode
             image_input = None
+            use_i2v_mode = False
             if image is not None:
-                logger.info("🖼️ Processing input image for TI2V mode...")
+                logger.info("🖼️ Processing input image for I2V mode...")
                 
                 if isinstance(image, str):
                     # Load from file path
@@ -301,6 +347,32 @@ class WanT2VGenerator:
                         logger.warning("⚠️ Unsupported tensor format, skipping image input")
                 else:
                     logger.warning(f"⚠️ Unsupported image type: {type(image)}, skipping image input")
+                
+                if image_input is not None:
+                    use_i2v_mode = True
+                    # Resize image to match pipeline dimensions (1280x704 or 704x1280)
+                    image_input = image_input.resize((self.width, self.height), Image.Resampling.LANCZOS)
+                    logger.info(f"📐 Resized image to {self.width}x{self.height} for 5B model compatibility")
+            
+            # Load I2V pipeline if image is provided, otherwise use T2V pipeline
+            if use_i2v_mode:
+                if self.pipeline_i2v is None:
+                    logger.info("🔄 Loading I2V pipeline for image-to-video generation...")
+                    self.pipeline_i2v = get_wan_pipeline(device=self.device, use_i2v=True)
+                    if self.pipeline_i2v is None:
+                        logger.warning("⚠️ I2V pipeline not available, falling back to T2V mode")
+                        logger.warning("⚠️ Creating dummy black frame for T2V mode...")
+                        use_i2v_mode = False
+                        # Create a dummy black frame for T2V fallback
+                        image_input = Image.new("RGB", (self.width, self.height), color=(0, 0, 0))
+                        logger.info("✅ Using T2V mode with dummy black frame (I2V not available)")
+                current_pipeline = self.pipeline_i2v
+            else:
+                current_pipeline = self.pipeline
+                if image_input is None:
+                    logger.info("✅ Using T2V mode: prompt only (no image provided)")
+                else:
+                    logger.info("✅ Using T2V mode with dummy frame (I2V pipeline not available)")
             
             # Set seed if provided
             if seed is not None:
@@ -316,74 +388,35 @@ class WanT2VGenerator:
             
             # Move VAE to GPU only for inference
             if self.device == 'cuda' and torch.cuda.is_available():
-                self.pipeline.vae.to(self.device)
+                current_pipeline.vae.to(self.device)
                 torch.cuda.empty_cache()
                 gc.collect()
                 logger.info("🚀 VAE moved to GPU for inference")
             
-            # Generate video (T2V or TI2V mode)
-            # Optimized for 720p (1280x720) @ 24fps with 16x16x4 VAE compression
-            logger.info("🎬 Running inference (optimized for 720p @ 24fps)...")
+            # Generate video (T2V or I2V mode)
+            # Optimized for 5B model resolution (1280x704 or 704x1280) @ 24fps with 16x16x4 VAE compression
+            logger.info(f"🎬 Running inference ({'I2V' if use_i2v_mode else 'T2V'} mode)...")
             logger.info(f"📊 Sampling config: {num_frames_to_use} frames @ {self.fps}fps, {self.width}x{self.height}px")
             pipeline_kwargs = {
                 "prompt": prompt,
                 "negative_prompt": neg_prompt,
-                "height": self.height,  # 720p optimized
-                "width": self.width,   # 720p optimized
-                "num_frames": num_frames_to_use,  # Calculated for 24fps
+                "height": self.height,  # 5B model optimized (704 or 1280)
+                "width": self.width,   # 5B model optimized (1280 or 704)
+                "num_frames": num_frames_to_use,
                 "num_inference_steps": self.num_inference_steps,
                 "guidance_scale": self.guidance_scale
             }
             
-            # Add image input for TI2V mode
-            # Check what parameters the pipeline actually accepts
-            if image_input is not None:
-                import inspect
-                try:
-                    sig = inspect.signature(self.pipeline.__call__)
-                    params = list(sig.parameters.keys())
-                    logger.info(f"🔍 Pipeline __call__ parameters: {params}")
-                    
-                    # Try common parameter names for image input in diffusers pipelines
-                    image_param_name = None
-                    for param_name in ["image", "init_image", "input_image", "reference_image", "conditioning_image"]:
-                        if param_name in params:
-                            image_param_name = param_name
-                            logger.info(f"✅ Found image parameter: {image_param_name}")
-                            break
-                    
-                    if image_param_name:
-                        pipeline_kwargs[image_param_name] = image_input
-                        logger.info(f"✅ Using TI2V mode: prompt + {image_param_name}")
-                    else:
-                        logger.warning(f"⚠️ Pipeline does not accept image parameter. Available params: {params}")
-                        logger.warning("⚠️ This version of WAN 2.2 TI2V pipeline may not support image input yet.")
-                        logger.warning("⚠️ Falling back to T2V mode (image will be ignored)")
-                        logger.info("✅ Using T2V mode: prompt only (image not supported by this pipeline version)")
-                        # Remove image from kwargs to avoid errors
-                        image_input = None
-                except Exception as e:
-                    logger.warning(f"⚠️ Could not inspect pipeline signature: {e}")
-                    logger.warning("⚠️ Attempting to use 'image' parameter anyway...")
-                    # Try with 'image' parameter - if it fails, the error will be caught below
-                    pipeline_kwargs["image"] = image_input
-                    logger.info("✅ Attempting TI2V mode: prompt + image")
-            else:
-                logger.info("✅ Using T2V mode: prompt only")
+            # Add image input for I2V mode (WanImageToVideoPipeline accepts 'image' parameter)
+            if use_i2v_mode and image_input is not None:
+                pipeline_kwargs["image"] = image_input
+                logger.info("✅ Using I2V mode: prompt + image")
+            elif image_input is not None and not use_i2v_mode:
+                # T2V mode with dummy frame (shouldn't happen, but handle gracefully)
+                logger.warning("⚠️ Image provided but I2V pipeline not available, using T2V mode")
             
-            try:
-                output = self.pipeline(**pipeline_kwargs)
-            except TypeError as e:
-                if "image" in str(e) or "unexpected keyword argument" in str(e):
-                    logger.error(f"❌ Pipeline does not support image input: {e}")
-                    logger.info("🔄 Retrying without image parameter (T2V mode)...")
-                    # Remove image-related parameters and retry
-                    pipeline_kwargs_retry = {k: v for k, v in pipeline_kwargs.items() 
-                                           if k not in ["image", "init_image", "input_image", "reference_image", "conditioning_image"]}
-                    output = self.pipeline(**pipeline_kwargs_retry)
-                    logger.warning("⚠️ Video generated in T2V mode (image input not supported by this pipeline version)")
-                else:
-                    raise
+            # Call the appropriate pipeline
+            output = current_pipeline(**pipeline_kwargs)
             
             # Extract frames
             frames = output.frames[0]
@@ -463,7 +496,7 @@ class WanT2VGenerator:
             
             # Move VAE back to CPU after saving/export is done
             if self.device == 'cuda' and torch.cuda.is_available():
-                self.pipeline.vae.to("cpu")
+                current_pipeline.vae.to("cpu")
                 torch.cuda.empty_cache()
                 gc.collect()
                 logger.info("💾 VAE moved back to CPU (idle)")
