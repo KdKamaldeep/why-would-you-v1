@@ -108,7 +108,7 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False, use_i2v: bo
         # Determine torch dtype based on device
         if device == 'cuda' and torch.cuda.is_available():
             # Use bfloat16 on CUDA for maximum quality (full BF16 for 48GB+ VRAM)
-            torch_dtype = torch.bfloat16
+            torch_dtype = torch.float16
             vae_dtype = torch.float16  # VAE in FP16 for decode VRAM stability
             logger.info("✅ Using full BF16 precision on CUDA for maximum quality (48GB+ VRAM optimized)")
         else:

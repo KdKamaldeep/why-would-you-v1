@@ -75,3 +75,15 @@ New topics for january
 Hidden Carbon Monoxide Sources Inside Your Home
 Hidden Water Leaks That Slowly Destroy Homes
 Hidden Mold Growth Behind Walls
+
+
+python scripts/test_wan.py \
+  --prompt "A cat walking on grass, realistic" \
+  --image ref_images/cat.png \
+  --out output/ti2v_video.mp4 \
+  --width 1344 \
+  --height 768 \
+  --num-frames 49 \
+  --fps 12
+  
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
