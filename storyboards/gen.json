@@ -1,43 +1,203 @@
 {
   "stories": [
     {
-      "title": "You Do This Too",
-      "description": "A Gen-Z reel built on everyday curiosity, not motivation.",
+      "title": "Songs Get Stuck Because of This",
+      "description": "A weird brain fact about music you can't unhear.",
       "scenes": [
         {
-          "id": "scene_01_hook",
+          "id": "song_hook_human",
           "duration": 2,
-          "num_frames": 24,
-          "visual_prompt": "Extreme close-up of a phone screen scrolling fast. The scrolling suddenly stops on a random post. Thumb hovers but doesn’t tap. Static frame, harsh phone light, realistic detail, 720p.",
-          "negative_prompt": "cartoon, fantasy, text overlay, watermark",
-          "narration": "You do this too."
+          "num_frames": 25,
+          "visual_prompt": "Realistic close-up of a young person wearing earphones, staring ahead. Minimal head movement, neutral expression. Natural indoor lighting, realistic skin texture, 720p.",
+          "negative_prompt": "cartoon, fantasy, exaggerated emotion, text overlay, watermark",
+          "narration": "Ever had a song stuck in your head?"
         },
         {
-          "id": "scene_02_behavior",
+          "id": "song_medium_nonhuman",
           "duration": 4,
           "num_frames": 49,
-          "visual_prompt": "Realistic medium shot of a person opening an app, closing it immediately, then opening the same app again without thinking. Focus on phone and hands. Natural indoor lighting, steady camera, 720p.",
-          "negative_prompt": "overacting, dramatic motion, text",
-          "narration": "You open an app… then forget why."
+          "visual_prompt": "Abstract non-human visualization of sound waves looping smoothly in a circular motion. Soft glow, calm colors, clean background, slow motion, 720p.",
+          "negative_prompt": "numbers, letters, text, chaotic motion, cartoon",
+          "narration": "Your brain hates unfinished patterns."
         },
         {
-          "id": "scene_03_relief",
-          "duration": 5,
-          "num_frames": 25,
-          "visual_prompt": "Realistic shot of a different person walking into a room, stopping in the doorway, looking confused for a second, then slowly turning back. Camera fixed, natural movement, 720p.",
-          "negative_prompt": "comedy exaggeration, fantasy",
-          "narration": "It’s not just you."
-        },
-        {
-          "id": "scene_04_loop",
+          "id": "song_long_nonhuman",
           "duration": 6,
-          "num_frames": 49,
-          "visual_prompt": "Realistic close shot of phone placed face-down on table. Notifications light up the screen one by one. The phone vibrates slightly but no one picks it up. Calm environment, natural lighting, 720p.",
-          "negative_prompt": "text overlay, watermark, fantasy glow",
-          "narration": "Your brain just needed a reset."
+          "num_frames": 73,
+          "visual_prompt": "Abstract brain-style visualization showing glowing neural paths repeating the same loop. Slow rhythmic motion, dark background, clean scientific aesthetic, 720p.",
+          "negative_prompt": "labels, medical diagrams, text, cartoon brain",
+          "narration": "So it keeps replaying the song, hoping to finish it."
+        },
+        {
+          "id": "song_close_human",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Realistic medium close shot of a person slightly smiling as realization hits. Earphones still on. Minimal movement, natural lighting, 720p.",
+          "negative_prompt": "overacting, exaggerated comedy, fantasy",
+          "narration": "That’s why it won’t stop."
         }
       ],
-      "total_duration": 17
+      "total_duration": 14
+    },
+
+    {
+      "title": "Why You Forget Why You Entered a Room",
+      "description": "Your brain does this on purpose.",
+      "scenes": [
+        {
+          "id": "room_hook_human",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Realistic shot of a person walking through a doorway and suddenly stopping. Confused body language. Face partially visible. Natural indoor lighting, 720p.",
+          "negative_prompt": "cartoon, comedy exaggeration, text",
+          "narration": "Ever walk into a room and forget why?"
+        },
+        {
+          "id": "room_medium_nonhuman",
+          "duration": 4,
+          "num_frames": 49,
+          "visual_prompt": "Non-human abstract visualization of doors opening and closing smoothly in sequence. Clean minimal design, slow motion, soft glow, 720p.",
+          "negative_prompt": "numbers, text, chaotic motion",
+          "narration": "Your brain separates spaces."
+        },
+        {
+          "id": "room_long_nonhuman",
+          "duration": 6,
+          "num_frames": 73,
+          "visual_prompt": "Abstract brain-style visualization showing memory nodes disconnecting and reconnecting. Calm motion, dark background, soft glowing paths, 720p.",
+          "negative_prompt": "labels, medical text, cartoon",
+          "narration": "Crossing a doorway can reset what you were thinking."
+        },
+        {
+          "id": "room_close_human",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Realistic medium shot of a person turning around and walking back slowly. Natural motion, neutral expression, 720p.",
+          "negative_prompt": "exaggerated acting, fantasy",
+          "narration": "That’s the doorway effect."
+        }
+      ],
+      "total_duration": 14
+    },
+
+    {
+      "title": "Why Time Feels Faster at Night",
+      "description": "This is why nights disappear.",
+      "scenes": [
+        {
+          "id": "time_hook_human",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Realistic close shot of a person checking the time on their phone at night. Blue light reflects on face. Minimal movement, 720p.",
+          "negative_prompt": "cartoon, fantasy, text overlay",
+          "narration": "Why does time move faster at night?"
+        },
+        {
+          "id": "time_medium_nonhuman",
+          "duration": 4,
+          "num_frames": 49,
+          "visual_prompt": "Non-human abstract visualization of a clock shadow moving faster while light dims. Smooth motion, dark tones, cinematic clarity, 720p.",
+          "negative_prompt": "numbers, text, chaotic motion",
+          "narration": "Your brain tracks time using events."
+        },
+        {
+          "id": "time_long_nonhuman",
+          "duration": 6,
+          "num_frames": 73,
+          "visual_prompt": "Abstract visualization of empty timeline segments stretching and compressing. Calm flowing motion, dark background, 720p.",
+          "negative_prompt": "labels, charts, text",
+          "narration": "At night, fewer memories form, so time feels shorter."
+        },
+        {
+          "id": "time_close_human",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Realistic medium shot of a person realizing the time is late, slight surprise expression. Phone in hand, low light, 720p.",
+          "negative_prompt": "overacting, fantasy",
+          "narration": "That’s why hours vanish."
+        }
+      ],
+      "total_duration": 14
+    },
+
+    {
+      "title": "Why Your Body Jerks Before Sleep",
+      "description": "That sudden jump has a reason.",
+      "scenes": [
+        {
+          "id": "sleep_hook_human",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Realistic shot of a person lying in bed, eyes closing slowly. Calm breathing, minimal motion, low light, 720p.",
+          "negative_prompt": "horror, exaggerated movement",
+          "narration": "Ever feel your body jump before sleep?"
+        },
+        {
+          "id": "sleep_medium_nonhuman",
+          "duration": 4,
+          "num_frames": 49,
+          "visual_prompt": "Non-human abstract visualization of a body outline gently falling through space. Soft motion, dark background, clean design, 720p.",
+          "negative_prompt": "text, symbols, cartoon",
+          "narration": "Your brain thinks you’re falling."
+        },
+        {
+          "id": "sleep_long_nonhuman",
+          "duration": 6,
+          "num_frames": 73,
+          "visual_prompt": "Abstract brain-style visualization showing a sudden signal pulse triggering muscle response. Slow controlled animation, dark background, 720p.",
+          "negative_prompt": "medical text, labels",
+          "narration": "So it sends a signal to wake your body."
+        },
+        {
+          "id": "sleep_close_human",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Realistic medium close shot of a person relaxing again in bed, breathing steady. Calm lighting, 720p.",
+          "negative_prompt": "overacting, fantasy",
+          "narration": "It’s completely normal."
+        }
+      ],
+      "total_duration": 14
+    },
+
+    {
+      "title": "Why Silence Feels Uncomfortable",
+      "description": "Your brain wants noise.",
+      "scenes": [
+        {
+          "id": "silence_hook_human",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Realistic shot of a person sitting alone in a quiet room, slight fidgeting. Neutral expression, natural light, 720p.",
+          "negative_prompt": "dramatic sadness, fantasy",
+          "narration": "Why does silence feel weird?"
+        },
+        {
+          "id": "silence_medium_nonhuman",
+          "duration": 4,
+          "num_frames": 49,
+          "visual_prompt": "Non-human abstract visualization of sound waves fading into stillness. Smooth slow motion, dark neutral background, 720p.",
+          "negative_prompt": "numbers, text, chaotic motion",
+          "narration": "Your brain is always scanning."
+        },
+        {
+          "id": "silence_long_nonhuman",
+          "duration": 6,
+          "num_frames": 73,
+          "visual_prompt": "Abstract visualization showing attention signals increasing in an empty environment. Clean scientific aesthetic, slow motion, 720p.",
+          "negative_prompt": "labels, charts, text",
+          "narration": "Without sound, it searches harder for danger."
+        },
+        {
+          "id": "silence_close_human",
+          "duration": 2,
+          "num_frames": 25,
+          "visual_prompt": "Realistic medium shot of a person turning on light background noise, then relaxing. Calm posture, 720p.",
+          "negative_prompt": "overacting, fantasy",
+          "narration": "That’s why silence feels loud."
+        }
+      ],
+      "total_duration": 14
     }
   ]
 }
