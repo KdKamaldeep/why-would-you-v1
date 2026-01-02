@@ -25,6 +25,8 @@ logger = logging.getLogger(__name__)
 _wan_pipeline_t2v = None
 _wan_pipeline_i2v = None
 _wan_vae = None
+# Shared components to avoid loading twice
+_wan_shared_components = None  # Will store transformer, text_encoder, etc.
 
 
 def get_cache_dir() -> Optional[str]:
@@ -139,14 +141,46 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False, use_i2v: bo
             logger.info("♻️ Reusing existing VAE (shared between T2V and I2V pipelines)")
         
         # Load appropriate pipeline based on mode
+        # If loading I2V and T2V already exists, reuse its components to avoid loading twice
+        global _wan_shared_components
+        
         if use_i2v and i2v_available:
-            logger.info("📦 Loading WAN 2.2 TI2V-5B I2V pipeline (dense architecture)...")
-            pipeline = WanImageToVideoPipeline.from_pretrained(
-                model_id,
-                vae=_wan_vae,
-                torch_dtype=torch_dtype,
-                cache_dir=cache_dir
-            )
+            # Check if T2V pipeline exists - if so, reuse its components
+            if _wan_pipeline_t2v is not None:
+                logger.info("♻️ Reusing components from T2V pipeline to avoid loading model weights twice...")
+                logger.info("📦 Constructing I2V pipeline from shared components...")
+                # Extract shared components from T2V pipeline
+                shared_kwargs = {
+                    "vae": _wan_vae,
+                }
+                # Copy shared components (transformer, text encoders, etc.)
+                if hasattr(_wan_pipeline_t2v, "transformer"):
+                    shared_kwargs["transformer"] = _wan_pipeline_t2v.transformer
+                if hasattr(_wan_pipeline_t2v, "text_encoder"):
+                    shared_kwargs["text_encoder"] = _wan_pipeline_t2v.text_encoder
+                if hasattr(_wan_pipeline_t2v, "text_encoder_2"):
+                    shared_kwargs["text_encoder_2"] = _wan_pipeline_t2v.text_encoder_2
+                if hasattr(_wan_pipeline_t2v, "tokenizer"):
+                    shared_kwargs["tokenizer"] = _wan_pipeline_t2v.tokenizer
+                if hasattr(_wan_pipeline_t2v, "tokenizer_2"):
+                    shared_kwargs["tokenizer_2"] = _wan_pipeline_t2v.tokenizer_2
+                
+                # Load I2V pipeline with shared components (only loads I2V-specific parts)
+                pipeline = WanImageToVideoPipeline.from_pretrained(
+                    model_id,
+                    **shared_kwargs,
+                    torch_dtype=torch_dtype,
+                    cache_dir=cache_dir
+                )
+                logger.info("✅ I2V pipeline constructed using shared components (no duplicate model loading)")
+            else:
+                logger.info("📦 Loading WAN 2.2 TI2V-5B I2V pipeline (dense architecture)...")
+                pipeline = WanImageToVideoPipeline.from_pretrained(
+                    model_id,
+                    vae=_wan_vae,
+                    torch_dtype=torch_dtype,
+                    cache_dir=cache_dir
+                )
         else:
             logger.info("📦 Loading WAN 2.2 TI2V-5B T2V pipeline (dense architecture)...")
             pipeline = WanPipeline.from_pretrained(
