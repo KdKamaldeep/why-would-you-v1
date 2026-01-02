@@ -300,6 +300,12 @@ class CartoonShortsGenerator:
                     
                     if not (self.config.reuse_existing and scene_audio.exists()):
                         logger.info(f"🎵 Scene {i+1}: Generating new audio clip...")
+                        # Ensure Coqui TTS is on GPU before synthesis
+                        try:
+                            self.voice_synthesizer.move_to_gpu()
+                        except Exception as e:
+                            logger.warning(f"⚠️ Failed to move TTS to GPU (may already be on GPU): {e}")
+                        
                         final_voice_file = voice_file or self.config.voice_id or None
                         logger.info(f"🎵 Scene {i+1}: Final voice_clone_audio parameter: {final_voice_file}")
                         generated_audio = self.voice_synthesizer.synthesize_voice(
@@ -727,6 +733,12 @@ class CartoonShortsGenerator:
                                 if fallback_voice_file:
                                     logger.info(f"🎵 Fallback: Using voice file from first scene: {fallback_voice_file}")
                                     break
+                    
+                    # Ensure Coqui TTS is on GPU before synthesis
+                    try:
+                        self.voice_synthesizer.move_to_gpu()
+                    except Exception as e:
+                        logger.warning(f"⚠️ Failed to move TTS to GPU (may already be on GPU): {e}")
                     
                     generated_audio = self.voice_synthesizer.synthesize_voice(
                         narration_lines,
