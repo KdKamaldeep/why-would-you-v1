@@ -406,7 +406,7 @@ class WanT2VGenerator:
                 torch.cuda.empty_cache()
                 gc.collect()
             
-            # Move VAE to GPU temporarily for inference (text encoders stay on CPU)
+            # Move VAE to GPU temporarily for inference
             if self.device == 'cuda' and torch.cuda.is_available():
                 if self.pipeline.vae is not None:
                     self.pipeline.vae.to(self.device)
@@ -440,10 +440,87 @@ class WanT2VGenerator:
             logger.info("🎬 Running inference (optimized for 720p @ 24fps)...")
             logger.info(f"📊 Sampling config: {num_frames_to_use} frames @ {self.fps}fps, {self.width}x{self.height}px")
             
+            # Temporarily move text encoders to GPU for fast prompt embedding
+            # Then move them back to CPU before diffusion sampling to save VRAM
+            text_encoders_moved_to_gpu = False
+            if self.device == 'cuda' and torch.cuda.is_available():
+                # Move text encoders to GPU for embedding
+                if hasattr(self.pipeline, "text_encoder") and self.pipeline.text_encoder is not None:
+                    self.pipeline.text_encoder.to(self.device)
+                    text_encoders_moved_to_gpu = True
+                if hasattr(self.pipeline, "text_encoder_2") and self.pipeline.text_encoder_2 is not None:
+                    self.pipeline.text_encoder_2.to(self.device)
+                    text_encoders_moved_to_gpu = True
+                
+                if text_encoders_moved_to_gpu:
+                    torch.cuda.empty_cache()
+                    gc.collect()
+                    logger.info("🚀 Text encoders moved to GPU for prompt embedding")
+            
+            # Try to pre-encode prompts if pipeline supports it (faster and allows moving encoders back sooner)
+            encoded_prompts = None
+            if text_encoders_moved_to_gpu and hasattr(self.pipeline, "encode_prompt"):
+                try:
+                    logger.info("📝 Encoding prompts on GPU (fast)...")
+                    # Encode prompts separately
+                    encoded_prompts = self.pipeline.encode_prompt(
+                        prompt=prompt,
+                        negative_prompt=neg_prompt,
+                        device=self.device,
+                        num_images_per_prompt=1,
+                        do_classifier_free_guidance=(self.guidance_scale > 1.0)
+                    )
+                    logger.info("✅ Prompt encoding completed on GPU")
+                    
+                    # Move text encoders back to CPU immediately after encoding
+                    if hasattr(self.pipeline, "text_encoder") and self.pipeline.text_encoder is not None:
+                        self.pipeline.text_encoder.to("cpu")
+                    if hasattr(self.pipeline, "text_encoder_2") and self.pipeline.text_encoder_2 is not None:
+                        self.pipeline.text_encoder_2.to("cpu")
+                    torch.cuda.empty_cache()
+                    gc.collect()
+                    logger.info("💾 Text encoders moved back to CPU (embedding done, diffusion starting)")
+                    text_encoders_moved_to_gpu = False
+                    
+                    # Update pipeline_kwargs to use encoded prompts if supported
+                    # Note: Some pipelines may not accept encoded prompts directly
+                    # If not supported, we'll fall back to regular call
+                except Exception as e:
+                    logger.warning(f"⚠️ Pre-encoding not supported or failed: {e}, will encode during pipeline call")
+                    encoded_prompts = None
+            
             # Run inference with autocast FP16 and inference_mode
-            # Text encoders stay on CPU (embedding is cheap on CPU)
             with torch.inference_mode(), torch.cuda.amp.autocast(dtype=torch_dtype, enabled=(self.device == 'cuda')):
-                output = self.pipeline(**pipeline_kwargs)
+                if encoded_prompts is not None:
+                    # Try to use pre-encoded prompts if pipeline supports it
+                    try:
+                        # Some pipelines accept prompt_embeds instead of prompt
+                        pipeline_kwargs_encoded = pipeline_kwargs.copy()
+                        pipeline_kwargs_encoded.pop("prompt", None)
+                        pipeline_kwargs_encoded.pop("negative_prompt", None)
+                        if isinstance(encoded_prompts, tuple) and len(encoded_prompts) >= 2:
+                            pipeline_kwargs_encoded["prompt_embeds"] = encoded_prompts[0]
+                            pipeline_kwargs_encoded["negative_prompt_embeds"] = encoded_prompts[1]
+                        else:
+                            pipeline_kwargs_encoded["prompt_embeds"] = encoded_prompts
+                        output = self.pipeline(**pipeline_kwargs_encoded)
+                    except Exception as e:
+                        logger.warning(f"⚠️ Pipeline doesn't accept pre-encoded prompts: {e}, using regular call")
+                        # Fall back to regular call (encoders still on GPU)
+                        output = self.pipeline(**pipeline_kwargs)
+                else:
+                    # Regular call - encoders will encode on GPU, then we move them back
+                    output = self.pipeline(**pipeline_kwargs)
+            
+            # Move text encoders back to CPU after inference (if still on GPU)
+            if text_encoders_moved_to_gpu and self.device == 'cuda' and torch.cuda.is_available():
+                if hasattr(self.pipeline, "text_encoder") and self.pipeline.text_encoder is not None:
+                    self.pipeline.text_encoder.to("cpu")
+                if hasattr(self.pipeline, "text_encoder_2") and self.pipeline.text_encoder_2 is not None:
+                    self.pipeline.text_encoder_2.to("cpu")
+                torch.cuda.empty_cache()
+                gc.collect()
+                logger.info("💾 Text encoders moved back to CPU (inference complete)")
             
             # Move VAE back to CPU after inference to free VRAM
             if self.device == 'cuda' and torch.cuda.is_available():
