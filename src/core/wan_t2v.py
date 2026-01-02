@@ -134,28 +134,60 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False, model_size:
             torch_dtype=torch.float16,  # FP16 for decode VRAM stability
             cache_dir=cache_dir
         )
+        # Keep VAE on CPU initially
+        _wan_vae = _wan_vae.to("cpu")
+        logger.info("💾 VAE loaded on CPU (will be moved to GPU during inference)")
         
-        # Load pipeline directly on GPU (MoE-safe: no device_map="auto", no low_cpu_mem_usage=False)
+        # Load pipeline on CPU first (MoE-safe: no device_map="auto", no low_cpu_mem_usage=False)
         # Pass VAE directly to avoid duplicate instances
-        logger.info(f"📦 Loading WAN 2.2 TI2V pipeline ({'MoE' if is_moe else 'Dense'} architecture) on GPU...")
+        logger.info(f"📦 Loading WAN 2.2 TI2V pipeline ({'MoE' if is_moe else 'Dense'} architecture) on CPU...")
         _wan_pipeline = WanPipeline.from_pretrained(
             model_id,
             vae=_wan_vae,  # Pass VAE directly to avoid duplication
             torch_dtype=torch_dtype,
             cache_dir=cache_dir
         )
+        # Keep pipeline on CPU initially
+        _wan_pipeline = _wan_pipeline.to("cpu")
         
-        # Move entire pipeline to GPU (GPU-only inference)
+        # Selective component placement: Only move transformer to GPU, keep VAE and text encoders on CPU
         if device == 'cuda' and torch.cuda.is_available():
-            logger.info("🚀 Moving pipeline to GPU (GPU-only inference)...")
-            _wan_pipeline = _wan_pipeline.to(device)
-            # Ensure VAE is also on GPU (no CPU offload)
-            _wan_pipeline.vae.to(device)
-            logger.info("✅ Pipeline loaded on GPU")
+            logger.info("🔧 Moving components selectively to GPU...")
             
-            # Clear cache after loading
+            # Keep text encoders on CPU (embedding is cheap on CPU)
+            if hasattr(_wan_pipeline, "text_encoder") and _wan_pipeline.text_encoder is not None:
+                _wan_pipeline.text_encoder.to("cpu")
+                logger.info("💾 Text encoder kept on CPU")
+            if hasattr(_wan_pipeline, "text_encoder_2") and _wan_pipeline.text_encoder_2 is not None:
+                _wan_pipeline.text_encoder_2.to("cpu")
+                logger.info("💾 Text encoder 2 kept on CPU")
+            
+            # Keep VAE on CPU (will be moved to GPU temporarily during inference)
+            _wan_pipeline.vae.to("cpu")
+            logger.info("💾 VAE kept on CPU (will be moved to GPU during inference)")
+            
+            # Move only the video backbone (transformer/unet/model) to GPU
+            video_backbone = None
+            if hasattr(_wan_pipeline, "transformer"):
+                video_backbone = _wan_pipeline.transformer
+                backbone_name = "transformer"
+            elif hasattr(_wan_pipeline, "model"):
+                video_backbone = _wan_pipeline.model
+                backbone_name = "model"
+            elif hasattr(_wan_pipeline, "unet"):
+                video_backbone = _wan_pipeline.unet
+                backbone_name = "unet"
+            else:
+                logger.error("❌ Could not identify video backbone component")
+                raise RuntimeError("Failed to identify video backbone component for selective GPU placement")
+            
+            video_backbone.to(device)
+            logger.info(f"🚀 Video backbone ({backbone_name}) moved to GPU")
+            
+            # Clear cache after selective placement
             torch.cuda.empty_cache()
             gc.collect()
+            logger.info("✅ Selective component placement completed")
         
         # Enable attention slicing if available
         if hasattr(_wan_pipeline, 'enable_attention_slicing'):
@@ -271,7 +303,7 @@ class WanT2VGenerator:
             logger.warning("⚠️ WAN pipeline not available")
         
         logger.info(f"📦 Model size: {self.model_size.upper()}")
-        logger.info("🚀 GPU-only inference (no CPU offload)")
+        logger.info("🔧 Selective GPU placement: transformer on GPU, VAE/text encoders on CPU")
     
     def generate_video(self, 
                       prompt: str, 
@@ -374,13 +406,13 @@ class WanT2VGenerator:
                 torch.cuda.empty_cache()
                 gc.collect()
             
-            # Ensure all components are on GPU (no CPU offload)
+            # Move VAE to GPU temporarily for inference (text encoders stay on CPU)
             if self.device == 'cuda' and torch.cuda.is_available():
-                # Ensure VAE is on GPU
                 if self.pipeline.vae is not None:
                     self.pipeline.vae.to(self.device)
-                torch.cuda.empty_cache()
-                gc.collect()
+                    torch.cuda.empty_cache()
+                    gc.collect()
+                    logger.info("🚀 VAE moved to GPU for inference")
             
             # Prepare pipeline kwargs
             pipeline_kwargs = {
@@ -408,29 +440,18 @@ class WanT2VGenerator:
             logger.info("🎬 Running inference (optimized for 720p @ 24fps)...")
             logger.info(f"📊 Sampling config: {num_frames_to_use} frames @ {self.fps}fps, {self.width}x{self.height}px")
             
-            # Run inference with autocast FP16 and inference_mode (GPU-only)
+            # Run inference with autocast FP16 and inference_mode
+            # Text encoders stay on CPU (embedding is cheap on CPU)
             with torch.inference_mode(), torch.cuda.amp.autocast(dtype=torch_dtype, enabled=(self.device == 'cuda')):
                 output = self.pipeline(**pipeline_kwargs)
             
-            # Aggressively free text encoder memory after embeddings are created (GPU-only approach)
-            # Delete text encoder weights to free VRAM while keeping inference functional
+            # Move VAE back to CPU after inference to free VRAM
             if self.device == 'cuda' and torch.cuda.is_available():
-                # Free text encoder memory by deleting their weights
-                # This is safe because embeddings are already computed and stored in the pipeline
-                if hasattr(self.pipeline, "text_encoder") and self.pipeline.text_encoder is not None:
-                    # Clear text encoder weights from GPU memory
-                    del self.pipeline.text_encoder
-                    self.pipeline.text_encoder = None
-                if hasattr(self.pipeline, "text_encoder_2") and self.pipeline.text_encoder_2 is not None:
-                    # Clear text encoder 2 weights from GPU memory
-                    del self.pipeline.text_encoder_2
-                    self.pipeline.text_encoder_2 = None
-                
-                # Aggressive memory cleanup
-                torch.cuda.empty_cache()
-                torch.cuda.synchronize()
-                gc.collect()
-                logger.info("🧹 Text encoder memory freed from GPU (embeddings preserved)")
+                if self.pipeline.vae is not None:
+                    self.pipeline.vae.to("cpu")
+                    torch.cuda.empty_cache()
+                    gc.collect()
+                    logger.info("💾 VAE moved back to CPU (VRAM freed)")
             
             # Extract frames
             frames = output.frames[0]
@@ -508,7 +529,7 @@ class WanT2VGenerator:
                 logger.info("✅ Using direct export (no slicing needed)")
                 export_to_video(frames, str(output_path), fps=self.fps)
             
-            # Keep VAE on GPU (no CPU offload)
+            # VAE already moved back to CPU after inference
             # Clear cache after export
             if self.device == 'cuda' and torch.cuda.is_available():
                 torch.cuda.empty_cache()
