@@ -7,6 +7,7 @@
         {
           "id": "scene_01_hook",
           "duration": 4,
+          "num_frames": 25,
           "visual_prompt": "A close-up, wide cinematic scene of an early radar dish rotating slowly on a cliff overlooking a stormy sea. First 1–2 seconds: sudden fast camera push-in (zoom shock) toward the spinning dish, creating immediate impact, then motion quickly stabilizes into slow cinematic movement. Lightning flashes in the distance, illuminating the metallic structure, cinematic lighting, high quality, 720p.",
           "visual_reference": "HOOK: First 1–2 seconds must visually interrupt scrolling using sudden camera movement or contrast change. Then settle into calm motion.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
@@ -15,6 +16,7 @@
         {
           "id": "scene_02_context",
           "duration": 4,
+          "num_frames": 49,
           "visual_prompt": "Wide cinematic shot showing a vast assembly line producing tanks and aircraft in a dimly lit factory. Sparks fly from welding stations, and giant presses stamp metal. Camera: slow steady dolly or gentle pan across the bustling scene, smooth motion, realistic depth, balanced composition, cinematic lighting, 720p.",
           "visual_reference": "Explain the main idea visually. Add depth and scale, but keep motion slow and controlled for stability.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
@@ -23,6 +25,7 @@
         {
           "id": "scene_03_example",
           "duration": 4,
+          "num_frames": 49,
           "visual_prompt": "Wide cinematic scene showing a concrete example. A sleek, early jet-powered aircraft (like a Messerschmitt Me 262) streaks across a cloudy sky, leaving a distinct vapor trail. Camera: slow controlled movement following the aircraft, stable framing, realistic motion, cinematic contrast, 720p.",
           "visual_reference": "Show a clear example or consequence that supports the fact or story.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
@@ -31,6 +34,7 @@
         {
           "id": "scene_04_reveal",
           "duration": 4,
+          "num_frames": 49,
           "visual_prompt": "Wide cinematic closing shot. A desolate desert landscape at dawn, with a mushroom cloud slowly dissipating in the far distance, casting an eerie glow. Camera: slow gentle pull-back, calm mood, cinematic lighting, realistic textures, 720p.",
           "visual_reference": "Final emotional or thought-provoking reveal. Encourage replay and reflection.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
