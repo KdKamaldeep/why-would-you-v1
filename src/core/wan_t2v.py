@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Model IDs
 WAN_MODEL_ID_5B = "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-WAN_MODEL_ID_14B = "Wan-AI/Wan2.2-TI2V-14B-Diffusers"
+WAN_MODEL_ID_14B = "Wan-AI/Wan2.2-T2V-A14B-Diffusers"
 
 # Global singleton instance
 _wan_pipeline = None
