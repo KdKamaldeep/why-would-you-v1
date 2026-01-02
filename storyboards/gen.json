@@ -8,7 +8,7 @@
           "id": "scene_01_hook",
           "duration": 4,
           "num_frames": 25,
-          "visual_prompt": "An extreme close-up of a glowing, iridescent dragon scale pulsing with teal light. First 1–2 seconds: sudden fast camera push-in (zoom shock) into the microscopic textures of the scale, revealing a shimmering galaxy within. Then motion stabilizes into a slow, liquid-like shimmer. Cinematic macro, floating magical embers, ultra-detailed, 720p.",
+          "visual_prompt": "An extreme close-up of a glowing, iridescent dragon scale pulsing with teal light. sudden fast camera push-in (zoom shock) into the microscopic textures of the scale, revealing a shimmering galaxy within. Then motion stabilizes into a slow, liquid-like shimmer. Cinematic macro, floating magical embers, ultra-detailed, 720p.",
           "visual_reference": "HOOK: Use the iridescent textures and 'zoom shock' to grab attention. The 'shimmering galaxy' inside the scale adds a high-fantasy surreal touch.",
           "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
           "narration": "Magic isn't dying. It's evolving."
