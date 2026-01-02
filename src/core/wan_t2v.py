@@ -6,7 +6,11 @@ Supports both text-to-video (T2V) and text-image-to-video (TI2V) modes
 """
 
 import os
-# Allocator env var handling (new PyTorch naming)
+# Allocator env var handling (new PyTorch naming) - MUST be set before torch import
+# Set PYTORCH_CUDA_ALLOC_CONF for compatibility
+if not os.getenv("PYTORCH_CUDA_ALLOC_CONF"):
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+# Set PYTORCH_ALLOC_CONF (new naming)
 if not os.getenv("PYTORCH_ALLOC_CONF") and os.getenv("PYTORCH_CUDA_ALLOC_CONF"):
     os.environ["PYTORCH_ALLOC_CONF"] = os.environ["PYTORCH_CUDA_ALLOC_CONF"]
 if not os.getenv("PYTORCH_ALLOC_CONF"):
@@ -103,12 +107,17 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False, model_size:
         logger.info(f"💻 Device: {device}")
         logger.info(f"📝 Model type: {'MoE (14B)' if is_moe else 'Dense (5B)'}")
         
-        # Determine torch dtype based on device
+        # Determine torch dtype based on device and model size
         if device == 'cuda' and torch.cuda.is_available():
-            # Use bfloat16 on CUDA for maximum quality (full BF16 for 48GB+ VRAM)
-            torch_dtype = torch.bfloat16
+            # For 14B MoE model, use FP16 to reduce VRAM (BF16 can cause OOM)
+            # For 5B dense model, use BF16 for maximum quality
+            if is_moe:
+                torch_dtype = torch.float16  # FP16 for 14B MoE to avoid OOM
+                logger.info("✅ Using FP16 precision for 14B MoE model (VRAM optimized)")
+            else:
+                torch_dtype = torch.bfloat16  # BF16 for 5B dense for maximum quality
+                logger.info("✅ Using full BF16 precision on CUDA for maximum quality (48GB+ VRAM optimized)")
             vae_dtype = torch.float16  # VAE in FP16 for decode VRAM stability
-            logger.info("✅ Using full BF16 precision on CUDA for maximum quality (48GB+ VRAM optimized)")
         else:
             torch_dtype = torch.float32
             vae_dtype = torch.float32
@@ -131,17 +140,22 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False, model_size:
             torch_dtype=torch.float16,  # FP16 for decode VRAM stability
             cache_dir=cache_dir
         )
+        # Keep VAE on CPU during load (will move to GPU only during inference)
+        _wan_vae = _wan_vae.to("cpu")
+        logger.info("💾 VAE loaded on CPU (will be moved to GPU only during inference)")
         
-        # Load pipeline (MoE-safe: no device_map="auto", no low_cpu_mem_usage=False)
-        logger.info(f"📦 Loading WAN 2.2 TI2V pipeline ({'MoE' if is_moe else 'Dense'} architecture)...")
+        # Load pipeline on CPU first (MoE-safe: no device_map="auto", no low_cpu_mem_usage=False)
+        logger.info(f"📦 Loading WAN 2.2 TI2V pipeline ({'MoE' if is_moe else 'Dense'} architecture) on CPU...")
         _wan_pipeline = WanPipeline.from_pretrained(
             model_id,
             vae=_wan_vae,
             torch_dtype=torch_dtype,
             cache_dir=cache_dir
         )
+        # Keep pipeline on CPU initially to avoid OOM
+        _wan_pipeline = _wan_pipeline.to("cpu")
         
-        # Enable attention slicing if available
+        # Enable attention slicing if available (before moving to GPU)
         if hasattr(_wan_pipeline, 'enable_attention_slicing'):
             try:
                 _wan_pipeline.enable_attention_slicing("max")
@@ -149,13 +163,56 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False, model_size:
             except Exception as e:
                 logger.warning(f"⚠️ Could not enable attention slicing: {e}")
         
-        # Move to device
-        _wan_pipeline = _wan_pipeline.to(device)
-        
-        # Offload VAE to CPU when idle to reduce peak VRAM overlap
-        if device == 'cuda':
-            _wan_pipeline.vae.to("cpu")
-            logger.info("💾 VAE offloaded to CPU (will be moved to GPU only during inference)")
+        # Selective component placement for 14B MoE to avoid OOM
+        # For 14B: Only move video backbone to GPU, keep text encoders and VAE on CPU
+        # For 5B: Preserve existing behavior (move all to GPU, then move VAE to CPU)
+        if device == 'cuda' and torch.cuda.is_available():
+            if is_moe:
+                # 14B MoE: Selective placement to avoid OOM
+                logger.info("🔧 Moving components selectively to GPU (14B MoE - avoiding OOM)...")
+                
+                # Keep text encoders on CPU
+                if hasattr(_wan_pipeline, "text_encoder") and _wan_pipeline.text_encoder is not None:
+                    _wan_pipeline.text_encoder.to("cpu")
+                    logger.info("💾 Text encoder kept on CPU")
+                if hasattr(_wan_pipeline, "text_encoder_2") and _wan_pipeline.text_encoder_2 is not None:
+                    _wan_pipeline.text_encoder_2.to("cpu")
+                    logger.info("💾 Text encoder 2 kept on CPU")
+                
+                # Keep VAE on CPU (already there)
+                _wan_pipeline.vae.to("cpu")
+                logger.info("💾 VAE kept on CPU")
+                
+                # Move only the video backbone (transformer/unet/model) to GPU
+                # Try common attribute names for the main video generation component
+                video_backbone = None
+                if hasattr(_wan_pipeline, "transformer"):
+                    video_backbone = _wan_pipeline.transformer
+                    backbone_name = "transformer"
+                elif hasattr(_wan_pipeline, "model"):
+                    video_backbone = _wan_pipeline.model
+                    backbone_name = "model"
+                elif hasattr(_wan_pipeline, "unet"):
+                    video_backbone = _wan_pipeline.unet
+                    backbone_name = "unet"
+                else:
+                    logger.error("❌ Could not identify video backbone for 14B MoE model")
+                    raise RuntimeError("Failed to identify video backbone component for selective GPU placement")
+                
+                video_backbone.to(device)
+                logger.info(f"🚀 Video backbone ({backbone_name}) moved to GPU")
+                
+                # Clear cache after selective placement
+                torch.cuda.empty_cache()
+                gc.collect()
+                logger.info("✅ Selective component placement completed (14B MoE)")
+            else:
+                # 5B Dense: Preserve existing behavior
+                logger.info("🔄 Moving pipeline to GPU (5B Dense - preserving existing behavior)...")
+                _wan_pipeline = _wan_pipeline.to(device)
+                # Then move VAE back to CPU (existing behavior)
+                _wan_pipeline.vae.to("cpu")
+                logger.info("💾 VAE offloaded to CPU (will be moved to GPU only during inference)")
         
         # Enable VAE optimizations (slicing and tiling for memory efficiency) - mandatory
         # Enable directly on VAE object, not pipeline wrapper
