@@ -252,11 +252,12 @@ class WanT2VGenerator:
         self.negative_prompt = negative_prompt
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
         self.pipeline = None
+        self.pipeline_i2v = None  # Separate pipeline for I2V mode
         
-        # Load pipeline (singleton, shared across instances)
-        self.pipeline = get_wan_pipeline(device=self.device)
+        # Load T2V pipeline by default (singleton, shared across instances)
+        self.pipeline = get_wan_pipeline(device=self.device, use_i2v=False)
         if self.pipeline is None:
-            logger.warning("⚠️ WAN pipeline not available")
+            logger.warning("⚠️ WAN T2V pipeline not available")
     
     def generate_video(self, 
                       prompt: str, 
