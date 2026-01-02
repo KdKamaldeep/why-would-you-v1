@@ -1,47 +1,43 @@
 {
   "stories": [
     {
-      "title": "Echoes of the Broken Oath",
-      "description": "POV: You're lost in a kingdom that forgot its gods. Survival is the only magic left. ⚔️💀 #darkfantasy #grimdark #wasteland",
+      "title": "You Do This Too",
+      "description": "A Gen-Z reel built on everyday curiosity, not motivation.",
       "scenes": [
         {
           "id": "scene_01_hook",
-          "duration": 4,
-          "num_frames": 49,
-          "visual_prompt": "Extreme close-up, wide cinematic scene of a rusted, cracked gauntlet covered in dried blood, slowly clenching a hilt of a broken sword. First 1–2 seconds: sudden fast camera push-in (zoom shock) into the jagged edge of the broken blade, reflecting a single, flickering torchlight. Then motion stabilizes into a subtle, desperate tremble of the gauntlet. Gritty textures, deep shadows, cinematic macro, 720p.",
-          "visual_reference": "HOOK: Immediate, visceral zoom. Focus on a single, grim detail. The trembling gauntlet conveys desperation and struggle instantly.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "In these lands, hope is a forgotten myth."
+          "duration": 2,
+          "num_frames": 24,
+          "visual_prompt": "Extreme close-up of a phone screen scrolling fast. The scrolling suddenly stops on a random post. Thumb hovers but doesn’t tap. Static frame, harsh phone light, realistic detail, 720p.",
+          "negative_prompt": "cartoon, fantasy, text overlay, watermark",
+          "narration": "You do this too."
         },
         {
-          "id": "scene_02_context",
+          "id": "scene_02_behavior",
           "duration": 4,
           "num_frames": 49,
-          "visual_prompt": "Wide cinematic shot of a desolate, wind-swept wasteland dotted with skeletal trees and the crumbling ruins of colossal, forgotten statues. A perpetual, suffocating dust storm churns in the distance. Camera: slow steady dolly across the bleak landscape, emphasizing the vast emptiness, volumetric dust, muted color palette, epic scale, 720p.",
-          "visual_reference": "Context: Establish the 'grimdark' world. Show the desolation and ancient ruin, hinting at a lost, grander past. The dust storm adds constant, uneasy motion.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "The kings are dust. The gods are silent."
+          "visual_prompt": "Realistic medium shot of a person opening an app, closing it immediately, then opening the same app again without thinking. Focus on phone and hands. Natural indoor lighting, steady camera, 720p.",
+          "negative_prompt": "overacting, dramatic motion, text",
+          "narration": "You open an app… then forget why."
         },
         {
-          "id": "scene_03_example",
-          "duration": 4,
-          "num_frames": 49,
-          "visual_prompt": "A cinematic shot of a lone, cloaked figure traversing a treacherous, narrow mountain pass under a blood-red sky. They clutch a dim, flickering lantern. A colossal, shadowy beast's eyes briefly glow from the crags above. Camera: slow controlled movement following the figure, emphasizing their vulnerability against the immense backdrop, high contrast, dramatic chiaroscuro lighting, 720p.",
-          "visual_reference": "Example: Focus on the struggle for survival. The single light source against overwhelming darkness, with a hint of a lurking threat, defines grimdark tension.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "Every shadow holds a hungry truth."
+          "id": "scene_03_relief",
+          "duration": 5,
+          "num_frames": 25,
+          "visual_prompt": "Realistic shot of a different person walking into a room, stopping in the doorway, looking confused for a second, then slowly turning back. Camera fixed, natural movement, 720p.",
+          "negative_prompt": "comedy exaggeration, fantasy",
+          "narration": "It’s not just you."
         },
         {
-          "id": "scene_04_reveal",
-          "duration": 4,
+          "id": "scene_04_loop",
+          "duration": 6,
           "num_frames": 49,
-          "visual_prompt": "A wide cinematic closing shot. The cloaked figure from the previous scene finally reaches a precipice, looking down at a vast, glowing chasm where faint, corrupted magical energy pulses rhythmically, illuminating grotesque, ancient structures below. Camera: slow gentle pull-back, revealing the scale of the chasm and the figure's smallness, eerie green/purple glow, oppressive atmosphere, 720p.",
-          "visual_reference": "Final Reveal: End with a sense of unsettling mystery and overwhelming power. The corrupted glow hints at dark magic and a deeper, sinister lore.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "What will you sacrifice to survive this broken world?"
+          "visual_prompt": "Realistic close shot of phone placed face-down on table. Notifications light up the screen one by one. The phone vibrates slightly but no one picks it up. Calm environment, natural lighting, 720p.",
+          "negative_prompt": "text overlay, watermark, fantasy glow",
+          "narration": "Your brain just needed a reset."
         }
       ],
-      "total_duration": 16
+      "total_duration": 17
     }
   ]
 }
