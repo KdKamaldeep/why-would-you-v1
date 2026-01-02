@@ -1,0 +1,56 @@
+{
+  "title": "When Dharma Shaped a Civilization",
+  "description": "A wide-shot cinematic retelling of Indian history through the calm and righteous presence of Lord Ram.",
+  "aspect_ratio": "9:16",
+  "video_type": "mythological_history",
+  "wan_model": "wan2.2-5b",
+  "fps": 12,
+  "total_duration": 34,
+
+  "audio_profile": {
+    "voice": "calm_male_indian",
+    "speech_rate": 0.95,
+    "pause_style": "dramatic",
+    "emotion": "reverent",
+    "music": "soft_epic_indian",
+    "music_volume": -30
+  },
+
+  "scenes": [
+    {
+      "id": "scene_01_establishing",
+      "duration": 8,
+      "num_frames": 73,
+      "visual_prompt": "Character design: Lord Ram as described in classical Indian art. Youthful male with tall lean build, serene and composed expression, lotus-shaped calm eyes, blue-tinted skin, long dark hair tied in a traditional topknot, subtle vertical tilak on the forehead. Wearing simple ancient Indian royal attire: saffron dhoti and shawl, minimal ornaments. Holding a traditional wooden bow. Wide cinematic establishing shot. Lord Ram stands on a high stone terrace overlooking ancient Ayodhya. Grand palace rooftops, temple spires, flowing river, distant greenery. Camera performs a very slow forward dolly. Golden sunrise lighting, soft mist, mythological realism, calm majestic tone.",
+      "negative_prompt": "text, watermark, logo, modern objects",
+      "narration": "In ancient India, leadership was not measured by power… but by dharma."
+    },
+
+    {
+      "id": "scene_02_choice_of_dharma",
+      "duration": 9,
+      "num_frames": 73,
+      "visual_prompt": "Character design: Lord Ram as described in classical Indian art. Youthful male with tall lean build, serene expression, blue-tinted skin, long dark hair in topknot, subtle tilak. Wearing saffron dhoti and shawl, minimal ornaments, holding a wooden bow. Wide shot of Lord Ram standing at the edge of a forest path. Far behind him, palace structures fade into morning haze. Tall trees, flowing river, birds in the sky. Camera slowly pans sideways, separating palace and forest. Soft natural light, epic Indian landscape, mythological realism.",
+      "negative_prompt": "crowds, text, watermark",
+      "narration": "When the moment came, Ram chose duty over the throne."
+    },
+
+    {
+      "id": "scene_03_journey",
+      "duration": 9,
+      "num_frames": 73,
+      "visual_prompt": "Character design: Lord Ram as described in classical Indian art. Youthful male, tall lean build, calm compassionate expression, blue-tinted skin, long dark hair tied back, subtle tilak, simple saffron attire, wooden bow. Wide landscape shot of Lord Ram walking calmly through an expansive ancient forest valley. Mountains in the distance, sunlight filtering through clouds, gentle wind moving trees. Camera follows from far behind with slow tracking motion. Serene timeless mood, mythological realism.",
+      "negative_prompt": "close-up, modern elements, logo",
+      "narration": "He walked away from comfort… to protect truth and honor."
+    },
+
+    {
+      "id": "scene_04_legacy",
+      "duration": 8,
+      "num_frames": 73,
+      "visual_prompt": "Character design: Lord Ram as described in classical Indian art. Youthful male with tall lean build, serene expression, blue-tinted skin, long dark hair in topknot, subtle tilak, saffron dhoti and shawl, wooden bow. Epic wide silhouette shot. Lord Ram stands on a hilltop overlooking rivers, forests, and distant lands beneath a glowing sunset sky. Camera slowly pulls back, revealing vast scale. Warm divine light, atmospheric haze, legendary Indian historical tone.",
+      "negative_prompt": "text, watermark, cartoon",
+      "narration": "And that choice shaped a civilization… forever."
+    }
+  ]
+}
