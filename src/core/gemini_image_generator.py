@@ -5,6 +5,9 @@ Gemini Image Generator Module - Handles image generation using Google Gemini API
 
 import os
 import logging
+import base64
+import io
+import json
 from pathlib import Path
 from typing import Optional
 from PIL import Image
@@ -17,6 +20,39 @@ try:
 except ImportError:
     GEMINI_AVAILABLE = False
     logger.warning("⚠️ google-genai package not installed. Install with: pip install google-genai")
+
+
+def extract_gemini_image(response_json):
+    """
+    Extract image from Gemini JSON response.
+    
+    Args:
+        response_json: Dictionary containing Gemini API response
+        
+    Returns:
+        PIL Image in RGB format
+        
+    Raises:
+        RuntimeError: If image extraction fails
+    """
+    try:
+        parts = response_json["candidates"][0]["content"]["parts"]
+
+        for part in parts:
+            if "inline_data" in part:
+                data = part["inline_data"]["data"]
+                mime = part["inline_data"].get("mime_type", "")
+
+                if not mime.startswith("image/"):
+                    raise ValueError(f"Unexpected mime type: {mime}")
+
+                img_bytes = base64.b64decode(data)
+                return Image.open(io.BytesIO(img_bytes)).convert("RGB")
+
+        raise ValueError("No inline image data found in Gemini response")
+
+    except Exception as e:
+        raise RuntimeError(f"Gemini image extraction failed: {e}")
 
 
 class GeminiImageGenerator:
@@ -77,81 +113,42 @@ class GeminiImageGenerator:
                 contents=prompt
             )
             
-            # Extract image from response
-            # The response structure may vary - check for image data
-            import base64
-            import io
-            
-            # Try different response structures
-            image_found = False
-            
-            # Method 1: Check candidates -> content -> parts -> inline_data
-            if hasattr(response, 'candidates') and len(response.candidates) > 0:
-                candidate = response.candidates[0]
-                if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
-                    for part in candidate.content.parts:
-                        # Check if part contains image data
-                        if hasattr(part, 'inline_data') and part.inline_data is not None:
-                            try:
-                                image_data = part.inline_data.data
-                                mime_type = getattr(part.inline_data, 'mime_type', 'image/png')
-                                
-                                # Decode base64 image
-                                image_bytes = base64.b64decode(image_data)
-                                image_found = True
-                                break
-                            except Exception as e:
-                                logger.warning(f"⚠️ Failed to extract image from inline_data: {e}")
-                                continue
-            
-            # Method 2: Check if response has direct image data
-            if not image_found and hasattr(response, 'parts'):
-                for part in response.parts:
-                    if hasattr(part, 'inline_data') and part.inline_data is not None:
-                        try:
-                            image_data = part.inline_data.data
-                            image_bytes = base64.b64decode(image_data)
-                            image_found = True
-                            break
-                        except Exception as e:
-                            continue
-            
-            # Method 3: Check response.text for base64 data URL
-            if not image_found and hasattr(response, 'text'):
-                text_response = response.text
-                # Look for base64 image data in text
-                import re
-                # Try to find base64 image data
-                base64_pattern = r'data:image/[^;]+;base64,([A-Za-z0-9+/=]+)'
-                match = re.search(base64_pattern, text_response)
-                if match:
-                    try:
-                        image_bytes = base64.b64decode(match.group(1))
-                        image_found = True
-                    except Exception as e:
-                        logger.warning(f"⚠️ Failed to decode base64 from text: {e}")
+            # Convert response to JSON/dict for parsing
+            # The google-genai library response needs to be converted to dict
+            try:
+                # Try multiple methods to convert response to dict
+                if isinstance(response, dict):
+                    response_json = response
+                elif hasattr(response, 'to_dict'):
+                    response_json = response.to_dict()
+                elif hasattr(response, '_raw_response'):
+                    # Some SDKs store raw response
+                    response_json = response._raw_response
                 else:
-                    logger.warning(f"⚠️ Gemini returned text instead of image: {text_response[:200]}")
+                    # Use JSON serialization as fallback
+                    # Convert response object to dict via JSON
+                    response_str = json.dumps(response, default=lambda o: o.__dict__ if hasattr(o, '__dict__') else str(o))
+                    response_json = json.loads(response_str)
+            except Exception as e:
+                logger.error(f"❌ Failed to convert response to JSON: {e}")
+                raise RuntimeError(f"Cannot parse Gemini response: {type(response)} - {e}")
             
-            if image_found:
-                # Load image and resize
-                image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+            # Extract image using helper function
+            try:
+                image = extract_gemini_image(response_json)
+                
+                # Resize and save image
                 image = image.resize((width, height), Image.Resampling.LANCZOS)
                 
-                # Save to output path
                 output_path_obj = Path(output_path)
                 output_path_obj.parent.mkdir(parents=True, exist_ok=True)
                 image.save(output_path_obj, "PNG")
                 
                 logger.info(f"✅ Image generated and saved: {output_path}")
                 return str(output_path_obj)
-            else:
-                logger.warning("⚠️ No image data found in Gemini response")
-                # Log response structure for debugging
-                logger.debug(f"Response type: {type(response)}")
-                logger.debug(f"Response attributes: {dir(response)}")
-                if hasattr(response, 'candidates'):
-                    logger.debug(f"Candidates: {response.candidates}")
+                
+            except RuntimeError as e:
+                logger.error(f"❌ {e}")
                 return None
             
         except Exception as e:
