@@ -32,6 +32,7 @@ from .script_generator import ScriptGenerator
 from .wan_t2v import WanT2VGenerator
 from .coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 from .video_processor import VideoProcessor, VideoConfig as VPConfig
+from .gemini_image_generator import GeminiImageGenerator
 
 
 # Load environment variables
@@ -163,6 +164,9 @@ class CartoonShortsGenerator:
         self.voice_synthesizer = CoquiVoiceSynthesizer(
             CoquiVoiceConfig(language=config.language)
         )
+        
+        # Initialize Gemini image generator
+        self.gemini_generator = GeminiImageGenerator()
 
         
         # Create video config for processor
@@ -421,6 +425,34 @@ class CartoonShortsGenerator:
                 if negative_prompt:
                     logger.info(f"🎬 Scene {i+1}: Using negative prompt ({len(negative_prompt)} characters)")
                 
+                # Generate initial frame with Gemini using visual_prompt
+                initial_image_path = None
+                visual_prompt = scene.get('visual_prompt', '')
+                if visual_prompt and self.gemini_generator.available:
+                    initial_image_path = self.output_dir / f"scene_{i+1}_initial_frame.png"
+                    logger.info(f"🎨 Scene {i+1}: Generating initial frame with Gemini...")
+                    generated_image = self.gemini_generator.generate_image(
+                        prompt=visual_prompt,
+                        output_path=str(initial_image_path),
+                        width=self.config.wan_width,
+                        height=self.config.wan_height
+                    )
+                    if generated_image:
+                        initial_image_path = generated_image
+                        logger.info(f"✅ Scene {i+1}: Initial frame generated: {initial_image_path}")
+                    else:
+                        logger.warning(f"⚠️ Scene {i+1}: Failed to generate initial frame, using T2V mode")
+                        initial_image_path = None
+                
+                # Combine motion_prompt with visual_prompt for WAN if available
+                motion_prompt = scene.get('motion_prompt', '')
+                if motion_prompt and visual_prompt:
+                    prompt = f"{visual_prompt}. Motion: {motion_prompt}"
+                    logger.info(f"🎬 Scene {i+1}: Combined visual_prompt + motion_prompt for WAN")
+                elif motion_prompt:
+                    prompt = f"{prompt}. Motion: {motion_prompt}"
+                    logger.info(f"🎬 Scene {i+1}: Added motion_prompt to prompt")
+                
                 # Generate video with WAN
                 try:
                     # Get num_frames from scene, fallback to command-line config
@@ -447,6 +479,7 @@ class CartoonShortsGenerator:
                     slug = "".join(c for c in story_title if c.isalnum() or c in (' ', '-', '_')).strip().replace(' ', '_').lower()[:50]
                     
                     # Generate video with optional best frame extraction
+                    # Pass initial_image_path to WAN for I2V mode if available
                     result = self.wan_generator.generate_video(
                         prompt=prompt,
                         output_path=str(clip_path),
@@ -456,7 +489,8 @@ class CartoonShortsGenerator:
                         scene_id=scene_id,
                         visual_reference=visual_reference,
                         slug=slug,
-                        best_frame_filename=best_frame_filename
+                        best_frame_filename=best_frame_filename,
+                        image=initial_image_path if initial_image_path else None
                     )
                     
                     # Handle return type: dict (with metadata) or string (backward compatible)
