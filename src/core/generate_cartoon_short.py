@@ -148,36 +148,45 @@ class CartoonShortsGenerator:
         self.output_dir = Path(config.output_path)
         self.output_dir.mkdir(exist_ok=True)
         
-        # Initialize components using modular classes
+        # Initialize lightweight components only (no ML pipelines yet - will load after validation)
         self.script_generator = ScriptGenerator(os.getenv('OPENAI_API_KEY', ''))
         
-        # Initialize WAN T2V generator
-        self.wan_generator = WanT2VGenerator(
-            width=config.wan_width,
-            height=config.wan_height,
-            num_frames=config.wan_num_frames,
-            fps=config.wan_fps,
-            num_inference_steps=config.wan_steps,
-            guidance_scale=config.wan_guidance,
-            negative_prompt=config.wan_negative_prompt
-        )
-        
-        # Initialize Coqui TTS voice synthesizer
-        self.voice_synthesizer = CoquiVoiceSynthesizer(
-            CoquiVoiceConfig(language=config.language)
-        )
-        
-        # Initialize Gemini image generator
-        self.gemini_generator = GeminiImageGenerator()
-
-        
-        # Create video config for processor
+        # Create video config for processor (lightweight)
         video_config = VPConfig(
             fps=config.fps,
             width=config.width,
             height=config.height
         )
         self.video_processor = VideoProcessor(video_config)
+        
+        # Pipelines will be initialized after validation (lazy loading to save VRAM)
+        self.wan_generator = None
+        self.voice_synthesizer = None
+        self.gemini_generator = None
+    
+    def _initialize_pipelines(self):
+        """Initialize ML pipelines (called after validation passes)."""
+        if self.wan_generator is None:
+            logger.info("🔄 Initializing WAN T2V generator...")
+            self.wan_generator = WanT2VGenerator(
+                width=self.config.wan_width,
+                height=self.config.wan_height,
+                num_frames=self.config.wan_num_frames,
+                fps=self.config.wan_fps,
+                num_inference_steps=self.config.wan_steps,
+                guidance_scale=self.config.wan_guidance,
+                negative_prompt=self.config.wan_negative_prompt
+            )
+        
+        if self.voice_synthesizer is None:
+            logger.info("🔄 Initializing Coqui TTS voice synthesizer...")
+            self.voice_synthesizer = CoquiVoiceSynthesizer(
+                CoquiVoiceConfig(language=self.config.language)
+            )
+        
+        if self.gemini_generator is None:
+            logger.info("🔄 Initializing Gemini image generator...")
+            self.gemini_generator = GeminiImageGenerator()
         
     def generate(self) -> str:
         """Generate the complete video reel following the specified flow."""
@@ -347,6 +356,9 @@ class CartoonShortsGenerator:
                 raise ValueError(f"Storyboard validation failed: {len(validation_errors)} scene(s) have narration longer than max video duration")
             
             logger.info("✅ Storyboard validation passed - all narrations fit within video duration limits")
+            
+            # Initialize pipelines AFTER validation passes (save VRAM until validation succeeds)
+            self._initialize_pipelines()
 
             # Step 2: Create audio clips at the beginning
             if self.config.skip_audio:
