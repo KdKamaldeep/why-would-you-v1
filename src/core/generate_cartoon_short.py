@@ -279,6 +279,75 @@ class CartoonShortsGenerator:
             else:
                 logger.info("ℹ️ No cast information found in script")
 
+            # Validate storyboard: Check if narration duration exceeds max video duration
+            logger.info("🔍 Validating storyboard and narration durations...")
+            validation_errors = []
+            
+            for i, scene in enumerate(script.get('scenes', [])):
+                scene_num = i + 1
+                
+                # Get num_frames for this scene
+                scene_num_frames = scene.get('num_frames', None)
+                if scene_num_frames is None:
+                    # Check generation_profile
+                    generation_profile = script.get('generation_profile', {})
+                    scene_num_frames = generation_profile.get('num_frames', None)
+                
+                # Fallback to config default
+                if scene_num_frames is None:
+                    scene_num_frames = self.config.wan_num_frames
+                
+                # Get fps for this scene (use config default)
+                scene_fps = self.config.wan_fps
+                
+                # Calculate max video duration: num_frames / fps
+                max_video_duration = scene_num_frames / scene_fps
+                
+                # Get narration text to estimate duration
+                narration_text = scene.get('narration', '')
+                if narration_text:
+                    # Rough estimate: average speaking rate is ~150 words per minute = 2.5 words per second
+                    # Or ~12-15 characters per second for English
+                    words = len(narration_text.split())
+                    estimated_narration_duration = words / 2.5  # words per second
+                    
+                    # Also check if scene has explicit duration
+                    scene_duration = scene.get('duration', None)
+                    if scene_duration:
+                        estimated_narration_duration = max(estimated_narration_duration, scene_duration)
+                    
+                    # Validate
+                    if estimated_narration_duration > max_video_duration:
+                        error_msg = (
+                            f"Scene {scene_num}: Narration is too long!\n"
+                            f"  • Narration duration: ~{estimated_narration_duration:.1f}s (estimated from {words} words)\n"
+                            f"  • Max video duration: {max_video_duration:.2f}s ({scene_num_frames} frames @ {scene_fps}fps)\n"
+                            f"  • Excess: {estimated_narration_duration - max_video_duration:.1f}s\n"
+                            f"  • Solution: Reduce narration text or increase num_frames to at least {int(estimated_narration_duration * scene_fps)}"
+                        )
+                        validation_errors.append(error_msg)
+                        logger.error(f"❌ {error_msg}")
+                    else:
+                        logger.info(f"✅ Scene {scene_num}: Narration fits ({estimated_narration_duration:.1f}s ≤ {max_video_duration:.2f}s max)")
+                else:
+                    logger.warning(f"⚠️ Scene {scene_num}: No narration text found")
+            
+            # Stop if validation errors found
+            if validation_errors:
+                logger.error("=" * 60)
+                logger.error("❌ STORYBOARD VALIDATION FAILED")
+                logger.error("=" * 60)
+                for error in validation_errors:
+                    logger.error(error)
+                logger.error("=" * 60)
+                logger.error("💡 Please fix the storyboard and try again:")
+                logger.error("   1. Reduce narration text length in scenes")
+                logger.error("   2. Increase num_frames in scenes (e.g., 49 → 73 for longer videos)")
+                logger.error("   3. Adjust fps if needed (lower fps = longer video for same frames)")
+                raise ValueError(f"Storyboard validation failed: {len(validation_errors)} scene(s) have narration longer than max video duration")
+            
+            logger.info("✅ Storyboard validation passed - all narrations fit within video duration limits")
+
             # Step 2: Create audio clips at the beginning
             if self.config.skip_audio:
                 logger.info("Step 2: Skipping audio generation (--skip-audio flag set)")
@@ -343,20 +412,65 @@ class CartoonShortsGenerator:
                     scene_audio_paths.append(str(scene_audio))
                     logger.info(f"Scene {i+1}: Audio clip ready: {scene_audio}")
             
-            # Detect length of each audio clip
+            # Detect length of each audio clip and validate against max video duration
             if not self.config.skip_audio:
                 logger.info("📏 Detecting length of each audio clip...")
                 total_audio_duration = 0
+                audio_validation_errors = []
+                
                 for i, scene_audio in enumerate(scene_audio_paths):
-                    logger.info(f"📏 Scene {i+1}: Analyzing audio duration...")
+                    scene_num = i + 1
+                    scene = script['scenes'][i]
+                    
+                    logger.info(f"📏 Scene {scene_num}: Analyzing audio duration...")
                     actual_duration = self.video_processor.get_audio_duration(scene_audio)
                     actual_scene_durations.append(actual_duration)
                     total_audio_duration += actual_duration
-                    logger.info(f"Scene {i+1}: Audio clip length: {actual_duration:.1f}s")
+                    logger.info(f"Scene {scene_num}: Audio clip length: {actual_duration:.1f}s")
+                    
+                    # Get num_frames for this scene (same logic as video generation)
+                    scene_num_frames = scene.get('num_frames', None)
+                    if scene_num_frames is None:
+                        generation_profile = script.get('generation_profile', {})
+                        scene_num_frames = generation_profile.get('num_frames', None)
+                    if scene_num_frames is None:
+                        scene_num_frames = self.config.wan_num_frames
+                    
+                    scene_fps = self.config.wan_fps
+                    max_video_duration = scene_num_frames / scene_fps
+                    
+                    # Validate actual audio duration against max video duration
+                    if actual_duration > max_video_duration:
+                        error_msg = (
+                            f"Scene {scene_num}: Actual audio duration exceeds max video duration!\n"
+                            f"  • Actual audio duration: {actual_duration:.2f}s\n"
+                            f"  • Max video duration: {max_video_duration:.2f}s ({scene_num_frames} frames @ {scene_fps}fps)\n"
+                            f"  • Excess: {actual_duration - max_video_duration:.2f}s\n"
+                            f"  • Solution: Increase num_frames to at least {int(actual_duration * scene_fps)} or reduce narration"
+                        )
+                        audio_validation_errors.append(error_msg)
+                        logger.error(f"❌ {error_msg}")
+                    else:
+                        logger.info(f"✅ Scene {scene_num}: Audio fits ({actual_duration:.2f}s ≤ {max_video_duration:.2f}s max)")
+                
+                # Stop if validation errors found
+                if audio_validation_errors:
+                    logger.error("=" * 60)
+                    logger.error("❌ AUDIO VALIDATION FAILED")
+                    logger.error("=" * 60)
+                    for error in audio_validation_errors:
+                        logger.error(error)
+                    logger.error("=" * 60)
+                    logger.error("💡 Please fix the storyboard and try again:")
+                    logger.error("   1. Reduce narration text length in scenes")
+                    logger.error("   2. Increase num_frames in scenes")
+                    logger.error("   3. Adjust fps if needed")
+                    raise ValueError(f"Audio validation failed: {len(audio_validation_errors)} scene(s) have audio longer than max video duration")
                 
                 logger.info(f"✅ Generated {len(scene_audio_paths)} audio clips for narration")
                 logger.info(f"📊 Total audio duration: {total_audio_duration:.1f}s")
                 logger.info(f"📊 Average audio duration per scene: {total_audio_duration/len(actual_scene_durations):.1f}s")
+                logger.info("✅ All audio durations validated - fit within video duration limits")
                 
                 # Move Coqui TTS pipeline to CPU after audio generation to free VRAM for WAN model
                 logger.info("💾 Moving Coqui TTS pipeline to CPU to free VRAM for video generation...")
