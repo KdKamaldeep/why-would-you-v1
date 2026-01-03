@@ -1,0 +1,44 @@
+{
+  "title": "Superman: The Constant Guardian",
+  "slug": "superman-consistency-comic",
+  "description": "A comic-book style story with strict visual character consistency across all scenes.",
+  "aspect_ratio": "9:16",
+  "video_type": "stylized_comic_book_motion",
+  "tone": "heroic, consistent, graphic",
+  "wan_fps": 12,
+  "stories": [
+    {
+      "total_duration": 40,
+      "scenes": [
+        {
+          "id": "scene_01_the_arrival",
+          "num_frames": 60,
+          "visual_prompt": "Comic book art style. A young Superman with short black hair and blue eyes, wearing a classic blue suit with a high-contrast red 'S' shield on his chest and a long flowing red cape. He stands in a golden cornfield under a bright blue sky. Bold ink outlines, cel-shaded lighting, vibrant primary colors.",
+          "motion_prompt": "Slow camera zoom into the 'S' symbol on his chest; the red cape ripples softly in the wind; corn stalks move in the background.",
+          "narration": "He came from the stars, carrying the hope of a lost world on his shoulders."
+        },
+        {
+          "id": "scene_02_metropolis_takeoff",
+          "num_frames": 72,
+          "visual_prompt": "Comic book art style. Same character: Superman with short black hair, blue suit, and red 'S' shield. He is crouched on a concrete rooftop in Metropolis, muscles defined. He looks upward with a determined expression. High-contrast shadows, thick ink lines, city skyline in background.",
+          "motion_prompt": "Dynamic camera shake as he leaps upward; dust and concrete fragments explode outward; the character blurs as he accelerates into the sky.",
+          "narration": "In a city of glass and steel, he found his calling."
+        },
+        {
+          "id": "scene_03_the_flight",
+          "num_frames": 72,
+          "visual_prompt": "Comic book art style. Same character: Superman flying at high speed. View from the side showing his profile, short black hair, red cape trailing behind horizontally. He wears the same blue suit and red 'S' shield. Background of clouds rendered with halftone dots and motion lines. Vibrant blue and red colors.",
+          "motion_prompt": "Fast tracking shot following his flight path; cape flapping violently with geometric folds; background clouds rushing past at high speed.",
+          "narration": "Faster than a speeding bullet, he became a shield for those who could not protect themselves."
+        },
+        {
+          "id": "scene_04_the_vigil",
+          "num_frames": 84,
+          "visual_prompt": "Comic book art style. Same character: Superman floating peacefully above the Earth. Full body shot showing the blue suit, red boots, and the prominent 'S' shield. His red cape billows majestically in the vacuum of space. The sun creates a sharp rim-light on his black hair. Cinematic graphic novel aesthetic.",
+          "motion_prompt": "Slow orbital rotation around the floating character; gentle pulsing of sunbeams in the corner; the Earth rotates slowly in the background.",
+          "narration": "He is the Man of Steel, the Man of Tomorrow, and our greatest hope."
+        }
+      ]
+    }
+  ]
+}
