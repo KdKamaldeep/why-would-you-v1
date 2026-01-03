@@ -1,0 +1,67 @@
+{
+  "title": "The One Who Remembered His Power",
+  "slug": "mythical-history-hanuman-story",
+  "description": "Hyper-realistic 12fps mythological storytelling inspired by Indian divine legends, designed for Wan 2.1/2.2 cinematic generation.",
+  "aspect_ratio": "9:16",
+  "video_type": "mythological_storytelling_doc",
+  "tone": "epic, inspirational, awe-inspiring",
+  "wan_fps": 12,
+
+  "characters": [
+    {
+      "id": "hanuman",
+      "name": "Lord Hanuman",
+      "type": "divine_mythological",
+      "appearance": {
+        "face": "monkey-faced with expressive intelligent eyes",
+        "body": "tall, muscular human body with powerful proportions",
+        "skin": "warm bronze skin tone with subtle divine glow",
+        "hair": "dark hair tied back, minimal movement",
+        "attire": "simple dhoti, sacred thread across chest, golden armlets",
+        "aura": "soft golden aura that intensifies during action"
+      },
+      "personality": "humble, devoted, immensely powerful yet calm",
+      "symbolism": "forgotten power awakened through devotion"
+    }
+  ],
+
+  "stories": [
+    {
+      "total_duration": 21,
+      "scenes": [
+        {
+          "id": "scene_01_forgotten_power",
+          "num_frames": 49,
+          "character_refs": ["hanuman"],
+          "visual_prompt": "Hyper-realistic mythological fantasy. Lord Hanuman sits silently on a stone in a vast ancient forest at dawn. His powerful form is relaxed, unaware of his own strength. Faint golden energy glows beneath his bronze skin. Towering trees wrapped in mist, cinematic god rays, volumetric fog, epic scale.",
+          "motion_prompt": "Slow cinematic dolly-in toward Hanuman; gentle mist drifting; subtle breathing motion.",
+          "narration": "He was born with limitless strength… yet lived as if it slept inside him."
+        },
+        {
+          "id": "scene_02_the_reminder",
+          "num_frames": 61,
+          "character_refs": ["hanuman"],
+          "visual_prompt": "Lord Hanuman. The powerful monkey-faced warrior stands as ancient sages appear as radiant silhouettes around him. His sacred thread and golden armlets glow brighter as divine energy awakens. Cinematic lighting, shallow depth of field, hyper-real skin detail.",
+          "motion_prompt": "Slow vertical crane from folded hands to focused eyes; aura pulsing softly; ornaments moving gently.",
+          "narration": "Until a single reminder shattered the silence… and memory returned."
+        },
+        {
+          "id": "scene_03_the_great_leap",
+          "num_frames": 61,
+          "character_refs": ["hanuman"],
+          "visual_prompt": "Same character: Lord Hanuman launches into the sky, leaping across a vast blue ocean. Water explodes outward at takeoff as clouds tear apart above him. His golden aura burns brighter mid-air. Hyper-realistic water physics, volumetric clouds, cinematic wide shot.",
+          "motion_prompt": "Explosive upward launch followed by smooth forward tracking; brief camera shake at takeoff, stabilizing mid-flight.",
+          "narration": "In that moment… effort vanished… and the impossible became natural."
+        },
+        {
+          "id": "scene_04_devotion_above_all",
+          "num_frames": 73,
+          "character_refs": ["hanuman"],
+          "visual_prompt": "Same character: Lord Hanuman kneels in devotion before a radiant divine light symbolizing Lord Rama. The battlefield dissolves into a calm golden void. Sacred particles float in stillness as his aura softens. Ethereal glow, cosmic silence.",
+          "motion_prompt": "Slow circular orbit around the kneeling figure; floating divine embers; gradual zoom-out into infinite space.",
+          "narration": "His power was never the miracle… devotion was the force that guided it."
+        }
+      ]
+    }
+  ]
+}
