@@ -1,42 +1,42 @@
 {
-  "title": "Why Fear Disappears at Height",
-  "slug": "fear-disappears-at-height-pov",
-  "description": "An immersive fantasy explainer where the viewer experiences how height changes fear.",
+  "title": "The Flight of Garuda: Beyond Fear",
+  "slug": "garuda-pov-fear-transcendence",
+  "description": "A POV experience as the divine eagle Lord Garuda, soaring from the earthly realm into the celestial heights where fear cannot reach.",
   "aspect_ratio": "9:16",
   "video_type": "immersive_fantasy_explainer",
-  "tone": "immersive, calm, surreal",
+  "tone": "divine, powerful, transcendental",
   "wan_fps": 12,
   "stories": [
     {
-      "total_duration": 36,
+      "total_duration": 48,
       "scenes": [
         {
-          "id": "scene_01_pov_rise",
-          "num_frames": 49,
-          "visual_prompt": "first person point of view, slowly rising above thick clouds, endless sky opening ahead, soft golden sunlight, fantasy cinematic lighting, volumetric fog, dreamlike unreal environment, immersive scale, no text, no watermark",
-          "motion_prompt": "slow vertical ascent as if floating upward, extremely smooth motion",
-          "narration": "You feel it... As you rise... something inside you goes quiet."
+          "id": "scene_01_garuda_rise",
+          "num_frames": 60,
+          "visual_prompt": "First-person POV from the back of a divine eagle deity, Lord Garuda. Massive golden-brown wings with shimmering emerald tips visible at the edges of the frame. Rising rapidly from a misty ancient Indian temple valley into the clouds. Cinematic sun rays piercing through feathers. Mythological fantasy style, hyper-detailed textures.",
+          "motion_prompt": "Powerful upward surge with the rhythmic, slow flapping of massive wings appearing at the periphery.",
+          "narration": "In the shadow of the earth, fear is heavy. But you were born for the sun."
         },
         {
-          "id": "scene_02_distance",
-          "num_frames": 49,
-          "visual_prompt": "first person view looking down from extreme height, tiny world far below, clouds drifting past, massive open sky, fantasy cinematic atmosphere, strong sense of distance and scale",
-          "motion_prompt": "gentle forward drift with slight downward tilt, calm motion",
-          "narration": "The noise fades... The worries shrink... Everything feels far away."
+          "id": "scene_02_celestial_ascent",
+          "num_frames": 72,
+          "visual_prompt": "POV gliding through high-altitude golden clouds. The edges of the frame show Garuda’s powerful talons and a glimpse of a jeweled chest-plate (Kavacha) reflecting the sun. Below, the mountains look like tiny pebbles. The sky transitions from blue to a deep cosmic indigo. Divine glow, high contrast, surreal scale.",
+          "motion_prompt": "Smooth, high-speed forward glide with slight banking to the left, clouds rushing past the viewer.",
+          "narration": "As the world shrinks, so does the noise of the ego. Up here, there is no 'small' to worry about."
         },
         {
-          "id": "scene_03_expansion",
-          "num_frames": 73,
-          "visual_prompt": "first person sensation of gliding through open sky, vast horizon in all directions, glowing clouds, surreal fantasy lighting, feeling of freedom and expansion, unreal style",
-          "motion_prompt": "slow forward glide through open space, wings-free floating motion",
-          "narration": "Fear survives on closeness... on details... on tight spaces."
+          "id": "scene_03_the_divine_eye",
+          "num_frames": 72,
+          "visual_prompt": "Ultra-wide POV from extreme height. The horizon curves. Wisps of golden energy trail from Garuda's wings. The viewer sees the world through a divine lens—everything is bathed in a calm, amber light. No ground visible, only an endless ocean of clouds and stars. Sacred, majestic atmosphere.",
+          "motion_prompt": "Steady, effortless hovering motion. The wings at the edges are now still, catching the celestial thermals.",
+          "narration": "Fear lives in the details of the ground. Height offers the truth of the whole."
         },
         {
-          "id": "scene_04_calm_realization",
-          "num_frames": 73,
-          "visual_prompt": "first person view surrounded by open sky and warm light, clouds parting gently, symbolic clarity and calm, fantasy cinematic environment",
-          "motion_prompt": "very slow upward drift, clouds separating smoothly",
-          "narration": "Up here... your mind stops zooming in... and starts seeing everything at once."
+          "id": "scene_04_garuda_zenith",
+          "num_frames": 84,
+          "visual_prompt": "POV looking directly into a massive, gentle sun that doesn't blind. A silhouette of Garuda’s eagle-like profile is briefly visible in a reflection. Feathers are glowing like molten gold. The atmosphere is one of absolute peace and cosmic power. Cinematic bloom, ethereal particles, divine fantasy.",
+          "motion_prompt": "Slow vertical ascent toward the light, fading into a soft golden white-out.",
+          "narration": "You are no longer the one who fears. You are the wings that carry the light. Fly higher."
         }
       ]
     }
