@@ -1,42 +1,42 @@
 {
   "title": "The Legend of the Golden King",
   "slug": "mythical-history-garuda-story",
-  "description": "Enhanced motion-driven storytelling of Lord Garuda.",
+  "description": "Timed 12fps mythological storytelling with audio-visual synchronization logic and character consistency.",
   "aspect_ratio": "9:16",
   "video_type": "mythological_storytelling_doc",
   "tone": "epic, educational, awe-inspiring",
   "wan_fps": 12,
   "stories": [
     {
-      "total_duration": 42,
+      "total_duration": 22,
       "scenes": [
         {
           "id": "scene_01_the_cosmic_egg",
-          "num_frames": 60,
+          "num_frames": 49,
           "visual_prompt": "A giant, glowing golden egg cracking open amidst a cosmic void. Intense light spills out, taking the shape of a massive bird. Mythical Vedic art style, swirling nebulae, high-contrast gold and deep purple. Cinematic sparkles and divine particles.",
-          "motion_prompt": "Extreme camera push-in (dolly-in) towards the central crack; high-speed particle expansion outward from the center; flickering light intensity with 3D depth jitter.",
-          "narration": "Long before the oceans were calmed, a power was born that shook the heavens. This is the story of Garuda."
+          "motion_prompt": "Extreme camera push-in (dolly-in) towards the central crack; high-speed particle expansion outward from the center; 12fps stepped flickering light intensity.",
+          "narration": "Long before the oceans were calmed, a power was born that shook the heavens."
         },
         {
           "id": "scene_02_appearance_details",
-          "num_frames": 72,
-          "visual_prompt": "Lord Garuda's form. A fierce white eagle face with a sharp golden beak, emerald-colored eyes, and a muscular human-like torso. He wears a crown of sun-fire and serpents draped like jewelry over his shoulders. His wings span the horizon, shimmering like molten copper.",
-          "motion_prompt": "Slow-motion sweeping crane shot starting from the talons, curving upward to the face; subtle rhythmic chest breathing; flowing hair and moving serpent ornaments; secondary motion in the wing feathers.",
-          "narration": "Half-man, half-eagle, his body glowed with the brilliance of a thousand suns. To look at him was to see the fire of the cosmos itself."
+          "num_frames": 61,
+          "visual_prompt": "Character Anchor: Lord Garuda with a fierce white eagle face, sharp golden beak, emerald eyes, and muscular human torso. He wears a sun-fire crown and serpent ornaments. Massive copper wings span the horizon. Mythical Vedic art style, bold ink outlines.",
+          "motion_prompt": "Slow-motion sweeping crane shot from talons to face; subtle rhythmic chest breathing; moving serpent ornaments in 12fps cycles.",
+          "narration": "Half-man, half-eagle, his body glowed with the brilliance of a thousand suns."
         },
         {
           "id": "scene_03_the_great_ascent",
-          "num_frames": 72,
-          "visual_prompt": "Garuda soaring upward, leaving the Earth behind. He passes through the clouds. He is carrying a massive mountain in one claw. Epic scale, cinematic wide shot, rich textures.",
-          "motion_prompt": "Dynamic tracking shot from behind; camera shakes as the massive wings flap; clouds part with realistic fluid simulation; background mountains shrink rapidly (parallax effect); heavy motion blur on the edges.",
-          "narration": "He flew higher than any god dared, driven by a sacred vow to free his mother. In his flight, fear died, and legend was born."
+          "num_frames": 61,
+          "visual_prompt": "Same character: Lord Garuda soaring upward carrying a massive mountain in one claw. He leaves the Earth behind, passing through halftone dot clouds. Epic scale, cinematic wide shot, rich Vedic textures, bold outlines.",
+          "motion_prompt": "Dynamic tracking shot from behind; camera shakes as wings flap; clouds part with fluid simulation; background mountains shrink rapidly.",
+          "narration": "He flew higher than any god dared, driven by a sacred vow to free his mother."
         },
         {
           "id": "scene_04_the_eternal_mount",
-          "num_frames": 84,
-          "visual_prompt": "Garuda bowing before a radiant blue light—Lord Vishnu. The two merge into a symbolic icon. The background is a golden mandala of the universe. Garuda’s wings are spread wide.",
-          "motion_prompt": "Slow-motion 360-degree orbital rotation around the characters; gentle floating particles; light rays (God rays) pulsing in and out; soft zoom-out to reveal the full cosmic mandala.",
-          "narration": "Today, we see him as the king of birds. But he is more—he is the reminder that when you rise for a higher purpose, you become unstoppable."
+          "num_frames": 73,
+          "visual_prompt": "Same character: Lord Garuda bowing before a radiant blue light of Lord Vishnu. The background is a golden cosmic mandala. Garuda’s wings are spread wide. High-contrast mythological fantasy, divine light rays.",
+          "motion_prompt": "Slow-motion 360-degree orbital rotation around the characters; gentle floating particles; soft zoom-out to reveal the full mandala.",
+          "narration": "Today, he is the king of birds, reminding us that with purpose, you become unstoppable."
         }
       ]
     }
