@@ -79,40 +79,80 @@ class GeminiImageGenerator:
             
             # Extract image from response
             # The response structure may vary - check for image data
+            import base64
+            import io
+            
+            # Try different response structures
+            image_found = False
+            
+            # Method 1: Check candidates -> content -> parts -> inline_data
             if hasattr(response, 'candidates') and len(response.candidates) > 0:
                 candidate = response.candidates[0]
                 if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
                     for part in candidate.content.parts:
                         # Check if part contains image data
-                        if hasattr(part, 'inline_data'):
+                        if hasattr(part, 'inline_data') and part.inline_data is not None:
+                            try:
+                                image_data = part.inline_data.data
+                                mime_type = getattr(part.inline_data, 'mime_type', 'image/png')
+                                
+                                # Decode base64 image
+                                image_bytes = base64.b64decode(image_data)
+                                image_found = True
+                                break
+                            except Exception as e:
+                                logger.warning(f"⚠️ Failed to extract image from inline_data: {e}")
+                                continue
+            
+            # Method 2: Check if response has direct image data
+            if not image_found and hasattr(response, 'parts'):
+                for part in response.parts:
+                    if hasattr(part, 'inline_data') and part.inline_data is not None:
+                        try:
                             image_data = part.inline_data.data
-                            mime_type = part.inline_data.mime_type
-                            
-                            # Decode base64 image
-                            import base64
-                            import io
                             image_bytes = base64.b64decode(image_data)
-                            
-                            # Load image and resize
-                            image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-                            image = image.resize((width, height), Image.Resampling.LANCZOS)
-                            
-                            # Save to output path
-                            output_path_obj = Path(output_path)
-                            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
-                            image.save(output_path_obj, "PNG")
-                            
-                            logger.info(f"✅ Image generated and saved: {output_path}")
-                            return str(output_path_obj)
+                            image_found = True
+                            break
+                        except Exception as e:
+                            continue
             
-            # Alternative: response might contain image URL or different structure
-            # Try to extract from text response if it's a URL
-            if hasattr(response, 'text'):
+            # Method 3: Check response.text for base64 data URL
+            if not image_found and hasattr(response, 'text'):
                 text_response = response.text
-                logger.warning(f"⚠️ Gemini returned text instead of image: {text_response[:200]}")
+                # Look for base64 image data in text
+                import re
+                # Try to find base64 image data
+                base64_pattern = r'data:image/[^;]+;base64,([A-Za-z0-9+/=]+)'
+                match = re.search(base64_pattern, text_response)
+                if match:
+                    try:
+                        image_bytes = base64.b64decode(match.group(1))
+                        image_found = True
+                    except Exception as e:
+                        logger.warning(f"⚠️ Failed to decode base64 from text: {e}")
+                else:
+                    logger.warning(f"⚠️ Gemini returned text instead of image: {text_response[:200]}")
             
-            logger.warning("⚠️ No image data in Gemini response")
-            return None
+            if image_found:
+                # Load image and resize
+                image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+                image = image.resize((width, height), Image.Resampling.LANCZOS)
+                
+                # Save to output path
+                output_path_obj = Path(output_path)
+                output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+                image.save(output_path_obj, "PNG")
+                
+                logger.info(f"✅ Image generated and saved: {output_path}")
+                return str(output_path_obj)
+            else:
+                logger.warning("⚠️ No image data found in Gemini response")
+                # Log response structure for debugging
+                logger.debug(f"Response type: {type(response)}")
+                logger.debug(f"Response attributes: {dir(response)}")
+                if hasattr(response, 'candidates'):
+                    logger.debug(f"Candidates: {response.candidates}")
+                return None
             
         except Exception as e:
             logger.error(f"❌ Error generating image with Gemini: {e}")
