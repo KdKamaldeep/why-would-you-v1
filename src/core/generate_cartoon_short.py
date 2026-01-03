@@ -192,6 +192,9 @@ class CartoonShortsGenerator:
         """Generate the complete video reel following the specified flow."""
         logger.info(f"Starting video generation for prompt: {self.config.prompt}")
         
+        # Initialize video_clips early to avoid UnboundLocalError in exception handlers
+        video_clips: List[str] = []
+        
         try:
             # Early exit if final video already exists and reuse is enabled
             if self.config.create_reel:
@@ -359,9 +362,6 @@ class CartoonShortsGenerator:
             
             # Initialize pipelines AFTER validation passes (save VRAM until validation succeeds)
             self._initialize_pipelines()
-            
-            # Initialize video_clips list early to avoid UnboundLocalError in error handling
-            video_clips: List[str] = []
 
             # Step 2: Create audio clips at the beginning
             if self.config.skip_audio:
@@ -882,6 +882,11 @@ class CartoonShortsGenerator:
             return str(final_output)
             
         except Exception as e:
+            # If validation failed, re-raise immediately (don't try fallback)
+            if isinstance(e, ValueError) and "Storyboard validation failed" in str(e):
+                logger.error(f"❌ Validation error: {e}")
+                raise
+            
             if self.config.skip_audio:
                 logger.info("🔄 Audio generation skipped, using scene durations for video timing")
                 # Use scene durations for video timing when audio is skipped
@@ -962,6 +967,11 @@ class CartoonShortsGenerator:
                         logger.info(f"  Scene {i+1}: {original_duration:.1f}s → {per_scene_duration:.1f}s")
                 
                 # Videos are already created with correct duration matching audio clips
+                # video_clips may be empty if validation failed before video generation
+                if not video_clips:
+                    logger.warning("⚠️ No video clips available (validation may have failed before video generation)")
+                    logger.warning("⚠️ Cannot proceed with fallback video compilation without video clips")
+                    raise ValueError("Cannot compile video: no video clips available. Validation may have failed.")
                 final_clips = video_clips
                 logger.info("✅ Videos already created with correct duration matching audio clips")
                 logger.info(f"📊 Fallback: Using {len(final_clips)} video clips")
