@@ -1,0 +1,44 @@
+{
+  "title": "The Day the Gods Froze Time",
+  "slug": "myth-mystery-time-frozen-49-motion",
+  "description": "A myth-inspired mystery visual where time itself appears to stop, designed for AI-only cinematic spectacle with high motion.",
+  "aspect_ratio": "9:16",
+  "video_type": "ai_myth_mystery_visual",
+  "tone": "awe-filled, cosmic, overpowering",
+  "wan_fps": 12,
+  "stories": [
+    {
+      "total_duration": 16,
+      "scenes": [
+        {
+          "id": "scene_01_world_in_motion",
+          "num_frames": 49,
+          "visual_prompt": "Hyper-realistic mythic city inspired by ancient India and cosmic architecture. Life in full motion — flowing rivers, moving crowds, flying birds, drifting clouds. Massive scale, golden-hour lighting, epic realism, no text, no watermark.",
+          "motion_prompt": "continuous forward cinematic glide, strong parallax between foreground and background, crowds moving in layered directions, birds crossing frame at different depths, water flowing with visible current acceleration, clouds drifting rapidly but smoothly, subtle camera breathing motion",
+          "narration": "Every world moves… because time allows it."
+        },
+        {
+          "id": "scene_02_sudden_pause",
+          "num_frames": 49,
+          "visual_prompt": "The same scene freezes instantly. Rivers hang mid-air, birds stop mid-flight, cloth and fire suspend unnaturally. Even dust particles freeze. Ultra-detailed realism, no text, no watermark.",
+          "motion_prompt": "camera continues slow forward movement, entire environment frozen mid-action, flowing water suspended with visible curvature, cloth and debris frozen with micro vibration, light rays sliding slowly across frozen objects, extreme parallax as camera moves through stillness",
+          "narration": "But once… it didn’t."
+        },
+        {
+          "id": "scene_03_the_gods_observing",
+          "num_frames": 49,
+          "visual_prompt": "High above the frozen world, colossal divine silhouettes appear in the sky — not detailed gods, only immense glowing outlines watching silently. The planet curves below. Cosmic scale, mythic atmosphere, no text, no watermark.",
+          "motion_prompt": "slow monumental pull-back revealing planetary scale, divine silhouettes expanding subtly in size, cosmic light waves pulsing outward, planet curvature increasing as camera retreats, faint starfield rotation behind the figures",
+          "narration": "Legends say… the gods paused it… just to look."
+        },
+        {
+          "id": "scene_04_time_released",
+          "num_frames": 49,
+          "visual_prompt": "Time snaps back violently. Water crashes down, birds resume flight, fire reignites, clouds surge forward. Life floods back instantly. The divine silhouettes fade without a trace. Hyper-real cinematic realism, no text, no watermark.",
+          "motion_prompt": "violent reactivation of all frozen motion, water crashing downward with acceleration, birds snapping back into flight, cloth and fire surging forward, debris falling past camera with depth parallax, camera stabilizes into slow calm drift",
+          "narration": "And when time returned… nothing remembered it."
+        }
+      ]
+    }
+  ]
+}
