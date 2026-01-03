@@ -55,28 +55,52 @@ def extract_gemini_image(response_json):
         if not parts:
             raise ValueError("Empty parts array")
 
-        for part in parts:
-            if "inline_data" in part:
+        for i, part in enumerate(parts):
+            logger.debug(f"Part {i}: {list(part.keys()) if isinstance(part, dict) else type(part)}")
+            
+            # Check both snake_case (Python) and camelCase (API response) - matches Node.js implementation
+            inline_data = None
+            if "inlineData" in part:
+                inline_data = part["inlineData"]
+            elif "inline_data" in part:
                 inline_data = part["inline_data"]
-                data = inline_data.get("data")
-                mime = inline_data.get("mime_type", "")
+            
+            if inline_data:
+                logger.debug(f"Inline data keys: {list(inline_data.keys()) if isinstance(inline_data, dict) else type(inline_data)}")
+                
+                # Check both snake_case and camelCase for data and mime_type
+                data = inline_data.get("data") or inline_data.get("data")
+                mime = inline_data.get("mimeType") or inline_data.get("mime_type") or ""
 
                 if not data:
                     logger.warning("⚠️ inline_data found but 'data' is empty")
                     continue
 
+                logger.info(f"📦 Found inline_data: mime={mime}, data_type={type(data)}, data_length={len(data) if isinstance(data, str) else 'unknown'}")
+
                 if not mime.startswith("image/"):
                     raise ValueError(f"Unexpected mime type: {mime}")
 
-                # Decode base64
-                try:
-                    img_bytes = base64.b64decode(data)
-                except Exception as e:
-                    raise ValueError(f"Failed to base64 decode image data: {e}")
+                # Check if data is already bytes or needs base64 decoding
+                if isinstance(data, bytes):
+                    img_bytes = data
+                    logger.info("📦 Data is already bytes, skipping base64 decode")
+                elif isinstance(data, str):
+                    # Decode base64
+                    try:
+                        img_bytes = base64.b64decode(data)
+                        logger.info(f"📦 Base64 decoded: {len(data)} chars -> {len(img_bytes)} bytes")
+                    except Exception as e:
+                        raise ValueError(f"Failed to base64 decode image data: {e}")
+                else:
+                    raise ValueError(f"Unexpected data type: {type(data)}")
 
                 # Validate we have image data
                 if not img_bytes or len(img_bytes) < 100:
-                    raise ValueError(f"Invalid image data: {len(img_bytes) if img_bytes else 0} bytes")
+                    logger.error(f"⚠️ Image data too small: {len(img_bytes) if img_bytes else 0} bytes")
+                    logger.error(f"⚠️ First 50 bytes (hex): {img_bytes[:50].hex() if img_bytes else 'N/A'}")
+                    logger.error(f"⚠️ First 50 bytes (ascii): {img_bytes[:50] if img_bytes else 'N/A'}")
+                    raise ValueError(f"Invalid image data: {len(img_bytes) if img_bytes else 0} bytes (expected at least 100 bytes for valid image)")
 
                 # Check if it's valid image data by checking magic bytes
                 # Common image formats: PNG, JPEG, WebP
@@ -147,6 +171,21 @@ class GeminiImageGenerator:
                 self.available = False
                 self.client = None
     
+    def _to_aspect_ratio(self, width: int, height: int) -> str:
+        """Convert width/height to aspect ratio string (matches Node.js implementation)."""
+        ratio = width / height
+        
+        if abs(ratio - 16/9) < 0.15:
+            return "16:9"
+        elif abs(ratio - 9/16) < 0.15:
+            return "9:16"
+        elif abs(ratio - 4/3) < 0.15:
+            return "4:3"
+        elif abs(ratio - 3/4) < 0.15:
+            return "3:4"
+        else:
+            return "1:1"
+    
     def generate_image(self, prompt: str, output_path: str, width: int = 1280, height: int = 704) -> Optional[str]:
         """
         Generate an image from a text prompt using Gemini API.
@@ -168,9 +207,18 @@ class GeminiImageGenerator:
             logger.info(f"🎨 Generating image with Gemini: {prompt[:100]}...")
             
             # Generate image using Gemini API
+            # IMPORTANT: Must pass imageConfig with aspectRatio for image generation (matches Node.js implementation)
+            aspect_ratio = self._to_aspect_ratio(width, height)
+            logger.info(f"📐 Using aspect ratio: {aspect_ratio} for {width}x{height}")
+            
             response = self.client.models.generate_content(
                 model=self.model_name,
-                contents=prompt
+                contents=prompt,
+                config={
+                    "imageConfig": {
+                        "aspectRatio": aspect_ratio
+                    }
+                }
             )
             
             # Convert response to JSON/dict for parsing
@@ -226,10 +274,33 @@ class GeminiImageGenerator:
                 raise RuntimeError(f"Cannot parse Gemini response: {type(response)} - {e}")
             
             # Log response structure for debugging
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"Response JSON keys: {list(response_json.keys()) if isinstance(response_json, dict) else 'Not a dict'}")
-                if isinstance(response_json, dict) and 'candidates' in response_json:
-                    logger.debug(f"Candidates count: {len(response_json['candidates'])}")
+            logger.info(f"📋 Response type: {type(response_json)}")
+            if isinstance(response_json, dict):
+                logger.info(f"📋 Response keys: {list(response_json.keys())}")
+                if 'candidates' in response_json:
+                    logger.info(f"📋 Candidates count: {len(response_json['candidates'])}")
+                    if len(response_json['candidates']) > 0:
+                        candidate = response_json['candidates'][0]
+                        logger.info(f"📋 Candidate type: {type(candidate)}")
+                        if isinstance(candidate, dict):
+                            logger.info(f"📋 Candidate keys: {list(candidate.keys())}")
+                            if 'content' in candidate:
+                                content = candidate['content']
+                                logger.info(f"📋 Content type: {type(content)}")
+                                if isinstance(content, dict):
+                                    logger.info(f"📋 Content keys: {list(content.keys())}")
+                                    if 'parts' in content:
+                                        logger.info(f"📋 Parts count: {len(content['parts'])}")
+                                        for i, part in enumerate(content['parts']):
+                                            logger.info(f"📋 Part {i} type: {type(part)}")
+                                            if isinstance(part, dict):
+                                                logger.info(f"📋 Part {i} keys: {list(part.keys())}")
+                                                if 'inline_data' in part:
+                                                    inline = part['inline_data']
+                                                    logger.info(f"📋 Inline data type: {type(inline)}")
+                                                    if isinstance(inline, dict):
+                                                        logger.info(f"📋 Inline data keys: {list(inline.keys())}")
+                                                        logger.info(f"📋 Inline data values: {[(k, type(v).__name__, len(str(v)) if isinstance(v, (str, bytes)) else 'N/A') for k, v in inline.items()]}")
             
             # Extract image using helper function
             try:
