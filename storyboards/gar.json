@@ -1,42 +1,42 @@
 {
-  "title": "The Flight of Garuda: Beyond Fear",
-  "slug": "garuda-pov-fear-transcendence",
-  "description": "A POV experience as the divine eagle Lord Garuda, soaring from the earthly realm into the celestial heights where fear cannot reach.",
+  "title": "The Legend of the Golden King",
+  "slug": "mythical-history-garuda-story",
+  "description": "An educational and immersive journey through the Puranic history of Lord Garuda, explaining his divine origin and power.",
   "aspect_ratio": "9:16",
-  "video_type": "immersive_fantasy_explainer",
-  "tone": "divine, powerful, transcendental",
+  "video_type": "mythological_storytelling_doc",
+  "tone": "epic, educational, awe-inspiring",
   "wan_fps": 12,
   "stories": [
     {
-      "total_duration": 48,
+      "total_duration": 42,
       "scenes": [
         {
-          "id": "scene_01_garuda_rise",
+          "id": "scene_01_the_cosmic_egg",
           "num_frames": 60,
-          "visual_prompt": "First-person POV from the back of a divine eagle deity, Lord Garuda. Massive golden-brown wings with shimmering emerald tips visible at the edges of the frame. Rising rapidly from a misty ancient Indian temple valley into the clouds. Cinematic sun rays piercing through feathers. Mythological fantasy style, hyper-detailed textures.",
-          "motion_prompt": "Powerful upward surge with the rhythmic, slow flapping of massive wings appearing at the periphery.",
-          "narration": "In the shadow of the earth, fear is heavy. But you were born for the sun."
+          "visual_prompt": "A giant, glowing golden egg cracking open amidst a cosmic void. Intense light spills out, taking the shape of a massive bird. Mythical Vedic art style, swirling nebulae, high-contrast gold and deep purple. Cinematic sparkles and divine particles.",
+          "motion_prompt": "Camera pushes in slowly as the egg cracks, followed by a sudden burst of golden light expanding outward.",
+          "narration": "Long before the oceans were calmed, a power was born that shook the heavens. This is the story of Garuda."
         },
         {
-          "id": "scene_02_celestial_ascent",
+          "id": "scene_02_appearance_details",
           "num_frames": 72,
-          "visual_prompt": "POV gliding through high-altitude golden clouds. The edges of the frame show Garuda’s powerful talons and a glimpse of a jeweled chest-plate (Kavacha) reflecting the sun. Below, the mountains look like tiny pebbles. The sky transitions from blue to a deep cosmic indigo. Divine glow, high contrast, surreal scale.",
-          "motion_prompt": "Smooth, high-speed forward glide with slight banking to the left, clouds rushing past the viewer.",
-          "narration": "As the world shrinks, so does the noise of the ego. Up here, there is no 'small' to worry about."
+          "visual_prompt": "Extreme close-up and pan of Lord Garuda's form. A fierce white eagle face with a sharp golden beak, emerald-colored eyes, and a muscular human-like torso. He wears a crown of sun-fire and serpents draped like jewelry over his shoulders. His wings span the horizon, shimmering like molten copper. High-fidelity mythological fantasy.",
+          "motion_prompt": "Slow cinematic pan from his powerful talons up to his majestic crowned head.",
+          "narration": "Half-man, half-eagle, his body glowed with the brilliance of a thousand suns. To look at him was to see the fire of the cosmos itself."
         },
         {
-          "id": "scene_03_the_divine_eye",
+          "id": "scene_03_the_great_ascent",
           "num_frames": 72,
-          "visual_prompt": "Ultra-wide POV from extreme height. The horizon curves. Wisps of golden energy trail from Garuda's wings. The viewer sees the world through a divine lens—everything is bathed in a calm, amber light. No ground visible, only an endless ocean of clouds and stars. Sacred, majestic atmosphere.",
-          "motion_prompt": "Steady, effortless hovering motion. The wings at the edges are now still, catching the celestial thermals.",
-          "narration": "Fear lives in the details of the ground. Height offers the truth of the whole."
+          "visual_prompt": "Garuda soaring upward, leaving the Earth behind. He passes through the clouds and into a realm of floating Vedic citadels. Lightning strikes his wings but he absorbs the energy. He is carrying a mountain in one claw, showcasing his immense strength. Epic scale, cinematic wide shot, rich textures.",
+          "motion_prompt": "Follow shot from behind Garuda as he accelerates through layers of clouds, creating a sonic boom effect in the mist.",
+          "narration": "He flew higher than any god dared, driven by a sacred vow to free his mother. In his flight, fear died, and legend was born."
         },
         {
-          "id": "scene_04_garuda_zenith",
+          "id": "scene_04_the_eternal_mount",
           "num_frames": 84,
-          "visual_prompt": "POV looking directly into a massive, gentle sun that doesn't blind. A silhouette of Garuda’s eagle-like profile is briefly visible in a reflection. Feathers are glowing like molten gold. The atmosphere is one of absolute peace and cosmic power. Cinematic bloom, ethereal particles, divine fantasy.",
-          "motion_prompt": "Slow vertical ascent toward the light, fading into a soft golden white-out.",
-          "narration": "You are no longer the one who fears. You are the wings that carry the light. Fly higher."
+          "visual_prompt": "Garuda bowing before a radiant blue light—Lord Vishnu. The two merge into a symbolic icon of the 'Vahana'. The background is a golden mandala of the universe. Garuda’s wings are spread wide, now calm and protective. Surreal, spiritual, ending on a masterpiece visual of the Garuda-Stambha pillar silhouette.",
+          "motion_prompt": "Slow zoom out to reveal the grand scale of the divine meeting, everything bathed in a warm, eternal glow.",
+          "narration": "Today, we see him as the king of birds. But he is more—he is the reminder that when you rise for a higher purpose, you become unstoppable."
         }
       ]
     }
