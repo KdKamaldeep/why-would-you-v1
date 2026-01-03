@@ -48,6 +48,24 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+def postprocess_voice(input_wav: str, output_wav: str) -> str:
+    filter_chain = "acompressor=threshold=-18dB:ratio=3:attack=20:release=250,highpass=f=80,lowpass=f=9000,equalizer=f=250:t=q:w=1:g=2,equalizer=f=3000:t=q:w=1:g=1.5,loudnorm=I=-16:TP=-1.5:LRA=11"
+    try:
+        result = subprocess.run(
+            ["ffmpeg", "-i", input_wav, "-af", filter_chain, "-y", output_wav],
+            capture_output=True,
+            text=True,
+            shell=False
+        )
+        if result.returncode != 0:
+            logger.error(f"ffmpeg postprocess failed: {result.stderr}")
+            return input_wav
+        return output_wav
+    except Exception as e:
+        logger.error(f"Voice postprocessing error: {e}")
+        return input_wav
+
 @dataclass
 class VideoConfig:
     """Configuration for video generation."""
@@ -311,6 +329,8 @@ class CartoonShortsGenerator:
                         # Use actual generated path (may switch extension on fallback)
                         scene_audio = Path(generated_audio)
                         logger.info(f"🎵 Scene {i+1}: Audio generation completed: {scene_audio}")
+                        processed_audio = postprocess_voice(str(scene_audio), str(scene_audio.parent / f"{scene_audio.stem}_pp{scene_audio.suffix}"))
+                        scene_audio = Path(processed_audio)
                     else:
                         logger.info(f"🎵 Scene {i+1}: Reusing existing audio: {scene_audio}")
                     
@@ -734,6 +754,8 @@ class CartoonShortsGenerator:
                         speaker=None,
                         voice_clone_audio=fallback_voice_file or self.config.voice_id or None,
                     )
+                    processed_audio = postprocess_voice(generated_audio, str(narration_path.parent / f"{narration_path.stem}_pp{narration_path.suffix}"))
+                    generated_audio = processed_audio
                     narration_path = Path(generated_audio)
                     logger.info(f"🎵 Fallback: Single audio generation completed: {narration_path}")
                 else:

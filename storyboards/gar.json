@@ -1,0 +1,44 @@
+{
+  "title": "Why Fear Disappears at Height",
+  "slug": "why-fear-disappears-at-height",
+  "description": "A fantasy explainer showing how fear weakens when perspective expands.",
+  "aspect_ratio": "9:16",
+  "video_type": "fantasy_explainer",
+  "tone": "calm, mysterious, insightful",
+  "wan_fps": 12,
+  "stories": [
+    {
+      "total_duration": 38,
+      "scenes": [
+        {
+          "id": "scene_01_hook",
+          "num_frames": 49,
+          "visual_prompt": "A vast fantasy sky world seen from above the clouds, endless horizon, golden sunlight breaking through clouds, cinematic fantasy lighting, volumetric fog, slow forward camera movement, dreamlike unreal environment, no text, no watermark",
+          "motion_prompt": "slow cinematic push forward through clouds, very gentle motion",
+          "narration": "<speak><prosody rate='92%'>Ever notice something strange?<break time='400ms'/>The higher you go…<break time='400ms'/>the less afraid you feel.</prosody></speak>"
+        },
+        {
+          "id": "scene_02_perspective",
+          "num_frames": 49,
+          "visual_prompt": "A lone human silhouette standing on a floating cliff above clouds, massive open sky, tiny world far below, fantasy cinematic style, soft glowing atmosphere, dramatic scale, unreal engine quality lighting",
+          "motion_prompt": "slow orbiting camera around the cliff, subtle parallax",
+          "narration": "<speak><prosody rate='93%'>That’s because fear survives on closeness.<break time='500ms'/>On details.<break time='400ms'/>On walls closing in.</prosody></speak>"
+        },
+        {
+          "id": "scene_03_symbolic_flight",
+          "num_frames": 73,
+          "visual_prompt": "A gigantic mythical eagle flying high above the clouds, glowing feathers, divine fantasy style, vast sky and sunlight, sense of freedom and scale, cinematic unreal fantasy, no text",
+          "motion_prompt": "slow majestic glide forward, wings moving gently",
+          "narration": "<speak><prosody rate='92%'>But at height…<break time='500ms'/>your brain stops zooming in.<break time='400ms'/>It starts seeing the whole picture.</prosody></speak>"
+        },
+        {
+          "id": "scene_04_resolution",
+          "num_frames": 73,
+          "visual_prompt": "Wide cosmic sky with clouds parting, soft golden light flooding the scene, fantasy symbolic environment representing clarity and calm, cinematic lighting, slow drifting motion",
+          "motion_prompt": "very slow upward camera rise, clouds gently separating",
+          "narration": "<speak><prosody rate='92%'>Perspective shrinks fear.<break time='500ms'/>That’s why distance feels calm…<break time='400ms'/>and small spaces feel loud.</prosody></speak>"
+        }
+      ]
+    }
+  ]
+}
