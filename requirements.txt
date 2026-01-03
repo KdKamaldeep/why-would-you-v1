@@ -39,6 +39,9 @@ tqdm>=4.65.0
 requests>=2.31.0
 python-dotenv>=1.0.0
 
+# API clients
+google-genai
+
 # Development
 pytest>=7.4.0
 black>=23.0.0
