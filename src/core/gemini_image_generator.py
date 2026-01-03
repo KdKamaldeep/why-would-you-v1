@@ -36,21 +36,81 @@ def extract_gemini_image(response_json):
         RuntimeError: If image extraction fails
     """
     try:
-        parts = response_json["candidates"][0]["content"]["parts"]
+        # Navigate to parts
+        if "candidates" not in response_json:
+            raise ValueError("No 'candidates' key in response")
+        
+        if len(response_json["candidates"]) == 0:
+            raise ValueError("Empty candidates array")
+        
+        candidate = response_json["candidates"][0]
+        if "content" not in candidate:
+            raise ValueError("No 'content' key in candidate")
+        
+        if "parts" not in candidate["content"]:
+            raise ValueError("No 'parts' key in content")
+        
+        parts = candidate["content"]["parts"]
+        
+        if not parts:
+            raise ValueError("Empty parts array")
 
         for part in parts:
             if "inline_data" in part:
-                data = part["inline_data"]["data"]
-                mime = part["inline_data"].get("mime_type", "")
+                inline_data = part["inline_data"]
+                data = inline_data.get("data")
+                mime = inline_data.get("mime_type", "")
+
+                if not data:
+                    logger.warning("⚠️ inline_data found but 'data' is empty")
+                    continue
 
                 if not mime.startswith("image/"):
                     raise ValueError(f"Unexpected mime type: {mime}")
 
-                img_bytes = base64.b64decode(data)
-                return Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                # Decode base64
+                try:
+                    img_bytes = base64.b64decode(data)
+                except Exception as e:
+                    raise ValueError(f"Failed to base64 decode image data: {e}")
+
+                # Validate we have image data
+                if not img_bytes or len(img_bytes) < 100:
+                    raise ValueError(f"Invalid image data: {len(img_bytes) if img_bytes else 0} bytes")
+
+                # Check if it's valid image data by checking magic bytes
+                # Common image formats: PNG, JPEG, WebP
+                is_valid_image = False
+                if img_bytes.startswith(b'\x89PNG\r\n\x1a\n'):  # PNG
+                    is_valid_image = True
+                elif img_bytes.startswith(b'\xff\xd8\xff'):  # JPEG
+                    is_valid_image = True
+                elif img_bytes.startswith(b'RIFF') and b'WEBP' in img_bytes[:12]:  # WebP
+                    is_valid_image = True
+                
+                if not is_valid_image:
+                    # Log first bytes for debugging
+                    hex_preview = img_bytes[:50].hex() if len(img_bytes) >= 50 else img_bytes.hex()
+                    logger.warning(f"⚠️ Image data doesn't match known formats. First bytes (hex): {hex_preview}")
+                    # Try to open anyway - PIL might still recognize it
+                
+                # Try to open the image
+                try:
+                    image = Image.open(io.BytesIO(img_bytes))
+                    # Verify it's actually an image
+                    image.verify()
+                    # Reopen for actual use (verify() closes the image)
+                    image = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+                    return image
+                except Exception as e:
+                    raise ValueError(f"PIL cannot open image data: {e}. Data length: {len(img_bytes)} bytes, mime: {mime}")
 
         raise ValueError("No inline image data found in Gemini response")
 
+    except KeyError as e:
+        raise RuntimeError(f"Gemini image extraction failed: Missing key in response - {e}")
+    except ValueError as e:
+        raise RuntimeError(f"Gemini image extraction failed: {e}")
     except Exception as e:
         raise RuntimeError(f"Gemini image extraction failed: {e}")
 
@@ -115,6 +175,7 @@ class GeminiImageGenerator:
             
             # Convert response to JSON/dict for parsing
             # The google-genai library response needs to be converted to dict
+            response_json = None
             try:
                 # Try multiple methods to convert response to dict
                 if isinstance(response, dict):
@@ -125,13 +186,50 @@ class GeminiImageGenerator:
                     # Some SDKs store raw response
                     response_json = response._raw_response
                 else:
-                    # Use JSON serialization as fallback
-                    # Convert response object to dict via JSON
-                    response_str = json.dumps(response, default=lambda o: o.__dict__ if hasattr(o, '__dict__') else str(o))
-                    response_json = json.loads(response_str)
+                    # Try to access response attributes directly as dict
+                    # The google-genai library might use protobuf or similar
+                    # Try accessing as dict-like object
+                    try:
+                        # Check if response has candidates attribute
+                        if hasattr(response, 'candidates'):
+                            # Build dict manually from response object
+                            candidates = []
+                            for cand in response.candidates:
+                                if hasattr(cand, 'content') and hasattr(cand.content, 'parts'):
+                                    parts = []
+                                    for part in cand.content.parts:
+                                        part_dict = {}
+                                        if hasattr(part, 'inline_data') and part.inline_data:
+                                            inline = part.inline_data
+                                            part_dict['inline_data'] = {
+                                                'data': getattr(inline, 'data', None),
+                                                'mime_type': getattr(inline, 'mime_type', 'image/png')
+                                            }
+                                        parts.append(part_dict)
+                                    candidates.append({
+                                        'content': {'parts': parts}
+                                    })
+                            response_json = {'candidates': candidates}
+                        else:
+                            # Use JSON serialization as fallback
+                            response_str = json.dumps(response, default=lambda o: o.__dict__ if hasattr(o, '__dict__') else str(o))
+                            response_json = json.loads(response_str)
+                    except Exception as inner_e:
+                        logger.warning(f"⚠️ Failed to build dict from response object: {inner_e}")
+                        # Last resort: try JSON serialization
+                        response_str = json.dumps(response, default=lambda o: o.__dict__ if hasattr(o, '__dict__') else str(o))
+                        response_json = json.loads(response_str)
             except Exception as e:
                 logger.error(f"❌ Failed to convert response to JSON: {e}")
+                logger.error(f"Response type: {type(response)}")
+                logger.error(f"Response attributes: {[attr for attr in dir(response) if not attr.startswith('_')]}")
                 raise RuntimeError(f"Cannot parse Gemini response: {type(response)} - {e}")
+            
+            # Log response structure for debugging
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Response JSON keys: {list(response_json.keys()) if isinstance(response_json, dict) else 'Not a dict'}")
+                if isinstance(response_json, dict) and 'candidates' in response_json:
+                    logger.debug(f"Candidates count: {len(response_json['candidates'])}")
             
             # Extract image using helper function
             try:
