@@ -358,11 +358,10 @@ class CartoonShortsGenerator:
                     scene_audio_paths.append(str(scene_audio))
                     logger.info(f"Scene {i+1}: Audio clip ready: {scene_audio}")
             
-            # Detect length of each audio clip and validate against max video duration
+            # Detect length of each audio clip (no validation - will set num_frames based on audio length)
             if not self.config.skip_audio:
                 logger.info("📏 Detecting length of each audio clip...")
                 total_audio_duration = 0
-                audio_validation_errors = []
                 
                 for i, scene_audio in enumerate(scene_audio_paths):
                     scene_num = i + 1
@@ -373,50 +372,10 @@ class CartoonShortsGenerator:
                     actual_scene_durations.append(actual_duration)
                     total_audio_duration += actual_duration
                     logger.info(f"Scene {scene_num}: Audio clip length: {actual_duration:.1f}s")
-                    
-                    # Get num_frames for this scene (same logic as video generation)
-                    scene_num_frames = scene.get('num_frames', None)
-                    if scene_num_frames is None:
-                        generation_profile = script.get('generation_profile', {})
-                        scene_num_frames = generation_profile.get('num_frames', None)
-                    if scene_num_frames is None:
-                        scene_num_frames = self.config.wan_num_frames
-                    
-                    scene_fps = self.config.wan_fps
-                    max_video_duration = scene_num_frames / scene_fps
-                    
-                    # Validate actual audio duration against max video duration
-                    if actual_duration > max_video_duration:
-                        error_msg = (
-                            f"Scene {scene_num}: Actual audio duration exceeds max video duration!\n"
-                            f"  • Actual audio duration: {actual_duration:.2f}s\n"
-                            f"  • Max video duration: {max_video_duration:.2f}s ({scene_num_frames} frames @ {scene_fps}fps)\n"
-                            f"  • Excess: {actual_duration - max_video_duration:.2f}s\n"
-                            f"  • Solution: Increase num_frames to at least {int(actual_duration * scene_fps)} or reduce narration"
-                        )
-                        audio_validation_errors.append(error_msg)
-                        logger.error(f"❌ {error_msg}")
-                    else:
-                        logger.info(f"✅ Scene {scene_num}: Audio fits ({actual_duration:.2f}s ≤ {max_video_duration:.2f}s max)")
-                
-                # Stop if validation errors found
-                if audio_validation_errors:
-                    logger.error("=" * 60)
-                    logger.error("❌ AUDIO VALIDATION FAILED")
-                    logger.error("=" * 60)
-                    for error in audio_validation_errors:
-                        logger.error(error)
-                    logger.error("=" * 60)
-                    logger.error("💡 Please fix the storyboard and try again:")
-                    logger.error("   1. Reduce narration text length in scenes")
-                    logger.error("   2. Increase num_frames in scenes")
-                    logger.error("   3. Adjust fps if needed")
-                    raise ValueError(f"Audio validation failed: {len(audio_validation_errors)} scene(s) have audio longer than max video duration")
                 
                 logger.info(f"✅ Generated {len(scene_audio_paths)} audio clips for narration")
                 logger.info(f"📊 Total audio duration: {total_audio_duration:.1f}s")
                 logger.info(f"📊 Average audio duration per scene: {total_audio_duration/len(actual_scene_durations):.1f}s")
-                logger.info("✅ All audio durations validated - fit within video duration limits")
                 
                 # Move Coqui TTS pipeline to CPU after audio generation to free VRAM for WAN model
                 logger.info("💾 Moving Coqui TTS pipeline to CPU to free VRAM for video generation...")
@@ -520,20 +479,31 @@ class CartoonShortsGenerator:
                 
                 # Generate video with WAN
                 try:
-                    # Get num_frames from scene, fallback to command-line config
-                    scene_num_frames = scene.get('num_frames', None)
-                    if scene_num_frames is None:
-                        # Check generation_profile for num_frames
-                        generation_profile = script.get('generation_profile', {})
-                        scene_num_frames = generation_profile.get('num_frames', None)
+                    # Calculate num_frames based on audio duration if available, otherwise use scene/config values
+                    num_frames_to_use = None
                     
-                    # Use scene num_frames if available, otherwise use command-line default
-                    num_frames_to_use = scene_num_frames if scene_num_frames is not None else self.config.wan_num_frames
-                    
-                    if scene_num_frames is not None:
-                        logger.info(f"🎬 Scene {i+1}: Using num_frames from scene: {scene_num_frames}")
+                    # If audio exists, calculate num_frames from actual audio duration
+                    if not self.config.skip_audio and i < len(actual_scene_durations):
+                        actual_duration = actual_scene_durations[i]
+                        scene_fps = self.config.wan_fps
+                        # Calculate num_frames needed to match audio duration
+                        num_frames_to_use = int(actual_duration * scene_fps)
+                        logger.info(f"🎬 Scene {i+1}: Setting num_frames to {num_frames_to_use} based on audio duration ({actual_duration:.2f}s @ {scene_fps}fps)")
                     else:
-                        logger.info(f"🎬 Scene {i+1}: Using num_frames from command-line: {num_frames_to_use}")
+                        # Fallback to scene num_frames or config
+                        scene_num_frames = scene.get('num_frames', None)
+                        if scene_num_frames is None:
+                            # Check generation_profile for num_frames
+                            generation_profile = script.get('generation_profile', {})
+                            scene_num_frames = generation_profile.get('num_frames', None)
+                        
+                        # Use scene num_frames if available, otherwise use command-line default
+                        num_frames_to_use = scene_num_frames if scene_num_frames is not None else self.config.wan_num_frames
+                        
+                        if scene_num_frames is not None:
+                            logger.info(f"🎬 Scene {i+1}: Using num_frames from scene: {scene_num_frames}")
+                        else:
+                            logger.info(f"🎬 Scene {i+1}: Using num_frames from command-line: {num_frames_to_use}")
                     
                     # Extract scene metadata for best frame extraction
                     scene_id = scene.get('id', f"scene_{i+1}")
