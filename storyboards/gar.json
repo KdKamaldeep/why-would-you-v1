@@ -1,42 +1,42 @@
 {
   "title": "Why Fear Disappears at Height",
-  "slug": "why-fear-disappears-at-height",
-  "description": "A fantasy explainer showing how fear weakens when perspective expands.",
+  "slug": "fear-disappears-at-height-pov",
+  "description": "An immersive fantasy explainer where the viewer experiences how height changes fear.",
   "aspect_ratio": "9:16",
-  "video_type": "fantasy_explainer",
-  "tone": "calm, mysterious, insightful",
+  "video_type": "immersive_fantasy_explainer",
+  "tone": "immersive, calm, surreal",
   "wan_fps": 12,
   "stories": [
     {
-      "total_duration": 38,
+      "total_duration": 36,
       "scenes": [
         {
-          "id": "scene_01_hook",
+          "id": "scene_01_pov_rise",
           "num_frames": 49,
-          "visual_prompt": "A vast fantasy sky world seen from above the clouds, endless horizon, golden sunlight breaking through clouds, cinematic fantasy lighting, volumetric fog, slow forward camera movement, dreamlike unreal environment, no text, no watermark",
-          "motion_prompt": "slow cinematic push forward through clouds, very gentle motion",
-          "narration": "<speak><prosody rate='92%'>Ever notice something strange?<break time='400ms'/>The higher you go…<break time='400ms'/>the less afraid you feel.</prosody></speak>"
+          "visual_prompt": "first person point of view, slowly rising above thick clouds, endless sky opening ahead, soft golden sunlight, fantasy cinematic lighting, volumetric fog, dreamlike unreal environment, immersive scale, no text, no watermark",
+          "motion_prompt": "slow vertical ascent as if floating upward, extremely smooth motion",
+          "narration": "You feel it... As you rise... something inside you goes quiet."
         },
         {
-          "id": "scene_02_perspective",
+          "id": "scene_02_distance",
           "num_frames": 49,
-          "visual_prompt": "A lone human silhouette standing on a floating cliff above clouds, massive open sky, tiny world far below, fantasy cinematic style, soft glowing atmosphere, dramatic scale, unreal engine quality lighting",
-          "motion_prompt": "slow orbiting camera around the cliff, subtle parallax",
-          "narration": "<speak><prosody rate='93%'>That’s because fear survives on closeness.<break time='500ms'/>On details.<break time='400ms'/>On walls closing in.</prosody></speak>"
+          "visual_prompt": "first person view looking down from extreme height, tiny world far below, clouds drifting past, massive open sky, fantasy cinematic atmosphere, strong sense of distance and scale",
+          "motion_prompt": "gentle forward drift with slight downward tilt, calm motion",
+          "narration": "The noise fades... The worries shrink... Everything feels far away."
         },
         {
-          "id": "scene_03_symbolic_flight",
+          "id": "scene_03_expansion",
           "num_frames": 73,
-          "visual_prompt": "A gigantic mythical eagle flying high above the clouds, glowing feathers, divine fantasy style, vast sky and sunlight, sense of freedom and scale, cinematic unreal fantasy, no text",
-          "motion_prompt": "slow majestic glide forward, wings moving gently",
-          "narration": "<speak><prosody rate='92%'>But at height…<break time='500ms'/>your brain stops zooming in.<break time='400ms'/>It starts seeing the whole picture.</prosody></speak>"
+          "visual_prompt": "first person sensation of gliding through open sky, vast horizon in all directions, glowing clouds, surreal fantasy lighting, feeling of freedom and expansion, unreal style",
+          "motion_prompt": "slow forward glide through open space, wings-free floating motion",
+          "narration": "Fear survives on closeness... on details... on tight spaces."
         },
         {
-          "id": "scene_04_resolution",
+          "id": "scene_04_calm_realization",
           "num_frames": 73,
-          "visual_prompt": "Wide cosmic sky with clouds parting, soft golden light flooding the scene, fantasy symbolic environment representing clarity and calm, cinematic lighting, slow drifting motion",
-          "motion_prompt": "very slow upward camera rise, clouds gently separating",
-          "narration": "<speak><prosody rate='92%'>Perspective shrinks fear.<break time='500ms'/>That’s why distance feels calm…<break time='400ms'/>and small spaces feel loud.</prosody></speak>"
+          "visual_prompt": "first person view surrounded by open sky and warm light, clouds parting gently, symbolic clarity and calm, fantasy cinematic environment",
+          "motion_prompt": "very slow upward drift, clouds separating smoothly",
+          "narration": "Up here... your mind stops zooming in... and starts seeing everything at once."
         }
       ]
     }
