@@ -359,6 +359,9 @@ class CartoonShortsGenerator:
             
             # Initialize pipelines AFTER validation passes (save VRAM until validation succeeds)
             self._initialize_pipelines()
+            
+            # Initialize video_clips list early to avoid UnboundLocalError in error handling
+            video_clips: List[str] = []
 
             # Step 2: Create audio clips at the beginning
             if self.config.skip_audio:
@@ -501,7 +504,6 @@ class CartoonShortsGenerator:
             # Step 3: Generate videos directly from prompts using WAN T2V
             logger.info("Step 3: Generating videos with WAN 2.2 TI2V-5B...")
             logger.info(f"🎬 Total videos to generate: {len(script['scenes'])}")
-            video_clips: List[str] = []
             total_video_duration = 0
             
             # Create scenes subdirectory
