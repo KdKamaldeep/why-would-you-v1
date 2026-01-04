@@ -407,13 +407,31 @@ class FaceAligner:
             result["avg_confidence"] = np.mean(confidences) if confidences else 0.0
             
             # Save bbox track to JSON
+            # Convert numpy types to native Python types for JSON serialization
+            def convert_to_python_types(obj):
+                """Recursively convert numpy types to Python native types."""
+                if isinstance(obj, np.integer):
+                    return int(obj)
+                elif isinstance(obj, np.floating):
+                    return float(obj)
+                elif isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                elif isinstance(obj, dict):
+                    return {key: convert_to_python_types(value) for key, value in obj.items()}
+                elif isinstance(obj, list):
+                    return [convert_to_python_types(item) for item in obj]
+                elif isinstance(obj, tuple):
+                    return tuple(convert_to_python_types(item) for item in obj)
+                else:
+                    return obj
+            
             track_file = Path(output_path).parent / f"{Path(output_path).stem}_bbox_track.json"
             with open(track_file, 'w') as f:
                 json.dump({
-                    "bbox_track": bbox_track,
-                    "avg_confidence": result["avg_confidence"],
-                    "frames_with_face": frames_with_face,
-                    "total_frames": frame_idx
+                    "bbox_track": convert_to_python_types(bbox_track),
+                    "avg_confidence": float(result["avg_confidence"]),
+                    "frames_with_face": int(frames_with_face),
+                    "total_frames": int(frame_idx)
                 }, f, indent=2)
             
             logger.info(f"✅ Preprocessed {frame_idx} frames: {frames_with_face} with faces (avg conf: {result['avg_confidence']:.2f})")
