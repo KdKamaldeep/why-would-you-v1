@@ -662,14 +662,9 @@ class LatentSyncRunner:
                 cmd.extend(["--guidance_scale", str(self.guidance_scale)])
                 logger.info(f"⚙️ Quality settings: inference_steps={self.inference_steps}, guidance_scale={self.guidance_scale}")
                 
-                # Add optional parameters if script supports them
-                if self.fp16:
-                    # Check if script supports --fp16
-                    cmd.append("--fp16")
-                
-                # Device parameter
-                if self.device:
-                    cmd.extend(["--device", self.device])
+                # Note: LatentSync inference.py doesn't support --fp16 or --device arguments
+                # These are handled automatically by the script based on CUDA availability
+                # Device selection is typically done via CUDA_VISIBLE_DEVICES environment variable if needed
                 
                 # Character reference image (if provided)
                 if character_reference and Path(character_reference).exists():
