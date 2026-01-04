@@ -11,10 +11,19 @@ import sys
 import subprocess
 import logging
 from pathlib import Path
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, List, Tuple
 import json
+import random
 
 logger = logging.getLogger(__name__)
+
+# Import face alignment module
+try:
+    from .face_align import get_face_aligner, FaceAligner
+    FACE_ALIGN_AVAILABLE = True
+except ImportError:
+    FACE_ALIGN_AVAILABLE = False
+    logger.warning("⚠️ Face alignment module not available")
 
 
 def get_cache_dir() -> str:
@@ -67,10 +76,39 @@ class LatentSyncRunner:
         self.face_crop = face_crop or os.getenv("LATENTSYNC_FACE_MODE", "auto")
         self.min_face_size = min_face_size
         self.debug_frames = debug_frames or os.getenv("LATENTSYNC_DEBUG_FRAMES", "false").lower() == "true"
+        # Quality parameters (from LatentSync docs: inference_steps [20-50], guidance_scale [1.0-3.0])
+        # Higher inference_steps = better quality but slower
+        # Higher guidance_scale = better lip sync but may cause distortion
+        self.inference_steps = int(os.getenv("LATENTSYNC_INFERENCE_STEPS", "40"))  # Default 40 for quality
+        self.guidance_scale = float(os.getenv("LATENTSYNC_GUIDANCE_SCALE", "2.0"))  # Default 2.0 for balance
         # LatentSync repository root directory (default: /workspace/LatentSync)
         self.latentsync_dir = Path(os.getenv("LATENTSYNC_DIR", "/workspace/LatentSync"))
         # UNet config file relative path (default: configs/unet/stage2.yaml)
         self.unet_config_rel = os.getenv("LATENTSYNC_UNET_CONFIG_REL", "configs/unet/stage2.yaml")
+        
+        # Face alignment settings
+        self.use_face_alignment = os.getenv("LATENTSYNC_USE_FACE_ALIGNMENT", "true").lower() == "true"
+        self.face_detection_method = os.getenv("LATENTSYNC_FACE_DETECTION", "mediapipe")
+        self.face_smoothing_alpha = float(os.getenv("LATENTSYNC_FACE_SMOOTHING", "0.7"))
+        self.face_min_confidence = float(os.getenv("LATENTSYNC_FACE_MIN_CONFIDENCE", "0.5"))
+        self.composite_back = os.getenv("LATENTSYNC_COMPOSITE_BACK", "true").lower() == "true"
+        
+        # Initialize face aligner if available
+        self.face_aligner = None
+        if self.use_face_alignment and FACE_ALIGN_AVAILABLE:
+            try:
+                self.face_aligner = get_face_aligner(
+                    detection_method=self.face_detection_method,
+                    crop_size=512,
+                    smoothing_alpha=self.face_smoothing_alpha,
+                    min_face_size=self.min_face_size,
+                    min_confidence=self.face_min_confidence
+                )
+                logger.info(f"✅ Face alignment enabled (method: {self.face_detection_method})")
+            except Exception as e:
+                logger.warning(f"⚠️ Failed to initialize face aligner: {e}")
+                self.face_aligner = None
+        
         # Python executable for LatentSync (can be from different virtualenv)
         latentsync_python = os.getenv("LATENTSYNC_PYTHON", None)
         if latentsync_python:
@@ -321,14 +359,75 @@ class LatentSyncRunner:
         # Use face_crop parameter or fallback to instance default
         face_mode = face_crop or self.face_crop
         
-        # Check for face in video (if auto mode)
-        if face_mode == "auto":
-            has_face = self._detect_face_in_video(str(video_path))
-            if not has_face:
-                warning = "No face detected in video - lip sync may not work correctly"
-                logger.warning(f"⚠️ {warning}")
-                result["warnings"].append(warning)
-                # Continue anyway - let LatentSync handle it
+        # Face alignment preprocessing (if enabled)
+        preprocessed_video_path = str(video_path)  # Default to original
+        bbox_track = None
+        alignment_result = None
+        
+        if self.use_face_alignment and self.face_aligner:
+            logger.info("🔍 Running face alignment preprocessing...")
+            
+            # Generate random frame indices for debug (5 frames)
+            try:
+                import cv2
+                cap = cv2.VideoCapture(str(video_path))
+                total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                cap.release()
+                debug_frames = sorted(random.sample(range(total_frames), min(5, total_frames))) if total_frames > 5 else list(range(total_frames))
+            except:
+                debug_frames = []
+            
+            # Create preprocessed video path
+            preprocessed_path = video_out_path.parent / f"{video_out_path.stem}_pre_latentsync.mp4"
+            
+            # Run face alignment
+            alignment_result = self.face_aligner.process_video(
+                video_path=str(video_path),
+                output_path=str(preprocessed_path),
+                save_debug=True,
+                debug_frames=debug_frames
+            )
+            
+            if alignment_result["success"]:
+                # Check if we should proceed (gating logic)
+                avg_confidence = alignment_result["avg_confidence"]
+                frames_with_face = alignment_result["frames_with_face"]
+                total_frames = alignment_result["frames_processed"]
+                face_ratio = frames_with_face / total_frames if total_frames > 0 else 0
+                
+                # Gating: skip if confidence too low or too few faces detected
+                if avg_confidence < self.face_min_confidence:
+                    error_msg = f"Face detection confidence too low ({avg_confidence:.2f} < {self.face_min_confidence})"
+                    logger.warning(f"⚠️ {error_msg} - skipping LatentSync")
+                    result["error"] = error_msg
+                    result["warnings"].append("Skipped LatentSync due to low face detection confidence")
+                    return result
+                
+                if face_ratio < 0.5:  # Less than 50% of frames have faces
+                    error_msg = f"Too few frames with faces ({frames_with_face}/{total_frames} = {face_ratio:.1%})"
+                    logger.warning(f"⚠️ {error_msg} - skipping LatentSync")
+                    result["error"] = error_msg
+                    result["warnings"].append("Skipped LatentSync due to insufficient face detection")
+                    return result
+                
+                # Use preprocessed video
+                preprocessed_video_path = str(preprocessed_path)
+                bbox_track = alignment_result["bbox_track"]
+                logger.info(f"✅ Face alignment complete: {frames_with_face}/{total_frames} frames with faces (avg conf: {avg_confidence:.2f})")
+            else:
+                error_msg = f"Face alignment failed: {alignment_result.get('error', 'Unknown error')}"
+                logger.warning(f"⚠️ {error_msg} - using original video")
+                result["warnings"].append(error_msg)
+                # Continue with original video
+        else:
+            # No face alignment - check for face in video (if auto mode)
+            if face_mode == "auto":
+                has_face = self._detect_face_in_video(str(video_path))
+                if not has_face:
+                    warning = "No face detected in video - lip sync may not work correctly"
+                    logger.warning(f"⚠️ {warning}")
+                    result["warnings"].append(warning)
+                    # Continue anyway - let LatentSync handle it
         
         # Output directory already created above, continue with LatentSync processing
         
@@ -338,14 +437,40 @@ class LatentSyncRunner:
             logger.info(f"   Face mode: {face_mode}, FPS: {result['fps']}")
             
             # Call LatentSync implementation with absolute paths
+            # Use preprocessed video if face alignment was used
+            latentsync_input_video = preprocessed_video_path if preprocessed_video_path != str(video_path) else str(video_path)
+            
+            # Create temporary output for LatentSync (will be composited back if needed)
+            if self.composite_back and bbox_track:
+                latentsync_output = video_out_path.parent / f"{video_out_path.stem}_latentsync_raw.mp4"
+            else:
+                latentsync_output = video_out_path
+            
             success = self._run_latentsync(
-                video_in=str(video_path),
+                video_in=latentsync_input_video,
                 audio_in=str(audio_path),
-                video_out=str(video_out_path),
+                video_out=str(latentsync_output),
                 face_mode=face_mode,
                 target_fps=result["fps"],
                 character_reference=character_reference_image
             )
+            
+            # Composite back to original video if face alignment was used
+            if success and self.composite_back and bbox_track and latentsync_output != video_out_path:
+                logger.info("🖼️ Compositing lip-synced face back to original video...")
+                composite_success = self._composite_face_back(
+                    original_video=str(video_path),
+                    synced_face_video=str(latentsync_output),
+                    output_video=str(video_out_path),
+                    bbox_track=bbox_track
+                )
+                if composite_success:
+                    logger.info("✅ Compositing complete")
+                else:
+                    logger.warning("⚠️ Compositing failed, using LatentSync output directly")
+                    # Copy LatentSync output to final output
+                    import shutil
+                    shutil.copy2(latentsync_output, video_out_path)
             
             if not success:
                 error_msg = "LatentSync processing failed"
@@ -531,19 +656,26 @@ class LatentSyncRunner:
                 else:
                     logger.warning("⚠️ Could not find inference checkpoint, script may fail")
                 
+                # Add quality parameters (inference_steps and guidance_scale)
+                # These are critical for output quality according to LatentSync docs
+                cmd.extend(["--inference_steps", str(self.inference_steps)])
+                cmd.extend(["--guidance_scale", str(self.guidance_scale)])
+                logger.info(f"⚙️ Quality settings: inference_steps={self.inference_steps}, guidance_scale={self.guidance_scale}")
+                
                 # Add optional parameters if script supports them
-                # Note: LatentSync script may not support all these, but we'll try
                 if self.fp16:
-                    # Check if script supports --fp16, if not it might be automatic
-                    pass  # Some scripts don't have explicit fp16 flag
+                    # Check if script supports --fp16
+                    cmd.append("--fp16")
                 
-                # Device is typically handled automatically by PyTorch based on CUDA availability
-                # The script might not have a --device flag
+                # Device parameter
+                if self.device:
+                    cmd.extend(["--device", self.device])
                 
+                # Character reference image (if provided)
                 if character_reference and Path(character_reference).exists():
-                    # Check if script supports reference image
-                    # This might be --reference_image or similar
-                    pass  # Add if script supports it
+                    # LatentSync might support --reference or --reference_image
+                    cmd.extend(["--reference", str(Path(character_reference).resolve())])
+                    logger.info(f"🖼️ Using character reference image: {character_reference}")
                 
                 # Use LATENTSYNC_DIR as working directory
                 # This ensures relative paths in the script (like configs/unet.yaml) work correctly
@@ -917,6 +1049,116 @@ class LatentSyncRunner:
         except Exception as e:
             logger.warning(f"Face detection error: {e}")
             return True  # Assume face exists on error
+    
+    def _composite_face_back(
+        self,
+        original_video: str,
+        synced_face_video: str,
+        output_video: str,
+        bbox_track: List[Optional[Tuple[int, int, int, int, float]]]
+    ) -> bool:
+        """
+        Composite the lip-synced face crop back onto the original video.
+        
+        Args:
+            original_video: Path to original WAN video
+            synced_face_video: Path to LatentSync output (512x512 face crop)
+            output_video: Path to final composited output
+            bbox_track: List of bboxes from face alignment (one per frame)
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            import cv2
+            import numpy as np
+            
+            cap_orig = cv2.VideoCapture(original_video)
+            cap_synced = cv2.VideoCapture(synced_face_video)
+            
+            if not cap_orig.isOpened() or not cap_synced.isOpened():
+                logger.error("❌ Could not open input videos for compositing")
+                return False
+            
+            # Get video properties
+            fps = int(cap_orig.get(cv2.CAP_PROP_FPS))
+            width = int(cap_orig.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(cap_orig.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            
+            # Setup output video writer
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            out = cv2.VideoWriter(output_video, fourcc, fps, (width, height))
+            
+            if not out.isOpened():
+                logger.error(f"❌ Could not create output video: {output_video}")
+                return False
+            
+            frame_idx = 0
+            
+            while True:
+                ret_orig, frame_orig = cap_orig.read()
+                ret_synced, frame_synced = cap_synced.read()
+                
+                if not ret_orig:
+                    break
+                
+                # Get bbox for this frame
+                if frame_idx < len(bbox_track) and bbox_track[frame_idx]:
+                    bbox = bbox_track[frame_idx]
+                    x, y, w, h, _ = bbox
+                    
+                    # Resize synced face to match original crop size
+                    if ret_synced:
+                        # Resize synced face from 512x512 to original crop size
+                        face_resized = cv2.resize(frame_synced, (w, h), interpolation=cv2.INTER_LINEAR)
+                        
+                        # Create feathered alpha mask for smooth blending
+                        mask = np.ones((h, w), dtype=np.float32)
+                        feather_size = min(w, h) // 10  # 10% feather
+                        
+                        # Create gradient mask
+                        for i in range(feather_size):
+                            alpha = i / feather_size
+                            mask[i, :] *= alpha  # Top
+                            mask[-i-1, :] *= alpha  # Bottom
+                            mask[:, i] *= alpha  # Left
+                            mask[:, -i-1] *= alpha  # Right
+                        
+                        # Clamp bbox to frame bounds
+                        x = max(0, min(x, width - 1))
+                        y = max(0, min(y, height - 1))
+                        w = min(w, width - x)
+                        h = min(h, height - y)
+                        
+                        # Adjust face_resized if needed
+                        if face_resized.shape[0] != h or face_resized.shape[1] != w:
+                            face_resized = cv2.resize(face_resized, (w, h))
+                            mask = cv2.resize(mask, (w, h))
+                        
+                        # Composite face back onto original frame
+                        roi = frame_orig[y:y+h, x:x+w].astype(np.float32)
+                        face_float = face_resized.astype(np.float32)
+                        mask_3d = np.stack([mask] * 3, axis=2)
+                        
+                        # Blend: face * mask + original * (1 - mask)
+                        blended = face_float * mask_3d + roi * (1 - mask_3d)
+                        frame_orig[y:y+h, x:x+w] = blended.astype(np.uint8)
+                
+                out.write(frame_orig)
+                frame_idx += 1
+            
+            cap_orig.release()
+            cap_synced.release()
+            out.release()
+            
+            logger.info(f"✅ Composited {frame_idx} frames")
+            return True
+            
+        except Exception as e:
+            logger.error(f"❌ Error compositing face back: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
+            return False
 
 
 def get_latentsync_runner() -> Optional[LatentSyncRunner]:
