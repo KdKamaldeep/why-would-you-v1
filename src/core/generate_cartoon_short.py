@@ -400,6 +400,9 @@ class CartoonShortsGenerator:
             scenes_dir = self.output_dir / "scenes"
             scenes_dir.mkdir(parents=True, exist_ok=True)
             
+            # Track previous image for character consistency across scenes
+            previous_image_path = None
+            
             for i, scene in enumerate(script['scenes']):
                 clip_path = scenes_dir / f"scene_{i+1}.mp4"
                 logger.info(f"🎬 Scene {i+1}: Processing video generation...")
@@ -452,14 +455,19 @@ class CartoonShortsGenerator:
                     if self.gemini_generator.available:
                         initial_image_path = self.output_dir / f"scene_{i+1}_initial_frame.png"
                         logger.info(f"🎨 Scene {i+1}: Generating initial frame with Gemini...")
+                        if previous_image_path:
+                            logger.info(f"🖼️ Scene {i+1}: Using previous image as reference for character consistency")
                         generated_image = self.gemini_generator.generate_image(
                             prompt=visual_prompt,
                             output_path=str(initial_image_path),
                             width=self.config.wan_width,
-                            height=self.config.wan_height
+                            height=self.config.wan_height,
+                            reference_image_path=previous_image_path
                         )
                         if generated_image:
                             initial_image_path = generated_image
+                            # Update previous_image_path for next scene
+                            previous_image_path = generated_image
                             logger.info(f"✅ Scene {i+1}: Initial frame generated: {initial_image_path}")
                         else:
                             logger.warning(f"⚠️ Scene {i+1}: Failed to generate initial frame, using T2V mode")

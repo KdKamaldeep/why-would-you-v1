@@ -2,57 +2,30 @@
   "stories": [
     {
       "title": "The Photo in the Ardennes",
-      "description": "A World War II soldier speaks directly to the camera while the battle rages around him.",
+      "description": "A World War II soldier talks to the camera as the battle unfolds, in short 6-second scenes for 24fps generation.",
       "total_duration": 60,
       "aspect_ratio": "9:16",
+      "fps": 24,
       "scenes": [
         {
-          "id": "scene_01_intro_under_fire",
-          "duration": 10,
-          "num_frames": 73,
-          "visual_prompt": "Extreme close-up of the SAME World War II infantry soldier, Elias, speaking directly to the camera. Caucasian male, mid-20s, narrow face, light stubble, small scar above left eyebrow. Frosted M1 helmet, snow on skin, mouth moving as he speaks, eyes locked on the lens. Smoke and distant artillery flashes behind him. Active WWII battlefield.",
-          "motion_prompt": "locked frontal framing, very slow cinematic push-in, natural mouth and jaw movement while speaking, subtle head micro-movements, blinking, visible breath in cold air, faint camera tremor from distant artillery, snow drifting softly, light flicker from off-screen explosions",
-          "narration": "I’m in the Ardennes right now. It’s freezing. Shells keep landing somewhere out there. Every second feels like it could be the one."
-        },
-        {
-          "id": "scene_02_trench_active",
-          "duration": 10,
-          "num_frames": 49,
-          "visual_prompt": "Medium close-up of Elias crouched in a muddy trench, speaking directly to the camera. Snow melting on his uniform, dirt smeared on his face, mouth moving naturally as he talks, eyes steady and alert. Smoke rolling overhead, sky flashing with artillery.",
-          "motion_prompt": "stabilized handheld framing with heavy damping, gentle camera sway, natural speaking head movement, subtle flinch reactions to distant blasts, smoke surging behind, falling snow and debris, no aggressive shake",
-          "narration": "We’re pinned down in this trench. Bullets cracking overhead. No clear orders. Nobody knows who’s still alive."
-        },
-        {
-          "id": "scene_03_photo_moment",
-          "duration": 11,
-          "num_frames": 73,
-          "visual_prompt": "Close-up of Elias’s gloved hands lifting a worn black-and-white photograph from the snow. Trench wall blurred behind. Debris falling as the battle continues.",
-          "motion_prompt": "tight framing on hands, subtle vibration from impacts, snow and dirt particles falling, fingers trembling from cold and stress, camera locked to subject",
-          "narration": "Then I see it in the snow. A photograph. I don’t know whose it is. Someone smiling like none of this is happening. I shouldn’t look, but I do."
-        },
-        {
-          "id": "scene_04_warning_imminent",
-          "duration": 10,
-          "num_frames": 73,
-          "visual_prompt": "Medium close-up of Elias back in the trench, speaking urgently to the camera as another soldier grabs his sleeve from the side. His mouth moves faster now, tension in his jaw. Smoke thickens, light flashes grow closer.",
-          "motion_prompt": "controlled handheld framing, natural urgent head movement while speaking, brief camera jolt from nearby impact, smoke pressure wave passing through background, motion quickly re-stabilizes",
-          "narration": "A guy next to me yells to stop staring. Says keep my head down. Before I can answer, everything changes."
-        },
-        {
-          "id": "scene_05_run_through_fire",
-          "duration": 13,
-          "num_frames": 73,
-          "visual_prompt": "Medium-wide shot of Elias sprinting out of the trench into a snow-filled battlefield. Mortars slam into the ground, debris flying, machine-gun fire cutting through smoke, tank silhouette advancing.",
-          "motion_prompt": "full sprint forward, aggressive handheld follow from behind and side, heavy camera shake synced to footsteps, shockwaves causing brief frame judder, debris blasting past lens, intermittent motion blur, no camera rotation",
-          "narration": "The ground erupts. Mortars everywhere. A tank pushing through the smoke. I’m running without thinking. Snow, dirt, fire—everything hits at once."
-        },
-        {
-          "id": "scene_06_forward_resolve",
+          "id": "scene_01_hook_closeup",
           "duration": 6,
-          "num_frames": 49,
-          "visual_prompt": "Close-up of Elias moving forward through thinning smoke, still speaking directly to the camera. Mouth moving slowly now, jaw clenched, eyes locked ahead. Dawn light breaking through chaos.",
-          "motion_prompt": "slow forward drift, natural speaking mouth movement, residual camera shake fading out, breath stabilizing, smoke peeling away, warm light emerging, camera fully stabilizes by the end",
-          "narration": "I shove the photo inside my jacket and keep moving. If this is where it ends, I’m not stopping here."
+          "num_frames": 144,
+          "visual_reference": "gemini_ref_prev_or_identity_anchor.png",
+          "visual_prompt": "Extreme close-up of the SAME World War II infantry soldier, Elias, speaking directly to the camera. Caucasian male, mid-20s, narrow face, light stubble, small scar above left eyebrow. Frosted M1 helmet, snow on skin, intense eye contact with the lens. Smoke behind him, distant artillery flashes reflecting faintly on his face. Active WWII battlefield.",
+          "motion_prompt": "locked frontal framing, very slow cinematic push-in, natural mouth and jaw movement while speaking, subtle head micro-movements, blinking, visible breath in cold air, faint micro tremor from distant artillery, snow drifting softly, light flicker from off-screen explosions",
+          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
+          "narration": "I’m in the Ardennes right now. It’s freezing."
+        },
+        {
+          "id": "scene_02_hook_closeup_impact",
+          "duration": 6,
+          "num_frames": 144,
+          "visual_reference": "use_previous_scene_image_as_reference",
+          "visual_prompt": "Extreme close-up of the SAME soldier Elias still speaking to the camera, eye contact unwavering. Helmet rim frosted, cheeks dirty, breath visible. Smoke thickens behind him and flashes are closer now.",
+          "motion_prompt": "slow push-in continues, subtle facial tension, natural speaking mouth movement, brief soft vibration from distant impact, snow and tiny debris drifting, light flicker intensifies, camera remains stable",
+          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
+          "narration": "Shells keep landing out there. Every second feels like it could be the one."
         }
       ]
     }

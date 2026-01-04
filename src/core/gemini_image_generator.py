@@ -186,7 +186,7 @@ class GeminiImageGenerator:
         else:
             return "1:1"
     
-    def generate_image(self, prompt: str, output_path: str, width: int = 1280, height: int = 704) -> Optional[str]:
+    def generate_image(self, prompt: str, output_path: str, width: int = 1280, height: int = 704, reference_image_path: Optional[str] = None) -> Optional[str]:
         """
         Generate an image from a text prompt using Gemini API.
         
@@ -195,6 +195,7 @@ class GeminiImageGenerator:
             output_path: Path to save the generated image
             width: Image width (default: 1280)
             height: Image height (default: 704)
+            reference_image_path: Optional path to a reference image to maintain character consistency
             
         Returns:
             Path to the generated image file, or None if generation fails
@@ -211,9 +212,46 @@ class GeminiImageGenerator:
             aspect_ratio = self._to_aspect_ratio(width, height)
             logger.info(f"📐 Using aspect ratio: {aspect_ratio} for {width}x{height}")
             
+            # Prepare contents - include reference image if provided
+            contents = prompt
+            if reference_image_path and Path(reference_image_path).exists():
+                try:
+                    # Read and encode reference image as base64
+                    with open(reference_image_path, 'rb') as img_file:
+                        image_data = img_file.read()
+                    image_base64 = base64.b64encode(image_data).decode('utf-8')
+                    
+                    # Determine MIME type from file extension
+                    ref_path = Path(reference_image_path)
+                    mime_type = "image/png"
+                    if ref_path.suffix.lower() in ['.jpg', '.jpeg']:
+                        mime_type = "image/jpeg"
+                    elif ref_path.suffix.lower() == '.webp':
+                        mime_type = "image/webp"
+                    
+                    # Construct contents with reference image and prompt
+                    # Format: list with parts containing image and text
+                    contents = [
+                        {
+                            "parts": [
+                                {
+                                    "inline_data": {
+                                        "mime_type": mime_type,
+                                        "data": image_base64
+                                    }
+                                },
+                                {"text": f"Use this reference image to maintain character consistency. {prompt}"}
+                            ]
+                        }
+                    ]
+                    logger.info(f"🖼️ Using reference image: {reference_image_path} for character consistency")
+                except Exception as e:
+                    logger.warning(f"⚠️ Failed to load reference image {reference_image_path}: {e}. Continuing without reference.")
+                    contents = prompt
+            
             response = self.client.models.generate_content(
                 model=self.model_name,
-                contents=prompt,
+                contents=contents,
                 config={
                     "imageConfig": {
                         "aspectRatio": aspect_ratio
