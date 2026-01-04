@@ -358,37 +358,39 @@ class LatentSyncRunner:
         """
         Internal method to invoke LatentSync.
         
-        This is a placeholder implementation. Replace with actual LatentSync API calls.
-        
-        Options:
-        1. Use LatentSync Python API if available
-        2. Use LatentSync CLI if available
-        3. Use subprocess to call external script
+        Tries multiple methods to run LatentSync:
+        1. Python package import (latentsync)
+        2. Repository inference.py script
+        3. Direct Python module execution
         """
-        # Option 1: Try Python API (if LatentSync provides one)
+        model_dir = Path(self.model_path)
+        
+        # Option 1: Try Python package import (if LatentSync is installed as package)
         try:
-            # Example: from latentsync import LatentSync
-            # sync = LatentSync(model_path=self.model_path, device=self.device)
-            # sync.process(video_in, audio_in, video_out, ...)
-            # return True
-            pass
+            import latentsync
+            # If we can import it, try to use it
+            # This depends on the actual LatentSync API structure
+            logger.info("📦 Found LatentSync Python package")
+            # TODO: Implement actual API calls once LatentSync package structure is known
+            # For now, continue to other options
         except ImportError:
             pass
         
-        # Option 2: Use CLI if available
-        latentsync_script = Path(self.model_path) / "inference.py"
-        if latentsync_script.exists():
+        # Option 2: Try repository inference.py script
+        inference_script = model_dir / "inference.py"
+        if inference_script.exists():
             try:
+                logger.info(f"📝 Found inference.py at: {inference_script}")
                 cmd = [
                     sys.executable,
-                    str(latentsync_script),
+                    str(inference_script),
                     "--video", video_in,
                     "--audio", audio_in,
                     "--output", video_out,
                     "--device", self.device,
-                    "--fps", str(target_fps),
                 ]
                 
+                # Add optional parameters if supported
                 if face_mode != "none":
                     cmd.extend(["--face_mode", face_mode])
                 
@@ -396,44 +398,71 @@ class LatentSyncRunner:
                     cmd.append("--fp16")
                 
                 if character_reference:
-                    cmd.extend(["--reference", character_reference])
+                    cmd.extend(["--reference", str(character_reference)])
                 
-                logger.info(f"Running: {' '.join(cmd)}")
+                logger.info(f"🔧 Running LatentSync: {' '.join(cmd)}")
                 result = subprocess.run(
                     cmd,
                     check=True,
                     capture_output=True,
                     text=True,
-                    cwd=self.model_path
+                    cwd=str(model_dir)
                 )
                 
                 if result.returncode == 0:
+                    logger.info("✅ LatentSync inference completed successfully")
                     return True
                 else:
-                    logger.error(f"LatentSync CLI failed: {result.stderr}")
+                    logger.error(f"❌ LatentSync inference failed (exit code {result.returncode})")
+                    if result.stderr:
+                        logger.error(f"Error output: {result.stderr}")
+                    if result.stdout:
+                        logger.info(f"Output: {result.stdout}")
                     return False
                     
             except subprocess.CalledProcessError as e:
-                logger.error(f"LatentSync CLI error: {e.stderr if hasattr(e, 'stderr') else str(e)}")
+                logger.error(f"❌ LatentSync subprocess error: {e}")
+                if hasattr(e, 'stderr') and e.stderr:
+                    logger.error(f"Error output: {e.stderr}")
+                if hasattr(e, 'stdout') and e.stdout:
+                    logger.info(f"Output: {e.stdout}")
                 return False
             except Exception as e:
-                logger.error(f"Error running LatentSync CLI: {e}")
+                logger.error(f"❌ Error running LatentSync inference script: {e}")
+                import traceback
+                logger.error(traceback.format_exc())
                 return False
         
-        # Option 3: Fallback - create a wrapper script or use alternative method
-        logger.warning("⚠️ LatentSync API/CLI not found - using placeholder")
-        logger.warning("⚠️ Please implement actual LatentSync integration")
+        # Option 3: Try to find and run LatentSync as a Python module
+        # Check if model_dir contains a Python package structure
+        init_file = model_dir / "__init__.py"
+        if init_file.exists() or any((model_dir / f).suffix == '.py' for f in model_dir.iterdir() if f.is_file()):
+            try:
+                # Try importing the module directly
+                import importlib.util
+                spec = importlib.util.spec_from_file_location("latentsync_module", model_dir / "inference.py")
+                if spec and spec.loader:
+                    module = importlib.util.module_from_spec(spec)
+                    # This would require knowing the actual API
+                    logger.info("📦 Found Python module structure")
+                    # TODO: Implement module execution once API is known
+            except Exception as e:
+                logger.debug(f"Module import attempt failed: {e}")
         
-        # For now, just copy the input video as placeholder
-        # In production, replace this with actual LatentSync call
-        try:
-            import shutil
-            shutil.copy(video_in, video_out)
-            logger.warning("⚠️ Using input video as placeholder (no lip sync applied)")
-            return True
-        except Exception as e:
-            logger.error(f"Failed to create placeholder: {e}")
-            return False
+        # Option 4: Fallback - provide helpful error message
+        logger.error("❌ LatentSync not found or not properly configured")
+        logger.error("📋 To use LatentSync, you need to:")
+        logger.error("   1. Clone the LatentSync repository:")
+        logger.error("      git clone https://github.com/bytedance/LatentSync.git")
+        logger.error("   2. Set LATENTSYNC_MODEL_PATH to the repository directory")
+        logger.error("   3. Install LatentSync dependencies")
+        logger.error("   4. Or install LatentSync as a Python package: pip install latentsync")
+        logger.error("")
+        logger.error(f"💡 Current model path: {self.model_path}")
+        logger.error(f"💡 Looking for: {inference_script}")
+        
+        # Don't create placeholder - fail explicitly
+        return False
     
     def _get_video_info(self, video_path: str) -> tuple:
         """Get video duration and FPS using ffprobe."""
