@@ -1,59 +1,60 @@
 {
   "stories": [
     {
-      "title": "The Devourer of Worlds",
-      "description": "A cinematic fantasy space war explaining how a conflict began, why a living planet was targeted, and how a forbidden black hole weapon changed the galaxy forever.",
+      "title": "The Photo in the Ardennes",
+      "description": "A World War II soldier speaks directly to the camera while the battle rages around him.",
+      "total_duration": 60,
+      "aspect_ratio": "9:16",
       "scenes": [
         {
-          "id": "fantasy_war_scene_01_tension",
-          "duration": 4,
-          "visual_prompt": "Wide cinematic view of deep space filled with glowing nebula clouds and distant stars. An abrupt, aggressive camera push-in toward two opposing fantasy star fleets facing each other across space creates immediate tension. The motion rapidly eases and settles into slow cinematic forward drift. Massive warships hold position, weapons glowing but unfired. Epic lighting, high contrast, grand scale, fantasy sci-fi style, 720p.",
-          "visual_reference": "HOOK + SETUP: Two fleets face each other, signaling a long-standing conflict about to erupt.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter, modern UI, realistic NASA spacecraft",
-          "narration": "The war began long before the first shot."
+          "id": "scene_01_intro_under_fire",
+          "duration": 10,
+          "num_frames": 73,
+          "visual_prompt": "Extreme close-up of the SAME World War II infantry soldier, Elias, speaking directly to the camera. Caucasian male, mid-20s, narrow face, light stubble, small scar above left eyebrow. Frosted M1 helmet, snow on skin, mouth moving as he speaks, eyes locked on the lens. Smoke and distant artillery flashes behind him. Active WWII battlefield.",
+          "motion_prompt": "locked frontal framing, very slow cinematic push-in, natural mouth and jaw movement while speaking, subtle head micro-movements, blinking, visible breath in cold air, faint camera tremor from distant artillery, snow drifting softly, light flicker from off-screen explosions",
+          "narration": "I’m in the Ardennes right now. It’s freezing. Shells keep landing somewhere out there. Every second feels like it could be the one."
         },
         {
-          "id": "fantasy_war_scene_02_reason",
-          "duration": 4,
-          "visual_prompt": "Wide cinematic scene showing ancient star maps and glowing energy paths across space. Multiple elements: holographic-looking constellations, luminous energy currents connecting star systems, distant fleets moving slowly along these paths. Camera: slow drifting movement through the star map, calm but ominous mood, cinematic lighting, fantasy sci-fi aesthetic, 720p.",
-          "visual_reference": "WHY WAR BEGAN: Show that control over rare cosmic energy routes or power sources caused the conflict.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "Control of power divided the galaxy."
+          "id": "scene_02_trench_active",
+          "duration": 10,
+          "num_frames": 49,
+          "visual_prompt": "Medium close-up of Elias crouched in a muddy trench, speaking directly to the camera. Snow melting on his uniform, dirt smeared on his face, mouth moving naturally as he talks, eyes steady and alert. Smoke rolling overhead, sky flashing with artillery.",
+          "motion_prompt": "stabilized handheld framing with heavy damping, gentle camera sway, natural speaking head movement, subtle flinch reactions to distant blasts, smoke surging behind, falling snow and debris, no aggressive shake",
+          "narration": "We’re pinned down in this trench. Bullets cracking overhead. No clear orders. Nobody knows who’s still alive."
         },
         {
-          "id": "fantasy_war_scene_03_beautiful_planet",
-          "duration": 4,
-          "visual_prompt": "Wide cinematic view of a breathtaking fantasy planet rich with life and energy. Multiple elements: vast blue oceans, lush green continents, glowing advanced cities, radiant energy veins visible beneath the planet’s surface, soft clouds wrapping the atmosphere, a warm sun illuminating the world. Camera: slow majestic orbital drift around the planet, calm and beautiful motion, vibrant yet natural colors, cinematic lighting, epic scale, 720p.",
-          "visual_reference": "WHAT WAS AT STAKE: A living planet that holds immense power capable of ending—or winning—the war.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "This world held power beyond imagination."
+          "id": "scene_03_photo_moment",
+          "duration": 11,
+          "num_frames": 73,
+          "visual_prompt": "Close-up of Elias’s gloved hands lifting a worn black-and-white photograph from the snow. Trench wall blurred behind. Debris falling as the battle continues.",
+          "motion_prompt": "tight framing on hands, subtle vibration from impacts, snow and dirt particles falling, fingers trembling from cold and stress, camera locked to subject",
+          "narration": "Then I see it in the snow. A photograph. I don’t know whose it is. Someone smiling like none of this is happening. I shouldn’t look, but I do."
         },
         {
-          "id": "fantasy_war_scene_04_weapon_decision",
-          "duration": 4,
-          "visual_prompt": "Wide cinematic shot of a colossal command ship revealing a forbidden weapon known as the Devourer of Worlds. Multiple elements: a swirling sphere of absolute darkness forming in space, violent gravitational distortion bending nearby stars and light, surrounding allied ships slowly retreating. Camera: slow controlled push-in toward the forming black hole weapon, ominous lighting, epic fantasy scale, 720p.",
-          "visual_reference": "THE DECISION: Leaders choose destruction over letting the enemy claim the planet’s power.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "They chose to destroy what they could not protect."
+          "id": "scene_04_warning_imminent",
+          "duration": 10,
+          "num_frames": 73,
+          "visual_prompt": "Medium close-up of Elias back in the trench, speaking urgently to the camera as another soldier grabs his sleeve from the side. His mouth moves faster now, tension in his jaw. Smoke thickens, light flashes grow closer.",
+          "motion_prompt": "controlled handheld framing, natural urgent head movement while speaking, brief camera jolt from nearby impact, smoke pressure wave passing through background, motion quickly re-stabilizes",
+          "narration": "A guy next to me yells to stop staring. Says keep my head down. Before I can answer, everything changes."
         },
         {
-          "id": "fantasy_war_scene_05_planet_destruction",
-          "duration": 4,
-          "visual_prompt": "Wide cinematic scene of the Devourer of Worlds tearing a living planet apart. Multiple elements: continents stretching and breaking, oceans spiraling into space, atmosphere ripped away into glowing streams, fragments of the planet pulled toward a distant black hole. Camera: slow dramatic pull-back revealing the planet’s destruction at massive scale, tragic lighting, epic fantasy sci-fi mood, 720p.",
-          "visual_reference": "CLIMAX: Show irreversible destruction driven by gravity, not explosions, to emphasize loss.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "In moments, a world was erased."
+          "id": "scene_05_run_through_fire",
+          "duration": 13,
+          "num_frames": 73,
+          "visual_prompt": "Medium-wide shot of Elias sprinting out of the trench into a snow-filled battlefield. Mortars slam into the ground, debris flying, machine-gun fire cutting through smoke, tank silhouette advancing.",
+          "motion_prompt": "full sprint forward, aggressive handheld follow from behind and side, heavy camera shake synced to footsteps, shockwaves causing brief frame judder, debris blasting past lens, intermittent motion blur, no camera rotation",
+          "narration": "The ground erupts. Mortars everywhere. A tank pushing through the smoke. I’m running without thinking. Snow, dirt, fire—everything hits at once."
         },
         {
-          "id": "fantasy_war_scene_06_aftermath",
-          "duration": 4,
-          "visual_prompt": "Wide cinematic aftermath of a devastated star system. Multiple elements: shattered starships drifting silently, faint nebula light illuminating debris, the distant black hole fading into darkness, a lone surviving ship slowly leaving the scene. Camera: slow gentle pull-back, somber and reflective mood, cinematic lighting, epic scale, 720p.",
-          "visual_reference": "AFTERMATH: The war continues, but the cost has changed everything.",
-          "negative_prompt": "text, subtitles, watermark, logo, cartoon, anime, oversaturated, blurry, low quality, flicker, jitter",
-          "narration": "Some victories cost everything."
+          "id": "scene_06_forward_resolve",
+          "duration": 6,
+          "num_frames": 49,
+          "visual_prompt": "Close-up of Elias moving forward through thinning smoke, still speaking directly to the camera. Mouth moving slowly now, jaw clenched, eyes locked ahead. Dawn light breaking through chaos.",
+          "motion_prompt": "slow forward drift, natural speaking mouth movement, residual camera shake fading out, breath stabilizing, smoke peeling away, warm light emerging, camera fully stabilizes by the end",
+          "narration": "I shove the photo inside my jacket and keep moving. If this is where it ends, I’m not stopping here."
         }
-      ],
-      "total_duration": 24
+      ]
     }
   ]
 }
