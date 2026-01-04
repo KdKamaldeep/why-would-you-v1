@@ -642,13 +642,12 @@ class LatentSyncRunner:
                         log_f.write(f"{'='*60}\n\n")
                         log_f.flush()
                         
-                        # Run subprocess with real-time logging
-                        # Use repo_root as working directory so relative paths work
-                        result = subprocess.run(
+                        # Run subprocess with real-time output capture and progress display
+                        import subprocess as sp
+                        process = sp.Popen(
                             cmd,
-                            check=False,  # Don't raise exception, handle return code manually
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT,  # Combine stderr into stdout
+                            stdout=sp.PIPE,
+                            stderr=sp.STDOUT,  # Combine stderr into stdout
                             text=True,
                             cwd=str(working_dir),  # Use LATENTSYNC_DIR as cwd
                             env=env,  # Pass environment with PYTHONPATH
@@ -656,29 +655,101 @@ class LatentSyncRunner:
                             universal_newlines=True
                         )
                         
-                        # Write output to log file
-                        if result.stdout:
-                            log_f.write("STDOUT/STDERR:\n")
-                            log_f.write(result.stdout)
-                            log_f.write(f"\n{'='*60}\n")
-                            log_f.write(f"Exit Code: {result.returncode}\n")
+                        # Capture output in real-time
+                        stdout_lines = []
+                        last_progress_line = ""
+                        last_progress_time = 0
+                        import time
+                        import re
                         
-                        # Also log to our logger
-                        if result.stdout:
-                            # Log important lines (filter verbose output)
-                            lines = result.stdout.split('\n')
-                            for line in lines:
-                                line = line.strip()
+                        logger.info("🔄 Starting LatentSync processing...")
+                        
+                        # Read output line by line
+                        while True:
+                            output = process.stdout.readline()
+                            if output == '' and process.poll() is not None:
+                                break
+                            if output:
+                                line = output.strip()
                                 if not line:
                                     continue
-                                # Log errors and important messages
-                                if any(keyword in line.lower() for keyword in ['error', 'failed', 'exception', 'traceback', 'warning']):
-                                    logger.warning(f"LatentSync: {line}")
+                                
+                                stdout_lines.append(line)
+                                
+                                # Write to log file immediately
+                                log_f.write(line + '\n')
+                                log_f.flush()
+                                
+                                # Parse and display progress
+                                # Look for progress indicators (percentage, progress bars, etc.)
+                                progress_indicators = [
+                                    '%', '|', 'progress', 'step', '/', 'epoch', 'batch',
+                                    'processing', 'generating', 'rendering', 'frame'
+                                ]
+                                
+                                # Check if this line contains progress information
+                                is_progress = any(indicator in line.lower() for indicator in progress_indicators)
+                                
+                                # Filter out verbose/repeated progress lines (throttle to once per second)
+                                current_time = time.time()
+                                if is_progress and (line != last_progress_line or current_time - last_progress_time > 1.0):
+                                    # Extract percentage if available
+                                    percent_match = re.search(r'(\d+(?:\.\d+)?)%', line)
+                                    if percent_match:
+                                        percent = percent_match.group(1)
+                                        logger.info(f"⏳ LatentSync progress: {percent}%")
+                                    else:
+                                        # Extract step information (e.g., "Step 10/100")
+                                        step_match = re.search(r'step\s+(\d+)/(\d+)', line, re.IGNORECASE)
+                                        if step_match:
+                                            current, total = step_match.groups()
+                                            percent = int((int(current) / int(total)) * 100)
+                                            logger.info(f"⏳ LatentSync progress: Step {current}/{total} ({percent}%)")
+                                        else:
+                                            # Show progress line but limit frequency and truncate
+                                            logger.info(f"⏳ LatentSync: {line[:80]}...")  # Truncate long lines
+                                    last_progress_line = line
+                                    last_progress_time = current_time
+                                
+                                # Always log errors and important messages
+                                elif any(keyword in line.lower() for keyword in ['error', 'failed', 'exception', 'traceback']):
+                                    logger.error(f"❌ LatentSync: {line}")
+                                elif any(keyword in line.lower() for keyword in ['warning']):
+                                    # Filter out common warnings that are not critical
+                                    if 'hf_xet' not in line.lower() and 'xet storage' not in line.lower():
+                                        logger.warning(f"⚠️ LatentSync: {line}")
                                 elif any(keyword in line.lower() for keyword in ['success', 'complete', 'done', 'finished']):
-                                    logger.info(f"LatentSync: {line}")
-                                # Log first few lines and last few lines for context
-                                elif len(lines) < 20 or lines.index(line) < 5 or lines.index(line) >= len(lines) - 5:
+                                    logger.info(f"✅ LatentSync: {line}")
+                                # Log first few lines for context
+                                elif len(stdout_lines) <= 5:
                                     logger.debug(f"LatentSync: {line}")
+                        
+                        # Wait for process to complete and get return code
+                        returncode = process.poll()
+                        
+                        # Get any remaining output
+                        remaining_output, _ = process.communicate()
+                        if remaining_output:
+                            remaining_lines = remaining_output.strip().split('\n')
+                            for line in remaining_lines:
+                                if line.strip():
+                                    stdout_lines.append(line.strip())
+                                    log_f.write(line.strip() + '\n')
+                        
+                        # Write final status to log
+                        log_f.write(f"\n{'='*60}\n")
+                        log_f.write(f"Exit Code: {returncode}\n")
+                        
+                        # Combine all output
+                        result_stdout = '\n'.join(stdout_lines)
+                        
+                        # Create a result-like object for compatibility
+                        class ProcessResult:
+                            def __init__(self, returncode, stdout):
+                                self.returncode = returncode
+                                self.stdout = stdout
+                        
+                        result = ProcessResult(returncode, result_stdout)
                     
                     if result.returncode == 0:
                         logger.info("✅ LatentSync inference completed successfully")
