@@ -67,6 +67,10 @@ class LatentSyncRunner:
         self.face_crop = face_crop or os.getenv("LATENTSYNC_FACE_MODE", "auto")
         self.min_face_size = min_face_size
         self.debug_frames = debug_frames or os.getenv("LATENTSYNC_DEBUG_FRAMES", "false").lower() == "true"
+        # LatentSync repository root directory (default: /workspace/LatentSync)
+        self.latentsync_dir = Path(os.getenv("LATENTSYNC_DIR", "/workspace/LatentSync"))
+        # UNet config file relative path (default: configs/unet/stage2.yaml)
+        self.unet_config_rel = os.getenv("LATENTSYNC_UNET_CONFIG_REL", "configs/unet/stage2.yaml")
         # Python executable for LatentSync (can be from different virtualenv)
         latentsync_python = os.getenv("LATENTSYNC_PYTHON", None)
         if latentsync_python:
@@ -399,49 +403,46 @@ class LatentSyncRunner:
             model_dir / "scripts" / "run_inference.py",
         ]
         
-        # Also check if model_dir is the Hugging Face cache, look for repo in /workspace/LatentSync
-        workspace_repo = Path("/workspace/LatentSync")
-        if ("huggingface" in str(model_dir) or "cache" in str(model_dir)) and workspace_repo.exists():
-            inference_scripts.extend([
-                workspace_repo / "inference.py",
-                workspace_repo / "infer.py",
-                workspace_repo / "scripts" / "inference.py",
-                workspace_repo / "scripts" / "infer.py",
-                workspace_repo / "scripts" / "interface.py",
-                workspace_repo / "scripts" / "run_inference.py",
-            ])
-            logger.info(f"💡 Model in cache, checking repository at: {workspace_repo}")
+        # Use LATENTSYNC_DIR as the repository root
+        latentsync_dir = self.latentsync_dir
+        if not latentsync_dir.exists():
+            logger.warning(f"⚠️ LATENTSYNC_DIR does not exist: {latentsync_dir}")
+            logger.warning(f"   Set LATENTSYNC_DIR environment variable to the LatentSync repository root")
+            return False
         
-        inference_script = None
-        script_dir = None
-        repo_root = None
-        for script_path in inference_scripts:
-            if script_path.exists():
-                inference_script = script_path
-                script_dir = script_path.parent
-                # Determine repository root (parent of scripts/ or the directory containing the script)
-                if "scripts" in str(script_dir):
-                    repo_root = script_dir.parent
-                elif workspace_repo.exists() and script_path.is_relative_to(workspace_repo):
-                    repo_root = workspace_repo
-                else:
-                    repo_root = script_dir
-                break
+        # Check if scripts/inference.py exists (for module-style invocation)
+        inference_script_path = latentsync_dir / "scripts" / "inference.py"
+        script_module_name = "inference"
+        if not inference_script_path.exists():
+            # Fallback: check other common script names
+            for script_name in ["infer.py", "interface.py", "run_inference.py"]:
+                alt_script = latentsync_dir / "scripts" / script_name
+                if alt_script.exists():
+                    inference_script_path = alt_script
+                    script_module_name = script_name.replace(".py", "")
+                    break
         
-        if inference_script:
+        if not inference_script_path.exists():
+            logger.error(f"❌ LatentSync inference script not found in: {latentsync_dir / 'scripts'}")
+            logger.error(f"   Expected: {latentsync_dir / 'scripts' / 'inference.py'}")
+            return False
+        
+        if inference_script_path.exists():
             try:
-                logger.info(f"📝 Found LatentSync script at: {inference_script}")
+                logger.info(f"📝 Found LatentSync script at: {inference_script_path}")
                 
                 # Use custom Python executable if specified, otherwise use sys.executable
                 python_exe = self.python_executable
                 if python_exe != sys.executable:
                     logger.info(f"🐍 Using custom Python executable: {python_exe}")
                 
-                # Build command - LatentSync uses specific argument names
-                # Based on error message: --video_path, --audio_path, --video_out_path, --inference_ckpt_path
+                # Build command using module-style invocation: python -m scripts.inference
+                # This ensures proper module resolution
+                script_module = f"scripts.{script_module_name}"
                 cmd = [
                     python_exe,
-                    str(inference_script),
+                    "-m",
+                    script_module,
                     "--video_path", video_in,
                     "--audio_path", audio_in,
                     "--video_out_path", video_out,
@@ -481,12 +482,12 @@ class LatentSyncRunner:
                     # If still not found, use the model directory (script might handle it)
                     if not inference_ckpt_path:
                         inference_ckpt_path = str(cache_model_dir)
-                elif latentsync_repo_root:
+                else:
                     # Check repository for checkpoint
                     repo_ckpt_paths = [
-                        latentsync_repo_root / "checkpoints" / "latentsync_unet.pt",
-                        latentsync_repo_root / "latentsync_unet.pt",
-                        latentsync_repo_root / "checkpoints" / "unet.pt",
+                        latentsync_dir / "checkpoints" / "latentsync_unet.pt",
+                        latentsync_dir / "latentsync_unet.pt",
+                        latentsync_dir / "checkpoints" / "unet.pt",
                     ]
                     for ckpt_path in repo_ckpt_paths:
                         if ckpt_path.exists():
@@ -513,13 +514,13 @@ class LatentSyncRunner:
                     # This might be --reference_image or similar
                     pass  # Add if script supports it
                 
-                # Use repository root as working directory (not scripts/ subdirectory)
+                # Use LATENTSYNC_DIR as working directory
                 # This ensures relative paths in the script (like configs/unet.yaml) work correctly
-                working_dir = repo_root if repo_root else script_dir
+                working_dir = latentsync_dir
                 
                 logger.info(f"🔧 Running LatentSync: {' '.join(cmd)}")
                 logger.info(f"📁 Working directory: {working_dir}")
-                logger.info(f"📁 Script location: {inference_script}")
+                logger.info(f"📁 LatentSync repository: {latentsync_dir}")
                 
                 # Create log file for LatentSync output
                 output_video_path = Path(video_out)
@@ -531,56 +532,67 @@ class LatentSyncRunner:
                 # Add LatentSync repository to PYTHONPATH so imports work
                 env = os.environ.copy()
                 
-                # Use repo_root for PYTHONPATH
-                latentsync_repo_root = repo_root
-                if latentsync_repo_root:
-                    pythonpath = str(latentsync_repo_root)
-                    # Add to existing PYTHONPATH if it exists
-                    if "PYTHONPATH" in env:
-                        env["PYTHONPATH"] = f"{pythonpath}:{env['PYTHONPATH']}"
-                    else:
-                        env["PYTHONPATH"] = pythonpath
-                    logger.info(f"🐍 Setting PYTHONPATH to include: {latentsync_repo_root}")
+                # Use latentsync_dir for PYTHONPATH
+                pythonpath = str(latentsync_dir)
+                # Add to existing PYTHONPATH if it exists
+                if "PYTHONPATH" in env:
+                    env["PYTHONPATH"] = f"{pythonpath}:{env['PYTHONPATH']}"
+                else:
+                    env["PYTHONPATH"] = pythonpath
+                logger.info(f"🐍 Setting PYTHONPATH to include: {latentsync_dir}")
                 
-                # Check for config file and add if script supports it
-                # Based on repo structure: configs/unet/stage1.yaml, stage2.yaml, etc.
-                # Also check scripts/configs/unet/ if it exists
-                if repo_root:
-                    config_paths = [
-                        # Check scripts/configs/unet/ first (as user mentioned)
-                        repo_root / "scripts" / "configs" / "unet.yaml",
-                        repo_root / "scripts" / "configs" / "unet" / "stage2.yaml",  # Default to stage2
-                        repo_root / "scripts" / "configs" / "unet" / "stage1.yaml",
-                        repo_root / "scripts" / "configs" / "unet" / "stage2_efficient.yaml",
-                        # Check root configs/unet/ (from image structure)
-                        repo_root / "configs" / "unet" / "stage2.yaml",  # Default to stage2
-                        repo_root / "configs" / "unet" / "stage1.yaml",
-                        repo_root / "configs" / "unet" / "stage2_efficient.yaml",
-                        repo_root / "configs" / "unet" / "stage2_512.yaml",
-                        # Fallback to old locations
-                        repo_root / "configs" / "unet.yaml",
-                        repo_root / "configs" / "unet.yml",
-                        repo_root / "config" / "unet.yaml",
-                    ]
-                    config_found = None
-                    for config_path in config_paths:
-                        if config_path.exists():
-                            config_found = config_path
-                            break
+                # Build UNet config path: <LATENTSYNC_DIR>/<LATENTSYNC_UNET_CONFIG_REL>
+                # Remove any "scripts/" prefix from the relative path
+                config_rel = self.unet_config_rel
+                if config_rel.startswith("scripts/"):
+                    config_rel = config_rel.replace("scripts/", "", 1)
+                    logger.warning(f"⚠️ Removed 'scripts/' prefix from config path: {self.unet_config_rel} -> {config_rel}")
+                
+                unet_config_path = latentsync_dir / config_rel
+                
+                # Validate config file exists
+                if not unet_config_path.exists():
+                    logger.error(f"❌ UNet config file not found: {unet_config_path}")
+                    logger.error(f"   Expected path: {latentsync_dir}/{config_rel}")
                     
-                    if config_found:
-                        # Add --unet_config_path parameter if script supports it
-                        if "--unet_config_path" not in cmd:
-                            # Insert before the last argument (output path)
-                            cmd.insert(-1, "--unet_config_path")
-                            cmd.insert(-1, str(config_found))
-                            logger.info(f"📋 Found and added config file: {config_found}")
-                    else:
-                        logger.warning(f"⚠️ Config file not found - checked multiple locations:")
-                        logger.warning(f"   - {repo_root}/scripts/configs/unet.yaml")
-                        logger.warning(f"   - {repo_root}/scripts/configs/unet/*.yaml")
-                        logger.warning(f"   - {repo_root}/configs/unet/*.yaml")
-                        logger.warning(f"   Script may fail without config file")
+                    # List available config files for helpful error message
+                    configs_dir = latentsync_dir / "configs"
+                    if configs_dir.exists():
+                        logger.info(f"📋 Searching for available config files in: {configs_dir}")
+                        try:
+                            # Walk configs directory and find all .yaml files
+                            yaml_files = []
+                            for root, dirs, files in os.walk(configs_dir):
+                                for file in files:
+                                    if file.endswith(('.yaml', '.yml')):
+                                        rel_path = Path(root).relative_to(latentsync_dir)
+                                        yaml_files.append(str(rel_path / file))
+                            
+                            if yaml_files:
+                                logger.info(f"   Found {len(yaml_files)} YAML config file(s):")
+                                # Show top 10 candidates
+                                for yaml_file in sorted(yaml_files)[:10]:
+                                    logger.info(f"     - {yaml_file}")
+                                if len(yaml_files) > 10:
+                                    logger.info(f"     ... and {len(yaml_files) - 10} more")
+                                
+                                # Suggest a likely candidate
+                                unet_configs = [f for f in yaml_files if "unet" in f.lower()]
+                                if unet_configs:
+                                    suggested = unet_configs[0]
+                                    logger.info(f"💡 Suggested config: {suggested}")
+                                    logger.info(f"   Set LATENTSYNC_UNET_CONFIG_REL={suggested}")
+                            else:
+                                logger.warning(f"   No YAML files found in {configs_dir}")
+                        except Exception as e:
+                            logger.warning(f"   Could not list config files: {e}")
+                    
+                    logger.error(f"❌ Cannot proceed without config file")
+                    return False
+                
+                # Add --unet_config_path parameter
+                cmd.extend(["--unet_config_path", str(unet_config_path)])
+                logger.info(f"📋 Using UNet config file: {unet_config_path}")
                 
                 # Run subprocess and capture output
                 try:
@@ -589,10 +601,10 @@ class LatentSyncRunner:
                         log_f.write(f"LatentSync Execution Log\n")
                         log_f.write(f"{'='*60}\n")
                         log_f.write(f"Command: {' '.join(cmd)}\n")
-                        log_f.write(f"Working Directory: {script_dir}\n")
+                        log_f.write(f"Working Directory: {working_dir}\n")
                         log_f.write(f"Python Executable: {python_exe}\n")
-                        if latentsync_repo_root:
-                            log_f.write(f"PYTHONPATH: {env.get('PYTHONPATH', 'Not set')}\n")
+                        log_f.write(f"LATENTSYNC_DIR: {latentsync_dir}\n")
+                        log_f.write(f"PYTHONPATH: {env.get('PYTHONPATH', 'Not set')}\n")
                         log_f.write(f"Input Video: {video_in}\n")
                         log_f.write(f"Input Audio: {audio_in}\n")
                         log_f.write(f"Output Video: {video_out}\n")
@@ -607,7 +619,7 @@ class LatentSyncRunner:
                             stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT,  # Combine stderr into stdout
                             text=True,
-                            cwd=str(working_dir),  # Use repo root, not scripts directory
+                            cwd=str(working_dir),  # Use LATENTSYNC_DIR as cwd
                             env=env,  # Pass environment with PYTHONPATH
                             bufsize=1,  # Line buffered
                             universal_newlines=True
