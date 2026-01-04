@@ -18,10 +18,15 @@ logger = logging.getLogger(__name__)
 
 try:
     import mediapipe as mp
-    MEDIAPIPE_AVAILABLE = True
+    # Verify MediaPipe is properly installed by checking for solutions module
+    if hasattr(mp, 'solutions'):
+        MEDIAPIPE_AVAILABLE = True
+    else:
+        MEDIAPIPE_AVAILABLE = False
+        logger.warning("⚠️ MediaPipe installed but 'solutions' module not available. Falling back to OpenCV.")
 except ImportError:
     MEDIAPIPE_AVAILABLE = False
-    logger.warning("⚠️ MediaPipe not available, falling back to OpenCV face detection")
+    logger.debug("MediaPipe not available, will use OpenCV face detection")
 
 try:
     from insightface import app as insightface_app
@@ -75,6 +80,10 @@ class FaceAligner:
         """Initialize face detection model based on method."""
         if self.detection_method == "mediapipe" and MEDIAPIPE_AVAILABLE:
             try:
+                # Check if MediaPipe has solutions module
+                if not hasattr(mp, 'solutions'):
+                    raise AttributeError("MediaPipe 'solutions' module not available. Install with: pip install mediapipe")
+                
                 self.mp_face_detection = mp.solutions.face_detection
                 self.mp_drawing = mp.solutions.drawing_utils
                 self.face_detector = self.mp_face_detection.FaceDetection(
@@ -82,6 +91,11 @@ class FaceAligner:
                     min_detection_confidence=self.min_confidence
                 )
                 logger.info("✅ Initialized MediaPipe face detection")
+            except (AttributeError, ImportError) as e:
+                logger.warning(f"⚠️ Failed to initialize MediaPipe: {e}")
+                logger.info("💡 Falling back to OpenCV face detection. To use MediaPipe, install: pip install mediapipe")
+                self.detection_method = "opencv"
+                MEDIAPIPE_AVAILABLE = False  # Mark as unavailable
             except Exception as e:
                 logger.warning(f"⚠️ Failed to initialize MediaPipe: {e}, falling back to OpenCV")
                 self.detection_method = "opencv"
