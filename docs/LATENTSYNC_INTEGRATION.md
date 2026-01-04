@@ -14,8 +14,13 @@ Add these environment variables to your `.env` file:
 # Enable/disable LatentSync (default: false)
 LATENTSYNC_ENABLED=true
 
-# Path to LatentSync model directory
-LATENTSYNC_MODEL_PATH=/path/to/latentsync/models
+# Path to LatentSync model directory OR Hugging Face model ID
+# Examples:
+#   - Local path: /path/to/latentsync/models
+#   - Hugging Face ID: ByteDance/LatentSync-1.6
+# If not set, defaults to: ByteDance/LatentSync-1.6
+# Models are automatically downloaded from Hugging Face on first use
+LATENTSYNC_MODEL_PATH=ByteDance/LatentSync-1.6
 
 # Device to use (cuda or cpu)
 LATENTSYNC_DEVICE=cuda
@@ -31,6 +36,20 @@ LATENTSYNC_FP16=true
 
 # Save debug frames during processing
 LATENTSYNC_DEBUG_FRAMES=false
+```
+
+### Automatic Model Download
+
+LatentSync models are automatically downloaded from Hugging Face on first use, similar to WAN models:
+
+- **Hugging Face Model ID**: Set `LATENTSYNC_MODEL_PATH` to a Hugging Face model ID (e.g., `ByteDance/LatentSync-1.6`)
+- **Local Path**: Set `LATENTSYNC_MODEL_PATH` to a local directory path
+- **Auto-download**: If a local path doesn't exist, the system will attempt to download from Hugging Face
+- **Cache Location**: Models are cached in `/workspace/.cache/huggingface` (if available) or `~/.cache/huggingface`
+
+**Requirements**: Install `huggingface_hub` for automatic downloads:
+```bash
+pip install huggingface_hub
 ```
 
 ## Scene JSON Schema

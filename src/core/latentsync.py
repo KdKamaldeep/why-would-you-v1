@@ -17,6 +17,21 @@ import json
 logger = logging.getLogger(__name__)
 
 
+def get_cache_dir() -> str:
+    """
+    Get the cache directory for Hugging Face models.
+    Always uses /workspace/.cache/huggingface (creates if needed).
+    
+    Returns:
+        Cache directory path as string
+    """
+    workspace_cache = Path("/workspace/.cache/huggingface")
+    workspace_cache.mkdir(parents=True, exist_ok=True)
+    # Set HF_HOME environment variable as well
+    os.environ["HF_HOME"] = str(workspace_cache)
+    return str(workspace_cache)
+
+
 class LatentSyncRunner:
     """
     Wrapper for LatentSync lip synchronization.
@@ -66,11 +81,50 @@ class LatentSyncRunner:
             logger.warning("⚠️ LATENTSYNC_MODEL_PATH not set")
             return False
         
-        # Check if model path exists
+        # Check if model_path is a Hugging Face model ID (contains '/')
+        # or if it's a local path that doesn't exist yet
+        is_hf_model_id = '/' in self.model_path and not Path(self.model_path).exists()
         model_dir = Path(self.model_path)
-        if not model_dir.exists():
-            logger.warning(f"⚠️ LatentSync model path does not exist: {self.model_path}")
+        
+        if is_hf_model_id or not model_dir.exists():
+            # Try to download from Hugging Face
+            if is_hf_model_id:
+                logger.info(f"📥 Detected Hugging Face model ID: {self.model_path}")
+                logger.info("🔄 Will download model automatically on first use")
+            else:
+                logger.info(f"📥 Model path does not exist: {self.model_path}")
+                logger.info("🔄 Attempting to download from Hugging Face...")
+            
+            # Download model from Hugging Face
+            downloaded_path = self._download_model_from_hf(self.model_path)
+            if downloaded_path:
+                self.model_path = downloaded_path
+                model_dir = Path(self.model_path)
+            else:
+                logger.warning(f"⚠️ Could not download LatentSync model: {self.model_path}")
+                return False
+        
+        # Verify model directory exists and contains expected files
+        if not model_dir.exists() or not model_dir.is_dir():
+            logger.warning(f"⚠️ LatentSync model path is not a valid directory: {self.model_path}")
             return False
+        
+        # Check for common LatentSync model files
+        expected_files = [
+            "latentsync_unet.pt",
+            "inference.py",
+            "config.json"
+        ]
+        has_any_file = any((model_dir / f).exists() for f in expected_files)
+        
+        if not has_any_file:
+            # Check for subdirectories that might contain the model
+            has_subdirs = any(d.is_dir() for d in model_dir.iterdir())
+            if not has_subdirs:
+                logger.warning(f"⚠️ LatentSync model directory exists but doesn't contain expected files: {self.model_path}")
+                logger.warning("⚠️ Model may need to be downloaded manually")
+                # Still return True - let the actual loading handle errors
+                return True
         
         # Try to import LatentSync (optional - may use CLI instead)
         try:
@@ -80,6 +134,69 @@ class LatentSyncRunner:
         except Exception as e:
             logger.warning(f"⚠️ Could not verify LatentSync availability: {e}")
             return False
+    
+    def _download_model_from_hf(self, model_id_or_path: str) -> Optional[str]:
+        """
+        Download LatentSync model from Hugging Face if needed.
+        
+        Args:
+            model_id_or_path: Hugging Face model ID (e.g., "ByteDance/LatentSync-1.6") or local path
+            
+        Returns:
+            Path to downloaded model directory, or None if download failed
+        """
+        try:
+            from huggingface_hub import snapshot_download
+        except ImportError:
+            logger.warning("⚠️ huggingface_hub not available - cannot download models automatically")
+            logger.info("💡 Install with: pip install huggingface_hub")
+            return None
+        
+        # Determine if it's a Hugging Face model ID
+        is_hf_id = '/' in model_id_or_path and not Path(model_id_or_path).exists()
+        
+        if not is_hf_id:
+            # It's a local path that doesn't exist - try common HF model IDs
+            logger.info("💡 Trying default LatentSync model from Hugging Face: ByteDance/LatentSync-1.6")
+            model_id = "ByteDance/LatentSync-1.6"
+        else:
+            model_id = model_id_or_path
+        
+        # Get cache directory (always uses /workspace/.cache/huggingface)
+        cache_dir = get_cache_dir()
+        logger.info(f"📁 Using Hugging Face cache directory: {cache_dir}")
+        
+        # Determine download location
+        if is_hf_id:
+            # For Hugging Face model IDs, use cache directory
+            download_dir = Path(cache_dir) / "hub" / model_id.replace("/", "--")
+        else:
+            # For local paths that don't exist, download to cache directory
+            download_dir = Path(cache_dir) / "hub" / model_id.replace("/", "--")
+            logger.info(f"💡 Local path doesn't exist, downloading to cache: {download_dir}")
+        
+        download_dir.parent.mkdir(parents=True, exist_ok=True)
+        
+        try:
+            logger.info(f"📥 Downloading LatentSync model: {model_id}")
+            logger.info(f"📁 Download location: {download_dir}")
+            logger.info("⏳ This may take a while on first run...")
+            
+            downloaded_path = snapshot_download(
+                repo_id=model_id,
+                local_dir=str(download_dir),
+                local_dir_use_symlinks=False,
+                resume_download=True,
+            )
+            
+            logger.info(f"✅ LatentSync model downloaded to: {downloaded_path}")
+            return downloaded_path
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to download LatentSync model: {e}")
+            logger.info("💡 You can download manually using:")
+            logger.info(f"   huggingface-cli download {model_id} --local-dir {download_dir}")
+            return None
     
     def run(
         self,
@@ -416,6 +533,9 @@ def get_latentsync_runner() -> Optional[LatentSyncRunner]:
     """
     Factory function to create LatentSyncRunner from environment/config.
     
+    Supports both local paths and Hugging Face model IDs.
+    Models will be automatically downloaded from Hugging Face on first use.
+    
     Returns:
         LatentSyncRunner instance if enabled and available, None otherwise
     """
@@ -427,8 +547,9 @@ def get_latentsync_runner() -> Optional[LatentSyncRunner]:
     
     model_path = os.getenv("LATENTSYNC_MODEL_PATH", "")
     if not model_path:
-        logger.warning("⚠️ LATENTSYNC_ENABLED=true but LATENTSYNC_MODEL_PATH not set")
-        return None
+        # Try default Hugging Face model ID
+        logger.info("💡 LATENTSYNC_MODEL_PATH not set, using default: ByteDance/LatentSync-1.6")
+        model_path = "ByteDance/LatentSync-1.6"
     
     device = os.getenv("LATENTSYNC_DEVICE", "cuda")
     face_mode = os.getenv("LATENTSYNC_FACE_MODE", "auto")
