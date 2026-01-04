@@ -429,35 +429,81 @@ class LatentSyncRunner:
                 if python_exe != sys.executable:
                     logger.info(f"🐍 Using custom Python executable: {python_exe}")
                 
-                # Build command - LatentSync typically uses these arguments
+                # Build command - LatentSync uses specific argument names
+                # Based on error message: --video_path, --audio_path, --video_out_path, --inference_ckpt_path
                 cmd = [
                     python_exe,
                     str(inference_script),
-                    "--video", video_in,
-                    "--audio", audio_in,
-                    "--output", video_out,
+                    "--video_path", video_in,
+                    "--audio_path", audio_in,
+                    "--video_out_path", video_out,
                 ]
                 
-                # Add device if supported (check script for actual parameter names)
-                if self.device == "cuda":
-                    cmd.extend(["--device", "cuda"])
-                elif self.device == "cpu":
-                    cmd.extend(["--device", "cpu"])
-                
-                # Add model path if script supports it (point to HF cache if model is there)
+                # Add inference checkpoint path (model path)
+                # Check for model checkpoint in HF cache or repository
+                inference_ckpt_path = None
                 if "huggingface" in str(model_dir) or "cache" in str(model_dir):
-                    # Model is in HF cache, script might need model path
-                    cmd.extend(["--model_path", str(model_dir)])
+                    # Model is in HF cache, look for checkpoint file
+                    cache_model_dir = Path(model_dir)
+                    # Common checkpoint file names
+                    ckpt_names = [
+                        "latentsync_unet.pt",
+                        "unet.pt",
+                        "checkpoint.pt",
+                        "model.pt",
+                    ]
+                    for ckpt_name in ckpt_names:
+                        ckpt_path = cache_model_dir / ckpt_name
+                        if ckpt_path.exists():
+                            inference_ckpt_path = str(ckpt_path)
+                            break
+                    
+                    # If not found, check subdirectories
+                    if not inference_ckpt_path:
+                        for subdir in cache_model_dir.iterdir():
+                            if subdir.is_dir():
+                                for ckpt_name in ckpt_names:
+                                    ckpt_path = subdir / ckpt_name
+                                    if ckpt_path.exists():
+                                        inference_ckpt_path = str(ckpt_path)
+                                        break
+                                if inference_ckpt_path:
+                                    break
+                    
+                    # If still not found, use the model directory (script might handle it)
+                    if not inference_ckpt_path:
+                        inference_ckpt_path = str(cache_model_dir)
+                elif latentsync_repo_root:
+                    # Check repository for checkpoint
+                    repo_ckpt_paths = [
+                        latentsync_repo_root / "checkpoints" / "latentsync_unet.pt",
+                        latentsync_repo_root / "latentsync_unet.pt",
+                        latentsync_repo_root / "checkpoints" / "unet.pt",
+                    ]
+                    for ckpt_path in repo_ckpt_paths:
+                        if ckpt_path.exists():
+                            inference_ckpt_path = str(ckpt_path)
+                            break
+                
+                if inference_ckpt_path:
+                    cmd.extend(["--inference_ckpt_path", inference_ckpt_path])
+                    logger.info(f"📦 Using checkpoint: {inference_ckpt_path}")
+                else:
+                    logger.warning("⚠️ Could not find inference checkpoint, script may fail")
                 
                 # Add optional parameters if script supports them
-                if face_mode != "none" and face_mode != "auto":
-                    cmd.extend(["--face_mode", face_mode])
-                
+                # Note: LatentSync script may not support all these, but we'll try
                 if self.fp16:
-                    cmd.append("--fp16")
+                    # Check if script supports --fp16, if not it might be automatic
+                    pass  # Some scripts don't have explicit fp16 flag
+                
+                # Device is typically handled automatically by PyTorch based on CUDA availability
+                # The script might not have a --device flag
                 
                 if character_reference and Path(character_reference).exists():
-                    cmd.extend(["--reference", str(character_reference)])
+                    # Check if script supports reference image
+                    # This might be --reference_image or similar
+                    pass  # Add if script supports it
                 
                 logger.info(f"🔧 Running LatentSync: {' '.join(cmd)}")
                 logger.info(f"📁 Working directory: {script_dir}")

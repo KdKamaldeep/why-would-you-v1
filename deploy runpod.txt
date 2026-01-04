@@ -1,7 +1,8 @@
 ssh-keygen -t rsa -b 4096 -C "kdkamaldeep2@gmail.com" && cat ~/.ssh/id_rsa.pub
 
 git clone https://github.com/bytedance/LatentSync.git /workspace/LatentSync
-cd /workspace/LatentSync && pip install -r requirements.txt
+in diff env named lnv under  /workspace/LatentSync cd /workspace/LatentSync && pip install -r requirements.txt
+
 apt update
 apt install ffmpeg -y
 
