@@ -457,7 +457,10 @@ class VideoProcessor:
                     concat_inputs.append(output_label)
                 
                 # Concatenate all faded clips
-                concat_filter = f"{''.join(concat_inputs)}concat=n={len(clips)}:v=1:a=0[vout]"
+                # Format: [v0][v1][v2]concat=n=3:v=1:a=0[vout]
+                concat_inputs_str = "".join([f"[{label}]" for label in concat_inputs])
+                concat_filter = f"{concat_inputs_str}concat=n={len(clips)}:v=1:a=0[vout]"
+
                 filter_parts.append(concat_filter)
                 filter_complex = ";".join(filter_parts)
                 
