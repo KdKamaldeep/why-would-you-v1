@@ -12,7 +12,7 @@
           "duration": 6,
           "num_frames": 96,
           "visual_reference": "identity_anchor_mathematician.png",
-          "visual_prompt": "Medium close-up of the SAME ancient Indian mathematician walking slowly toward the camera along a stone corridor inspired by Nalanda University. Male, early 30s, short beard, calm but confident face, simple cotton robe, holding palm-leaf manuscripts. Speaking directly to the camera while walking.",
+          "visual_prompt": "Medium close-up of the ancient Indian mathematician walking slowly toward the camera along a stone corridor inspired by Nalanda University. Male, early 30s, short beard, calm but confident face, simple cotton robe, holding palm-leaf manuscripts. Speaking directly to the camera while walking.",
           "motion_prompt": "slow forward walk, smooth camera tracking backward at chest height, natural head and hand movement while speaking, stable framing",
           "narration": "हर कोई अंकों को जानता है। एक, दो, तीन। लेकिन इतिहास यह पूछना भूल गया कि शून्य कहाँ से आया।"
         },
@@ -21,7 +21,7 @@
           "duration": 6,
           "num_frames": 96,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium shot of the SAME mathematician continuing to walk through an ancient courtyard with stone pillars and scholars behind him. He keeps eye contact with the camera while walking.",
+          "visual_prompt": "Medium shot of the ancient mathematician continuing to walk through an ancient courtyard with stone pillars and scholars behind him. He keeps eye contact with the camera while walking.",
           "motion_prompt": "steady walking pace, smooth camera tracking, subtle background scholar movement",
           "narration": "यह यूरोप से नहीं आया। शून्य का जन्म यहीं हुआ — भारत में।"
         }
