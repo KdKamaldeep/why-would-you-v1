@@ -4,15 +4,7 @@
       "title": "Example Story with Lip Sync",
       "description": "Demonstrates lip sync scene configuration",
       "scenes": [
-        {
-          "id": "scene_01_narration_only",
-          "duration": 5,
-          "num_frames": 60,
-          "visual_prompt": "Wide shot of a beautiful landscape with mountains in the background, cinematic lighting",
-          "negative_prompt": "text, watermark, blurry",
-          "narration": "This is a narration-only scene without lip sync.",
-          "lip_sync": false
-        },
+        
         {
           "id": "scene_02_character_talking",
           "duration": 8,
@@ -48,15 +40,6 @@
           },
           "dialogue": "The key to success is understanding your audience.",
           "character_reference_image": null
-        },
-        {
-          "id": "scene_04_wide_shot_no_lipsync",
-          "duration": 4,
-          "num_frames": 48,
-          "visual_prompt": "Wide establishing shot of a city skyline at sunset, no people visible",
-          "negative_prompt": "text, watermark",
-          "narration": "And that's how the story ends.",
-          "lip_sync": false
         }
       ],
       "total_duration": 23
