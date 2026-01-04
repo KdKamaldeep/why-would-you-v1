@@ -376,41 +376,88 @@ class LatentSyncRunner:
         except ImportError:
             pass
         
-        # Option 2: Try repository inference.py script
-        inference_script = model_dir / "inference.py"
-        if inference_script.exists():
+        # Option 2: Try repository inference script (check multiple common names and locations)
+        inference_scripts = [
+            model_dir / "inference.py",
+            model_dir / "infer.py",
+            model_dir / "run_inference.py",
+            model_dir / "scripts" / "inference.py",
+            model_dir / "scripts" / "infer.py",
+            model_dir / "scripts" / "interface.py",  # User mentioned this location
+            model_dir / "scripts" / "run_inference.py",
+        ]
+        
+        # Also check if model_dir is the Hugging Face cache, look for repo in /workspace/LatentSync
+        if "huggingface" in str(model_dir) or "cache" in str(model_dir):
+            workspace_repo = Path("/workspace/LatentSync")
+            if workspace_repo.exists():
+                inference_scripts.extend([
+                    workspace_repo / "inference.py",
+                    workspace_repo / "infer.py",
+                    workspace_repo / "scripts" / "inference.py",
+                    workspace_repo / "scripts" / "infer.py",
+                    workspace_repo / "scripts" / "interface.py",
+                    workspace_repo / "scripts" / "run_inference.py",
+                ])
+                logger.info(f"💡 Model in cache, checking repository at: {workspace_repo}")
+        
+        inference_script = None
+        script_dir = None
+        for script_path in inference_scripts:
+            if script_path.exists():
+                inference_script = script_path
+                script_dir = script_path.parent
+                break
+        
+        if inference_script:
             try:
-                logger.info(f"📝 Found inference.py at: {inference_script}")
+                logger.info(f"📝 Found LatentSync script at: {inference_script}")
+                
+                # Build command - LatentSync typically uses these arguments
                 cmd = [
                     sys.executable,
                     str(inference_script),
                     "--video", video_in,
                     "--audio", audio_in,
                     "--output", video_out,
-                    "--device", self.device,
                 ]
                 
-                # Add optional parameters if supported
-                if face_mode != "none":
+                # Add device if supported (check script for actual parameter names)
+                if self.device == "cuda":
+                    cmd.extend(["--device", "cuda"])
+                elif self.device == "cpu":
+                    cmd.extend(["--device", "cpu"])
+                
+                # Add model path if script supports it (point to HF cache if model is there)
+                if "huggingface" in str(model_dir) or "cache" in str(model_dir):
+                    # Model is in HF cache, script might need model path
+                    cmd.extend(["--model_path", str(model_dir)])
+                
+                # Add optional parameters if script supports them
+                if face_mode != "none" and face_mode != "auto":
                     cmd.extend(["--face_mode", face_mode])
                 
                 if self.fp16:
                     cmd.append("--fp16")
                 
-                if character_reference:
+                if character_reference and Path(character_reference).exists():
                     cmd.extend(["--reference", str(character_reference)])
                 
                 logger.info(f"🔧 Running LatentSync: {' '.join(cmd)}")
+                logger.info(f"📁 Working directory: {script_dir}")
+                
                 result = subprocess.run(
                     cmd,
-                    check=True,
+                    check=False,  # Don't raise exception, handle return code manually
                     capture_output=True,
                     text=True,
-                    cwd=str(model_dir)
+                    cwd=str(script_dir)
                 )
                 
                 if result.returncode == 0:
                     logger.info("✅ LatentSync inference completed successfully")
+                    if result.stdout:
+                        logger.debug(f"LatentSync output: {result.stdout}")
                     return True
                 else:
                     logger.error(f"❌ LatentSync inference failed (exit code {result.returncode})")
@@ -420,13 +467,6 @@ class LatentSyncRunner:
                         logger.info(f"Output: {result.stdout}")
                     return False
                     
-            except subprocess.CalledProcessError as e:
-                logger.error(f"❌ LatentSync subprocess error: {e}")
-                if hasattr(e, 'stderr') and e.stderr:
-                    logger.error(f"Error output: {e.stderr}")
-                if hasattr(e, 'stdout') and e.stdout:
-                    logger.info(f"Output: {e.stdout}")
-                return False
             except Exception as e:
                 logger.error(f"❌ Error running LatentSync inference script: {e}")
                 import traceback
@@ -450,16 +490,23 @@ class LatentSyncRunner:
                 logger.debug(f"Module import attempt failed: {e}")
         
         # Option 4: Fallback - provide helpful error message
-        logger.error("❌ LatentSync not found or not properly configured")
+        logger.error("❌ LatentSync inference script not found")
         logger.error("📋 To use LatentSync, you need to:")
         logger.error("   1. Clone the LatentSync repository:")
-        logger.error("      git clone https://github.com/bytedance/LatentSync.git")
-        logger.error("   2. Set LATENTSYNC_MODEL_PATH to the repository directory")
-        logger.error("   3. Install LatentSync dependencies")
-        logger.error("   4. Or install LatentSync as a Python package: pip install latentsync")
+        logger.error("      git clone https://github.com/bytedance/LatentSync.git /workspace/LatentSync")
+        logger.error("   2. Set LATENTSYNC_MODEL_PATH:")
+        logger.error("      - For repository: LATENTSYNC_MODEL_PATH=/workspace/LatentSync")
+        logger.error("      - For HF model: LATENTSYNC_MODEL_PATH=ByteDance/LatentSync-1.6")
+        logger.error("   3. Install LatentSync dependencies:")
+        logger.error("      cd /workspace/LatentSync && pip install -r requirements.txt")
         logger.error("")
         logger.error(f"💡 Current model path: {self.model_path}")
-        logger.error(f"💡 Looking for: {inference_script}")
+        logger.error(f"💡 Checked for scripts in: {model_dir}")
+        workspace_repo = Path("/workspace/LatentSync")
+        if workspace_repo.exists():
+            logger.error(f"💡 Found repository at: {workspace_repo}")
+        else:
+            logger.error(f"💡 Repository not found at: {workspace_repo}")
         
         # Don't create placeholder - fail explicitly
         return False
