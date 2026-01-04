@@ -400,18 +400,17 @@ class LatentSyncRunner:
         ]
         
         # Also check if model_dir is the Hugging Face cache, look for repo in /workspace/LatentSync
-        if "huggingface" in str(model_dir) or "cache" in str(model_dir):
-            workspace_repo = Path("/workspace/LatentSync")
-            if workspace_repo.exists():
-                inference_scripts.extend([
-                    workspace_repo / "inference.py",
-                    workspace_repo / "infer.py",
-                    workspace_repo / "scripts" / "inference.py",
-                    workspace_repo / "scripts" / "infer.py",
-                    workspace_repo / "scripts" / "interface.py",
-                    workspace_repo / "scripts" / "run_inference.py",
-                ])
-                logger.info(f"💡 Model in cache, checking repository at: {workspace_repo}")
+        workspace_repo = Path("/workspace/LatentSync")
+        if ("huggingface" in str(model_dir) or "cache" in str(model_dir)) and workspace_repo.exists():
+            inference_scripts.extend([
+                workspace_repo / "inference.py",
+                workspace_repo / "infer.py",
+                workspace_repo / "scripts" / "inference.py",
+                workspace_repo / "scripts" / "infer.py",
+                workspace_repo / "scripts" / "interface.py",
+                workspace_repo / "scripts" / "run_inference.py",
+            ])
+            logger.info(f"💡 Model in cache, checking repository at: {workspace_repo}")
         
         inference_script = None
         script_dir = None
@@ -463,25 +462,122 @@ class LatentSyncRunner:
                 logger.info(f"🔧 Running LatentSync: {' '.join(cmd)}")
                 logger.info(f"📁 Working directory: {script_dir}")
                 
-                result = subprocess.run(
-                    cmd,
-                    check=False,  # Don't raise exception, handle return code manually
-                    capture_output=True,
-                    text=True,
-                    cwd=str(script_dir)
-                )
+                # Create log file for LatentSync output
+                output_video_path = Path(video_out)
+                log_file = output_video_path.parent / f"{output_video_path.stem}_latentsync.log"
                 
-                if result.returncode == 0:
-                    logger.info("✅ LatentSync inference completed successfully")
-                    if result.stdout:
-                        logger.debug(f"LatentSync output: {result.stdout}")
-                    return True
-                else:
-                    logger.error(f"❌ LatentSync inference failed (exit code {result.returncode})")
-                    if result.stderr:
-                        logger.error(f"Error output: {result.stderr}")
-                    if result.stdout:
-                        logger.info(f"Output: {result.stdout}")
+                logger.info(f"📝 Saving LatentSync logs to: {log_file}")
+                
+                # Prepare environment variables for subprocess
+                # Add LatentSync repository to PYTHONPATH so imports work
+                env = os.environ.copy()
+                
+                # Find LatentSync repository root (parent of scripts directory or model_dir)
+                latentsync_repo_root = None
+                if script_dir and "scripts" in str(script_dir):
+                    # Script is in scripts/ subdirectory, repo root is parent
+                    latentsync_repo_root = script_dir.parent
+                    logger.info(f"📦 Detected repo root from script location: {latentsync_repo_root}")
+                elif workspace_repo.exists():
+                    latentsync_repo_root = workspace_repo
+                    logger.info(f"📦 Using workspace repository: {latentsync_repo_root}")
+                elif model_dir.exists():
+                    # Check if model_dir is the repo root
+                    if (model_dir / "scripts").exists() or (model_dir / "latentsync").exists():
+                        latentsync_repo_root = model_dir
+                        logger.info(f"📦 Using model directory as repo root: {latentsync_repo_root}")
+                
+                if latentsync_repo_root:
+                    pythonpath = str(latentsync_repo_root)
+                    # Add to existing PYTHONPATH if it exists
+                    if "PYTHONPATH" in env:
+                        env["PYTHONPATH"] = f"{pythonpath}:{env['PYTHONPATH']}"
+                    else:
+                        env["PYTHONPATH"] = pythonpath
+                    logger.info(f"🐍 Setting PYTHONPATH to include: {latentsync_repo_root}")
+                
+                # Run subprocess and capture output
+                try:
+                    with open(log_file, 'w', encoding='utf-8') as log_f:
+                        # Write header
+                        log_f.write(f"LatentSync Execution Log\n")
+                        log_f.write(f"{'='*60}\n")
+                        log_f.write(f"Command: {' '.join(cmd)}\n")
+                        log_f.write(f"Working Directory: {script_dir}\n")
+                        log_f.write(f"Python Executable: {python_exe}\n")
+                        if latentsync_repo_root:
+                            log_f.write(f"PYTHONPATH: {env.get('PYTHONPATH', 'Not set')}\n")
+                        log_f.write(f"Input Video: {video_in}\n")
+                        log_f.write(f"Input Audio: {audio_in}\n")
+                        log_f.write(f"Output Video: {video_out}\n")
+                        log_f.write(f"{'='*60}\n\n")
+                        log_f.flush()
+                        
+                        # Run subprocess with real-time logging
+                        result = subprocess.run(
+                            cmd,
+                            check=False,  # Don't raise exception, handle return code manually
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT,  # Combine stderr into stdout
+                            text=True,
+                            cwd=str(script_dir),
+                            env=env,  # Pass environment with PYTHONPATH
+                            bufsize=1,  # Line buffered
+                            universal_newlines=True
+                        )
+                        
+                        # Write output to log file
+                        if result.stdout:
+                            log_f.write("STDOUT/STDERR:\n")
+                            log_f.write(result.stdout)
+                            log_f.write(f"\n{'='*60}\n")
+                            log_f.write(f"Exit Code: {result.returncode}\n")
+                        
+                        # Also log to our logger
+                        if result.stdout:
+                            # Log important lines (filter verbose output)
+                            lines = result.stdout.split('\n')
+                            for line in lines:
+                                line = line.strip()
+                                if not line:
+                                    continue
+                                # Log errors and important messages
+                                if any(keyword in line.lower() for keyword in ['error', 'failed', 'exception', 'traceback', 'warning']):
+                                    logger.warning(f"LatentSync: {line}")
+                                elif any(keyword in line.lower() for keyword in ['success', 'complete', 'done', 'finished']):
+                                    logger.info(f"LatentSync: {line}")
+                                # Log first few lines and last few lines for context
+                                elif len(lines) < 20 or lines.index(line) < 5 or lines.index(line) >= len(lines) - 5:
+                                    logger.debug(f"LatentSync: {line}")
+                    
+                    if result.returncode == 0:
+                        logger.info("✅ LatentSync inference completed successfully")
+                        logger.info(f"📝 Full logs saved to: {log_file}")
+                        return True
+                    else:
+                        logger.error(f"❌ LatentSync inference failed (exit code {result.returncode})")
+                        logger.error(f"📝 Check logs for details: {log_file}")
+                        # Show last few lines of error
+                        if result.stdout:
+                            error_lines = [l for l in result.stdout.split('\n') if l.strip()][-10:]
+                            if error_lines:
+                                logger.error("Last error lines:")
+                                for line in error_lines:
+                                    logger.error(f"  {line}")
+                        return False
+                        
+                except Exception as e:
+                    logger.error(f"❌ Error running LatentSync: {e}")
+                    # Try to write error to log file
+                    try:
+                        with open(log_file, 'a', encoding='utf-8') as log_f:
+                            log_f.write(f"\n\nException occurred: {str(e)}\n")
+                            import traceback
+                            log_f.write(traceback.format_exc())
+                    except:
+                        pass
+                    import traceback
+                    logger.error(traceback.format_exc())
                     return False
                     
             except Exception as e:
