@@ -588,6 +588,44 @@ class CartoonShortsGenerator:
                         else:
                             logger.info(f"✅ Scene {i+1}: Video duration ({actual_duration:.2f}s) already matches audio ({target_audio_duration:.2f}s)")
                     
+                    # Run LatentSync lip sync if audio is available
+                    if not self.config.skip_audio and i < len(scene_audio_paths) and scene_audio_paths[i]:
+                        try:
+                            logger.info(f"🎙️ Scene {i+1}: Running LatentSync lip sync...")
+                            latentsync_output = str(clip_path).replace('.mp4', '_lip_synced.mp4')
+                            
+                            # Get absolute paths
+                            video_path_abs = os.path.abspath(str(video_path))
+                            audio_path_abs = os.path.abspath(scene_audio_paths[i])
+                            latentsync_output_abs = os.path.abspath(latentsync_output)
+                            
+                            # Find sync_bridge.py script (now in src/core)
+                            sync_bridge_script = Path(__file__).parent / "sync_bridge.py"
+                            
+                            if sync_bridge_script.exists():
+                                cmd = [
+                                    sys.executable,
+                                    str(sync_bridge_script),
+                                    '--video_path', video_path_abs,
+                                    '--audio_path', audio_path_abs,
+                                    '--out_path', latentsync_output_abs,
+                                    '--fps', str(self.config.wan_fps),
+                                    '--sr', '16000',
+                                    '--guidance_scale', '1.5'
+                                ]
+                                
+                                result = subprocess.run(cmd, check=False, capture_output=True, text=True)
+                                if result.returncode == 0:
+                                    video_path = latentsync_output
+                                    logger.info(f"✅ Scene {i+1}: LatentSync lip sync completed: {latentsync_output}")
+                                else:
+                                    logger.warning(f"⚠️ Scene {i+1}: LatentSync failed, using original video")
+                                    logger.debug(f"LatentSync stderr: {result.stderr[-500:] if result.stderr else 'No stderr'}")
+                            else:
+                                logger.warning(f"⚠️ Scene {i+1}: sync_bridge.py not found at {sync_bridge_script}, skipping LatentSync")
+                        except Exception as e:
+                            logger.warning(f"⚠️ Scene {i+1}: Error running LatentSync: {e}, using original video")
+                    
                     video_clips.append(video_path)
                     total_video_duration += actual_duration
                     logger.info(f"🎬 Scene {i+1}: Video ready: {video_path} ({actual_duration:.1f}s)")
