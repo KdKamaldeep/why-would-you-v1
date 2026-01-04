@@ -24,42 +24,6 @@
           "visual_prompt": "Medium shot of the ancient mathematician continuing to walk through an ancient courtyard with stone pillars and scholars behind him. He keeps walking forward and continues speaking, mouth clearly moving, occasionally glancing back to the camera.",
           "motion_prompt": "steady walking pace, smooth backward camera tracking, visible speaking mouth movement, subtle footstep rhythm, light background scholar movement",
           "narration": "यह यूरोप से नहीं आया। शून्य का जन्म यहीं हुआ — भारत में।"
-        },
-        {
-          "id": "scene_03_problem_before_zero",
-          "duration": 6,
-          "num_frames": 96,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of the mathematician walking alongside a stone wall carved with faint mathematical symbols. He continues walking and speaking at the same time, using gentle hand gestures to explain, mouth moving naturally.",
-          "motion_prompt": "slow continuous walk, synchronized hand gestures while speaking, visible mouth movement, steady backward camera movement, soft background parallax",
-          "narration": "शून्य से पहले, संख्याएँ चीज़ों को गिन सकती थीं। लेकिन वे ‘कुछ नहीं’ को समझा नहीं सकती थीं।"
-        },
-        {
-          "id": "scene_04_definition",
-          "duration": 6,
-          "num_frames": 96,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of the mathematician walking more slowly now, turning his shoulders slightly toward the camera while still moving forward. Manuscripts and writing tools appear behind him. He continues speaking clearly as he walks.",
-          "motion_prompt": "slower walking pace, gentle camera tracking, clear mouth movement while talking, subtle head emphasis on key words, calm and deliberate motion",
-          "narration": "भारतीय विद्वानों ने शून्य का केवल उपयोग नहीं किया। उन्होंने उसे परिभाषित किया। उसे नियम दिए।"
-        },
-        {
-          "id": "scene_05_world_impact",
-          "duration": 6,
-          "num_frames": 96,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium shot of the mathematician walking confidently past students studying on wooden boards. He continues speaking while walking, mouth moving clearly, expression firm and assured.",
-          "motion_prompt": "smooth confident walking motion, steady backward camera tracking, visible speaking mouth movement, slight increase in background activity, stable framing",
-          "narration": "शून्य के बिना न बीजगणित होता, न विज्ञान, और न ही आधुनिक दुनिया।"
-        },
-        {
-          "id": "scene_06_travel_world",
-          "duration": 6,
-          "num_frames": 96,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of the mathematician walking toward a stone bench beneath a shaded archway. While still speaking, he slows down, turns, and sits on the bench, continuing to talk after sitting. Ancient maps and trade routes are carved into the walls behind him.",
-          "motion_prompt": "slow forward walk transitioning into a gentle stop, natural body movement as he turns and sits down, continuous mouth movement while speaking, camera slows and settles smoothly, robe folds adjust naturally, framing remains stable",
-          "narration": "यह विचार भारत से दुनिया तक पहुँचा — धीरे-धीरे, लेकिन सब कुछ बदलते हुए।"
         }
       ]
     }
