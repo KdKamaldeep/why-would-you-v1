@@ -543,23 +543,44 @@ class LatentSyncRunner:
                     logger.info(f"🐍 Setting PYTHONPATH to include: {latentsync_repo_root}")
                 
                 # Check for config file and add if script supports it
+                # Based on repo structure: configs/unet/stage1.yaml, stage2.yaml, etc.
+                # Also check scripts/configs/unet/ if it exists
                 if repo_root:
                     config_paths = [
+                        # Check scripts/configs/unet/ first (as user mentioned)
+                        repo_root / "scripts" / "configs" / "unet.yaml",
+                        repo_root / "scripts" / "configs" / "unet" / "stage2.yaml",  # Default to stage2
+                        repo_root / "scripts" / "configs" / "unet" / "stage1.yaml",
+                        repo_root / "scripts" / "configs" / "unet" / "stage2_efficient.yaml",
+                        # Check root configs/unet/ (from image structure)
+                        repo_root / "configs" / "unet" / "stage2.yaml",  # Default to stage2
+                        repo_root / "configs" / "unet" / "stage1.yaml",
+                        repo_root / "configs" / "unet" / "stage2_efficient.yaml",
+                        repo_root / "configs" / "unet" / "stage2_512.yaml",
+                        # Fallback to old locations
                         repo_root / "configs" / "unet.yaml",
                         repo_root / "configs" / "unet.yml",
                         repo_root / "config" / "unet.yaml",
                     ]
+                    config_found = None
                     for config_path in config_paths:
                         if config_path.exists():
-                            # Add --unet_config_path parameter if script supports it
-                            if "--unet_config_path" not in cmd:
-                                # Insert before the last argument (output path)
-                                cmd.insert(-1, "--unet_config_path")
-                                cmd.insert(-1, str(config_path))
-                                logger.info(f"📋 Found and added config file: {config_path}")
+                            config_found = config_path
                             break
+                    
+                    if config_found:
+                        # Add --unet_config_path parameter if script supports it
+                        if "--unet_config_path" not in cmd:
+                            # Insert before the last argument (output path)
+                            cmd.insert(-1, "--unet_config_path")
+                            cmd.insert(-1, str(config_found))
+                            logger.info(f"📋 Found and added config file: {config_found}")
                     else:
-                        logger.warning(f"⚠️ Config file not found in {repo_root}/configs/ - script may fail")
+                        logger.warning(f"⚠️ Config file not found - checked multiple locations:")
+                        logger.warning(f"   - {repo_root}/scripts/configs/unet.yaml")
+                        logger.warning(f"   - {repo_root}/scripts/configs/unet/*.yaml")
+                        logger.warning(f"   - {repo_root}/configs/unet/*.yaml")
+                        logger.warning(f"   Script may fail without config file")
                 
                 # Run subprocess and capture output
                 try:
