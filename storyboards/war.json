@@ -1,131 +1,74 @@
 {
   "stories": [
     {
-      "title": "The Photo in the Ardennes",
-      "description": "A World War II soldier talks to the camera as the battle unfolds, in short 6-second scenes for 24fps generation.",
-      "total_duration": 60,
+      "title": "When Zero Was Born in India",
+      "description": "An Indian mathematician walks through history, explaining how zero was invented in India and changed the world.",
+      "total_duration": 40,
       "aspect_ratio": "9:16",
-      "fps": 24,
+      "fps": 16,
       "scenes": [
         {
-          "id": "scene_01_hook_closeup",
+          "id": "scene_01_hook_walk",
           "duration": 6,
-          "num_frames": 144,
-          "visual_reference": "gemini_ref_prev_or_identity_anchor.png",
-          "visual_prompt": "Extreme close-up of the SAME World War II infantry soldier, Elias, speaking directly to the camera. Caucasian male, mid-20s, narrow face, light stubble, small scar above left eyebrow. Frosted M1 helmet, snow on skin, intense eye contact with the lens. Smoke behind him, distant artillery flashes reflecting faintly on his face. Active WWII battlefield.",
-          "motion_prompt": "locked frontal framing, very slow cinematic push-in, natural mouth and jaw movement while speaking, subtle head micro-movements, blinking, visible breath in cold air, faint micro tremor from distant artillery, snow drifting softly, light flicker from off-screen explosions",
-          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
-          "narration": "I’m in the Ardennes right now. It’s freezing."
+          "num_frames": 96,
+          "visual_reference": "identity_anchor_mathematician.png",
+          "visual_prompt": "Medium close-up of the SAME ancient Indian mathematician walking slowly toward the camera along a stone corridor inspired by Nalanda University. Male, early 30s, short beard, calm but confident face, simple cotton robe, holding palm-leaf manuscripts. Speaking directly to the camera while walking.",
+          "motion_prompt": "slow forward walk, smooth camera tracking backward at chest height, natural head and hand movement while speaking, stable framing",
+          "narration": "Everyone knows numbers. One, two, three. But history forgot to ask where zero came from."
         },
         {
-          "id": "scene_02_hook_closeup_impact",
+          "id": "scene_02_origin_india",
           "duration": 6,
-          "num_frames": 144,
+          "num_frames": 96,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Extreme close-up of the SAME soldier Elias still speaking to the camera, eye contact unwavering. Helmet rim frosted, cheeks dirty, breath visible. Smoke thickens behind him and flashes are closer now.",
-          "motion_prompt": "slow push-in continues, subtle facial tension, natural speaking mouth movement, brief soft vibration from distant impact, snow and tiny debris drifting, light flicker intensifies, camera remains stable",
-          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
-          "narration": "Shells keep landing out there. Every second feels like it could be the one."
+          "visual_prompt": "Medium shot of the SAME mathematician continuing to walk through an ancient courtyard with stone pillars and scholars behind him. He keeps eye contact with the camera while walking.",
+          "motion_prompt": "steady walking pace, smooth camera tracking, subtle background scholar movement",
+          "narration": "It didn’t come from Europe. Zero was born here. In India."
         },
         {
-          "id": "scene_03_trench_medium",
+          "id": "scene_03_problem_before_zero",
           "duration": 6,
-          "num_frames": 144,
+          "num_frames": 96,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of the SAME soldier Elias crouched in a muddy trench, speaking directly to the camera. Snow melts on his uniform. Smoke rolls overhead. Sky flashes from artillery.",
-          "motion_prompt": "stabilized handheld with heavy damping, gentle camera sway, natural speaking head movement, smoke surging above trench line, falling snow particles, no aggressive shake",
-          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
-          "narration": "We’re pinned down in this trench. Bullets crack overhead."
+          "visual_prompt": "Medium close-up of the mathematician walking and gesturing gently with one hand. Ancient mathematical markings carved faintly on stone walls.",
+          "motion_prompt": "slow walk, natural hand gestures while explaining, camera steady and centered",
+          "narration": "Before zero, numbers could count things. But they couldn’t explain nothing."
         },
         {
-          "id": "scene_04_trench_fear",
+          "id": "scene_04_definition",
           "duration": 6,
-          "num_frames": 144,
+          "num_frames": 96,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of Elias in the trench, still addressing the camera. Dirt on his face, jaw tight. A nearby blast lights the smoke behind him.",
-          "motion_prompt": "gentle sway, subtle flinch reaction, brief light flicker, controlled micro tremor from distant blasts, natural mouth movement, camera stays centered on face",
-          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
-          "narration": "No clear orders. Nobody even knows who’s still alive."
+          "visual_prompt": "Medium close-up of the mathematician slowing his walk, facing the camera more directly. Manuscripts and writing tools visible behind him.",
+          "motion_prompt": "walk slows almost to a stop, gentle camera settle, subtle head movement",
+          "narration": "Indian scholars didn’t just use zero. They defined it. They gave it rules."
         },
         {
-          "id": "scene_05_hands_photo_find",
+          "id": "scene_05_world_impact",
           "duration": 6,
-          "num_frames": 144,
+          "num_frames": 96,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Close-up of Elias’s gloved hands brushing snow away to reveal a worn black-and-white photograph. Trench wall blurred behind. Dust and snow fall as battle continues.",
-          "motion_prompt": "tight framing on hands, subtle vibration from impacts, snow and dirt particles falling, fingers trembling from cold and stress, camera locked to subject, no sudden movement",
-          "negative_prompt": "text, watermark, logo, readable writing, gore, cartoon",
-          "narration": "Then I see it in the snow. A photograph."
+          "visual_prompt": "Medium shot of the mathematician resuming his walk past students studying. He glances at the camera while moving forward.",
+          "motion_prompt": "smooth walking motion, steady backward camera tracking, light background activity",
+          "narration": "Without zero, there is no algebra. No science. No modern world."
         },
         {
-          "id": "scene_06_hands_photo_meaning",
+          "id": "scene_06_travel_world",
           "duration": 6,
-          "num_frames": 144,
+          "num_frames": 96,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Close-up of the photograph in Elias’s hands. The image shows a smiling face but with no readable text. Dirt smudges on the edges, snow melting on paper.",
-          "motion_prompt": "slow micro push-in, particles drifting, slight tremor, background smoke moving, camera stays locked on the photo",
-          "negative_prompt": "text, watermark, logo, readable writing, gore, cartoon",
-          "narration": "I don’t know whose it is. But they’re smiling like none of this exists."
+          "visual_prompt": "Medium close-up of the mathematician walking as the background subtly suggests maps and trade routes carved into stone.",
+          "motion_prompt": "continuous forward walk, slow parallax in background, stable framing",
+          "narration": "This idea traveled from India to the world, quietly changing everything."
         },
         {
-          "id": "scene_07_back_to_face_warning",
-          "duration": 6,
-          "num_frames": 144,
+          "id": "scene_07_final_address",
+          "duration": 4,
+          "num_frames": 64,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Close-up of Elias back on camera, speaking urgently. Another soldier grabs his sleeve from the side, mostly off-frame. Smoke thickens and flashes grow closer.",
-          "motion_prompt": "controlled handheld framing with heavy damping, natural urgent head movement while speaking, brief soft jolt from nearby impact, smoke pressure wave in background, quickly re-stabilizes",
-          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
-          "narration": "A guy next to me yells, stop staring. Keep your head down."
-        },
-        {
-          "id": "scene_08_change_instant",
-          "duration": 6,
-          "num_frames": 144,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Close-up of Elias as the trench shakes slightly. He looks into the camera, decision locked in his eyes. Light flashes closer, smoke surges.",
-          "motion_prompt": "slow push-in, face remains centered, stronger light flicker, subtle vibration rising, breath quickens, no aggressive shake",
-          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
-          "narration": "Before I can answer… everything changes."
-        },
-        {
-          "id": "scene_09_run_start",
-          "duration": 6,
-          "num_frames": 144,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium-wide shot of Elias launching out of the trench into a snow-filled battlefield. Smoke thick, visibility low, flashes erupting around.",
-          "motion_prompt": "forward sprint, aggressive handheld follow from behind and side, camera shake synced to footsteps, debris and snow blasting past lens, intermittent motion blur, no rotation",
-          "negative_prompt": "text, watermark, logo, gore, cartoon",
-          "narration": "The ground erupts. Mortars everywhere."
-        },
-        {
-          "id": "scene_10_run_tank",
-          "duration": 6,
-          "num_frames": 144,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium-wide battlefield shot: Elias sprinting through smoke while a tank silhouette advances in the distance. Snow and dirt explode from impacts.",
-          "motion_prompt": "full sprint forward, heavier camera shake, brief frame judder from shockwaves, debris blasting across frame, motion blur bursts, no camera spin",
-          "negative_prompt": "text, watermark, logo, gore, cartoon",
-          "narration": "A tank pushes through the smoke. I run without thinking."
-        },
-        {
-          "id": "scene_11_aftershock_face",
-          "duration": 6,
-          "num_frames": 144,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Close-up of Elias moving forward through thinning smoke, speaking directly to the camera again. Face dirty, breath heavy, eyes steady. Dawn light starts to break through haze.",
-          "motion_prompt": "slow forward drift, natural mouth movement while speaking, residual shake fading out, smoke peeling away, warm light emerging, camera stabilizes more each second",
-          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
-          "narration": "I shove the photo inside my jacket. Not for luck."
-        },
-        {
-          "id": "scene_12_final_resolve",
-          "duration": 6,
-          "num_frames": 144,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Extreme close-up of Elias facing the camera, final words. Eyes locked on lens, jaw clenched, dawn light warming his face through smoke.",
-          "motion_prompt": "locked frontal framing, very slow push-in, subtle head micro-movement, breath stabilizing, light flicker fades, snow slows, camera fully stabilized by the end",
-          "negative_prompt": "text, watermark, logo, cartoon, modern gear",
-          "narration": "As proof. Then I keep moving. I’m not stopping here."
+          "visual_prompt": "Close-up of the mathematician stopping his walk and facing the camera directly, warm sunlight touching his face, calm and assured expression.",
+          "motion_prompt": "very slow push-in, minimal head movement, steady camera, gentle robe motion",
+          "narration": "Every time you write zero, you’re using an Indian invention."
         }
       ]
     }
