@@ -1,8 +1,5 @@
 ssh-keygen -t rsa -b 4096 -C "kdkamaldeep2@gmail.com" && cat ~/.ssh/id_rsa.pub
 
-git clone https://github.com/bytedance/LatentSync.git /workspace/LatentSync
-in diff env named lnv under  /workspace/LatentSync cd /workspace/LatentSync && pip install -r requirements.txt
-
 apt update
 apt install ffmpeg -y
 
@@ -37,11 +34,11 @@ python -m src.interfaces.simple_cartoon_generator \
  
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
-  --storyboard storyboards/example_lipsync.json \
+  --storyboard storyboards/wife.json \
   --wan-width 768 \
   --wan-height 1344 \
   --wan-num-frames 25 \
-  --wan-fps 24 \
+  --wan-fps 12 \
   --wan-steps 24 \
   --wan-guidance 6 \
   --gen-bulk
@@ -91,18 +88,8 @@ python scripts/test_wan.py \
   
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-
-python scripts/test_wan_gemini.py \
-  --visual-prompt "Hyper-realistic surreal spectacle. A massive adult elephant flying through the sky with enormous feathered wings seamlessly attached to its shoulders. The wings are powerful and anatomically convincing, layered feathers catching sunlight. The elephant’s body feels heavy and real, ultra-detailed skin texture, veins visible, subtle muscle tension. Thick cinematic clouds part and curl around the wings with realistic airflow. Epic scale, golden-hour lighting, volumetric clouds, believable physics despite impossibility. No cartoon style, no fantasy glow, no symbols. No text, no watermark." \
-  --motion-prompt "slow forward cinematic camera glide slightly below wing level, steady rhythmic wing beats with visible downwash, feathers flexing and rippling under air pressure, clouds pushed downward and outward by wing motion, strong depth parallax between wings body and distant clouds, subtle vertical lift on each downstroke, stable camera with gentle breathing motion, no rotation, no shake, no fast movement" \
-  --steps 30 \
-  --num-frames 49 \
-  --fps 12 \
-  --width 768 \
-  --height 1344
-
-
-python scripts/run_latentsync.py \
-  --video_in output/Example_Story_with_Lip_Sync/scenes/scene_2.mp4 \
-  --audio_in output/Example_Story_with_Lip_Sync/audio_scene_2_pp.wav \
-  --out output/scene_2_lp.mp4
+LATENTSYNC_ENABLED=true
+LATENTSYNC_MODEL_PATH=/workspace/.cache/huggingface/hub/ByteDance--LatentSync-1.6
+LATENTSYNC_DEVICE=cuda
+LATENTSYNC_DIR=/workspace/LatentSync
+LATENTSYNC_PYTHON=/workspace/LatentSync/lnv/bin/python

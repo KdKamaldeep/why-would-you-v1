@@ -402,69 +402,17 @@ class VideoProcessor:
                 for clip in clips:
                     f.write(f"file '{clip}'\n")
             
-            # Check if clips have consistent FPS (needed for -c copy)
-            # If FPS differs, we'll need to re-encode to normalize
-            target_fps = self.config.fps  # Default target FPS
-            need_fps_normalization = False
-            
-            try:
-                fps_values = []
-                for clip in clips:
-                    probe_cmd = [
-                        'ffprobe', '-v', 'error',
-                        '-select_streams', 'v:0',
-                        '-show_entries', 'stream=r_frame_rate',
-                        '-of', 'default=nw=1:nk=1',
-                        clip
-                    ]
-                    result = subprocess.run(probe_cmd, check=True, capture_output=True, text=True)
-                    rate_str = result.stdout.strip()
-                    if '/' in rate_str:
-                        num, den = map(int, rate_str.split('/'))
-                        fps = num / den if den > 0 else target_fps
-                    else:
-                        fps = float(rate_str) if rate_str else target_fps
-                    fps_values.append(fps)
-                
-                # Check if all FPS are the same (within 0.1 tolerance)
-                if fps_values:
-                    avg_fps = sum(fps_values) / len(fps_values)
-                    fps_diff = max(abs(f - avg_fps) for f in fps_values)
-                    if fps_diff > 0.1:
-                        need_fps_normalization = True
-                        target_fps = int(round(avg_fps))
-                        logger.info(f"📊 Clips have different FPS (range: {min(fps_values):.1f}-{max(fps_values):.1f}), normalizing to {target_fps}fps")
-            except Exception as e:
-                logger.warning(f"⚠️ Could not check FPS consistency: {e}, proceeding with copy mode")
-            
             # Concatenate video clips
             temp_video = "temp_video.mp4"
-            if need_fps_normalization:
-                # Re-encode to normalize FPS
-                cmd = [
-                    'ffmpeg', '-y',
-                    '-f', 'concat',
-                    '-safe', '0',
-                    '-i', concat_file,
-                    '-r', str(target_fps),  # Set output FPS
-                    '-c:v', self.config.codec,
-                    '-preset', self.config.preset,
-                    '-crf', str(self.config.crf),
-                    '-pix_fmt', 'yuv420p',
-                    '-movflags', '+faststart',
-                    temp_video
-                ]
-            else:
-                # Fast copy mode (all clips have same format)
-                cmd = [
-                    'ffmpeg', '-y',
-                    '-f', 'concat',
-                    '-safe', '0',
-                    '-i', concat_file,
-                    '-c', 'copy',
-                    '-movflags', '+faststart',  # Ensure moov atom is at front
-                    temp_video
-                ]
+            cmd = [
+                'ffmpeg', '-y',
+                '-f', 'concat',
+                '-safe', '0',
+                '-i', concat_file,
+                '-c', 'copy',
+                '-movflags', '+faststart',  # Ensure moov atom is at front
+                temp_video
+            ]
             
             result = subprocess.run(cmd, check=True, capture_output=True, text=True)
             if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:

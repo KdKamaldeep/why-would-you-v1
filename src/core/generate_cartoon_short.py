@@ -33,7 +33,6 @@ from .wan_t2v import WanT2VGenerator
 from .coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 from .video_processor import VideoProcessor, VideoConfig as VPConfig
 from .gemini_image_generator import GeminiImageGenerator
-from .latentsync import get_latentsync_runner
 
 
 # Load environment variables (try .env first, then config.env as fallback)
@@ -439,42 +438,6 @@ class CartoonShortsGenerator:
                     total_video_duration += existing_duration
                     continue
                 
-                # Validate lip_sync requirements
-                lip_sync_enabled = scene.get('lip_sync', False)
-                if lip_sync_enabled:
-                    visual_prompt = scene.get('visual_prompt', '')
-                    talking_head = scene.get('talking_head', False)
-                    
-                    # Check if prompt suggests face-visible framing
-                    face_keywords = ['close-up', 'closeup', 'medium shot', 'portrait', 'face', 'head', 'talking', 'speaking', 'mouth']
-                    has_face_framing = any(keyword.lower() in visual_prompt.lower() for keyword in face_keywords) or talking_head
-                    
-                    if not has_face_framing:
-                        warning = (
-                            f"Scene {i+1}: lip_sync=true but visual_prompt doesn't suggest face-visible framing. "
-                            f"Lip sync may not work correctly. Consider adding 'close-up' or 'medium shot' to visual_prompt, "
-                            f"or set talking_head=true."
-                        )
-                        logger.warning(f"⚠️ {warning}")
-                
-                # Validate lip_sync requirements before video generation
-                lip_sync_enabled = scene.get('lip_sync', False)
-                if lip_sync_enabled:
-                    visual_prompt = scene.get('visual_prompt', '')
-                    talking_head = scene.get('talking_head', False)
-                    
-                    # Check if prompt suggests face-visible framing
-                    face_keywords = ['close-up', 'closeup', 'medium shot', 'portrait', 'face', 'head', 'talking', 'speaking', 'mouth']
-                    has_face_framing = any(keyword.lower() in visual_prompt.lower() for keyword in face_keywords) or talking_head
-                    
-                    if not has_face_framing:
-                        warning = (
-                            f"Scene {i+1}: lip_sync=true but visual_prompt doesn't suggest face-visible framing. "
-                            f"Lip sync may not work correctly. Consider adding 'close-up' or 'medium shot' to visual_prompt, "
-                            f"or set talking_head=true."
-                        )
-                        logger.warning(f"⚠️ {warning}")
-                
                 # Compose prompt from scene
                 prompt, negative_prompt = self._compose_video_prompt(scene)
                 logger.info(f"🎬 Scene {i+1}: Generating video with prompt ({len(prompt)} characters)")
@@ -617,52 +580,9 @@ class CartoonShortsGenerator:
                         else:
                             logger.info(f"✅ Scene {i+1}: Video duration ({actual_duration:.2f}s) already matches audio ({target_audio_duration:.2f}s)")
                     
-                    # Step 3.5: Apply LatentSync lip sync if enabled and scene requires it
-                    final_video_path = video_path
-                    if not self.config.skip_audio and i < len(scene_audio_paths):
-                        scene_audio = scene_audio_paths[i]
-                        lip_sync_enabled = scene.get('lip_sync', False)
-                        
-                        if lip_sync_enabled:
-                            latentsync_runner = get_latentsync_runner()
-                            if latentsync_runner and latentsync_runner.available:
-                                logger.info(f"💋 Scene {i+1}: Applying LatentSync lip sync...")
-                                
-                                # Prepare output path for lip-synced video
-                                lipsync_video_path = str(clip_path).replace('.mp4', '_lipsync.mp4')
-                                
-                                # Get character reference image if available
-                                character_ref = scene.get('character_reference_image', None)
-                                
-                                # Run LatentSync
-                                result = latentsync_runner.run(
-                                    video_in=str(video_path),
-                                    audio_in=scene_audio,
-                                    video_out=lipsync_video_path,
-                                    keep_fps=True,
-                                    target_fps=self.config.wan_fps,
-                                    character_reference_image=character_ref
-                                )
-                                
-                                if result['success']:
-                                    final_video_path = result['video_path']
-                                    logger.info(f"✅ Scene {i+1}: Lip sync completed ({result['duration_out']:.2f}s @ {result['fps']:.1f}fps)")
-                                    
-                                    if result['warnings']:
-                                        for warning in result['warnings']:
-                                            logger.warning(f"⚠️ Scene {i+1}: {warning}")
-                                else:
-                                    error_msg = result.get('error', 'Unknown error')
-                                    logger.error(f"❌ Scene {i+1}: LatentSync failed: {error_msg}")
-                                    logger.warning(f"⚠️ Scene {i+1}: Falling back to original video (no lip sync)")
-                                    # Continue with original video
-                            else:
-                                if lip_sync_enabled:
-                                    logger.warning(f"⚠️ Scene {i+1}: lip_sync=true but LatentSync not available - skipping")
-                    
-                    video_clips.append(final_video_path)
+                    video_clips.append(video_path)
                     total_video_duration += actual_duration
-                    logger.info(f"🎬 Scene {i+1}: Video ready: {final_video_path} ({actual_duration:.1f}s)")
+                    logger.info(f"🎬 Scene {i+1}: Video ready: {video_path} ({actual_duration:.1f}s)")
                 except Exception as e:
                     logger.error(f"❌ Error generating video for scene {i+1}: {e}")
                     raise
