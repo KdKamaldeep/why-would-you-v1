@@ -262,21 +262,42 @@ class LatentSyncRunner:
             result["error"] = error_msg
             return result
         
-        # Validate inputs
-        video_path = Path(video_in)
-        audio_path = Path(audio_in)
+        # Convert all paths to absolute paths to avoid issues with cwd
+        # Store original paths for logging
+        video_in_original = video_in
+        audio_in_original = audio_in
+        video_out_original = video_out
         
+        video_path = Path(video_in).resolve()
+        audio_path = Path(audio_in).resolve()
+        video_out_path = Path(video_out).resolve()
+        
+        # Log path resolution
+        if str(video_path) != video_in_original:
+            logger.debug(f"📁 Resolved video path: {video_in_original} -> {video_path}")
+        if str(audio_path) != audio_in_original:
+            logger.debug(f"📁 Resolved audio path: {audio_in_original} -> {audio_path}")
+        if str(video_out_path) != video_out_original:
+            logger.debug(f"📁 Resolved output path: {video_out_original} -> {video_out_path}")
+        
+        # Validate inputs exist
         if not video_path.exists():
-            error_msg = f"Input video not found: {video_in}"
+            error_msg = f"Input video not found: {video_in_original}"
             logger.error(f"❌ {error_msg}")
+            logger.error(f"   Resolved path: {video_path}")
             result["error"] = error_msg
             return result
         
         if not audio_path.exists():
-            error_msg = f"Input audio not found: {audio_in}"
+            error_msg = f"Input audio not found: {audio_in_original}"
             logger.error(f"❌ {error_msg}")
+            logger.error(f"   Resolved path: {audio_path}")
             result["error"] = error_msg
             return result
+        
+        # Ensure output directory exists
+        video_out_path.parent.mkdir(parents=True, exist_ok=True)
+        logger.debug(f"📁 Ensured output directory exists: {video_out_path.parent}")
         
         # Get input video duration and FPS
         try:
@@ -309,21 +330,18 @@ class LatentSyncRunner:
                 result["warnings"].append(warning)
                 # Continue anyway - let LatentSync handle it
         
-        # Create output directory
-        output_path = Path(video_out)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
+        # Output directory already created above, continue with LatentSync processing
         
         # Run LatentSync
         try:
-            logger.info(f"🎬 Running LatentSync: {video_in} + {audio_in} -> {video_out}")
+            logger.info(f"🎬 Running LatentSync: {video_in_original} + {audio_in_original} -> {video_out_original}")
             logger.info(f"   Face mode: {face_mode}, FPS: {result['fps']}")
             
-            # Call LatentSync implementation
-            # This is a placeholder - actual implementation depends on LatentSync API
+            # Call LatentSync implementation with absolute paths
             success = self._run_latentsync(
                 video_in=str(video_path),
                 audio_in=str(audio_path),
-                video_out=str(output_path),
+                video_out=str(video_out_path),
                 face_mode=face_mode,
                 target_fps=result["fps"],
                 character_reference=character_reference_image
@@ -335,16 +353,18 @@ class LatentSyncRunner:
                 result["error"] = error_msg
                 return result
             
-            # Verify output
-            if not output_path.exists() or output_path.stat().st_size == 0:
+            # Verify output (video_out is already absolute path)
+            video_out_abs_path = Path(video_out)
+            if not video_out_abs_path.exists() or video_out_abs_path.stat().st_size == 0:
                 error_msg = "LatentSync output file is missing or empty"
                 logger.error(f"❌ {error_msg}")
+                logger.error(f"   Expected path: {video_out_abs_path}")
                 result["error"] = error_msg
                 return result
             
             # Get output video info
             try:
-                duration_out, fps_out = self._get_video_info(str(output_path))
+                duration_out, fps_out = self._get_video_info(str(video_out_abs_path))
                 result["duration_out"] = duration_out
                 result["fps"] = fps_out
                 
@@ -354,6 +374,7 @@ class LatentSyncRunner:
                 result["warnings"].append(f"Could not read output video metadata: {e}")
             
             result["success"] = True
+            result["video_path"] = str(video_out_abs_path)  # Return absolute path
             return result
             
         except Exception as e:
@@ -438,15 +459,25 @@ class LatentSyncRunner:
                 
                 # Build command using module-style invocation: python -m scripts.inference
                 # This ensures proper module resolution
+                # Use absolute paths to avoid issues with cwd=/workspace/LatentSync
+                # video_in, audio_in, video_out are already absolute paths from run() method
                 script_module = f"scripts.{script_module_name}"
+                video_in_abs = video_in  # Already absolute
+                audio_in_abs = audio_in  # Already absolute
+                video_out_abs = video_out  # Already absolute
+                
                 cmd = [
                     python_exe,
                     "-m",
                     script_module,
-                    "--video_path", video_in,
-                    "--audio_path", audio_in,
-                    "--video_out_path", video_out,
+                    "--video_path", video_in_abs,
+                    "--audio_path", audio_in_abs,
+                    "--video_out_path", video_out_abs,
                 ]
+                
+                logger.info(f"📹 Input video (absolute): {video_in_abs}")
+                logger.info(f"🔊 Input audio (absolute): {audio_in_abs}")
+                logger.info(f"📹 Output video (absolute): {video_out_abs}")
                 
                 # Add inference checkpoint path (model path)
                 # Check for model checkpoint in HF cache or repository
@@ -522,9 +553,9 @@ class LatentSyncRunner:
                 logger.info(f"📁 Working directory: {working_dir}")
                 logger.info(f"📁 LatentSync repository: {latentsync_dir}")
                 
-                # Create log file for LatentSync output
-                output_video_path = Path(video_out)
-                log_file = output_video_path.parent / f"{output_video_path.stem}_latentsync.log"
+                # Create log file for LatentSync output (use absolute path)
+                video_out_abs_path = Path(video_out)
+                log_file = video_out_abs_path.parent / f"{video_out_abs_path.stem}_latentsync.log"
                 
                 logger.info(f"📝 Saving LatentSync logs to: {log_file}")
                 
@@ -605,9 +636,9 @@ class LatentSyncRunner:
                         log_f.write(f"Python Executable: {python_exe}\n")
                         log_f.write(f"LATENTSYNC_DIR: {latentsync_dir}\n")
                         log_f.write(f"PYTHONPATH: {env.get('PYTHONPATH', 'Not set')}\n")
-                        log_f.write(f"Input Video: {video_in}\n")
-                        log_f.write(f"Input Audio: {audio_in}\n")
-                        log_f.write(f"Output Video: {video_out}\n")
+                        log_f.write(f"Input Video (absolute): {video_in_abs}\n")
+                        log_f.write(f"Input Audio (absolute): {audio_in_abs}\n")
+                        log_f.write(f"Output Video (absolute): {video_out_abs}\n")
                         log_f.write(f"{'='*60}\n\n")
                         log_f.flush()
                         
