@@ -25,6 +25,11 @@ LATENTSYNC_MODEL_PATH=ByteDance/LatentSync-1.6
 # Device to use (cuda or cpu)
 LATENTSYNC_DEVICE=cuda
 
+# Python executable for LatentSync (optional - use if LatentSync is in different virtualenv)
+# Example: /workspace/latentsync_venv/bin/python
+# If not set, uses the current Python interpreter (sys.executable)
+LATENTSYNC_PYTHON=/workspace/latentsync_venv/bin/python
+
 # Face detection mode (auto, manual, none)
 LATENTSYNC_FACE_MODE=auto
 

@@ -1,6 +1,7 @@
 ssh-keygen -t rsa -b 4096 -C "kdkamaldeep2@gmail.com" && cat ~/.ssh/id_rsa.pub
 
 git clone https://github.com/bytedance/LatentSync.git /workspace/LatentSync
+cd /workspace/LatentSync && pip install -r requirements.txt
 apt update
 apt install ffmpeg -y
 
@@ -101,6 +102,6 @@ python scripts/test_wan_gemini.py \
 
 
 python scripts/run_latentsync.py \
-  --video_in output/scenes/scene_2.mp4 \
+  --video_in output/Example_Story_with_Lip_Sync/scenes/scene_2.mp4 \
   --audio_in output/Example_Story_with_Lip_Sync/audio_scene_2_pp.wav \
   --out output/scene_2_lp.mp4

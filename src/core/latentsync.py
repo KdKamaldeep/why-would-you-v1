@@ -67,6 +67,18 @@ class LatentSyncRunner:
         self.face_crop = face_crop or os.getenv("LATENTSYNC_FACE_MODE", "auto")
         self.min_face_size = min_face_size
         self.debug_frames = debug_frames or os.getenv("LATENTSYNC_DEBUG_FRAMES", "false").lower() == "true"
+        # Python executable for LatentSync (can be from different virtualenv)
+        latentsync_python = os.getenv("LATENTSYNC_PYTHON", None)
+        if latentsync_python:
+            python_path = Path(latentsync_python)
+            if python_path.exists() and python_path.is_file():
+                self.python_executable = str(python_path)
+                logger.info(f"🐍 Using custom Python executable for LatentSync: {self.python_executable}")
+            else:
+                logger.warning(f"⚠️ LATENTSYNC_PYTHON path does not exist: {latentsync_python}, using default")
+                self.python_executable = sys.executable
+        else:
+            self.python_executable = sys.executable
         self.opts = opts
         
         # Check if LatentSync is available
@@ -413,9 +425,14 @@ class LatentSyncRunner:
             try:
                 logger.info(f"📝 Found LatentSync script at: {inference_script}")
                 
+                # Use custom Python executable if specified, otherwise use sys.executable
+                python_exe = self.python_executable
+                if python_exe != sys.executable:
+                    logger.info(f"🐍 Using custom Python executable: {python_exe}")
+                
                 # Build command - LatentSync typically uses these arguments
                 cmd = [
-                    sys.executable,
+                    python_exe,
                     str(inference_script),
                     "--video", video_in,
                     "--audio", audio_in,
