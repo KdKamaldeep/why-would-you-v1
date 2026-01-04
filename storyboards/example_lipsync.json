@@ -9,10 +9,10 @@
           "id": "scene_02_character_talking",
           "duration": 8,
           "num_frames": 96,
-          "visual_prompt": "Close-up portrait of a young woman speaking directly to camera, natural lighting, realistic skin texture, medium shot showing face and shoulders",
+          "visual_prompt": "Close-up portrait of a young woman looking directly at the camera, neutral relaxed expression, lips gently closed, subtle breathing, static camera, natural lighting, realistic skin texture",
           "negative_prompt": "text, watermark, blurry, cartoon, anime",
           "narration": "Hello, I'm here to tell you about an amazing story.",
-          "lip_sync": false,
+          "lip_sync": true,
           "talking_head": true,
           "speaker": {
             "id": "char_01",
@@ -22,24 +22,6 @@
           },
           "dialogue": "Hello, I'm here to tell you about an amazing story.",
           "character_reference_image": "outputs/character_refs/narrator_face.png"
-        },
-        {
-          "id": "scene_03_character_dialogue",
-          "duration": 6,
-          "num_frames": 72,
-          "visual_prompt": "Medium close-up of a man with expressive face, talking to camera, professional lighting, realistic",
-          "negative_prompt": "text, watermark, blurry",
-          "narration": "The key to success is understanding your audience.",
-          "lip_sync": false,
-          "talking_head": true,
-          "speaker": {
-            "id": "char_02",
-            "name": "Expert",
-            "gender": "male",
-            "voice_id": "coqui_voice_male_01"
-          },
-          "dialogue": "The key to success is understanding your audience.",
-          "character_reference_image": null
         }
       ],
       "total_duration": 23
