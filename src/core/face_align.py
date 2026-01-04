@@ -95,7 +95,6 @@ class FaceAligner:
                 logger.warning(f"⚠️ Failed to initialize MediaPipe: {e}")
                 logger.info("💡 Falling back to OpenCV face detection. To use MediaPipe, install: pip install mediapipe")
                 self.detection_method = "opencv"
-                MEDIAPIPE_AVAILABLE = False  # Mark as unavailable
             except Exception as e:
                 logger.warning(f"⚠️ Failed to initialize MediaPipe: {e}, falling back to OpenCV")
                 self.detection_method = "opencv"
