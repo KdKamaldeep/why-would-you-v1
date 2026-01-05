@@ -176,6 +176,50 @@ def generate_video_with_wan(
     return video_path
 
 
+def convert_video_fps(input_video: str, output_video: str, target_fps: int = 25) -> str:
+    """
+    Convert video to target FPS using ffmpeg.
+    
+    Args:
+        input_video: Path to input video file
+        output_video: Path to output video file
+        target_fps: Target frame rate (default: 25)
+        
+    Returns:
+        Path to converted video file
+    """
+    logger.info(f"🔄 Converting video FPS: {input_video} -> {output_video}")
+    logger.info(f"Target FPS: {target_fps}")
+    
+    # Create output directory if needed
+    Path(output_video).parent.mkdir(parents=True, exist_ok=True)
+    
+    cmd = [
+        'ffmpeg', '-y',
+        '-i', input_video,
+        '-vf', f'fps={target_fps}',
+        '-c:v', 'libx264',
+        '-preset', 'veryfast',
+        '-crf', '18',
+        '-pix_fmt', 'yuv420p',
+        output_video
+    ]
+    
+    try:
+        result = subprocess.run(
+            cmd,
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        logger.info(f"✅ Video FPS converted: {output_video}")
+        return output_video
+    except subprocess.CalledProcessError as e:
+        logger.error(f"❌ FPS conversion failed: {e}")
+        logger.error(f"STDERR: {e.stderr[-500:] if e.stderr else 'No stderr'}")
+        raise
+
+
 def generate_audio_with_coqui(
     text: str,
     output_path: str,
@@ -595,6 +639,23 @@ Examples:
     # Run lipsync if not skipped
     if not args.skip_lipsync:
         output_path = str(output_dir / f"{args.output_name}.mp4")
+        
+        # Convert video to 25 fps (LatentSync requirement) before sync
+        # WAN generates at 24 fps, but LatentSync needs 25 fps
+        if args.sync_fps != args.fps:
+            logger.info("=" * 60)
+            logger.info(f"🔄 Converting video from {args.fps} fps to {args.sync_fps} fps for LatentSync...")
+            logger.info("=" * 60)
+            converted_video_path = str(output_dir / f"{Path(video_path).stem}_25fps.mp4")
+            try:
+                video_path = convert_video_fps(
+                    input_video=video_path,
+                    output_video=converted_video_path,
+                    target_fps=args.sync_fps
+                )
+            except Exception as e:
+                logger.error(f"❌ Failed to convert video FPS: {e}")
+                logger.warning("⚠️ Continuing with original video (may cause sync issues)")
         
         # Find checkpoint (auto-detect if not provided)
         try:

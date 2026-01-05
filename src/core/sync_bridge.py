@@ -210,8 +210,10 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ck
     out_path_abs = os.path.abspath(out_path)
     inference_ckpt_path_abs = os.path.abspath(inference_ckpt_path)
     
+    # Add -u flag to Python executable for unbuffered output
     cmd = [
         LATENTSYNC_PYTHON,
+        '-u',  # Unbuffered Python output
         LATENTSYNC_SCRIPT,
         '--video_path', temp_video_abs,
         '--audio_path', temp_audio_abs,
@@ -232,9 +234,14 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ck
     logger.debug(f"Setting PYTHONPATH to: {LATENTSYNC_ROOT}")
     logger.debug("Setting PYTHONUNBUFFERED=1 for real-time output")
     
+    # Create log file next to output video
+    log_file_path = Path(out_path_abs).parent / "latentsync.log"
+    log_file_path.parent.mkdir(parents=True, exist_ok=True)
+    
     # Stream output in real-time with progress visibility
     logger.info("=" * 60)
     logger.info("LatentSync Output (streaming with progress):")
+    logger.info(f"Log file: {log_file_path}")
     logger.info("=" * 60)
     
     # Use line-buffered output for real-time progress display
@@ -254,57 +261,69 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ck
     stdout_lines = []
     last_progress_line = None
     
-    try:
-        # Read line by line, handling progress bars with \r
-        # Using iter() with readline() for better real-time reading
-        for line in iter(process.stdout.readline, ''):
-            if not line:
-                # Check if process has finished
-                if process.poll() is not None:
-                    break
-                continue
-            
-            # Check if this is a progress bar update (starts with \r or contains \r)
-            if line.startswith('\r'):
-                # Progress bar - overwrite previous line
-                line = line.lstrip('\r').rstrip('\n')
-                if line:
-                    print(f'\r{line}', end='', flush=True)
-                    last_progress_line = line
-            elif '\r' in line:
-                # Progress bar in middle of line
-                parts = line.split('\r')
-                line = parts[-1].rstrip('\n')
-                if line:
-                    print(f'\r{line}', end='', flush=True)
-                    last_progress_line = line
-            else:
-                # Regular line
-                line = line.rstrip('\n')
-                if line:
-                    # If we had a progress line, move to new line first
-                    if last_progress_line:
-                        print()  # New line after progress bar
-                        last_progress_line = None
-                    print(line, flush=True)
-                    stdout_lines.append(line)
-        
-        # Ensure we're on a new line after any progress bars
-        if last_progress_line:
-            print()
-            stdout_lines.append(last_progress_line)
-        
-    except Exception as e:
-        logger.warning(f"Error reading output: {e}")
-        # Fallback: read remaining output line by line
+    # Open log file for writing
+    with open(log_file_path, 'w', encoding='utf-8') as log_file:
         try:
-            for line in process.stdout:
-                line = line.rstrip()
-                if line:
-                    print(line, flush=True)
-                    stdout_lines.append(line)
-        except:
-            pass
+            # Read line by line, handling progress bars with \r
+            # Using iter() with readline() for better real-time reading
+            for line in iter(process.stdout.readline, ''):
+                if not line:
+                    # Check if process has finished
+                    if process.poll() is not None:
+                        break
+                    continue
+                
+                # Write to log file immediately
+                log_file.write(line)
+                log_file.flush()
+                
+                # Check if this is a progress bar update (starts with \r or contains \r)
+                if line.startswith('\r'):
+                    # Progress bar - overwrite previous line
+                    line_clean = line.lstrip('\r').rstrip('\n')
+                    if line_clean:
+                        print(f'\r{line_clean}', end='', flush=True)  # Real-time display
+                        last_progress_line = line_clean
+                elif '\r' in line:
+                    # Progress bar in middle of line
+                    parts = line.split('\r')
+                    line_clean = parts[-1].rstrip('\n')
+                    if line_clean:
+                        print(f'\r{line_clean}', end='', flush=True)  # Real-time display
+                        last_progress_line = line_clean
+                else:
+                    # Regular line
+                    line_clean = line.rstrip('\n')
+                    if line_clean:
+                        # If we had a progress line, move to new line first
+                        if last_progress_line:
+                            print()  # New line after progress bar
+                            last_progress_line = None
+                        print(line_clean, flush=True)  # Real-time display
+                        logger.info(line_clean)  # Also log to logger
+                        stdout_lines.append(line_clean)
+            
+            # Ensure we're on a new line after any progress bars
+            if last_progress_line:
+                print()  # New line after progress bar
+                stdout_lines.append(last_progress_line)
+            
+        except Exception as e:
+            logger.warning(f"Error reading output: {e}")
+            # Fallback: read remaining output line by line
+            try:
+                for line in process.stdout:
+                    log_file.write(line)
+                    log_file.flush()
+                    line_clean = line.rstrip()
+                    if line_clean:
+                        print(line_clean, flush=True)  # Real-time display
+                        logger.info(line_clean)  # Also log to logger
+                        stdout_lines.append(line_clean)
+            except:
+                pass
+    
+    logger.info(f"✅ LatentSync logs saved to: {log_file_path}")
     
     # Wait for process to complete
     exit_code = process.wait()

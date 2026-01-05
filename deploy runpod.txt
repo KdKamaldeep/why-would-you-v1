@@ -93,3 +93,25 @@ LATENTSYNC_MODEL_PATH=/workspace/.cache/huggingface/hub/ByteDance--LatentSync-1.
 LATENTSYNC_DEVICE=cuda
 LATENTSYNC_DIR=/workspace/LatentSync
 LATENTSYNC_PYTHON=/workspace/LatentSync/lnv/bin/python
+
+
+# Generate everything from scratch
+python scripts/check_sync_bridge.py \
+    --video-prompt "A cat walks on the grass" \
+    --audio-text "This is a cat walking on the grass" \
+    --output-dir outputs/test_sync
+
+# Use existing files (skips generation)
+python scripts/check_sync_bridge.py \
+    --video-path outputs/test_sync/video.mp4 \
+    --audio-path outputs/test_sync/audio.wav \
+    --output-dir outputs/test_sync
+
+# Custom settings
+python scripts/check_sync_bridge.py \
+  --video-prompt "Medium close-up, chest-up shot of a human man speaking directly to the camera, full head visible with space above the forehead and below the chin, shoulders visible, frontal face, neutral background, soft directional lighting, stable camera, natural mouth movement" \
+  --audio-text "A dog is running on footpath" \
+  --output-dir outputs/test_sync \
+  --width 768 --height 768 --num-frames 72 --fps 24 \
+  --language en \
+  --voice-file /workspace/why-would-you-v1/tts-speaker/voice-male.wav
