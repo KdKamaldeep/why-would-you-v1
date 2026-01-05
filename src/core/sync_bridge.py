@@ -216,6 +216,7 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ck
         '--video_path', temp_video_abs,
         '--audio_path', temp_audio_abs,
         '--video_out_path', out_path_abs,
+        '--unet_config_path', f"{LATENTSYNC_ROOT}/configs/unet/stage2.yaml",
         '--inference_ckpt_path', inference_ckpt_path_abs,
         '--guidance_scale', str(guidance_scale)
     ]
