@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 from pathlib import Path
 from typing import Optional, Tuple, Dict
 import cv2
@@ -656,90 +657,86 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ck
     logger.info("=" * 60)
     
     # Use line-buffered output for real-time progress display
-    # Note: bufsize=1 means line buffered, which works cross-platform
+    # Capture BOTH stdout and stderr separately
     process = subprocess.Popen(
         cmd,
         cwd=LATENTSYNC_ROOT,
         env=env,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,  # Merge stderr into stdout for unified output
+        stderr=subprocess.PIPE,
         text=True,
         bufsize=1,  # Line buffered for real-time output
         universal_newlines=True
     )
     
-    # Stream output in real-time, properly handling progress bars
+    # Stream output in real-time, handling both stdout and stderr
     stdout_lines = []
-    last_progress_line = None
+    stderr_lines = []
+    log_lock = threading.Lock()
     
     # Open log file for writing
-    with open(log_file_path, 'w', encoding='utf-8') as log_file:
+    log_file = open(log_file_path, 'w', encoding='utf-8')
+    
+    def read_stdout():
+        """Read from stdout and log in real-time."""
         try:
-            # Read line by line, handling progress bars with \r
-            # Using iter() with readline() for better real-time reading
             for line in iter(process.stdout.readline, ''):
                 if not line:
-                    # Check if process has finished
                     if process.poll() is not None:
                         break
                     continue
                 
-                # Write to log file immediately
-                log_file.write(line)
-                log_file.flush()
-                
-                # Check if this is a progress bar update (starts with \r or contains \r)
-                if line.startswith('\r'):
-                    # Progress bar - overwrite previous line
-                    line_clean = line.lstrip('\r').rstrip('\n')
-                    if line_clean:
-                        print(f'\r{line_clean}', end='', flush=True)  # Real-time display
-                        last_progress_line = line_clean
-                elif '\r' in line:
-                    # Progress bar in middle of line
-                    parts = line.split('\r')
-                    line_clean = parts[-1].rstrip('\n')
-                    if line_clean:
-                        print(f'\r{line_clean}', end='', flush=True)  # Real-time display
-                        last_progress_line = line_clean
-                else:
-                    # Regular line
-                    line_clean = line.rstrip('\n')
-                    if line_clean:
-                        # If we had a progress line, move to new line first
-                        if last_progress_line:
-                            print()  # New line after progress bar
-                            last_progress_line = None
-                        print(line_clean, flush=True)  # Real-time display
-                        logger.info(line_clean)  # Also log to logger
-                        stdout_lines.append(line_clean)
-            
-            # Ensure we're on a new line after any progress bars
-            if last_progress_line:
-                print()  # New line after progress bar
-                stdout_lines.append(last_progress_line)
-            
-        except Exception as e:
-            logger.warning(f"Error reading output: {e}")
-            # Fallback: read remaining output line by line
-            try:
-                for line in process.stdout:
+                with log_lock:
                     log_file.write(line)
                     log_file.flush()
-                    line_clean = line.rstrip()
-                    if line_clean:
-                        print(line_clean, flush=True)  # Real-time display
-                        logger.info(line_clean)  # Also log to logger
-                        stdout_lines.append(line_clean)
-            except:
-                pass
+                
+                line_clean = line.rstrip('\n\r')
+                if line_clean:
+                    stdout_lines.append(line_clean)
+                    logger.info(f"LatentSync | {line_clean}")
+        except Exception as e:
+            logger.warning(f"Error reading stdout: {e}")
+    
+    def read_stderr():
+        """Read from stderr and log in real-time."""
+        try:
+            for line in iter(process.stderr.readline, ''):
+                if not line:
+                    if process.poll() is not None:
+                        break
+                    continue
+                
+                with log_lock:
+                    log_file.write(line)
+                    log_file.flush()
+                
+                line_clean = line.rstrip('\n\r')
+                if line_clean:
+                    stderr_lines.append(line_clean)
+                    logger.warning(f"LatentSync | {line_clean}")
+        except Exception as e:
+            logger.warning(f"Error reading stderr: {e}")
+    
+    # Start threads to read from both streams concurrently
+    stdout_thread = threading.Thread(target=read_stdout, daemon=True)
+    stderr_thread = threading.Thread(target=read_stderr, daemon=True)
+    
+    stdout_thread.start()
+    stderr_thread.start()
+    
+    # Wait for both threads to finish
+    stdout_thread.join()
+    stderr_thread.join()
+    
+    # Close log file
+    log_file.close()
     
     logger.info(f"✅ LatentSync logs saved to: {log_file_path}")
     
     # Wait for process to complete
     exit_code = process.wait()
     stdout = '\n'.join(stdout_lines)
-    stderr = ''  # Already merged into stdout
+    stderr = '\n'.join(stderr_lines)
     
     if exit_code != 0:
         # Extract last ~2000 chars of stderr and stdout
