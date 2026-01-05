@@ -26,6 +26,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional
 
 # Add parent directory to path to import modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -161,10 +162,53 @@ def generate_audio_with_coqui(
     return audio_path
 
 
+def find_latentsync_checkpoint(checkpoint_path: Optional[str] = None) -> str:
+    """
+    Find LatentSync checkpoint file.
+    
+    Args:
+        checkpoint_path: Explicit checkpoint path (optional)
+        
+    Returns:
+        Absolute path to checkpoint file
+        
+    Raises:
+        FileNotFoundError: If no checkpoint found
+    """
+    if checkpoint_path:
+        checkpoint_abs = os.path.abspath(checkpoint_path)
+        if os.path.exists(checkpoint_abs):
+            return checkpoint_abs
+        else:
+            raise FileNotFoundError(f"Checkpoint file not found: {checkpoint_abs}")
+    
+    # Try default location
+    default_checkpoint_dir = Path("/workspace/LatentSync/checkpoints")
+    if default_checkpoint_dir.exists() and default_checkpoint_dir.is_dir():
+        # Look for common checkpoint file extensions
+        checkpoint_extensions = ['.ckpt', '.pth', '.pt', '.safetensors']
+        checkpoints = []
+        
+        for ext in checkpoint_extensions:
+            checkpoints.extend(list(default_checkpoint_dir.glob(f"*{ext}")))
+        
+        if checkpoints:
+            # Sort by modification time (most recent first)
+            checkpoints.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+            checkpoint_path = checkpoints[0]
+            logger.info(f"✅ Auto-detected checkpoint: {checkpoint_path}")
+            return str(checkpoint_path.absolute())
+    
+    raise FileNotFoundError(
+        f"No checkpoint found. Please provide --inference-ckpt-path or place a checkpoint in {default_checkpoint_dir}"
+    )
+
+
 def run_sync_bridge(
     video_path: str,
     audio_path: str,
     output_path: str,
+    inference_ckpt_path: str,
     fps: int = 25,
     sample_rate: int = 16000,
     guidance_scale: float = 1.5,
@@ -177,6 +221,7 @@ def run_sync_bridge(
         video_path: Path to input video (must be absolute)
         audio_path: Path to input audio (must be absolute)
         output_path: Path to output synchronized video (must be absolute)
+        inference_ckpt_path: Path to LatentSync inference checkpoint file (must be absolute)
         fps: Target frame rate (default: 25)
         sample_rate: Target sample rate (default: 16000)
         guidance_scale: Guidance scale for LatentSync (default: 1.5)
@@ -193,6 +238,7 @@ def run_sync_bridge(
     video_path_abs = os.path.abspath(video_path)
     audio_path_abs = os.path.abspath(audio_path)
     output_path_abs = os.path.abspath(output_path)
+    inference_ckpt_path_abs = os.path.abspath(inference_ckpt_path)
     
     # Create output directory if needed
     Path(output_path_abs).parent.mkdir(parents=True, exist_ok=True)
@@ -211,6 +257,7 @@ def run_sync_bridge(
         '--video_path', video_path_abs,
         '--audio_path', audio_path_abs,
         '--out_path', output_path_abs,
+        '--inference_ckpt_path', inference_ckpt_path_abs,
         '--fps', str(fps),
         '--sr', str(sample_rate),
         '--guidance_scale', str(guidance_scale)
@@ -251,7 +298,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Generate everything from scratch
+  # Generate everything from scratch (auto-detects checkpoint from /workspace/LatentSync/checkpoints)
   python scripts/check_sync_bridge.py \\
     --video-prompt "A cat walks on the grass" \\
     --audio-text "This is a cat walking on the grass" \\
@@ -262,6 +309,13 @@ Examples:
     --video-path outputs/test_sync/video.mp4 \\
     --audio-path outputs/test_sync/audio.wav \\
     --output-dir outputs/test_sync
+
+  # Specify custom checkpoint path
+  python scripts/check_sync_bridge.py \\
+    --video-prompt "A dog running" \\
+    --audio-text "A dog is running" \\
+    --output-dir outputs/test_sync \\
+    --inference-ckpt-path /absolute/path/to/checkpoint.ckpt
 
   # Custom WAN settings
   python scripts/check_sync_bridge.py \\
@@ -380,6 +434,12 @@ Examples:
     
     # Sync bridge settings
     parser.add_argument(
+        '--inference-ckpt-path',
+        type=str,
+        default=None,
+        help='Absolute path to LatentSync inference checkpoint file (optional, auto-detects from /workspace/LatentSync/checkpoints if not provided)'
+    )
+    parser.add_argument(
         '--sync-fps',
         type=int,
         default=25,
@@ -473,10 +533,19 @@ Examples:
     # Run lipsync if not skipped
     if not args.skip_lipsync:
         output_path = str(output_dir / f"{args.output_name}.mp4")
+        
+        # Find checkpoint (auto-detect if not provided)
+        try:
+            inference_ckpt_path = find_latentsync_checkpoint(args.inference_ckpt_path)
+        except FileNotFoundError as e:
+            logger.error(f"❌ {e}")
+            sys.exit(1)
+        
         success = run_sync_bridge(
             video_path=video_path,
             audio_path=audio_path,
             output_path=output_path,
+            inference_ckpt_path=inference_ckpt_path,
             fps=args.sync_fps,
             sample_rate=args.sync_sr,
             guidance_scale=args.sync_guidance,
