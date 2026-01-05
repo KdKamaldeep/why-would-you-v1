@@ -14,7 +14,9 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict
+import cv2
+import numpy as np
 
 # Configure logging
 logging.basicConfig(
@@ -28,6 +30,10 @@ logger = logging.getLogger(__name__)
 LATENTSYNC_ROOT = "/workspace/LatentSync"
 LATENTSYNC_PYTHON = "/workspace/LatentSync/venv/bin/python"
 LATENTSYNC_SCRIPT = "/workspace/LatentSync/scripts/inference.py"
+
+# Face detection model cache (singleton pattern)
+_face_detector = None
+_face_detector_type = None
 
 
 def run_cmd(cmd: list[str], cwd: Optional[str] = None, capture_output: bool = True, env: Optional[dict] = None) -> Tuple[int, str, str]:
@@ -59,6 +65,217 @@ def run_cmd(cmd: list[str], cwd: Optional[str] = None, capture_output: bool = Tr
     )
     
     return result.returncode, result.stdout, result.stderr
+
+
+def get_face_detector():
+    """
+    Get face detector (InsightFace preferred, MediaPipe fallback).
+    Uses singleton pattern to avoid reloading models.
+    
+    Returns:
+        Tuple of (detector_object, detector_type_string)
+        Returns (None, None) if no detector available
+    """
+    global _face_detector, _face_detector_type
+    
+    if _face_detector is not None:
+        return _face_detector, _face_detector_type
+    
+    # Try InsightFace first
+    try:
+        from insightface.app import FaceAnalysis
+        app = FaceAnalysis(providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+        app.prepare(ctx_id=0, det_size=(640, 640))
+        _face_detector = app
+        _face_detector_type = "insightface"
+        logger.info("✅ Using InsightFace for face detection")
+        return _face_detector, _face_detector_type
+    except ImportError:
+        logger.debug("InsightFace not available, trying MediaPipe...")
+    except Exception as e:
+        logger.warning(f"Failed to initialize InsightFace: {e}, trying MediaPipe...")
+    
+    # Fallback to MediaPipe
+    try:
+        import mediapipe as mp
+        mp_face_detection = mp.solutions.face_detection
+        detector = mp_face_detection.FaceDetection(
+            model_selection=1,  # 0 = short-range, 1 = full-range
+            min_detection_confidence=0.5
+        )
+        _face_detector = detector
+        _face_detector_type = "mediapipe"
+        logger.info("✅ Using MediaPipe for face detection")
+        return _face_detector, _face_detector_type
+    except ImportError:
+        logger.warning("MediaPipe not available for face detection")
+    except Exception as e:
+        logger.warning(f"Failed to initialize MediaPipe: {e}")
+    
+    return None, None
+
+
+def detect_face_bbox(frame: np.ndarray) -> Optional[Tuple[int, int, int, int]]:
+    """
+    Detect face bounding box in a frame.
+    
+    Args:
+        frame: BGR frame (numpy array from cv2)
+        
+    Returns:
+        Tuple of (x, y, w, h) bounding box, or None if no face detected
+    """
+    detector, detector_type = get_face_detector()
+    
+    if detector is None:
+        logger.error("❌ No face detector available. Install insightface or mediapipe.")
+        return None
+    
+    if detector_type == "insightface":
+        # InsightFace expects BGR
+        faces = detector.get(frame)
+        if not faces:
+            return None
+        # Get first face (largest by confidence/area)
+        face = faces[0]
+        bbox = face.bbox.astype(int)  # (x1, y1, x2, y2)
+        x, y, w, h = bbox[0], bbox[1], bbox[2] - bbox[0], bbox[3] - bbox[1]
+        return (x, y, w, h)
+    
+    elif detector_type == "mediapipe":
+        # MediaPipe expects RGB
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        results = detector.process(rgb_frame)
+        
+        if not results.detections:
+            return None
+        
+        # Get first detection (largest by default)
+        detection = results.detections[0]
+        bbox = detection.location_data.relative_bounding_box
+        
+        h, w_frame = frame.shape[:2]
+        x = int(bbox.xmin * w_frame)
+        y = int(bbox.ymin * h)
+        w = int(bbox.width * w_frame)
+        h_bbox = int(bbox.height * h)
+        
+        return (x, y, w, h_bbox)
+    
+    return None
+
+
+def calculate_face_crop_params(video_path: str) -> Optional[Dict]:
+    """
+    Detect face in first valid frame and calculate crop parameters.
+    
+    Args:
+        video_path: Path to input video
+        
+    Returns:
+        Dictionary with crop parameters:
+        - 'x', 'y', 'w', 'h': Original bounding box
+        - 'crop_x', 'crop_y', 'crop_size': Square crop coordinates and size
+        - 'orig_width', 'orig_height': Original video dimensions
+        Returns None if no face detected
+    """
+    logger.info("🔍 Detecting face in video...")
+    
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        logger.error(f"❌ Failed to open video: {video_path}")
+        return None
+    
+    # Try to read first few frames (some videos start with black frames)
+    max_attempts = 30
+    frame = None
+    frame_num = 0
+    
+    for _ in range(max_attempts):
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        # Try to detect face
+        bbox = detect_face_bbox(frame)
+        if bbox is not None:
+            frame_num = cap.get(cv2.CAP_PROP_POS_FRAMES) - 1
+            logger.info(f"✅ Face detected in frame {frame_num}")
+            break
+    
+    cap.release()
+    
+    if frame is None or bbox is None:
+        logger.warning("⚠️ No face detected in video, cannot perform face-centered cropping")
+        return None
+    
+    x, y, w, h = bbox
+    frame_height, frame_width = frame.shape[:2]
+    
+    logger.info(f"📐 Original bbox: x={x}, y={y}, w={w}, h={h}")
+    logger.info(f"📐 Frame size: {frame_width}x{frame_height}")
+    
+    # Expand bounding box by 1.5×
+    expansion_factor = 1.5
+    new_w = int(w * expansion_factor)
+    new_h = int(h * expansion_factor)
+    
+    # Center the expanded box on the original box
+    center_x = x + w // 2
+    center_y = y + h // 2
+    new_x = center_x - new_w // 2
+    new_y = center_y - new_h // 2
+    
+    # Clamp to frame bounds
+    new_x = max(0, new_x)
+    new_y = max(0, new_y)
+    new_x = min(frame_width - new_w, new_x) if new_w < frame_width else 0
+    new_y = min(frame_height - new_h, new_y) if new_h < frame_height else 0
+    
+    # Ensure box stays within bounds (adjust size if necessary)
+    if new_x + new_w > frame_width:
+        new_w = frame_width - new_x
+    if new_y + new_h > frame_height:
+        new_h = frame_height - new_y
+    
+    logger.info(f"📐 Expanded bbox: x={new_x}, y={new_y}, w={new_w}, h={new_h}")
+    
+    # Create square crop
+    crop_size = max(new_w, new_h)
+    
+    # Center square on the expanded box center
+    crop_x = center_x - crop_size // 2
+    crop_y = center_y - crop_size // 2
+    
+    # Clamp to frame bounds
+    crop_x = max(0, crop_x)
+    crop_y = max(0, crop_y)
+    if crop_x + crop_size > frame_width:
+        crop_x = frame_width - crop_size
+    if crop_y + crop_size > frame_height:
+        crop_y = frame_height - crop_size
+    crop_x = max(0, crop_x)
+    crop_y = max(0, crop_y)
+    
+    # Adjust crop_size if it would exceed bounds
+    if crop_x + crop_size > frame_width:
+        crop_size = frame_width - crop_x
+    if crop_y + crop_size > frame_height:
+        crop_size = frame_height - crop_y
+    
+    logger.info(f"📐 Square crop: x={crop_x}, y={crop_y}, size={crop_size}")
+    
+    return {
+        'x': x,
+        'y': y,
+        'w': w,
+        'h': h,
+        'crop_x': crop_x,
+        'crop_y': crop_y,
+        'crop_size': crop_size,
+        'orig_width': frame_width,
+        'orig_height': frame_height
+    }
 
 
 def ensure_ok(condition: bool, message: str) -> None:
@@ -128,35 +345,229 @@ def validate_paths(video_path: str, audio_path: str, out_path: str, inference_ck
     logger.info("✅ All validations passed")
 
 
-def preprocess_video(input_video: str, output_video: str, fps: int) -> None:
+def preprocess_video(input_video: str, output_video: str, fps: int, crop_params: Optional[Dict] = None) -> None:
     """
-    Preprocess video: convert to CFR, remove audio, encode H.264.
+    Preprocess video: detect face, crop to square, resize to 512x512, convert to CFR, remove audio, encode H.264.
     
     Args:
         input_video: Path to input video file
         output_video: Path to output video file
         fps: Target frame rate (must be exact CFR)
+        crop_params: Optional crop parameters dict (if None, will detect face automatically)
     """
     logger.info(f"Preprocessing video: {input_video} -> {output_video}")
     logger.info(f"Target FPS: {fps} (CFR)")
     
-    cmd = [
-        'ffmpeg', '-y',
-        '-i', input_video,
-        '-an',  # Remove audio
-        '-vf', f'fps={fps},pad=iw*1.3:ih*1.3:(ow-iw)/2:(oh-ih)/2,format=yuv420p',  # Force CFR, add 30% padding, then pixel format
-        '-r', str(fps),  # Additional CFR enforcement
-        '-c:v', 'libx264',
-        '-preset', 'veryfast',
-        '-crf', '18',
-        '-pix_fmt', 'yuv420p',
-        output_video
-    ]
+    # Detect face and calculate crop if not provided
+    if crop_params is None:
+        crop_params = calculate_face_crop_params(input_video)
     
-    exit_code, stdout, stderr = run_cmd(cmd)
-    ensure_ok(exit_code == 0, f"❌ Video preprocessing failed:\n{stderr}")
+    if crop_params is None:
+        logger.warning("⚠️ No face detected, using center crop fallback")
+        # Fallback: use center crop
+        cap = cv2.VideoCapture(input_video)
+        ret, frame = cap.read()
+        if ret:
+            h, w = frame.shape[:2]
+            crop_size = min(w, h)
+            crop_x = (w - crop_size) // 2
+            crop_y = (h - crop_size) // 2
+            crop_params = {
+                'crop_x': crop_x,
+                'crop_y': crop_y,
+                'crop_size': crop_size,
+                'orig_width': w,
+                'orig_height': h
+            }
+        cap.release()
     
-    logger.info(f"✅ Video preprocessed: {output_video}")
+    if crop_params is None:
+        logger.error("❌ Failed to determine crop parameters")
+        ensure_ok(False, "Cannot proceed without crop parameters")
+    
+    # Extract frames, crop, resize to 512x512
+    logger.info("🎬 Extracting and processing frames...")
+    cap = cv2.VideoCapture(input_video)
+    if not cap.isOpened():
+        ensure_ok(False, f"❌ Failed to open video: {input_video}")
+    
+    # Get video properties
+    orig_fps = cap.get(cv2.CAP_PROP_FPS)
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    
+    # Create temporary directory for frames
+    temp_dir = tempfile.mkdtemp(prefix='sync_bridge_frames_')
+    frames_dir = os.path.join(temp_dir, 'frames')
+    os.makedirs(frames_dir, exist_ok=True)
+    
+    crop_x = crop_params['crop_x']
+    crop_y = crop_params['crop_y']
+    crop_size = crop_params['crop_size']
+    target_size = 512
+    
+    frame_count = 0
+    processed_frames = []
+    
+    try:
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            
+            # Crop to square
+            cropped = frame[crop_y:crop_y+crop_size, crop_x:crop_x+crop_size]
+            
+            # Resize to 512x512
+            resized = cv2.resize(cropped, (target_size, target_size), interpolation=cv2.INTER_LANCZOS4)
+            
+            processed_frames.append(resized)
+            frame_count += 1
+        
+        cap.release()
+        
+        logger.info(f"✅ Processed {frame_count} frames, crop: {crop_size}x{crop_size} -> {target_size}x{target_size}")
+        
+        # Write frames as images
+        for i, frame in enumerate(processed_frames):
+            frame_path = os.path.join(frames_dir, f"{i:06d}.jpg")
+            cv2.imwrite(frame_path, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
+        
+        # Encode video from frames with CFR
+        cmd = [
+            'ffmpeg', '-y',
+            '-framerate', str(fps),
+            '-i', os.path.join(frames_dir, '%06d.jpg'),
+            '-an',  # Remove audio
+            '-c:v', 'libx264',
+            '-preset', 'veryfast',
+            '-crf', '18',
+            '-pix_fmt', 'yuv420p',
+            '-r', str(fps),  # CFR enforcement
+            output_video
+        ]
+        
+        exit_code, stdout, stderr = run_cmd(cmd)
+        if exit_code != 0:
+            # Cleanup
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            ensure_ok(False, f"❌ Video encoding failed:\n{stderr}")
+        
+        logger.info(f"✅ Video preprocessed: {output_video}")
+        
+    finally:
+        # Cleanup temporary frames
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def composite_synced_video(
+    original_video: str,
+    synced_cropped_video: str,
+    output_video: str,
+    crop_params: Dict,
+    fps: int
+) -> None:
+    """
+    Composite the synced cropped video back into the original video.
+    
+    Args:
+        original_video: Path to original wide video
+        synced_cropped_video: Path to synced 512x512 cropped video from LatentSync
+        output_video: Path to output composited video
+        crop_params: Crop parameters dict from calculate_face_crop_params
+        fps: Frame rate
+    """
+    logger.info("🖼️ Compositing synced video back into original frames...")
+    
+    crop_x = crop_params['crop_x']
+    crop_y = crop_params['crop_y']
+    crop_size = crop_params['crop_size']
+    orig_width = crop_params['orig_width']
+    orig_height = crop_params['orig_height']
+    
+    # Open videos
+    cap_orig = cv2.VideoCapture(original_video)
+    cap_synced = cv2.VideoCapture(synced_cropped_video)
+    
+    if not cap_orig.isOpened():
+        ensure_ok(False, f"❌ Failed to open original video: {original_video}")
+    if not cap_synced.isOpened():
+        ensure_ok(False, f"❌ Failed to open synced video: {synced_cropped_video}")
+    
+    # Get video properties
+    synced_fps = cap_synced.get(cv2.CAP_PROP_FPS)
+    synced_frame_count = int(cap_synced.get(cv2.CAP_PROP_FRAME_COUNT))
+    
+    logger.info(f"📐 Original video: {orig_width}x{orig_height}")
+    logger.info(f"📐 Crop region: {crop_x},{crop_y} size {crop_size}x{crop_size}")
+    logger.info(f"📐 Synced video: {synced_frame_count} frames @ {synced_fps}fps")
+    
+    # Create temporary directory for frames
+    temp_dir = tempfile.mkdtemp(prefix='sync_bridge_composite_')
+    frames_dir = os.path.join(temp_dir, 'frames')
+    os.makedirs(frames_dir, exist_ok=True)
+    
+    frame_count = 0
+    
+    try:
+        # Read frames from both videos and composite
+        while True:
+            ret_orig, frame_orig = cap_orig.read()
+            ret_synced, frame_synced = cap_synced.read()
+            
+            if not ret_orig or not ret_synced:
+                break
+            
+            # Resize synced frame back to original crop size
+            frame_synced_resized = cv2.resize(
+                frame_synced,
+                (crop_size, crop_size),
+                interpolation=cv2.INTER_LANCZOS4
+            )
+            
+            # Composite: replace crop region in original frame
+            frame_composited = frame_orig.copy()
+            
+            # Ensure crop region is within bounds
+            if (crop_x + crop_size <= orig_width and 
+                crop_y + crop_size <= orig_height and
+                crop_x >= 0 and crop_y >= 0):
+                frame_composited[crop_y:crop_y+crop_size, crop_x:crop_x+crop_size] = frame_synced_resized
+            
+            # Save frame
+            frame_path = os.path.join(frames_dir, f"{frame_count:06d}.jpg")
+            cv2.imwrite(frame_path, frame_composited, [int(cv2.IMWRITE_JPEG_QUALITY), 95])
+            
+            frame_count += 1
+        
+        cap_orig.release()
+        cap_synced.release()
+        
+        logger.info(f"✅ Composited {frame_count} frames")
+        
+        # Encode final video (audio pipeline unchanged - LatentSync handles audio separately)
+        cmd_video = [
+            'ffmpeg', '-y',
+            '-framerate', str(fps),
+            '-i', os.path.join(frames_dir, '%06d.jpg'),
+            '-an',  # No audio (audio pipeline unchanged)
+            '-c:v', 'libx264',
+            '-preset', 'veryfast',
+            '-crf', '18',
+            '-pix_fmt', 'yuv420p',
+            '-r', str(fps),
+            output_video
+        ]
+        
+        exit_code, stdout, stderr = run_cmd(cmd_video)
+        if exit_code != 0:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            ensure_ok(False, f"❌ Video encoding failed:\n{stderr}")
+        
+        logger.info(f"✅ Composited video saved: {output_video}")
+        
+    finally:
+        # Cleanup
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 def preprocess_audio(input_audio: str, output_audio: str, sample_rate: int) -> None:
@@ -444,22 +855,64 @@ Examples:
     temp_audio = os.path.join(temp_dir, 'temp_audio.wav')
     
     try:
-        # Preprocess video and audio (MANDATORY, always run)
+        # Step 1: Detect face and calculate crop parameters
         logger.info("=" * 60)
-        logger.info("Step 1: Preprocessing video")
+        logger.info("Step 1: Detecting face and calculating crop parameters")
         logger.info("=" * 60)
-        preprocess_video(args.video_path, temp_video, args.fps)
+        crop_params = calculate_face_crop_params(args.video_path)
         
+        if crop_params is None:
+            logger.warning("⚠️ No face detected, falling back to center crop")
+            # Fallback: use center crop
+            cap = cv2.VideoCapture(args.video_path)
+            ret, frame = cap.read()
+            if ret:
+                h, w = frame.shape[:2]
+                crop_size = min(w, h)
+                crop_x = (w - crop_size) // 2
+                crop_y = (h - crop_size) // 2
+                crop_params = {
+                    'crop_x': crop_x,
+                    'crop_y': crop_y,
+                    'crop_size': crop_size,
+                    'orig_width': w,
+                    'orig_height': h
+                }
+            cap.release()
+        
+        if crop_params is None:
+            ensure_ok(False, "❌ Failed to determine crop parameters")
+        
+        # Step 2: Preprocess video with face-centered cropping (crop + resize to 512x512)
         logger.info("=" * 60)
-        logger.info("Step 2: Preprocessing audio")
+        logger.info("Step 2: Preprocessing video (face-centered crop + resize to 512x512)")
+        logger.info("=" * 60)
+        preprocess_video(args.video_path, temp_video, args.fps, crop_params)
+        
+        # Step 3: Preprocess audio
+        logger.info("=" * 60)
+        logger.info("Step 3: Preprocessing audio")
         logger.info("=" * 60)
         preprocess_audio(args.audio_path, temp_audio, args.sr)
         
-        # Run LatentSync
+        # Step 4: Run LatentSync on cropped video
         logger.info("=" * 60)
-        logger.info("Step 3: Running LatentSync inference")
+        logger.info("Step 4: Running LatentSync inference on cropped video")
         logger.info("=" * 60)
-        run_latentsync(temp_video, temp_audio, args.out_path, args.inference_ckpt_path, args.guidance_scale)
+        temp_synced_video = os.path.join(temp_dir, 'temp_synced.mp4')
+        run_latentsync(temp_video, temp_audio, temp_synced_video, args.inference_ckpt_path, args.guidance_scale)
+        
+        # Step 5: Composite synced video back into original frames
+        logger.info("=" * 60)
+        logger.info("Step 5: Compositing synced video back into original frames")
+        logger.info("=" * 60)
+        composite_synced_video(
+            args.video_path,
+            temp_synced_video,
+            args.out_path,
+            crop_params,
+            args.fps
+        )
         
         logger.info("=" * 60)
         logger.info("✅ Synchronization completed successfully!")
