@@ -6,6 +6,7 @@ then running lipsync on them.
 If audio and video already exist, generation is skipped.
 
 Usage:
+    # Generate video using I2V (Gemini generates image, then WAN generates video)
     python scripts/check_sync_bridge.py \
         --video-prompt "A cat walks on the grass" \
         --audio-text "This is a cat walking on the grass" \
@@ -18,6 +19,13 @@ Usage:
         --output-dir outputs/test_sync \
         --video-path outputs/test_sync/video.mp4 \
         --audio-path outputs/test_sync/audio.wav
+
+    # Use T2V mode (skip Gemini, use text-to-video directly)
+    python scripts/check_sync_bridge.py \
+        --video-prompt "A cat walks on the grass" \
+        --audio-text "This is a cat walking on the grass" \
+        --output-dir outputs/test_sync \
+        --skip-gemini
 """
 
 import argparse
@@ -33,6 +41,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.core.wan_t2v import WanT2VGenerator
 from src.core.coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
+from src.core.gemini_image_generator import GeminiImageGenerator
 
 # Configure logging
 logging.basicConfig(
@@ -63,13 +72,14 @@ def generate_video_with_wan(
     num_inference_steps: int = 30,
     guidance_scale: float = 6.0,
     seed: int = None,
-    negative_prompt: str = None
+    negative_prompt: str = None,
+    skip_gemini: bool = False
 ) -> str:
     """
-    Generate video using WAN.
+    Generate video using WAN I2V (Image-to-Video) with Gemini-generated image.
     
     Args:
-        prompt: Text prompt for video generation
+        prompt: Text prompt for video generation (used for both Gemini image and WAN video)
         output_path: Path to save the video
         width: Video width
         height: Video height
@@ -79,17 +89,56 @@ def generate_video_with_wan(
         guidance_scale: Guidance scale
         seed: Random seed (optional)
         negative_prompt: Negative prompt (optional)
+        skip_gemini: If True, skip Gemini image generation and use T2V mode (optional)
         
     Returns:
         Path to generated video file
     """
     logger.info("=" * 60)
-    logger.info("🎬 Generating video with WAN...")
+    logger.info("🎬 Generating video with WAN I2V (Image-to-Video)...")
     logger.info("=" * 60)
     
     # Create output directory if needed
     output_path_obj = Path(output_path)
     output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+    
+    initial_image_path = None
+    
+    # Step 1: Generate initial frame with Gemini (unless skipped)
+    if not skip_gemini:
+        logger.info("=" * 60)
+        logger.info("🎨 Step 1: Generating initial frame with Gemini...")
+        logger.info("=" * 60)
+        
+        gemini_generator = GeminiImageGenerator()
+        
+        if not gemini_generator.available:
+            logger.warning("⚠️ Gemini not available, falling back to T2V mode")
+            logger.warning("💡 Make sure GEMINI_API_KEY is set and google-genai is installed")
+        else:
+            initial_image_path = output_path_obj.parent / f"{output_path_obj.stem}_initial_frame.png"
+            logger.info(f"📝 Generating image from prompt: {prompt[:100]}...")
+            
+            generated_image = gemini_generator.generate_image(
+                prompt=prompt,
+                output_path=str(initial_image_path),
+                width=width,
+                height=height
+            )
+            
+            if generated_image:
+                initial_image_path = generated_image
+                logger.info(f"✅ Initial frame generated: {initial_image_path}")
+            else:
+                logger.warning("⚠️ Failed to generate initial frame, falling back to T2V mode")
+                initial_image_path = None
+    else:
+        logger.info("⏭️ Skipping Gemini image generation (using T2V mode)")
+    
+    # Step 2: Generate video with WAN (I2V if image available, T2V otherwise)
+    logger.info("=" * 60)
+    logger.info(f"🎬 Step 2: Generating video with WAN ({'I2V' if initial_image_path else 'T2V'} mode)...")
+    logger.info("=" * 60)
     
     # Initialize WAN generator
     wan_generator = WanT2VGenerator(
@@ -102,12 +151,13 @@ def generate_video_with_wan(
         negative_prompt=negative_prompt or "text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly"
     )
     
-    # Generate video
+    # Generate video (I2V if image available, T2V otherwise)
     result = wan_generator.generate_video(
         prompt=prompt,
         output_path=output_path,
         seed=seed,
-        negative_prompt=negative_prompt
+        negative_prompt=negative_prompt,
+        image=str(initial_image_path) if initial_image_path else None  # Pass image for I2V mode
     )
     
     # Handle return value (can be string or dict)
@@ -417,6 +467,11 @@ Examples:
         default=None,
         help='Negative prompt for video generation (optional)'
     )
+    parser.add_argument(
+        '--skip-gemini',
+        action='store_true',
+        help='Skip Gemini image generation and use T2V mode instead of I2V (optional)'
+    )
     
     # Coqui TTS settings
     parser.add_argument(
@@ -502,7 +557,8 @@ Examples:
                 num_inference_steps=args.steps,
                 guidance_scale=args.guidance,
                 seed=args.seed,
-                negative_prompt=args.negative_prompt
+                negative_prompt=args.negative_prompt,
+                skip_gemini=args.skip_gemini
             )
     else:
         logger.error("❌ Either --video-prompt or --video-path must be provided")
