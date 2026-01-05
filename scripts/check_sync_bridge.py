@@ -35,6 +35,12 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Optional
+from dotenv import load_dotenv
+
+# Load environment variables (try .env first, then config.env as fallback)
+load_dotenv()
+if not os.getenv("GEMINI_API_KEY") and Path("config.env").exists():
+    load_dotenv("config.env")
 
 # Add parent directory to path to import modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
