@@ -225,9 +225,12 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ck
     logger.debug(f"Working directory: {LATENTSYNC_ROOT}")
     
     # Set PYTHONPATH to LatentSync root so Python can find the latentsync module
+    # Also disable Python output buffering for real-time log display
     env = os.environ.copy()
     env["PYTHONPATH"] = LATENTSYNC_ROOT
+    env["PYTHONUNBUFFERED"] = "1"  # Disable Python output buffering
     logger.debug(f"Setting PYTHONPATH to: {LATENTSYNC_ROOT}")
+    logger.debug("Setting PYTHONUNBUFFERED=1 for real-time output")
     
     # Stream output in real-time with progress visibility
     logger.info("=" * 60)
@@ -235,6 +238,7 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ck
     logger.info("=" * 60)
     
     # Use line-buffered output for real-time progress display
+    # Note: bufsize=1 means line buffered, which works cross-platform
     process = subprocess.Popen(
         cmd,
         cwd=LATENTSYNC_ROOT,
@@ -252,10 +256,13 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ck
     
     try:
         # Read line by line, handling progress bars with \r
-        while True:
-            line = process.stdout.readline()
+        # Using iter() with readline() for better real-time reading
+        for line in iter(process.stdout.readline, ''):
             if not line:
-                break
+                # Check if process has finished
+                if process.poll() is not None:
+                    break
+                continue
             
             # Check if this is a progress bar update (starts with \r or contains \r)
             if line.startswith('\r'):
