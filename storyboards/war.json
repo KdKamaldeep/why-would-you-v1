@@ -14,7 +14,7 @@
           "visual_reference": "identity_anchor_mathematician.png",
           "visual_prompt": "Medium close-up of an ancient Indian guru (around 65–70 years old) walking slowly and directly toward the camera along a stone corridor inspired by Nalanda University. Male, long white and grey beard, deeply lined face, serene and wise eyes, high forehead, calm spiritual authority. Wearing simple saffron and off-white robes, rudraksha beads around the neck, holding palm-leaf manuscripts. He is clearly speaking while walking, lips articulating speech, mouth and jaw moving naturally, eyes engaging directly with the camera. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
           "motion_prompt": "slow reverent forward walk, camera tracking backward on straight axis, no rotation, no orbit, no angle change, continuous speaking mouth and jaw movement, gentle head nods of emphasis, soft robe movement, stable framing",
-          "narration": "हर कोई अंकों को जानता है — एक, दो, तीन। लेकिन जब कुछ भी नहीं होता, तब हम उसे कैसे गिनते हैं? एक समय था जब संख्याएँ थीं… लेकिन ‘कुछ नहीं’ का कोई नाम नहीं था।"
+          "narration": "हम एक, दो, तीन गिनते हैं। लेकिन जब कुछ भी नहीं हो… उसे क्या कहें? एक समय था जब ‘कुछ नहीं’ का नाम ही नहीं था।"
         },
         {
           "id": "scene_02_birth_of_zero",
@@ -23,7 +23,7 @@
           "visual_reference": "use_previous_scene_image_as_reference",
           "visual_prompt": "Medium shot of the same ancient Indian guru walking directly toward the camera through an open courtyard with stone pillars and young disciples studying behind him. His expression reflects timeless wisdom and certainty as he continues speaking, mouth clearly moving, lips articulating each word. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
           "motion_prompt": "steady dignified forward walk, camera tracking backward on straight axis, no rotation, no orbit, no angle change, continuous speaking mouth movement, slow controlled hand emphasis, gentle background disciple motion, stable framing",
-          "narration": "इस प्रश्न का उत्तर भारत में खोजा गया। हमारे आचार्यों ने शून्य को केवल खाली स्थान नहीं माना, बल्कि उसे एक संख्या का स्वरूप दिया — जिसके अपने नियम और अर्थ थे।"
+          "narration": "इसका उत्तर भारत में मिला। आचार्यों ने शून्य को खाली जगह नहीं, एक वास्तविक संख्या बनाया — अपने नियमों के साथ।"
         },
         {
           "id": "scene_03_power_of_zero",
@@ -32,7 +32,7 @@
           "visual_reference": "use_previous_scene_image_as_reference",
           "visual_prompt": "Medium close-up of the ancient Indian guru walking directly toward the camera beside stone walls carved with ancient numerical symbols and yantras. He explains calmly using slow forward-facing hand gestures, mouth moving clearly as he speaks. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
           "motion_prompt": "slow continuous walk, synchronized forward-facing hand gestures while speaking, camera tracking backward on straight axis, no rotation, no orbit, no angle change, soft spiritual parallax, stable framing",
-          "narration": "शून्य के साथ संख्याओं को नई शक्ति मिली। बड़ी गणनाएँ संभव हुईं। खगोल विज्ञान, गणित और ज्ञान की अनेक शाखाएँ इसी विचार से आगे बढ़ीं।"
+          "narration": "शून्य ने संख्याओं को शक्ति दी। बड़ी गणनाएँ आसान हुईं। गणित और खगोल विज्ञान ने यहीं से नई उड़ान ली।"
         },
         {
           "id": "scene_04_zero_changes_world",
@@ -41,7 +41,7 @@
           "visual_reference": "use_previous_scene_image_as_reference",
           "visual_prompt": "Medium close-up of the ancient Indian guru under a shaded stone archway, still facing directly toward the camera. He slowly sits on a stone bench in meditation posture and continues speaking peacefully. Ancient maps, trade routes, and inscriptions are carved into the wall behind him. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
           "motion_prompt": "slow forward walk transitioning into a seated meditative posture facing camera, continuous mouth movement while speaking, camera settles smoothly on straight axis, no rotation, no orbit, stable framing",
-          "narration": "यह ज्ञान भारत से बाहर गया और संसार को बदल दिया। आज का आधुनिक विज्ञान उसी शून्य पर टिका है — जो हमारे गुरुओं की साधना से जन्मा था।"
+          "narration": "यह ज्ञान भारत से आगे गया — और दुनिया बदल गई। आज का विज्ञान उसी शून्य पर टिका है, जो हमारे गुरुओं की सोच से जन्मा।"
         }
       ]
     }
