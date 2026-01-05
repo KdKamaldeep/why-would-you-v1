@@ -74,7 +74,7 @@ def ensure_ok(condition: bool, message: str) -> None:
         sys.exit(1)
 
 
-def validate_paths(video_path: str, audio_path: str, out_path: str) -> None:
+def validate_paths(video_path: str, audio_path: str, out_path: str, inference_ckpt_path: str) -> None:
     """
     Validate input paths and requirements.
     
@@ -82,6 +82,7 @@ def validate_paths(video_path: str, audio_path: str, out_path: str) -> None:
         video_path: Path to input video file
         audio_path: Path to input audio file
         out_path: Path to output file
+        inference_ckpt_path: Path to LatentSync checkpoint file
     """
     logger.info("Validating paths and requirements...")
     
@@ -89,10 +90,12 @@ def validate_paths(video_path: str, audio_path: str, out_path: str) -> None:
     ensure_ok(os.path.isabs(video_path), f"❌ --video_path must be absolute: {video_path}")
     ensure_ok(os.path.isabs(audio_path), f"❌ --audio_path must be absolute: {audio_path}")
     ensure_ok(os.path.isabs(out_path), f"❌ --out_path must be absolute: {out_path}")
+    ensure_ok(os.path.isabs(inference_ckpt_path), f"❌ --inference_ckpt_path must be absolute: {inference_ckpt_path}")
     
     # Check input files exist
     ensure_ok(os.path.exists(video_path), f"❌ Video file does not exist: {video_path}")
     ensure_ok(os.path.exists(audio_path), f"❌ Audio file does not exist: {audio_path}")
+    ensure_ok(os.path.exists(inference_ckpt_path), f"❌ Inference checkpoint file does not exist: {inference_ckpt_path}")
     
     # Create parent directory for output if needed
     out_parent = Path(out_path).parent
@@ -180,33 +183,37 @@ def preprocess_audio(input_audio: str, output_audio: str, sample_rate: int) -> N
     logger.info(f"✅ Audio preprocessed: {output_audio}")
 
 
-def run_latentsync(temp_video: str, temp_audio: str, out_path: str, guidance_scale: float) -> None:
+def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ckpt_path: str, guidance_scale: float) -> None:
     """
-    Run LatentSync inference.
+    Run LatentSync inference with real-time log streaming.
     
     Args:
         temp_video: Path to preprocessed video file
         temp_audio: Path to preprocessed audio file
         out_path: Path to output file
+        inference_ckpt_path: Path to LatentSync checkpoint file
         guidance_scale: Guidance scale for LatentSync
     """
     logger.info("Running LatentSync inference...")
     logger.info(f"Video: {temp_video}")
     logger.info(f"Audio: {temp_audio}")
     logger.info(f"Output: {out_path}")
+    logger.info(f"Checkpoint: {inference_ckpt_path}")
     logger.info(f"Guidance scale: {guidance_scale}")
     
     # Make paths absolute for LatentSync
     temp_video_abs = os.path.abspath(temp_video)
     temp_audio_abs = os.path.abspath(temp_audio)
     out_path_abs = os.path.abspath(out_path)
+    inference_ckpt_path_abs = os.path.abspath(inference_ckpt_path)
     
     cmd = [
         LATENTSYNC_PYTHON,
         LATENTSYNC_SCRIPT,
         '--video_path', temp_video_abs,
         '--audio_path', temp_audio_abs,
-        '--out_path', out_path_abs,
+        '--video_out_path', out_path_abs,
+        '--inference_ckpt_path', inference_ckpt_path_abs,
         '--guidance_scale', str(guidance_scale)
     ]
     
@@ -218,7 +225,34 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, guidance_sca
     env["PYTHONPATH"] = LATENTSYNC_ROOT
     logger.debug(f"Setting PYTHONPATH to: {LATENTSYNC_ROOT}")
     
-    exit_code, stdout, stderr = run_cmd(cmd, cwd=LATENTSYNC_ROOT, env=env)
+    # Stream output in real-time
+    logger.info("=" * 60)
+    logger.info("LatentSync Output (streaming):")
+    logger.info("=" * 60)
+    
+    process = subprocess.Popen(
+        cmd,
+        cwd=LATENTSYNC_ROOT,
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,  # Merge stderr into stdout
+        text=True,
+        bufsize=1,  # Line buffered
+        universal_newlines=True
+    )
+    
+    # Stream output line by line
+    stdout_lines = []
+    for line in process.stdout:
+        line = line.rstrip()
+        if line:  # Only print non-empty lines
+            print(line, flush=True)  # Print to console in real-time
+            stdout_lines.append(line)
+    
+    # Wait for process to complete
+    exit_code = process.wait()
+    stdout = '\n'.join(stdout_lines)
+    stderr = ''  # Already merged into stdout
     
     if exit_code != 0:
         # Extract last ~2000 chars of stderr and stdout
@@ -226,12 +260,16 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, guidance_sca
         stdout_tail = stdout[-2000:] if len(stdout) > 2000 else stdout
         
         error_msg = f"❌ LatentSync inference failed (exit code {exit_code})\n"
-        error_msg += f"\n=== STDERR (last 2000 chars) ===\n{stderr_tail}\n"
-        error_msg += f"\n=== STDOUT (last 2000 chars) ===\n{stdout_tail}\n"
+        if stderr_tail:
+            error_msg += f"\n=== STDERR (last 2000 chars) ===\n{stderr_tail}\n"
+        if stdout_tail:
+            error_msg += f"\n=== STDOUT (last 2000 chars) ===\n{stdout_tail}\n"
         
         raise RuntimeError(error_msg)
     
+    logger.info("=" * 60)
     logger.info(f"✅ LatentSync inference completed: {out_path}")
+    logger.info("=" * 60)
 
 
 def main() -> None:
@@ -244,12 +282,14 @@ Examples:
   python sync_bridge.py \\
     --video_path /absolute/path/to/video.mp4 \\
     --audio_path /absolute/path/to/audio.wav \\
-    --out_path /absolute/path/to/output.mp4
+    --out_path /absolute/path/to/output.mp4 \\
+    --inference_ckpt_path /absolute/path/to/checkpoint.ckpt
   
   python sync_bridge.py \\
     --video_path /path/to/video.mp4 \\
     --audio_path /path/to/audio.mp3 \\
     --out_path /path/to/output.mp4 \\
+    --inference_ckpt_path /path/to/checkpoint.ckpt \\
     --fps 30 \\
     --sr 22050 \\
     --guidance_scale 2.0 \\
@@ -273,6 +313,11 @@ Examples:
         '--out_path',
         required=True,
         help='Absolute path to output synchronized video (MP4)'
+    )
+    parser.add_argument(
+        '--inference_ckpt_path',
+        required=True,
+        help='Absolute path to LatentSync inference checkpoint file'
     )
     
     # Optional arguments
@@ -313,7 +358,7 @@ Examples:
         logger.debug("Verbose mode enabled")
     
     # Validate paths and requirements
-    validate_paths(args.video_path, args.audio_path, args.out_path)
+    validate_paths(args.video_path, args.audio_path, args.out_path, args.inference_ckpt_path)
     
     # Create temporary directory
     temp_dir = tempfile.mkdtemp(prefix='sync_bridge_')
@@ -338,7 +383,7 @@ Examples:
         logger.info("=" * 60)
         logger.info("Step 3: Running LatentSync inference")
         logger.info("=" * 60)
-        run_latentsync(temp_video, temp_audio, args.out_path, args.guidance_scale)
+        run_latentsync(temp_video, temp_audio, args.out_path, args.inference_ckpt_path, args.guidance_scale)
         
         logger.info("=" * 60)
         logger.info("✅ Synchronization completed successfully!")
