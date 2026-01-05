@@ -63,6 +63,7 @@ def run_cmd(cmd: list[str], cwd: Optional[str] = None, capture_output: bool = Tr
 def normalize_video(input_video: str, output_video: str, fps: int) -> bool:
     """
     Normalize video: force constant fps, ensure even dimensions, yuv420p format.
+    Uses high-quality encoding (CRF 18) to minimize quality loss during re-encoding.
     
     Args:
         input_video: Path to input video file
@@ -82,6 +83,9 @@ def normalize_video(input_video: str, output_video: str, fps: int) -> bool:
             '-r', str(fps),  # Force constant frame rate
             '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2',  # Ensure even dimensions
             '-pix_fmt', 'yuv420p',
+            '-c:v', 'libx264',  # Explicit codec
+            '-crf', '18',  # High quality (lower = better, 18 is visually lossless)
+            '-preset', 'medium',  # Balanced encoding speed/quality
             output_video
         ]
         
