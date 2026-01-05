@@ -144,7 +144,7 @@ def preprocess_video(input_video: str, output_video: str, fps: int) -> None:
         'ffmpeg', '-y',
         '-i', input_video,
         '-an',  # Remove audio
-        '-vf', f'fps={fps},format=yuv420p',  # Force CFR and pixel format
+        '-vf', f'fps={fps},pad=iw*1.3:ih*1.3:(ow-iw)/2:(oh-ih)/2,format=yuv420p',  # Force CFR, add 30% padding, then pixel format
         '-r', str(fps),  # Additional CFR enforcement
         '-c:v', 'libx264',
         '-preset', 'veryfast',
