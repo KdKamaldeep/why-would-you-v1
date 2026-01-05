@@ -109,13 +109,7 @@ python scripts/check_sync_bridge.py \
 
 # Custom settings
 python scripts/check_sync_bridge.py \
-  --video-prompt "Chest-up shot of a real human male presenter speaking directly to the camera.
-Perfectly frontal face, no head tilt, no head rotation.
-Full head and shoulders visible with generous margin on all sides.
-Neutral plain background.
-Flat even lighting with no strong shadows.
-Static camera, no zoom, no camera movement.
-Realistic facial proportions, minimal expression.
+  --video-prompt "Medium close-up of an ancient Indian guru (around 65–70 years old) walking slowly and directly toward the camera along a stone corridor inspired by Nalanda University. Male, long white and grey beard, deeply lined face, serene and wise eyes, high forehead, calm spiritual authority. Wearing simple saffron and off-white robes, rudraksha beads around the neck, holding palm-leaf manuscripts. He is clearly speaking while walking, lips articulating speech, mouth and jaw moving naturally, eyes engaging directly with the camera. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.
 " \
   --audio-text "A dog is running on footpath" \
   --output-dir outputs/test_sync \
@@ -124,3 +118,23 @@ Realistic facial proportions, minimal expression.
   --voice-file /workspace/why-would-you-v1/tts-speaker/voice-male.wav
   --use-wav2lip
   
+For wav2lip these requiremts will work 
+
+# 1) python 3.10 venv
+apt-get update
+apt-get install -y python3.10 python3.10-venv python3.10-dev
+
+cd /workspace/Wav2Lip
+python3.10 -m venv venv310
+source venv310/bin/activate
+python -m pip install -U pip setuptools wheel
+
+# 2) install modern deps (compatible)
+pip install numpy==1.23.5 scipy==1.10.1 librosa==0.9.2 numba==0.56.4 tqdm opencv-python opencv-contrib-python soundfile
+
+# 3) install torch matching CUDA
+nvidia-smi
+# CUDA 12.1/12.2:
+pip install --index-url https://download.pytorch.org/whl/cu121 torch torchvision torchaudio
+# (if CUDA 11.8 use cu118 instead)
+
