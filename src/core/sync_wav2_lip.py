@@ -22,10 +22,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Hardcoded Wav2Lip paths (similar to LatentSync)
+# Hardcoded Wav2Lip paths
 WAV2LIP_ROOT = "/workspace/Wav2Lip"
 WAV2LIP_PYTHON = "/workspace/Wav2Lip/venv/bin/python"
 WAV2LIP_SCRIPT = "/workspace/Wav2Lip/inference.py"
+WAV2LIP_CHECKPOINT = "/workspace/Wav2Lip/checkpoints/Wav2Lip-SD-GAN.pt"
 
 
 def run_cmd(cmd: list[str], cwd: Optional[str] = None, capture_output: bool = True, env: Optional[dict] = None) -> Tuple[int, str, str]:
@@ -81,9 +82,6 @@ def normalize_video(input_video: str, output_video: str, fps: int) -> bool:
             '-r', str(fps),  # Force constant frame rate
             '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2',  # Ensure even dimensions
             '-pix_fmt', 'yuv420p',
-            '-c:v', 'libx264',
-            '-preset', 'fast',
-            '-crf', '23',
             output_video
         ]
         
@@ -102,7 +100,7 @@ def normalize_video(input_video: str, output_video: str, fps: int) -> bool:
 
 def normalize_audio(input_audio: str, output_audio: str) -> bool:
     """
-    Normalize audio: mono, 16kHz, PCM 16-bit.
+    Normalize audio: mono, 16kHz.
     
     Args:
         input_audio: Path to input audio file
@@ -113,14 +111,13 @@ def normalize_audio(input_audio: str, output_audio: str) -> bool:
     """
     try:
         logger.debug(f"Normalizing audio: {input_audio} -> {output_audio}")
-        logger.debug(f"Target: mono, 16kHz, PCM 16-bit")
+        logger.debug(f"Target: mono, 16kHz")
         
         cmd = [
             'ffmpeg', '-y',
             '-i', input_audio,
             '-ac', '1',  # Mono
             '-ar', '16000',  # 16kHz sample rate
-            '-acodec', 'pcm_s16le',  # PCM 16-bit
             output_audio
         ]
         
@@ -143,7 +140,9 @@ def run_wav2lip(
     output_video: str,
     wav2lip_dir: str,
     checkpoint_path: str,
-    python_cmd: Optional[str] = None
+    python_cmd: Optional[str] = None,
+    pads: str = "0 20 0 0",
+    nosmooth: bool = True
 ) -> bool:
     """
     Run Wav2Lip inference using its virtual environment Python.
@@ -155,6 +154,8 @@ def run_wav2lip(
         wav2lip_dir: Path to Wav2Lip repository root
         checkpoint_path: Path to Wav2Lip checkpoint file
         python_cmd: Python command to use (optional, uses WAV2LIP_PYTHON if not provided)
+        pads: Padding values for face detection (default: "0 20 0 0")
+        nosmooth: Disable smoothing (default: True)
         
     Returns:
         True if successful, False otherwise
@@ -193,13 +194,17 @@ def run_wav2lip(
         
         cmd = [
             python_cmd,
-            '-u',  # Unbuffered output (like LatentSync)
+            '-u',  # Unbuffered output
             inference_script,
             '--checkpoint_path', checkpoint_path_abs,
             '--face', norm_video_abs,
             '--audio', norm_audio_abs,
-            '--outfile', output_video_abs
+            '--outfile', output_video_abs,
+            '--pads', pads
         ]
+        
+        if nosmooth:
+            cmd.append('--nosmooth')
         
         exit_code, stdout, stderr = run_cmd(cmd, cwd=wav2lip_dir)
         
@@ -224,7 +229,9 @@ def lipsync_wav2lip(
     fps: int,
     wav2lip_dir: Optional[str] = None,
     checkpoint_path: Optional[str] = None,
-    python_cmd: Optional[str] = None
+    python_cmd: Optional[str] = None,
+    pads: str = "0 20 0 0",
+    nosmooth: bool = True
 ) -> bool:
     """
     Lip-sync video with audio using Wav2Lip.
@@ -244,11 +251,11 @@ def lipsync_wav2lip(
     Returns:
         True if lip-sync succeeded and out_video_mp4 exists with non-trivial size, else False.
     """
-    # Use environment variables or defaults (similar to LatentSync)
+    # Use environment variables or defaults
     if wav2lip_dir is None:
         wav2lip_dir = os.getenv("WAV2LIP_DIR", WAV2LIP_ROOT)
     if checkpoint_path is None:
-        checkpoint_path = os.getenv("WAV2LIP_CHECKPOINT", os.path.join(wav2lip_dir, "checkpoints", "wav2lip_gan.pth"))
+        checkpoint_path = os.getenv("WAV2LIP_CHECKPOINT", WAV2LIP_CHECKPOINT)
     if python_cmd is None:
         python_cmd = os.getenv("WAV2LIP_PYTHON", WAV2LIP_PYTHON)
     
@@ -297,7 +304,7 @@ def lipsync_wav2lip(
         
         # Step 3: Run Wav2Lip (using virtual environment Python)
         logger.info("🎬 Step 3: Running Wav2Lip inference...")
-        if not run_wav2lip(norm_video, norm_audio, out_video_mp4, wav2lip_dir, checkpoint_path, python_cmd):
+        if not run_wav2lip(norm_video, norm_audio, out_video_mp4, wav2lip_dir, checkpoint_path, python_cmd, pads, nosmooth):
             logger.error("❌ Wav2Lip inference failed")
             return False
         

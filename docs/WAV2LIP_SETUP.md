@@ -35,7 +35,7 @@ Wav2Lip is integrated as an **optional** post-process step that can be enabled p
    
    # Download the checkpoint (use wget or curl)
    cd checkpoints
-   wget https://github.com/Rudrabha/Wav2Lip/releases/download/v1.0.0/wav2lip_gan.pth
+   wget https://huggingface.co/Nekochu/Wav2Lip/blob/main/wav2lip_gan.pth
    # Or download manually from: https://github.com/Rudrabha/Wav2Lip/releases
    ```
 

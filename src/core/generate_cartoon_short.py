@@ -594,7 +594,7 @@ class CartoonShortsGenerator:
                     
                     if not self.config.skip_audio and i < len(scene_audio_paths) and scene_audio_paths[i]:
                         if scene_lip_sync:
-                            # Try Wav2Lip (Route A) - uses its own virtual environment Python
+                            # Run Wav2Lip - uses its own virtual environment Python
                             wav2lip_enabled = os.getenv("WAV2LIP_ENABLED", "false").lower() in ("true", "1", "yes")
                             
                             if wav2lip_enabled:
@@ -623,42 +623,8 @@ class CartoonShortsGenerator:
                                     reason = f"Error: {str(e)}"
                                     logger.warning(f"Scene {i+1}: lip_sync=ON → FAILED (fallback to {Path(video_path).name}): {reason}")
                             else:
-                                # Fallback to LatentSync if Wav2Lip not enabled
-                                try:
-                                    logger.info(f"🎙️ Scene {i+1}: Running LatentSync lip sync...")
-                                    latentsync_output = str(clip_path).replace('.mp4', '_lip_synced.mp4')
-                                    
-                                    # Get absolute paths
-                                    video_path_abs = os.path.abspath(str(video_path))
-                                    audio_path_abs = os.path.abspath(scene_audio_paths[i])
-                                    latentsync_output_abs = os.path.abspath(latentsync_output)
-                                    
-                                    # Find sync_bridge.py script (now in src/core)
-                                    sync_bridge_script = Path(__file__).parent / "sync_bridge.py"
-                                    
-                                    if sync_bridge_script.exists():
-                                        cmd = [
-                                            sys.executable,
-                                            str(sync_bridge_script),
-                                            '--video_path', video_path_abs,
-                                            '--audio_path', audio_path_abs,
-                                            '--out_path', latentsync_output_abs,
-                                            '--fps', str(self.config.wan_fps),
-                                            '--sr', '16000',
-                                            '--guidance_scale', '1.5'
-                                        ]
-                                        
-                                        result = subprocess.run(cmd, check=False, capture_output=True, text=True)
-                                        if result.returncode == 0:
-                                            video_path = latentsync_output
-                                            logger.info(f"✅ Scene {i+1}: LatentSync lip sync completed: {latentsync_output}")
-                                        else:
-                                            logger.warning(f"⚠️ Scene {i+1}: LatentSync failed, using original video")
-                                            logger.debug(f"LatentSync stderr: {result.stderr[-500:] if result.stderr else 'No stderr'}")
-                                    else:
-                                        logger.warning(f"⚠️ Scene {i+1}: sync_bridge.py not found at {sync_bridge_script}, skipping LatentSync")
-                                except Exception as e:
-                                    logger.warning(f"⚠️ Scene {i+1}: Error running LatentSync: {e}, using original video")
+                                logger.warning(f"⚠️ Scene {i+1}: WAV2LIP_ENABLED is not set to 'true'. Skipping lip sync.")
+                                logger.info(f"Scene {i+1}: lip_sync=ON but WAV2LIP_ENABLED=false → skipped")
                         else:
                             logger.info(f"Scene {i+1}: lip_sync=OFF → skipped")
                     

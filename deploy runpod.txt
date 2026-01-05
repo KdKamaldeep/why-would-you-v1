@@ -111,7 +111,8 @@ python scripts/check_sync_bridge.py \
 python scripts/check_sync_bridge.py \
   --video-prompt "Medium close-up of an ancient Indian guru (around 65–70 years old) walking slowly and directly toward the camera along a stone corridor inspired by Nalanda University. Male, long white and grey beard, deeply lined face, serene and wise eyes, high forehead, calm spiritual authority. Wearing simple saffron and off-white robes, rudraksha beads around the neck, holding palm-leaf manuscripts. He is clearly speaking while walking, lips articulating speech, mouth and jaw moving naturally, eyes engaging directly with the camera. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.
 " \
-  --audio-text "A dog is running on footpath" \
+  --audio-text "We all count numbers — one, two, three.
+But long ago, humanity was missing the most powerful number of all." \
   --output-dir outputs/test_sync \
   --width 768 --height 768 --num-frames 72 --fps 24 \
   --language en \
@@ -138,3 +139,10 @@ nvidia-smi
 pip install --index-url https://download.pytorch.org/whl/cu121 torch torchvision torchaudio
 # (if CUDA 11.8 use cu118 instead)
 
+python inference.py \
+  --checkpoint_path checkpoints/Wav2Lip-SD-GAN.pt \
+  --face /workspace/why-would-you-v1/outputs/test_sync/video.mp4 \
+  --audio /workspace/why-would-you-v1/outputs/test_sync/audio.wav \
+  --outfile /workspace/why-would-you-v1/outputs/test_sync/video_lipsync.mp4 \
+  --pads 0 20 0 0 \
+  --nosmooth
