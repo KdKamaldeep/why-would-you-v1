@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
 """
-Script to check sync_bridge by generating audio and video with WAN and Coqui,
-then running lipsync on them.
+Script to check sync_bridge and sync_wav2_lip by generating audio and video with WAN and Coqui,
+then running lipsync on them using either LatentSync (sync_bridge) or Wav2Lip.
 
 If audio and video already exist, generation is skipped.
 
 Usage:
     # Generate video using I2V (Gemini generates image, then WAN generates video)
+    # Use LatentSync (default)
     python scripts/check_sync_bridge.py \
         --video-prompt "A cat walks on the grass" \
         --audio-text "This is a cat walking on the grass" \
         --output-dir outputs/test_sync
+
+    # Use Wav2Lip instead
+    python scripts/check_sync_bridge.py \
+        --video-prompt "A cat walks on the grass" \
+        --audio-text "This is a cat walking on the grass" \
+        --output-dir outputs/test_sync \
+        --use-wav2lip
 
     # Skip generation if files exist
     python scripts/check_sync_bridge.py \
@@ -48,6 +56,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.core.wan_t2v import WanT2VGenerator
 from src.core.coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 from src.core.gemini_image_generator import GeminiImageGenerator
+from src.core.sync_wav2_lip import lipsync_wav2lip
 
 # Configure logging
 logging.basicConfig(
@@ -176,6 +185,59 @@ def generate_video_with_wan(
     return video_path
 
 
+def combine_video_audio(video_path: str, audio_path: str, output_path: str) -> str:
+    """
+    Combine video and audio into final output using ffmpeg.
+    
+    Args:
+        video_path: Path to input video file
+        audio_path: Path to input audio file
+        output_path: Path to output video file with audio
+        
+    Returns:
+        Path to output video file
+        
+    Raises:
+        RuntimeError: If combination fails
+    """
+    logger.info("=" * 60)
+    logger.info("🎬 Combining synced video with audio...")
+    logger.info("=" * 60)
+    logger.info(f"📹 Video: {video_path}")
+    logger.info(f"🎵 Audio: {audio_path}")
+    logger.info(f"🎬 Output: {output_path}")
+    
+    # Create output directory if needed
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    
+    cmd = [
+        'ffmpeg', '-y',
+        '-i', video_path,  # Video input
+        '-i', audio_path,  # Audio input
+        '-c:v', 'copy',    # Copy video codec (no re-encoding)
+        '-c:a', 'aac',     # Encode audio as AAC
+        '-b:a', '192k',    # Audio bitrate
+        '-shortest',       # Use shortest stream duration
+        '-movflags', '+faststart',
+        output_path
+    ]
+    
+    try:
+        result = subprocess.run(
+            cmd,
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        logger.info(f"✅ Final video with audio created: {output_path}")
+        return output_path
+    except subprocess.CalledProcessError as e:
+        logger.error(f"❌ Failed to combine video and audio: {e}")
+        if e.stderr:
+            logger.error(f"STDERR: {e.stderr[-500:]}")
+        raise RuntimeError(f"Failed to combine video and audio: {e}")
+
+
 def convert_video_fps(input_video: str, output_video: str, target_fps: int = 25) -> str:
     """
     Convert video to target FPS using ffmpeg.
@@ -296,11 +358,42 @@ def find_latentsync_checkpoint(checkpoint_path: Optional[str] = None) -> str:
             # Sort by modification time (most recent first)
             checkpoints.sort(key=lambda p: p.stat().st_mtime, reverse=True)
             checkpoint_path = checkpoints[0]
-            logger.info(f"✅ Auto-detected checkpoint: {checkpoint_path}")
+            logger.info(f"✅ Auto-detected LatentSync checkpoint: {checkpoint_path}")
             return str(checkpoint_path.absolute())
     
     raise FileNotFoundError(
-        f"No checkpoint found. Please provide --inference-ckpt-path or place a checkpoint in {default_checkpoint_dir}"
+        f"No LatentSync checkpoint found. Please provide --inference-ckpt-path or place a checkpoint in {default_checkpoint_dir}"
+    )
+
+
+def find_wav2lip_checkpoint(checkpoint_path: Optional[str] = None) -> str:
+    """
+    Find Wav2Lip checkpoint file.
+    
+    Args:
+        checkpoint_path: Explicit checkpoint path (optional)
+        
+    Returns:
+        Absolute path to checkpoint file
+        
+    Raises:
+        FileNotFoundError: If no checkpoint found
+    """
+    if checkpoint_path:
+        checkpoint_abs = os.path.abspath(checkpoint_path)
+        if os.path.exists(checkpoint_abs):
+            return checkpoint_abs
+        else:
+            raise FileNotFoundError(f"Checkpoint file not found: {checkpoint_abs}")
+    
+    # Try default location
+    default_checkpoint = Path("/workspace/Wav2Lip/checkpoints/wav2lip_gan.pth")
+    if default_checkpoint.exists():
+        logger.info(f"✅ Auto-detected Wav2Lip checkpoint: {default_checkpoint}")
+        return str(default_checkpoint.absolute())
+    
+    raise FileNotFoundError(
+        f"No Wav2Lip checkpoint found. Please provide --wav2lip-checkpoint or place wav2lip_gan.pth in /workspace/Wav2Lip/checkpoints/"
     )
 
 
@@ -315,7 +408,7 @@ def run_sync_bridge(
     verbose: bool = False
 ) -> bool:
     """
-    Run sync_bridge.py to perform lipsync.
+    Run sync_bridge.py to perform lipsync using LatentSync.
     
     Args:
         video_path: Path to input video (must be absolute)
@@ -331,7 +424,7 @@ def run_sync_bridge(
         True if successful, False otherwise
     """
     logger.info("=" * 60)
-    logger.info("🔄 Running sync_bridge (lipsync)...")
+    logger.info("🔄 Running sync_bridge (LatentSync)...")
     logger.info("=" * 60)
     
     # Convert paths to absolute
@@ -377,10 +470,10 @@ def run_sync_bridge(
         )
         
         if result.returncode == 0:
-            logger.info(f"✅ Lipsync completed: {output_path_abs}")
+            logger.info(f"✅ LatentSync lipsync completed: {output_path_abs}")
             return True
         else:
-            logger.error(f"❌ Lipsync failed with exit code {result.returncode}")
+            logger.error(f"❌ LatentSync lipsync failed with exit code {result.returncode}")
             if result.stderr:
                 logger.error(f"STDERR: {result.stderr[-1000:]}")
             if result.stdout:
@@ -392,30 +485,108 @@ def run_sync_bridge(
         return False
 
 
+def run_wav2lip_lipsync(
+    video_path: str,
+    audio_path: str,
+    output_path: str,
+    checkpoint_path: str,
+    fps: int = 24,
+    wav2lip_dir: Optional[str] = None,
+    verbose: bool = False
+) -> bool:
+    """
+    Run sync_wav2_lip to perform lipsync using Wav2Lip.
+    
+    Args:
+        video_path: Path to input video
+        audio_path: Path to input audio
+        output_path: Path to output synchronized video
+        checkpoint_path: Path to Wav2Lip checkpoint file
+        fps: Target frame rate (default: 24)
+        wav2lip_dir: Path to Wav2Lip directory (optional, uses default if None)
+        verbose: Enable verbose logging
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    logger.info("=" * 60)
+    logger.info("🔄 Running Wav2Lip lipsync...")
+    logger.info("=" * 60)
+    
+    # Convert paths to absolute
+    video_path_abs = os.path.abspath(video_path)
+    audio_path_abs = os.path.abspath(audio_path)
+    output_path_abs = os.path.abspath(output_path)
+    
+    # Create output directory if needed
+    Path(output_path_abs).parent.mkdir(parents=True, exist_ok=True)
+    
+    try:
+        success = lipsync_wav2lip(
+            in_video_mp4=video_path_abs,
+            in_audio_wav=audio_path_abs,
+            out_video_mp4=output_path_abs,
+            fps=fps,
+            wav2lip_dir=wav2lip_dir,  # None uses default from sync_wav2_lip.py
+            checkpoint_path=checkpoint_path,
+            python_cmd=None  # Uses Wav2Lip venv Python by default
+        )
+        
+        if success:
+            logger.info(f"✅ Wav2Lip lipsync completed: {output_path_abs}")
+            return True
+        else:
+            logger.error(f"❌ Wav2Lip lipsync failed")
+            return False
+            
+    except Exception as e:
+        logger.error(f"❌ Error running Wav2Lip lipsync: {e}")
+        import traceback
+        if verbose:
+            logger.debug(traceback.format_exc())
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate audio and video with WAN and Coqui, then run lipsync",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Generate everything from scratch (auto-detects checkpoint from /workspace/LatentSync/checkpoints)
+  # Generate everything from scratch with LatentSync (default)
   python scripts/check_sync_bridge.py \\
     --video-prompt "A cat walks on the grass" \\
     --audio-text "This is a cat walking on the grass" \\
     --output-dir outputs/test_sync
 
-  # Use existing video and audio files
+  # Use Wav2Lip instead
+  python scripts/check_sync_bridge.py \\
+    --video-prompt "A cat walks on the grass" \\
+    --audio-text "This is a cat walking on the grass" \\
+    --output-dir outputs/test_sync \\
+    --use-wav2lip
+
+  # Use existing video and audio files with Wav2Lip
   python scripts/check_sync_bridge.py \\
     --video-path outputs/test_sync/video.mp4 \\
     --audio-path outputs/test_sync/audio.wav \\
-    --output-dir outputs/test_sync
+    --output-dir outputs/test_sync \\
+    --use-wav2lip
 
-  # Specify custom checkpoint path
+  # Specify custom checkpoint path (LatentSync)
   python scripts/check_sync_bridge.py \\
     --video-prompt "A dog running" \\
     --audio-text "A dog is running" \\
     --output-dir outputs/test_sync \\
     --inference-ckpt-path /absolute/path/to/checkpoint.ckpt
+
+  # Specify custom checkpoint path (Wav2Lip)
+  python scripts/check_sync_bridge.py \\
+    --video-prompt "A dog running" \\
+    --audio-text "A dog is running" \\
+    --output-dir outputs/test_sync \\
+    --use-wav2lip \\
+    --wav2lip-checkpoint /absolute/path/to/wav2lip_gan.pth
 
   # Custom WAN settings
   python scripts/check_sync_bridge.py \\
@@ -537,7 +708,14 @@ Examples:
         help='Path to reference audio file for voice cloning (optional)'
     )
     
-    # Sync bridge settings
+    # Lipsync method selection
+    parser.add_argument(
+        '--use-wav2lip',
+        action='store_true',
+        help='Use Wav2Lip instead of LatentSync for lipsync (default: use LatentSync)'
+    )
+    
+    # LatentSync settings
     parser.add_argument(
         '--inference-ckpt-path',
         type=str,
@@ -548,19 +726,33 @@ Examples:
         '--sync-fps',
         type=int,
         default=25,
-        help='Target frame rate for sync_bridge (default: 25)'
+        help='Target frame rate for lipsync (default: 25 for LatentSync, 24 for Wav2Lip)'
     )
     parser.add_argument(
         '--sync-sr',
         type=int,
         default=16000,
-        help='Target sample rate for sync_bridge (default: 16000)'
+        help='Target sample rate for LatentSync (default: 16000, not used for Wav2Lip)'
     )
     parser.add_argument(
         '--sync-guidance',
         type=float,
         default=1.5,
-        help='Guidance scale for LatentSync (default: 1.5)'
+        help='Guidance scale for LatentSync (default: 1.5, not used for Wav2Lip)'
+    )
+    
+    # Wav2Lip settings
+    parser.add_argument(
+        '--wav2lip-checkpoint',
+        type=str,
+        default=None,
+        help='Path to Wav2Lip checkpoint file (optional, auto-detects from /workspace/Wav2Lip/checkpoints/wav2lip_gan.pth if not provided)'
+    )
+    parser.add_argument(
+        '--wav2lip-dir',
+        type=str,
+        default=None,
+        help='Path to Wav2Lip directory (optional, uses /workspace/Wav2Lip by default)'
     )
     
     # Other options
@@ -640,53 +832,141 @@ Examples:
     if not args.skip_lipsync:
         output_path = str(output_dir / f"{args.output_name}.mp4")
         
-        # Convert video to 25 fps (LatentSync requirement) before sync
-        # WAN generates at 24 fps, but LatentSync needs 25 fps
-        if args.sync_fps != args.fps:
+        if args.use_wav2lip:
+            # Wav2Lip path
             logger.info("=" * 60)
-            logger.info(f"🔄 Converting video from {args.fps} fps to {args.sync_fps} fps for LatentSync...")
+            logger.info("🎬 Using Wav2Lip for lipsync")
             logger.info("=" * 60)
-            converted_video_path = str(output_dir / f"{Path(video_path).stem}_25fps.mp4")
+            
+            # Convert video FPS if needed (Wav2Lip typically works with 24fps, but can use any)
+            wav2lip_fps = args.sync_fps if args.sync_fps else args.fps
+            if wav2lip_fps != args.fps:
+                logger.info("=" * 60)
+                logger.info(f"🔄 Converting video from {args.fps} fps to {wav2lip_fps} fps for Wav2Lip...")
+                logger.info("=" * 60)
+                converted_video_path = str(output_dir / f"{Path(video_path).stem}_{wav2lip_fps}fps.mp4")
+                try:
+                    video_path = convert_video_fps(
+                        input_video=video_path,
+                        output_video=converted_video_path,
+                        target_fps=wav2lip_fps
+                    )
+                except Exception as e:
+                    logger.error(f"❌ Failed to convert video FPS: {e}")
+                    logger.warning("⚠️ Continuing with original video (may cause sync issues)")
+            
+            # Find Wav2Lip checkpoint (auto-detect if not provided)
             try:
-                video_path = convert_video_fps(
-                    input_video=video_path,
-                    output_video=converted_video_path,
-                    target_fps=args.sync_fps
-                )
-            except Exception as e:
-                logger.error(f"❌ Failed to convert video FPS: {e}")
-                logger.warning("⚠️ Continuing with original video (may cause sync issues)")
-        
-        # Find checkpoint (auto-detect if not provided)
-        try:
-            inference_ckpt_path = find_latentsync_checkpoint(args.inference_ckpt_path)
-        except FileNotFoundError as e:
-            logger.error(f"❌ {e}")
-            sys.exit(1)
-        
-        success = run_sync_bridge(
-            video_path=video_path,
-            audio_path=audio_path,
-            output_path=output_path,
-            inference_ckpt_path=inference_ckpt_path,
-            fps=args.sync_fps,
-            sample_rate=args.sync_sr,
-            guidance_scale=args.sync_guidance,
-            verbose=args.verbose
-        )
-        
-        if success:
-            logger.info("=" * 60)
-            logger.info("✅ All steps completed successfully!")
-            logger.info(f"📹 Video: {video_path}")
-            logger.info(f"🎵 Audio: {audio_path}")
-            logger.info(f"🎬 Synced output: {output_path}")
-            logger.info("=" * 60)
+                wav2lip_checkpoint = find_wav2lip_checkpoint(args.wav2lip_checkpoint)
+            except FileNotFoundError as e:
+                logger.error(f"❌ {e}")
+                sys.exit(1)
+            
+            # Run Wav2Lip (outputs synced video without audio)
+            synced_video_path = str(output_dir / f"{Path(output_path).stem}_synced_only.mp4")
+            success = run_wav2lip_lipsync(
+                video_path=video_path,
+                audio_path=audio_path,
+                output_path=synced_video_path,
+                checkpoint_path=wav2lip_checkpoint,
+                fps=wav2lip_fps,
+                wav2lip_dir=args.wav2lip_dir,
+                verbose=args.verbose
+            )
+            
+            if success:
+                # Combine synced video with original audio
+                try:
+                    final_output = combine_video_audio(
+                        video_path=synced_video_path,
+                        audio_path=audio_path,
+                        output_path=output_path
+                    )
+                    logger.info("=" * 60)
+                    logger.info("✅ All steps completed successfully!")
+                    logger.info(f"📹 Original video: {video_path}")
+                    logger.info(f"🎵 Audio: {audio_path}")
+                    logger.info(f"🎬 Synced video (no audio): {synced_video_path}")
+                    logger.info(f"🎬 Final output (with audio): {final_output}")
+                    logger.info("=" * 60)
+                except Exception as e:
+                    logger.error("=" * 60)
+                    logger.error(f"❌ Failed to combine video and audio: {e}")
+                    logger.error("=" * 60)
+                    sys.exit(1)
+            else:
+                logger.error("=" * 60)
+                logger.error("❌ Wav2Lip lipsync failed. Check logs above for details.")
+                logger.error("=" * 60)
+                sys.exit(1)
         else:
-            logger.error("=" * 60)
-            logger.error("❌ Lipsync failed. Check logs above for details.")
-            logger.error("=" * 60)
-            sys.exit(1)
+            # LatentSync path (default)
+            logger.info("=" * 60)
+            logger.info("🎬 Using LatentSync for lipsync")
+            logger.info("=" * 60)
+            
+            # Convert video to 25 fps (LatentSync requirement) before sync
+            # WAN generates at 24 fps, but LatentSync needs 25 fps
+            if args.sync_fps != args.fps:
+                logger.info("=" * 60)
+                logger.info(f"🔄 Converting video from {args.fps} fps to {args.sync_fps} fps for LatentSync...")
+                logger.info("=" * 60)
+                converted_video_path = str(output_dir / f"{Path(video_path).stem}_25fps.mp4")
+                try:
+                    video_path = convert_video_fps(
+                        input_video=video_path,
+                        output_video=converted_video_path,
+                        target_fps=args.sync_fps
+                    )
+                except Exception as e:
+                    logger.error(f"❌ Failed to convert video FPS: {e}")
+                    logger.warning("⚠️ Continuing with original video (may cause sync issues)")
+            
+            # Find LatentSync checkpoint (auto-detect if not provided)
+            try:
+                inference_ckpt_path = find_latentsync_checkpoint(args.inference_ckpt_path)
+            except FileNotFoundError as e:
+                logger.error(f"❌ {e}")
+                sys.exit(1)
+            
+            # Run LatentSync (outputs synced video, may or may not have audio)
+            synced_video_path = str(output_dir / f"{Path(output_path).stem}_synced_only.mp4")
+            success = run_sync_bridge(
+                video_path=video_path,
+                audio_path=audio_path,
+                output_path=synced_video_path,
+                inference_ckpt_path=inference_ckpt_path,
+                fps=args.sync_fps,
+                sample_rate=args.sync_sr,
+                guidance_scale=args.sync_guidance,
+                verbose=args.verbose
+            )
+            
+            if success:
+                # Combine synced video with original audio (ensures we use the correct audio)
+                try:
+                    final_output = combine_video_audio(
+                        video_path=synced_video_path,
+                        audio_path=audio_path,
+                        output_path=output_path
+                    )
+                    logger.info("=" * 60)
+                    logger.info("✅ All steps completed successfully!")
+                    logger.info(f"📹 Original video: {video_path}")
+                    logger.info(f"🎵 Audio: {audio_path}")
+                    logger.info(f"🎬 Synced video (from LatentSync): {synced_video_path}")
+                    logger.info(f"🎬 Final output (with audio): {final_output}")
+                    logger.info("=" * 60)
+                except Exception as e:
+                    logger.error("=" * 60)
+                    logger.error(f"❌ Failed to combine video and audio: {e}")
+                    logger.error("=" * 60)
+                    sys.exit(1)
+            else:
+                logger.error("=" * 60)
+                logger.error("❌ LatentSync lipsync failed. Check logs above for details.")
+                logger.error("=" * 60)
+                sys.exit(1)
     else:
         logger.info("=" * 60)
         logger.info("✅ Video and audio generation completed (lipsync skipped)")

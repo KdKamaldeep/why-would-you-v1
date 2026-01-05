@@ -33,6 +33,7 @@ from .wan_t2v import WanT2VGenerator
 from .coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 from .video_processor import VideoProcessor, VideoConfig as VPConfig
 from .gemini_image_generator import GeminiImageGenerator
+from .sync_wav2_lip import lipsync_wav2lip
 
 
 # Load environment variables (try .env first, then config.env as fallback)
@@ -588,43 +589,78 @@ class CartoonShortsGenerator:
                         else:
                             logger.info(f"✅ Scene {i+1}: Video duration ({actual_duration:.2f}s) already matches audio ({target_audio_duration:.2f}s)")
                     
-                    # Run LatentSync lip sync if audio is available
+                    # Run lip sync if audio is available and scene has lip_sync enabled
+                    scene_lip_sync = scene.get('lip_sync', False)
+                    
                     if not self.config.skip_audio and i < len(scene_audio_paths) and scene_audio_paths[i]:
-                        try:
-                            logger.info(f"🎙️ Scene {i+1}: Running LatentSync lip sync...")
-                            latentsync_output = str(clip_path).replace('.mp4', '_lip_synced.mp4')
+                        if scene_lip_sync:
+                            # Try Wav2Lip (Route A) - uses its own virtual environment Python
+                            wav2lip_enabled = os.getenv("WAV2LIP_ENABLED", "false").lower() in ("true", "1", "yes")
                             
-                            # Get absolute paths
-                            video_path_abs = os.path.abspath(str(video_path))
-                            audio_path_abs = os.path.abspath(scene_audio_paths[i])
-                            latentsync_output_abs = os.path.abspath(latentsync_output)
-                            
-                            # Find sync_bridge.py script (now in src/core)
-                            sync_bridge_script = Path(__file__).parent / "sync_bridge.py"
-                            
-                            if sync_bridge_script.exists():
-                                cmd = [
-                                    sys.executable,
-                                    str(sync_bridge_script),
-                                    '--video_path', video_path_abs,
-                                    '--audio_path', audio_path_abs,
-                                    '--out_path', latentsync_output_abs,
-                                    '--fps', str(self.config.wan_fps),
-                                    '--sr', '16000',
-                                    '--guidance_scale', '1.5'
-                                ]
-                                
-                                result = subprocess.run(cmd, check=False, capture_output=True, text=True)
-                                if result.returncode == 0:
-                                    video_path = latentsync_output
-                                    logger.info(f"✅ Scene {i+1}: LatentSync lip sync completed: {latentsync_output}")
-                                else:
-                                    logger.warning(f"⚠️ Scene {i+1}: LatentSync failed, using original video")
-                                    logger.debug(f"LatentSync stderr: {result.stderr[-500:] if result.stderr else 'No stderr'}")
+                            if wav2lip_enabled:
+                                try:
+                                    wav2lip_output = str(clip_path).replace('.mp4', '_lipsync.mp4')
+                                    logger.info(f"🎙️ Scene {i+1}: lip_sync=ON → Running Wav2Lip...")
+                                    
+                                    # Pass None to use default paths from sync_wav2_lip.py (which uses env vars or hardcoded defaults)
+                                    success = lipsync_wav2lip(
+                                        in_video_mp4=str(video_path),
+                                        in_audio_wav=scene_audio_paths[i],
+                                        out_video_mp4=wav2lip_output,
+                                        fps=self.config.wan_fps,
+                                        wav2lip_dir=None,  # Use default from sync_wav2_lip.py
+                                        checkpoint_path=None,  # Use default from sync_wav2_lip.py
+                                        python_cmd=None  # Use Wav2Lip venv Python (default: /workspace/Wav2Lip/venv/bin/python)
+                                    )
+                                    
+                                    if success:
+                                        video_path = wav2lip_output
+                                        logger.info(f"Scene {i+1}: lip_sync=ON → SUCCESS ({Path(wav2lip_output).name})")
+                                    else:
+                                        reason = "Wav2Lip inference failed"
+                                        logger.warning(f"Scene {i+1}: lip_sync=ON → FAILED (fallback to {Path(video_path).name}): {reason}")
+                                except Exception as e:
+                                    reason = f"Error: {str(e)}"
+                                    logger.warning(f"Scene {i+1}: lip_sync=ON → FAILED (fallback to {Path(video_path).name}): {reason}")
                             else:
-                                logger.warning(f"⚠️ Scene {i+1}: sync_bridge.py not found at {sync_bridge_script}, skipping LatentSync")
-                        except Exception as e:
-                            logger.warning(f"⚠️ Scene {i+1}: Error running LatentSync: {e}, using original video")
+                                # Fallback to LatentSync if Wav2Lip not enabled
+                                try:
+                                    logger.info(f"🎙️ Scene {i+1}: Running LatentSync lip sync...")
+                                    latentsync_output = str(clip_path).replace('.mp4', '_lip_synced.mp4')
+                                    
+                                    # Get absolute paths
+                                    video_path_abs = os.path.abspath(str(video_path))
+                                    audio_path_abs = os.path.abspath(scene_audio_paths[i])
+                                    latentsync_output_abs = os.path.abspath(latentsync_output)
+                                    
+                                    # Find sync_bridge.py script (now in src/core)
+                                    sync_bridge_script = Path(__file__).parent / "sync_bridge.py"
+                                    
+                                    if sync_bridge_script.exists():
+                                        cmd = [
+                                            sys.executable,
+                                            str(sync_bridge_script),
+                                            '--video_path', video_path_abs,
+                                            '--audio_path', audio_path_abs,
+                                            '--out_path', latentsync_output_abs,
+                                            '--fps', str(self.config.wan_fps),
+                                            '--sr', '16000',
+                                            '--guidance_scale', '1.5'
+                                        ]
+                                        
+                                        result = subprocess.run(cmd, check=False, capture_output=True, text=True)
+                                        if result.returncode == 0:
+                                            video_path = latentsync_output
+                                            logger.info(f"✅ Scene {i+1}: LatentSync lip sync completed: {latentsync_output}")
+                                        else:
+                                            logger.warning(f"⚠️ Scene {i+1}: LatentSync failed, using original video")
+                                            logger.debug(f"LatentSync stderr: {result.stderr[-500:] if result.stderr else 'No stderr'}")
+                                    else:
+                                        logger.warning(f"⚠️ Scene {i+1}: sync_bridge.py not found at {sync_bridge_script}, skipping LatentSync")
+                                except Exception as e:
+                                    logger.warning(f"⚠️ Scene {i+1}: Error running LatentSync: {e}, using original video")
+                        else:
+                            logger.info(f"Scene {i+1}: lip_sync=OFF → skipped")
                     
                     video_clips.append(video_path)
                     total_video_duration += actual_duration

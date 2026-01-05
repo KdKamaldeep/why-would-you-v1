@@ -103,15 +103,24 @@ python scripts/check_sync_bridge.py \
 
 # Use existing files (skips generation)
 python scripts/check_sync_bridge.py \
-    --video-path outputs/test_sync/video.mp4 \
-    --audio-path outputs/test_sync/audio.wav \
+    --video-path /workspace/why-would-you-v1/outputs/test_sync/video.mp4 \
+    --audio-path /workspace/why-would-you-v1/outputs/test_sync/audio.wav \
     --output-dir outputs/test_sync
 
 # Custom settings
 python scripts/check_sync_bridge.py \
-  --video-prompt "Medium close-up, chest-up shot of a human man speaking directly to the camera, full head visible with space above the forehead and below the chin, shoulders visible, frontal face, neutral background, soft directional lighting, stable camera, natural mouth movement" \
+  --video-prompt "Chest-up shot of a real human male presenter speaking directly to the camera.
+Perfectly frontal face, no head tilt, no head rotation.
+Full head and shoulders visible with generous margin on all sides.
+Neutral plain background.
+Flat even lighting with no strong shadows.
+Static camera, no zoom, no camera movement.
+Realistic facial proportions, minimal expression.
+" \
   --audio-text "A dog is running on footpath" \
   --output-dir outputs/test_sync \
   --width 768 --height 768 --num-frames 72 --fps 24 \
   --language en \
   --voice-file /workspace/why-would-you-v1/tts-speaker/voice-male.wav
+  --use-wav2lip
+  

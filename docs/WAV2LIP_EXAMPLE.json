@@ -1,0 +1,44 @@
+{
+  "stories": [
+    {
+      "title": "Example Story with Lip Sync",
+      "slug": "example-lip-sync",
+      "description": "Example storyboard showing lip_sync configuration",
+      "total_duration": 21,
+      "aspect_ratio": "16:9",
+      "scenes": [
+        {
+          "id": "scene_01",
+          "duration": 7,
+          "narration": "Did you know that lip-syncing can be enabled per-scene?",
+          "lip_sync": true,
+          "visual_prompt": "A person speaking with synchronized lip movements",
+          "visual_reference": "Close-up of a face speaking",
+          "negative_prompt": "text, watermark, blurry",
+          "fps_hint": 24
+        },
+        {
+          "id": "scene_02",
+          "duration": 7,
+          "narration": "You can enable or disable it for each scene individually.",
+          "lip_sync": false,
+          "visual_prompt": "A landscape scene without faces",
+          "visual_reference": "Wide landscape shot",
+          "negative_prompt": "text, watermark, blurry",
+          "fps_hint": 24
+        },
+        {
+          "id": "scene_03",
+          "duration": 7,
+          "narration": "This scene will have lip-syncing enabled.",
+          "lip_sync": true,
+          "visual_prompt": "Another person speaking",
+          "visual_reference": "Medium shot of a person",
+          "negative_prompt": "text, watermark, blurry",
+          "fps_hint": 24
+        }
+      ]
+    }
+  ]
+}
+
