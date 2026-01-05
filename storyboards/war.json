@@ -2,64 +2,91 @@
   "stories": [
     {
       "title": "When Zero Was Born in India",
-      "description": "An Indian mathematician walks through history, explaining how zero was invented in India and changed the world.",
-      "total_duration": 40,
+      "description": "An ancient Indian guru explains how zero was conceived in India and transformed human understanding.",
+      "total_duration": 36,
       "aspect_ratio": "9:16",
       "fps": 16,
       "scenes": [
         {
-          "id": "scene_01_hook_walk",
-          "duration": 6,
-          "num_frames": 96,
+          "id": "scene_01_hook_question",
+          "duration": 4,
+          "num_frames": 64,
           "visual_reference": "identity_anchor_mathematician.png",
-          "visual_prompt": "Medium close-up of the  ancient Indian mathematician walking slowly toward the camera along a stone corridor inspired by Nalanda University. Male, early 30s, short beard, calm but confident face, simple cotton robe, holding palm-leaf manuscripts. He is clearly speaking while walking, mouth moving naturally, eyes engaging directly with the camera.",
-          "motion_prompt": "slow forward walk, smooth camera tracking backward at chest height, natural speaking mouth and jaw movement, gentle head nods while talking, light robe sway, stable framing",
-          "narration": "हर कोई अंकों को जानता है। एक, दो, तीन। लेकिन इतिहास यह पूछना भूल गया कि शून्य कहाँ से आया।"
+          "visual_prompt": "Medium close-up of an ancient Indian guru (around 65–70 years old) walking slowly and directly toward the camera along a stone corridor inspired by Nalanda University. Male, long white and grey beard, deeply lined face, serene and wise eyes, high forehead, calm spiritual authority. Wearing simple saffron and off-white robes, rudraksha beads around the neck, holding palm-leaf manuscripts. He is clearly speaking while walking, lips articulating speech, mouth and jaw moving naturally, eyes engaging directly with the camera. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
+          "motion_prompt": "slow reverent forward walk, camera tracking backward on straight axis, no rotation, no orbit, no angle change, continuous speaking mouth and jaw movement, gentle head nods of emphasis, soft robe movement, stable framing",
+          "narration": "हम एक, दो, तीन गिनते हैं।"
         },
         {
-          "id": "scene_02_origin_india",
-          "duration": 6,
-          "num_frames": 96,
+          "id": "scene_02_hook_nothing",
+          "duration": 4,
+          "num_frames": 64,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium shot of the ancient mathematician continuing to walk through an ancient courtyard with stone pillars and scholars behind him. He keeps walking forward and continues speaking, mouth clearly moving, occasionally glancing back to the camera.",
-          "motion_prompt": "steady walking pace, smooth backward camera tracking, visible speaking mouth movement, subtle footstep rhythm, light background scholar movement",
-          "narration": "यह यूरोप से नहीं आया। शून्य का जन्म यहीं हुआ — भारत में।"
+          "visual_prompt": "Same ancient Indian guru, still walking directly toward the camera in the same Nalanda-inspired stone corridor. He keeps calm authority and continues speaking clearly with natural mouth and jaw movement. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
+          "motion_prompt": "steady slow forward walk, camera tracking backward on straight axis, no rotation, no orbit, no angle change, continuous speaking mouth movement, subtle eyebrow emphasis, stable framing",
+          "narration": "लेकिन जब कुछ भी नहीं हो… उसे क्या कहें?"
         },
         {
-          "id": "scene_03_problem_before_zero",
-          "duration": 6,
-          "num_frames": 96,
+          "id": "scene_03_old_world_problem",
+          "duration": 4,
+          "num_frames": 64,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of the mathematician walking alongside a stone wall carved with faint mathematical symbols. He continues walking and speaking at the same time, using gentle hand gestures to explain, mouth moving naturally.",
-          "motion_prompt": "slow continuous walk, synchronized hand gestures while speaking, visible mouth movement, steady backward camera movement, soft background parallax",
-          "narration": "शून्य से पहले, संख्याएँ चीज़ों को गिन सकती थीं। लेकिन वे ‘कुछ नहीं’ को समझा नहीं सकती थीं।"
+          "visual_prompt": "Same guru, front-facing, speaking while walking. The corridor feels older and more ancient, with faint chalk marks of numbers on stone. Mouth articulates speech clearly. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
+          "motion_prompt": "slow walk continues, gentle head nods, camera tracking backward on straight axis, no rotation, no orbit, stable framing",
+          "narration": "एक समय था जब ‘कुछ नहीं’ का नाम ही नहीं था।"
         },
         {
-          "id": "scene_04_definition",
-          "duration": 6,
-          "num_frames": 96,
+          "id": "scene_04_india_answer",
+          "duration": 4,
+          "num_frames": 64,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of the mathematician walking more slowly now, turning his shoulders slightly toward the camera while still moving forward. Manuscripts and writing tools appear behind him. He continues speaking clearly as he walks.",
-          "motion_prompt": "slower walking pace, gentle camera tracking, clear mouth movement while talking, subtle head emphasis on key words, calm and deliberate motion",
-          "narration": "भारतीय विद्वानों ने शून्य का केवल उपयोग नहीं किया। उन्होंने उसे परिभाषित किया। उसे नियम दिए।"
+          "visual_prompt": "Medium shot of the same guru walking directly toward the camera through an open courtyard with stone pillars and young disciples studying behind him. He speaks with certainty, mouth clearly moving and lips articulating each word. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
+          "motion_prompt": "steady dignified forward walk, camera tracking backward on straight axis, no rotation, no orbit, no angle change, continuous speaking mouth movement, gentle background disciple motion, stable framing",
+          "narration": "इसका उत्तर भारत में मिला।"
         },
         {
-          "id": "scene_05_world_impact",
-          "duration": 6,
-          "num_frames": 96,
+          "id": "scene_05_zero_becomes_number",
+          "duration": 4,
+          "num_frames": 64,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium shot of the mathematician walking confidently past students studying on wooden boards. He continues speaking while walking, mouth moving clearly, expression firm and assured.",
-          "motion_prompt": "smooth confident walking motion, steady backward camera tracking, visible speaking mouth movement, slight increase in background activity, stable framing",
-          "narration": "शून्य के बिना न बीजगणित होता, न विज्ञान, और न ही आधुनिक दुनिया।"
+          "visual_prompt": "Same guru, front-facing in the courtyard, continuing to walk slowly. He raises one hand subtly while explaining, mouth moving clearly. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
+          "motion_prompt": "slow controlled hand emphasis while walking, camera tracking backward on straight axis, no rotation, no orbit, stable framing, continuous speaking mouth movement",
+          "narration": "आचार्यों ने शून्य को खाली जगह नहीं, एक संख्या बनाया।"
         },
         {
-          "id": "scene_06_travel_world",
-          "duration": 6,
-          "num_frames": 96,
+          "id": "scene_06_rules_and_meaning",
+          "duration": 4,
+          "num_frames": 64,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of the mathematician walking toward a stone bench beneath a shaded archway. While still speaking, he slows down, turns, and sits on the bench, continuing to talk after sitting. Ancient maps and trade routes are carved into the walls behind him.",
-          "motion_prompt": "slow forward walk transitioning into a gentle stop, natural body movement as he turns and sits down, continuous mouth movement while speaking, camera slows and settles smoothly, robe folds adjust naturally, framing remains stable",
-          "narration": "यह विचार भारत से दुनिया तक पहुँचा — धीरे-धीरे, लेकिन सब कुछ बदलते हुए।"
+          "visual_prompt": "Medium close-up of the guru walking directly toward the camera beside stone walls carved with ancient numerical symbols and yantras. He speaks calmly, lips articulating each word. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
+          "motion_prompt": "slow continuous walk, synchronized forward-facing hand gestures while speaking, camera tracking backward on straight axis, no rotation, no orbit, stable framing",
+          "narration": "और उसके अपने नियम और अर्थ भी थे।"
+        },
+        {
+          "id": "scene_07_power_growth",
+          "duration": 4,
+          "num_frames": 64,
+          "visual_reference": "use_previous_scene_image_as_reference",
+          "visual_prompt": "Same guru, front-facing, still beside carved stone symbols. His expression becomes slightly more intense as he explains the impact, mouth moving clearly. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
+          "motion_prompt": "slow walk continues, gentle head nods of emphasis, camera tracking backward on straight axis, no rotation, no orbit, stable framing, continuous speaking mouth movement",
+          "narration": "शून्य ने संख्याओं को नई शक्ति दी।"
+        },
+        {
+          "id": "scene_08_science_flight",
+          "duration": 4,
+          "num_frames": 64,
+          "visual_reference": "use_previous_scene_image_as_reference",
+          "visual_prompt": "Same guru, front-facing, still beside ancient symbols, now calmer again. He explains with slow hand gestures, mouth articulating speech clearly. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
+          "motion_prompt": "slow continuous walk, subtle forward-facing hand gestures, camera tracking backward on straight axis, no rotation, no orbit, stable framing, continuous speaking mouth movement",
+          "narration": "बड़ी गणनाएँ संभव हुईं—गणित और खगोल विज्ञान आगे बढ़े।"
+        },
+        {
+          "id": "scene_09_world_changes",
+          "duration": 4,
+          "num_frames": 64,
+          "visual_reference": "use_previous_scene_image_as_reference",
+          "visual_prompt": "Medium close-up of the guru under a shaded stone archway, still facing directly toward the camera. He slowly sits on a stone bench in meditation posture and continues speaking peacefully. Ancient maps, trade routes, and inscriptions are carved into the wall behind him. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.",
+          "motion_prompt": "slow forward walk transitioning into a seated meditative posture facing camera, continuous mouth movement while speaking, camera settles smoothly on straight axis, no rotation, no orbit, stable framing",
+          "narration": "यह ज्ञान भारत से बाहर गया—और आज का विज्ञान उसी शून्य पर टिका है।"
         }
       ]
     }

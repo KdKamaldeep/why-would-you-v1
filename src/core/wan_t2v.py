@@ -21,6 +21,59 @@ from PIL import Image
 
 logger = logging.getLogger(__name__)
 
+
+def write_frames_fast(frames, out_dir):
+    """Write frames as JPEG files quickly using OpenCV."""
+    import os
+    import cv2
+    os.makedirs(out_dir, exist_ok=True)
+    for i, frame in enumerate(frames):
+        cv2.imwrite(
+            os.path.join(out_dir, f"{i:06d}.jpg"),
+            cv2.cvtColor(frame, cv2.COLOR_RGB2BGR),
+            [int(cv2.IMWRITE_JPEG_QUALITY), 92]
+        )
+
+
+def encode_video_ffmpeg(frames_dir, fps, output_path):
+    """Encode video using FFmpeg with NVENC (GPU) or CPU fallback."""
+    import subprocess
+    import shutil
+
+    if shutil.which("ffmpeg") is None:
+        raise RuntimeError("ffmpeg not found")
+
+    # Try GPU NVENC first (FAST)
+    try:
+        subprocess.run([
+            "ffmpeg", "-y",
+            "-framerate", str(fps),
+            "-i", f"{frames_dir}/%06d.jpg",
+            "-c:v", "h264_nvenc",
+            "-preset", "p1",
+            "-pix_fmt", "yuv420p",
+            "-movflags", "+faststart",
+            output_path
+        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        logger.info("✅ Video encoded using GPU NVENC")
+        return
+    except Exception:
+        pass
+
+    # CPU fallback (still fast)
+    logger.info("⚠️ NVENC not available, using CPU encoding")
+    subprocess.run([
+        "ffmpeg", "-y",
+        "-framerate", str(fps),
+        "-i", f"{frames_dir}/%06d.jpg",
+        "-c:v", "libx264",
+        "-preset", "ultrafast",
+        "-pix_fmt", "yuv420p",
+        "-movflags", "+faststart",
+        output_path
+    ], check=True)
+
+
 # Global singleton instances (separate for T2V and I2V)
 _wan_pipeline_t2v = None
 _wan_pipeline_i2v = None
@@ -456,78 +509,36 @@ class WanT2VGenerator:
             # Extract frames
             frames = output.frames[0]
             
-            # Export to video with slicing/chunking for memory efficiency
-            from diffusers.utils import export_to_video
-            
+            # Fast export using FFmpeg (NVENC GPU or CPU fallback)
             output_path = Path(output_path)
             output_path.parent.mkdir(parents=True, exist_ok=True)
             
-            # Enable slicing for large videos (720p @ 24fps can be memory-intensive)
-            # Process frames in chunks to avoid OOM errors
-            num_frames = len(frames)
-            chunk_size = 100  # Process 100 frames at a time (adjust based on VRAM)
-            
-            logger.info(f"💾 Saving video to: {output_path}")
-            logger.info(f"📊 Total frames: {num_frames}, Chunk size: {chunk_size}")
-            
-            if num_frames > chunk_size:
-                # Use chunked export for large videos
-                logger.info(f"🔪 Using chunked export (slicing enabled) for {num_frames} frames")
-                # Convert frames to numpy if needed and process in chunks
-                
-                # Ensure frames are in the right format
-                if isinstance(frames, torch.Tensor):
-                    frames_np = frames.cpu().numpy()
-                elif isinstance(frames, list):
-                    frames_np = np.array([np.array(f) for f in frames])
-                else:
-                    frames_np = np.array(frames)
-                
-                # Process in chunks to save memory
-                temp_dir = tempfile.mkdtemp(prefix="wan_export_")
-                chunk_files = []
-                
-                try:
-                    for i in range(0, num_frames, chunk_size):
-                        chunk_end = min(i + chunk_size, num_frames)
-                        chunk = frames_np[i:chunk_end]
-                        chunk_file = os.path.join(temp_dir, f"chunk_{i:04d}.mp4")
-                        chunk_files.append(chunk_file)
-                        
-                        logger.info(f"📦 Processing chunk {i//chunk_size + 1}/{(num_frames-1)//chunk_size + 1}: frames {i}-{chunk_end-1}")
-                        export_to_video(chunk, chunk_file, fps=self.fps)
-                    
-                    # Concatenate chunks using FFmpeg
-                    logger.info("🔗 Concatenating video chunks...")
-                    concat_file = os.path.join(temp_dir, "concat_list.txt")
-                    with open(concat_file, 'w') as f:
-                        for chunk_file in chunk_files:
-                            f.write(f"file '{os.path.abspath(chunk_file)}'\n")
-                    
-                    cmd = [
-                        'ffmpeg', '-y',
-                        '-f', 'concat',
-                        '-safe', '0',
-                        '-i', concat_file,
-                        '-c', 'copy',  # Fast copy without re-encoding
-                        str(output_path)
-                    ]
-                    subprocess.run(cmd, check=True, capture_output=True, text=True)
-                    
-                    # Clean up temp files
-                    import shutil
-                    shutil.rmtree(temp_dir, ignore_errors=True)
-                    logger.info("✅ Chunked export completed successfully")
-                except Exception as e:
-                    # Fallback to direct export if chunking fails
-                    logger.warning(f"⚠️ Chunked export failed: {e}, falling back to direct export")
-                    import shutil
-                    shutil.rmtree(temp_dir, ignore_errors=True)
-                    export_to_video(frames, str(output_path), fps=self.fps)
+            # Convert frames to numpy if needed
+            if isinstance(frames, torch.Tensor):
+                frames_np = frames.cpu().numpy()
+            elif isinstance(frames, list):
+                frames_np = np.array([np.array(f) for f in frames])
             else:
-                # Direct export for smaller videos
-                logger.info("✅ Using direct export (no slicing needed)")
-                export_to_video(frames, str(output_path), fps=self.fps)
+                frames_np = np.array(frames)
+            
+            # Ensure frames are in RGB format (0-255 uint8)
+            if frames_np.dtype != np.uint8:
+                if frames_np.max() <= 1.0:
+                    frames_np = (frames_np * 255).astype(np.uint8)
+                else:
+                    frames_np = frames_np.astype(np.uint8)
+            
+            num_frames = len(frames_np)
+            logger.info(f"💾 Exporting {num_frames} frames to: {output_path}")
+            
+            # Fast single-pass FFmpeg export
+            import shutil
+            temp_frames_dir = tempfile.mkdtemp(prefix="wan_frames_")
+            try:
+                write_frames_fast(frames_np, temp_frames_dir)
+                encode_video_ffmpeg(temp_frames_dir, self.fps, str(output_path))
+            finally:
+                shutil.rmtree(temp_frames_dir, ignore_errors=True)
             
             # Move VAE back to CPU after saving/export is done
             if self.device == 'cuda' and torch.cuda.is_available():
