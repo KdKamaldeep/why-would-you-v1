@@ -30,7 +30,7 @@ LATENTSYNC_PYTHON = "/workspace/LatentSync/venv/bin/python"
 LATENTSYNC_SCRIPT = "/workspace/LatentSync/scripts/inference.py"
 
 
-def run_cmd(cmd: list[str], cwd: Optional[str] = None, capture_output: bool = True) -> Tuple[int, str, str]:
+def run_cmd(cmd: list[str], cwd: Optional[str] = None, capture_output: bool = True, env: Optional[dict] = None) -> Tuple[int, str, str]:
     """
     Run a shell command and return exit code, stdout, stderr.
     
@@ -38,6 +38,7 @@ def run_cmd(cmd: list[str], cwd: Optional[str] = None, capture_output: bool = Tr
         cmd: Command as list of strings
         cwd: Working directory (optional)
         capture_output: Whether to capture stdout/stderr
+        env: Environment variables dict (optional)
         
     Returns:
         Tuple of (exit_code, stdout, stderr)
@@ -45,10 +46,13 @@ def run_cmd(cmd: list[str], cwd: Optional[str] = None, capture_output: bool = Tr
     logger.debug(f"Running command: {' '.join(cmd)}")
     if cwd:
         logger.debug(f"Working directory: {cwd}")
+    if env:
+        logger.debug(f"Using custom environment with PYTHONPATH: {env.get('PYTHONPATH', 'not set')}")
     
     result = subprocess.run(
         cmd,
         cwd=cwd,
+        env=env,
         capture_output=capture_output,
         text=True,
         check=False
@@ -209,7 +213,12 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, guidance_sca
     logger.debug(f"LatentSync command: {' '.join(cmd)}")
     logger.debug(f"Working directory: {LATENTSYNC_ROOT}")
     
-    exit_code, stdout, stderr = run_cmd(cmd, cwd=LATENTSYNC_ROOT)
+    # Set PYTHONPATH to LatentSync root so Python can find the latentsync module
+    env = os.environ.copy()
+    env["PYTHONPATH"] = LATENTSYNC_ROOT
+    logger.debug(f"Setting PYTHONPATH to: {LATENTSYNC_ROOT}")
+    
+    exit_code, stdout, stderr = run_cmd(cmd, cwd=LATENTSYNC_ROOT, env=env)
     
     if exit_code != 0:
         # Extract last ~2000 chars of stderr and stdout
