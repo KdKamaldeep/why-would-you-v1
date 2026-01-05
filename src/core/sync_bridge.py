@@ -92,10 +92,13 @@ def validate_paths(video_path: str, audio_path: str, out_path: str, inference_ck
     ensure_ok(os.path.isabs(out_path), f"❌ --out_path must be absolute: {out_path}")
     ensure_ok(os.path.isabs(inference_ckpt_path), f"❌ --inference_ckpt_path must be absolute: {inference_ckpt_path}")
     
-    # Check input files exist
+    # Check input files exist and are files (not directories)
     ensure_ok(os.path.exists(video_path), f"❌ Video file does not exist: {video_path}")
+    ensure_ok(os.path.isfile(video_path), f"❌ Video path is not a file: {video_path}")
     ensure_ok(os.path.exists(audio_path), f"❌ Audio file does not exist: {audio_path}")
+    ensure_ok(os.path.isfile(audio_path), f"❌ Audio path is not a file: {audio_path}")
     ensure_ok(os.path.exists(inference_ckpt_path), f"❌ Inference checkpoint file does not exist: {inference_ckpt_path}")
+    ensure_ok(os.path.isfile(inference_ckpt_path), f"❌ Inference checkpoint path is not a file (may be a directory): {inference_ckpt_path}")
     
     # Create parent directory for output if needed
     out_parent = Path(out_path).parent
@@ -225,29 +228,75 @@ def run_latentsync(temp_video: str, temp_audio: str, out_path: str, inference_ck
     env["PYTHONPATH"] = LATENTSYNC_ROOT
     logger.debug(f"Setting PYTHONPATH to: {LATENTSYNC_ROOT}")
     
-    # Stream output in real-time
+    # Stream output in real-time with progress visibility
     logger.info("=" * 60)
-    logger.info("LatentSync Output (streaming):")
+    logger.info("LatentSync Output (streaming with progress):")
     logger.info("=" * 60)
     
+    # Use line-buffered output for real-time progress display
     process = subprocess.Popen(
         cmd,
         cwd=LATENTSYNC_ROOT,
         env=env,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,  # Merge stderr into stdout
+        stderr=subprocess.STDOUT,  # Merge stderr into stdout for unified output
         text=True,
-        bufsize=1,  # Line buffered
+        bufsize=1,  # Line buffered for real-time output
         universal_newlines=True
     )
     
-    # Stream output line by line
+    # Stream output in real-time, properly handling progress bars
     stdout_lines = []
-    for line in process.stdout:
-        line = line.rstrip()
-        if line:  # Only print non-empty lines
-            print(line, flush=True)  # Print to console in real-time
-            stdout_lines.append(line)
+    last_progress_line = None
+    
+    try:
+        # Read line by line, handling progress bars with \r
+        while True:
+            line = process.stdout.readline()
+            if not line:
+                break
+            
+            # Check if this is a progress bar update (starts with \r or contains \r)
+            if line.startswith('\r'):
+                # Progress bar - overwrite previous line
+                line = line.lstrip('\r').rstrip('\n')
+                if line:
+                    print(f'\r{line}', end='', flush=True)
+                    last_progress_line = line
+            elif '\r' in line:
+                # Progress bar in middle of line
+                parts = line.split('\r')
+                line = parts[-1].rstrip('\n')
+                if line:
+                    print(f'\r{line}', end='', flush=True)
+                    last_progress_line = line
+            else:
+                # Regular line
+                line = line.rstrip('\n')
+                if line:
+                    # If we had a progress line, move to new line first
+                    if last_progress_line:
+                        print()  # New line after progress bar
+                        last_progress_line = None
+                    print(line, flush=True)
+                    stdout_lines.append(line)
+        
+        # Ensure we're on a new line after any progress bars
+        if last_progress_line:
+            print()
+            stdout_lines.append(last_progress_line)
+        
+    except Exception as e:
+        logger.warning(f"Error reading output: {e}")
+        # Fallback: read remaining output line by line
+        try:
+            for line in process.stdout:
+                line = line.rstrip()
+                if line:
+                    print(line, flush=True)
+                    stdout_lines.append(line)
+        except:
+            pass
     
     # Wait for process to complete
     exit_code = process.wait()
