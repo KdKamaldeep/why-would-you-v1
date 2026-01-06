@@ -35,6 +35,131 @@ def write_frames_fast(frames, out_dir):
         )
 
 
+def encode_video_ffmpeg_pipe(frames_np, fps, output_path):
+    """
+    Encode video by piping raw RGB frames directly to ffmpeg via stdin.
+    Much faster than writing to disk and re-reading.
+    
+    Args:
+        frames_np: uint8 RGB array [T, H, W, 3]
+        fps: Frames per second
+        output_path: Output video file path
+    
+    Raises:
+        RuntimeError: If ffmpeg is not found or encoding fails
+    """
+    import subprocess
+    import shutil
+    
+    if shutil.which("ffmpeg") is None:
+        raise RuntimeError("ffmpeg not found")
+    
+    # Get dimensions
+    num_frames, height, width, channels = frames_np.shape
+    if channels != 3:
+        raise ValueError(f"Expected RGB frames [T,H,W,3], got shape {frames_np.shape}")
+    
+    # Ensure frames are contiguous in memory for efficient tobytes()
+    if not frames_np.flags['C_CONTIGUOUS']:
+        frames_np = np.ascontiguousarray(frames_np)
+    
+    # Prepare frame data as bytes
+    frame_bytes = frames_np.tobytes()
+    frame_size = height * width * 3  # RGB24
+    
+    # Try GPU NVENC first (FAST)
+    try:
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "rawvideo",
+            "-pix_fmt", "rgb24",
+            "-s", f"{width}x{height}",
+            "-r", str(fps),
+            "-i", "pipe:0",
+            "-c:v", "h264_nvenc",
+            "-preset", "p1",  # p1 = fastest, p7 = slowest (best quality)
+            "-rc", "vbr",  # Variable bitrate mode
+            "-b:v", "10M",  # Target bitrate
+            "-maxrate", "20M",  # Max bitrate
+            "-pix_fmt", "yuv420p",
+            "-movflags", "+faststart",
+            output_path
+        ]
+        
+        # Use Popen to write to stdin (don't use capture_output=True - can block)
+        process = subprocess.Popen(
+            cmd,
+            stdin=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE
+        )
+        
+        # Write all frames to stdin
+        process.stdin.write(frame_bytes)
+        process.stdin.close()
+        
+        # Wait for completion and check return code
+        stdout, stderr = process.communicate()
+        
+        if process.returncode != 0:
+            error_msg = stderr.decode('utf-8', errors='ignore')[:500] if stderr else 'Unknown error'
+            raise subprocess.CalledProcessError(process.returncode, cmd, error_msg)
+        
+        logger.info("✅ Video encoded using GPU NVENC (h264_nvenc) via pipe")
+        return
+        
+    except (subprocess.CalledProcessError, OSError) as e:
+        error_msg = str(e)
+        if hasattr(e, 'stderr') and e.stderr:
+            error_msg = e.stderr.decode('utf-8', errors='ignore')[:500] if isinstance(e.stderr, bytes) else str(e.stderr)[:500]
+        logger.warning(f"⚠️ NVENC encoding via pipe failed: {error_msg}")
+        logger.info("🔄 Falling back to CPU encoding via pipe...")
+    
+    # CPU fallback via pipe
+    try:
+        logger.info("💻 Using CPU encoding (libx264) via pipe")
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "rawvideo",
+            "-pix_fmt", "rgb24",
+            "-s", f"{width}x{height}",
+            "-r", str(fps),
+            "-i", "pipe:0",
+            "-c:v", "libx264",
+            "-preset", "ultrafast",
+            "-pix_fmt", "yuv420p",
+            "-movflags", "+faststart",
+            output_path
+        ]
+        
+        process = subprocess.Popen(
+            cmd,
+            stdin=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE
+        )
+        
+        # Write all frames to stdin
+        process.stdin.write(frame_bytes)
+        process.stdin.close()
+        
+        # Wait for completion and check return code
+        stdout, stderr = process.communicate()
+        
+        if process.returncode != 0:
+            error_msg = stderr.decode('utf-8', errors='ignore')[:500] if stderr else 'Unknown error'
+            raise subprocess.CalledProcessError(process.returncode, cmd, error_msg)
+        
+        logger.info("✅ Video encoded using CPU (libx264) via pipe")
+        return
+        
+    except Exception as e:
+        error_msg = str(e)
+        if hasattr(e, 'stderr') and e.stderr:
+            error_msg = e.stderr.decode('utf-8', errors='ignore')[:500] if isinstance(e.stderr, bytes) else str(e.stderr)[:500]
+        raise RuntimeError(f"Failed to encode video via pipe: {error_msg}")
+
+
 def encode_video_ffmpeg(frames_dir, fps, output_path):
     """Encode video using FFmpeg with NVENC (GPU) or CPU fallback."""
     import subprocess
@@ -104,6 +229,100 @@ def get_cache_dir() -> Optional[str]:
         os.environ["HF_HOME"] = str(workspace_cache)
         return str(workspace_cache)
     return None
+
+
+def apply_fastwan_lora(pipeline, lora_id_or_path, weight_name=None, scale=1.0):
+    """
+    Apply FastWan (distilled/lightning) LoRA to the pipeline.
+    
+    Args:
+        pipeline: The WAN pipeline instance
+        lora_id_or_path: LoRA repository ID or local path
+        weight_name: Optional specific weight file name (e.g., "pytorch_lora_weights.safetensors")
+        scale: LoRA scale (default: 1.0)
+    
+    Returns:
+        True if LoRA was successfully applied, False otherwise
+    """
+    try:
+        # Check if diffusers LoRA APIs are available
+        if not hasattr(pipeline, 'load_lora_weights'):
+            logger.warning("ℹ️ FastWan disabled: LoRA APIs not available in this diffusers version")
+            return False
+        
+        logger.info(f"⚡ Loading FastWan LoRA from: {lora_id_or_path}")
+        
+        # Load LoRA weights
+        if weight_name:
+            pipeline.load_lora_weights(lora_id_or_path, weight_name=weight_name)
+            logger.info(f"⚡ FastWan LoRA loaded: {lora_id_or_path} (weight: {weight_name})")
+        else:
+            pipeline.load_lora_weights(lora_id_or_path)
+            logger.info(f"⚡ FastWan LoRA loaded: {lora_id_or_path}")
+        
+        # Try to fuse LoRA for better performance (if available)
+        if hasattr(pipeline, 'fuse_lora'):
+            try:
+                pipeline.fuse_lora(lora_scale=scale)
+                logger.info(f"✅ FastWan LoRA fused (scale: {scale})")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not fuse LoRA (will use unfused): {e}")
+        elif hasattr(pipeline, 'set_adapters'):
+            # Alternative: use adapter API if available
+            try:
+                pipeline.set_adapters(["default"], adapter_weights=[scale])
+                logger.info(f"✅ FastWan LoRA adapter set (scale: {scale})")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not set LoRA adapter: {e}")
+        
+        return True
+        
+    except ImportError:
+        logger.warning("ℹ️ FastWan disabled: LoRA support not available")
+        return False
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to apply FastWan LoRA: {e}")
+        return False
+
+
+def try_enable_teacache(pipeline, threshold=0.12):
+    """
+    Enable TeaCache-style transformer caching for the pipeline.
+    Only wraps pipeline.transformer, never crashes if TeaCache is missing.
+    
+    Args:
+        pipeline: The WAN pipeline instance
+        threshold: Cache threshold (default: 0.12)
+    
+    Returns:
+        True if TeaCache was successfully enabled, False otherwise
+    """
+    try:
+        # Try to import TeaCache
+        try:
+            from teacache import TeaCache
+        except ImportError:
+            logger.info("ℹ️ TeaCache disabled: teacache package not installed")
+            return False
+        
+        # Check if pipeline has transformer
+        if not hasattr(pipeline, 'transformer'):
+            logger.warning("⚠️ TeaCache: Pipeline does not have transformer attribute")
+            return False
+        
+        # Wrap transformer with TeaCache (only wraps transformer, preserves other components)
+        original_transformer = pipeline.transformer
+        pipeline.transformer = TeaCache(original_transformer, threshold=threshold)
+        
+        logger.info(f"🫖 TeaCache enabled (threshold: {threshold})")
+        return True
+        
+    except ImportError:
+        logger.info("ℹ️ TeaCache disabled: teacache package not installed")
+        return False
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to enable TeaCache: {e}")
+        return False
 
 
 def get_wan_pipeline(device: str = None, force_reload: bool = False, use_i2v: bool = False):
@@ -253,10 +472,9 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False, use_i2v: bo
         # Move to device
         pipeline = pipeline.to(device)
         
-        # Offload VAE to CPU when idle to reduce peak VRAM overlap
+        # Keep VAE on GPU permanently (48GB VRAM target - no CPU↔GPU shuffling)
         if device == 'cuda':
-            pipeline.vae.to("cpu")
-            logger.info("💾 VAE offloaded to CPU (will be moved to GPU only during inference)")
+            logger.info("💾 VAE kept on GPU permanently (48GB VRAM optimized)")
         
         # Enable VAE optimizations (slicing and tiling for memory efficiency)
         # Enable directly on VAE object, not pipeline wrapper
@@ -288,6 +506,23 @@ def get_wan_pipeline(device: str = None, force_reload: bool = False, use_i2v: bo
                     logger.info("✅ Enabled xformers memory efficient attention")
             except Exception as e:
                 logger.info("ℹ️ xFormers not available; continuing without it")
+        
+        # Apply FastWan LoRA if enabled via environment variable
+        fastwan_lora = os.getenv("FASTWAN_LORA", "")
+        if fastwan_lora:
+            fastwan_weight = os.getenv("FASTWAN_WEIGHT", None)
+            fastwan_scale = float(os.getenv("FASTWAN_SCALE", "1.0"))
+            apply_fastwan_lora(pipeline, fastwan_lora, weight_name=fastwan_weight, scale=fastwan_scale)
+        else:
+            logger.info("ℹ️ FastWan disabled (set FASTWAN_LORA to enable)")
+        
+        # Enable TeaCache if enabled via environment variable
+        teacache_enabled = os.getenv("TEACACHE", "0").lower() in ("1", "true", "yes")
+        if teacache_enabled:
+            teacache_threshold = float(os.getenv("TEACACHE_T", "0.12"))
+            try_enable_teacache(pipeline, threshold=teacache_threshold)
+        else:
+            logger.info("ℹ️ TeaCache disabled (set TEACACHE=1 to enable)")
         
         # Store pipeline in appropriate global variable
         if use_i2v:
@@ -408,7 +643,6 @@ class WanT2VGenerator:
             logger.info(f"📝 Prompt: {prompt[:100]}{'...' if len(prompt) > 100 else ''}")
             logger.info(f"📐 Dimensions: {self.width}x{self.height} (720p)")
             logger.info(f"🎞️ FPS: {self.fps} (24fps configured)")
-            logger.info(f"⚙️ Steps: {self.num_inference_steps}, Guidance: {self.guidance_scale}")
             
             # Use provided negative prompt or default
             neg_prompt = negative_prompt or self.negative_prompt
@@ -476,29 +710,32 @@ class WanT2VGenerator:
                     torch.cuda.manual_seed_all(seed)
                 logger.info(f"🎲 Using seed: {seed}")
             
-            # Clear GPU cache before generation
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-                gc.collect()
-            
-            # Move VAE to GPU only for inference
-            if self.device == 'cuda' and torch.cuda.is_available():
-                current_pipeline.vae.to(self.device)
-                torch.cuda.empty_cache()
-                gc.collect()
-                logger.info("🚀 VAE moved to GPU for inference")
+            # Check if FastWan is enabled and clamp steps if needed
+            fastwan_lora = os.getenv("FASTWAN_LORA", "")
+            num_inference_steps = self.num_inference_steps
+            if fastwan_lora:
+                fastwan_steps = os.getenv("FASTWAN_STEPS", "")
+                if fastwan_steps:
+                    try:
+                        fastwan_steps = int(fastwan_steps)
+                        if num_inference_steps > fastwan_steps:
+                            logger.info(f"⚡ FastWan enabled: clamping steps from {num_inference_steps} to {fastwan_steps}")
+                            num_inference_steps = fastwan_steps
+                    except ValueError:
+                        logger.warning(f"⚠️ Invalid FASTWAN_STEPS value: {fastwan_steps}, using default")
             
             # Generate video (T2V or I2V mode)
             # Optimized for 5B model resolution (1280x704 or 704x1280) @ 24fps with 16x16x4 VAE compression
             logger.info(f"🎬 Running inference ({'I2V' if use_i2v_mode else 'T2V'} mode)...")
             logger.info(f"📊 Sampling config: {num_frames_to_use} frames @ {self.fps}fps, {self.width}x{self.height}px")
+            logger.info(f"⚙️ Steps: {num_inference_steps}, Guidance: {self.guidance_scale}")
             pipeline_kwargs = {
                 "prompt": prompt,
                 "negative_prompt": neg_prompt,
                 "height": self.height,  # 5B model optimized (704 or 1280)
                 "width": self.width,   # 5B model optimized (1280 or 704)
                 "num_frames": num_frames_to_use,
-                "num_inference_steps": self.num_inference_steps,
+                "num_inference_steps": num_inference_steps,
                 "guidance_scale": self.guidance_scale
             }
             
@@ -535,36 +772,45 @@ class WanT2VGenerator:
                 else:
                     frames_np = frames_np.astype(np.uint8)
             
-            num_frames = len(frames_np)
+            # Ensure frames are in [T, H, W, 3] format for pipe encoding
+            if frames_np.ndim == 4:
+                # Already in correct format [T, H, W, 3]
+                pass
+            elif frames_np.ndim == 3:
+                # Single frame or wrong format - reshape if needed
+                # This shouldn't happen, but handle gracefully
+                if frames_np.shape[2] == 3:
+                    # [H, W, 3] - add time dimension
+                    frames_np = frames_np[np.newaxis, ...]
+                else:
+                    raise ValueError(f"Unexpected frame shape: {frames_np.shape}")
+            else:
+                raise ValueError(f"Unexpected frame dimensions: {frames_np.ndim}, shape: {frames_np.shape}")
+            
+            num_frames = frames_np.shape[0]
             logger.info(f"💾 Exporting {num_frames} frames to: {output_path}")
             
-            # Fast single-pass FFmpeg export
-            import shutil
-            temp_frames_dir = tempfile.mkdtemp(prefix="wan_frames_")
+            # Try fast pipe-based encoding first (no disk I/O)
             try:
-                write_frames_fast(frames_np, temp_frames_dir)
-                encode_video_ffmpeg(temp_frames_dir, self.fps, str(output_path))
-            finally:
-                shutil.rmtree(temp_frames_dir, ignore_errors=True)
-            
-            # Move VAE back to CPU after saving/export is done
-            if self.device == 'cuda' and torch.cuda.is_available():
-                current_pipeline.vae.to("cpu")
-                torch.cuda.empty_cache()
-                gc.collect()
-                logger.info("💾 VAE moved back to CPU (idle)")
+                encode_video_ffmpeg_pipe(frames_np, self.fps, str(output_path))
+                logger.info("🚀 Video exported using fast pipe method (no disk I/O)")
+            except Exception as e:
+                # Fallback to disk-based method if pipe fails
+                logger.warning(f"⚠️ Pipe encoding failed: {e}")
+                logger.info("🔄 Falling back to disk-based encoding...")
+                import shutil
+                temp_frames_dir = tempfile.mkdtemp(prefix="wan_frames_")
+                try:
+                    write_frames_fast(frames_np, temp_frames_dir)
+                    encode_video_ffmpeg(temp_frames_dir, self.fps, str(output_path))
+                finally:
+                    shutil.rmtree(temp_frames_dir, ignore_errors=True)
             
             # Explicitly delete frames and output to free memory
             del frames
             del output
             frames = None
             output = None
-            
-            # Clear GPU cache after generation
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-                torch.cuda.synchronize()  # Wait for all GPU operations to complete
-            gc.collect()  # Force Python garbage collection
             
             logger.info(f"✅ Video generated successfully: {output_path}")
             
