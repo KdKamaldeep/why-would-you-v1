@@ -169,19 +169,38 @@ def run_wav2lip(
         if python_cmd is None:
             python_cmd = os.getenv("WAV2LIP_PYTHON", WAV2LIP_PYTHON)
         
-        # Make paths absolute
+        # Make paths absolute for face, audio, and output (Wav2Lip expects absolute paths)
         norm_video_abs = os.path.abspath(norm_video)
         norm_audio_abs = os.path.abspath(norm_audio)
         output_video_abs = os.path.abspath(output_video)
+        
+        # For checkpoint, use relative path from wav2lip_dir (matches working example)
+        # If checkpoint is absolute, make it relative to wav2lip_dir
+        wav2lip_dir_abs = os.path.abspath(wav2lip_dir)
         checkpoint_path_abs = os.path.abspath(checkpoint_path)
-        inference_script = os.path.join(wav2lip_dir, "inference.py")
+        
+        # Check if checkpoint is within wav2lip_dir
+        try:
+            checkpoint_relative = os.path.relpath(checkpoint_path_abs, wav2lip_dir_abs)
+            # If relative path doesn't start with '..', it's within the directory
+            if not checkpoint_relative.startswith('..'):
+                checkpoint_path_for_cmd = checkpoint_relative
+            else:
+                # Checkpoint is outside wav2lip_dir, use absolute path
+                checkpoint_path_for_cmd = checkpoint_path_abs
+        except ValueError:
+            # Paths on different drives (Windows), use absolute
+            checkpoint_path_for_cmd = checkpoint_path_abs
+        
+        inference_script = "inference.py"  # Relative to wav2lip_dir (matches working example)
         
         logger.debug(f"Running Wav2Lip inference...")
         logger.debug(f"Python: {python_cmd}")
+        logger.debug(f"Working directory: {wav2lip_dir_abs}")
         logger.debug(f"Video: {norm_video_abs}")
         logger.debug(f"Audio: {norm_audio_abs}")
         logger.debug(f"Output: {output_video_abs}")
-        logger.debug(f"Checkpoint: {checkpoint_path_abs}")
+        logger.debug(f"Checkpoint (relative): {checkpoint_path_for_cmd}")
         logger.debug(f"Script: {inference_script}")
         
         # Check if Python executable exists
@@ -192,18 +211,20 @@ def run_wav2lip(
             return False
         
         # Check if inference script exists
-        if not os.path.exists(inference_script):
-            logger.error(f"❌ Wav2Lip inference script not found: {inference_script}")
+        inference_script_abs = os.path.join(wav2lip_dir_abs, inference_script)
+        if not os.path.exists(inference_script_abs):
+            logger.error(f"❌ Wav2Lip inference script not found: {inference_script_abs}")
             return False
         
+        # Build command (matches working example exactly)
         cmd = [
             python_cmd,
             '-u',  # Unbuffered output
-            inference_script,
-            '--checkpoint_path', checkpoint_path_abs,
-            '--face', norm_video_abs,
-            '--audio', norm_audio_abs,
-            '--outfile', output_video_abs,
+            inference_script,  # Relative path (will be resolved from cwd)
+            '--checkpoint_path', checkpoint_path_for_cmd,  # Relative to wav2lip_dir
+            '--face', norm_video_abs,  # Absolute path
+            '--audio', norm_audio_abs,  # Absolute path
+            '--outfile', output_video_abs,  # Absolute path
             '--pads', pads
         ]
         
