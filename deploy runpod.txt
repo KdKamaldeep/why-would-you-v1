@@ -34,7 +34,7 @@ python -m src.interfaces.simple_cartoon_generator \
  
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
-  --storyboard storyboards/wife.json \
+  --storyboard storyboards/war.json \
   --wan-width 768 \
   --wan-height 1344 \
   --wan-num-frames 25 \
@@ -42,6 +42,7 @@ python -m src.interfaces.simple_cartoon_generator \
   --wan-steps 24 \
   --wan-guidance 6 \
   --gen-bulk
+  --voice /workspace/why-would-you-v1/tts-speaker/voice-male.wav
     
 
 # With Hindi narration
@@ -109,15 +110,19 @@ python scripts/check_sync_bridge.py \
 
 # Custom settings
 python scripts/check_sync_bridge.py \
-  --video-prompt "Medium close-up of an ancient Indian guru (around 65–70 years old) walking slowly and directly toward the camera along a stone corridor inspired by Nalanda University. Male, long white and grey beard, deeply lined face, serene and wise eyes, high forehead, calm spiritual authority. Wearing simple saffron and off-white robes, rudraksha beads around the neck, holding palm-leaf manuscripts. He is clearly speaking while walking, lips articulating speech, mouth and jaw moving naturally, eyes engaging directly with the camera. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face.
+  --video-prompt "Medium close-up of an ancient Indian guru (around 65–70 years old) walking slowly and directly toward the camera along a stone corridor inspired by Nalanda University. Male, long white and grey beard, deeply lined face, serene and wise eyes, high forehead, calm spiritual authority. Wearing simple saffron and off-white robes, rudraksha beads around the neck, holding palm-leaf manuscripts. He is clearly speaking while walking, lips articulating speech, mouth and jaw moving naturally, eyes engaging directly with the camera. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face 4K.
 " \
   --audio-text "We all count numbers — one, two, three.
 But long ago, humanity was missing the most powerful number of all." \
   --output-dir outputs/test_sync \
-  --width 768 --height 768 --num-frames 72 --fps 24 \
+  --width 1344 \
+  --height 768 \ 
+  --num-frames 200 
+  --fps 24 \
   --language en \
   --voice-file /workspace/why-would-you-v1/tts-speaker/voice-male.wav
   --use-wav2lip
+  --steps 24
   
 For wav2lip these requiremts will work 
 

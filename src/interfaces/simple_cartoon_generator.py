@@ -47,7 +47,7 @@ def get_model_path_for_type(model_type: str) -> str | None:
     # It downloads automatically on first use to Hugging Face cache
     return None
 
-def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=False, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False):
+def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=False, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False, voice_file=None, auto_sub=False):
     """Generate a video reel with the given prompt."""
     try:
         # Import the main generator
@@ -88,7 +88,7 @@ def generate_cartoon(prompt, style="realistic", duration=30, language="en", enab
             style=style,
             video_format=video_format,
             output_path="output",
-            add_subtitles=auto_sub,  # Only enable if --auto-sub is provided
+            add_subtitles=auto_sub,  # Enable subtitles if requested
             language=language,
             enable_prompt_enhancement=enable_prompt_enhancement,
             wan_width=wan_width,
@@ -107,7 +107,8 @@ def generate_cartoon(prompt, style="realistic", duration=30, language="en", enab
             music_path=music_path,
             music_volume=music_volume,
             voice_volume=voice_volume,
-            verbose_ffmpeg=verbose_ffmpeg
+            verbose_ffmpeg=verbose_ffmpeg,
+            voice_id=voice_file or ""  # Path to reference speaker WAV for Coqui TTS
         )
         
         # Initialize generator
@@ -386,6 +387,13 @@ Storyboard Cast Format (with face images):
     )
     
     parser.add_argument(
+        "--voice",
+        type=str,
+        default=None,
+        help="Path to reference speaker WAV file for Coqui TTS voice cloning (optional). If not provided, uses default voice or voice specified in storyboard JSON."
+    )
+    
+    parser.add_argument(
         "--verbose-ffmpeg",
         action="store_true",
         help="Print FFmpeg commands for debugging"
@@ -495,7 +503,8 @@ Storyboard Cast Format (with face images):
                     music_volume=args.music_volume,
                     voice_volume=args.voice_volume,
                     verbose_ffmpeg=args.verbose_ffmpeg,
-                    add_hooks=args.add_hooks  # Enable hook text rendering
+                    add_hooks=args.add_hooks,  # Enable hook text rendering
+                    voice_id=args.voice or ""  # Path to reference speaker WAV for Coqui TTS
                 )
                 
                 # Pre-initialize generator to load pipelines once
@@ -718,7 +727,8 @@ Storyboard Cast Format (with face images):
                 music_path=args.music,
                 music_volume=args.music_volume,
                 voice_volume=args.voice_volume,
-                verbose_ffmpeg=args.verbose_ffmpeg
+                verbose_ffmpeg=args.verbose_ffmpeg,
+                voice_id=args.voice or ""  # Path to reference speaker WAV for Coqui TTS
             )
             generator = CartoonShortsGenerator(config)
             output_path = generator.generate()
@@ -753,7 +763,7 @@ Storyboard Cast Format (with face images):
             music_volume=args.music_volume,
             voice_volume=args.voice_volume,
             verbose_ffmpeg=args.verbose_ffmpeg,
-            auto_sub=args.auto_sub
+            voice_file=args.voice
         )
     
     if output_path:
