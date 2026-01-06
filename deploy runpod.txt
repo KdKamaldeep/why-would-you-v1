@@ -34,7 +34,7 @@ python -m src.interfaces.simple_cartoon_generator \
  
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
-  --storyboard storyboards/war.json \
+  --storyboard storyboards/ludo.json \
   --wan-width 768 \
   --wan-height 1344 \
   --wan-num-frames 25 \
@@ -42,8 +42,8 @@ python -m src.interfaces.simple_cartoon_generator \
   --wan-steps 24 \
   --wan-guidance 6 \
   --language hi \
-  --gen-bulk
-  --voice /workspace/why-would-you-v1/tts-speaker/female-voice.wav
+  --gen-bulk \
+  --voice /workspace/why-would-you-v1/tts-speaker/srikant-friendly_-helpful-and-neutral.wav
     
 
 # With Hindi narration
