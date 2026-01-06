@@ -715,7 +715,10 @@ class VideoProcessor:
                 logger.info(f"✅ Video extended to {video_duration:.2f}s to match narration")
 
             # Prepare audio inputs
-            audio_inputs = ['-i', narration_audio]
+            # Use narration_audio_to_use (already processed - string or None, not a list)
+            audio_inputs = []
+            if narration_audio_to_use:
+                audio_inputs.extend(['-i', narration_audio_to_use])
             have_music = bool(background_music and os.path.exists(background_music))
             if have_music:
                 audio_inputs.extend(['-i', background_music])

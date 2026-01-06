@@ -1,0 +1,70 @@
+{
+  "title": "The Healing That Should Not Have Worked",
+  "description": "A cinematic origin story where ancient healing challenges everything modern audiences believe about medicine.",
+  "total_duration": 42,
+  "aspect_ratio": "9:16",
+  "fps": 24,
+  "scenes": [
+    {
+      "id": "scene_01_world_hook_nature",
+      "duration": 6,
+      "num_frames": 144,
+      "lip_sync": false,
+      "character": null,
+      "visual_prompt": "Ultra-wide cinematic shot of dense ancient forests at dawn. Leaves sway, rivers flow, insects hover, flowers slowly open. No visible human faces. Golden sunrise light breaks through the canopy creating volumetric god-rays. Floating pollen and mist fill the air. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "slow aerial glide through treetops, strong depth parallax, continuous organic motion of foliage and water, drifting mist, stable camera",
+      "narration": "This forest once healed people. No hospitals. No machines. And somehow… it worked."
+    },
+    {
+      "id": "scene_02_witness_healer_claim",
+      "duration": 7,
+      "num_frames": 168,
+      "lip_sync": true,
+      "character": "witness",
+      "visual_prompt": "Epic hero shot, ultra-cinematic medium close-up of an ancient Indian healer (male, 60–70 years old) in a lush herbal courtyard at dawn. Long silver-grey hair tied back, flowing beard, intense calm eyes. Wearing traditional cotton robes. A stone table in front of him holds fresh herbs, flowers, and a shallow bowl. Golden sunlight filters through leaves creating volumetric god-rays, floating dust and pollen particles. He speaks directly to the camera while gently crushing herbs with his hands. Strong eye contact. Front-facing camera only. Chest and face square to camera. No side view, no profile, no angle change. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "slow controlled hand movement crushing herbs, subtle robe sway, natural speaking mouth and jaw motion, steady camera tracking backward on straight axis",
+      "narration": "People think ancient healing was guesswork. Trial and error. Blind belief."
+    },
+    {
+      "id": "scene_03_world_pattern_break",
+      "duration": 6,
+      "num_frames": 144,
+      "lip_sync": false,
+      "character": null,
+      "visual_prompt": "Wide cinematic montage of repeated actions: herbs measured carefully, roots sorted by size, mixtures prepared in identical bowls, fires controlled precisely. No visible faces. Warm earth tones with controlled lighting. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "slow lateral tracking, rhythmic repetitive motions, layered parallax between foreground tools and background huts, stable camera",
+      "narration": "But patterns were forming. The same plants. The same doses. The same results."
+    },
+    {
+      "id": "scene_04_challenger_doubt_hook",
+      "duration": 6,
+      "num_frames": 144,
+      "lip_sync": true,
+      "character": "challenger",
+      "visual_prompt": "Ultra-cinematic medium close-up of a younger challenger (male, 30–35 years old) standing beneath a banyan tree at midday. Short dark hair, skeptical eyes, controlled expression. Wearing a simple earth-toned robe. Dappled sunlight creates moving leaf shadows across his face. He speaks directly to the camera. Front-facing camera only. Face and chest square to camera. No side view, no profile, no angle change. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "minimal movement, subtle breathing, gentle shadow motion across face, locked camera",
+      "narration": "But how do you prove healing… without writing anything down?"
+    },
+    {
+      "id": "scene_05_world_reveal_memory",
+      "duration": 7,
+      "num_frames": 168,
+      "lip_sync": false,
+      "character": null,
+      "visual_prompt": "Epic wide cinematic shot of students repeating procedures, elders correcting mistakes, remedies tested again and again across seasons. Palm-leaf manuscripts begin to appear. No visible faces. Warm lamplight fades into moonlight. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "slow push-in, time-lapse blending of seasons, ritualistic repetition of movements, drifting smoke and dust, stable camera",
+      "narration": "Because memory was the laboratory. Repetition was the test. And failure was never hidden."
+    },
+    {
+      "id": "scene_06_witness_twist_closing",
+      "duration": 10,
+      "num_frames": 240,
+      "lip_sync": true,
+      "character": "witness",
+      "visual_prompt": "Epic hero close-up of the ancient healer standing still in the courtyard as sunlight intensifies. Herbs rest neatly on the stone table. Soft golden rim light outlines his hair and shoulders. Floating pollen and dust shimmer behind him. He looks directly into the camera with calm authority. Front-facing camera only. Face perfectly square to camera. No side view, no profile, no angle change. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "very slow forward camera drift, minimal head movement, controlled natural speaking mouth motion, gentle ambient leaf and particle motion",
+      "narration": "Modern medicine didn’t replace ancient healing. It finally learned how to measure it."
+    }
+  ]
+}
+
