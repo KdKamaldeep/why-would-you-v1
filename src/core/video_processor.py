@@ -823,10 +823,10 @@ class VideoProcessor:
                     '-pix_fmt', 'yuv420p'
                 ])
             
-            # Don't trim video after stitching - use full video duration
-            # Video was already synced/extended to match audio during scene processing
-            # Trimming here causes loss of content (~1 second)
-            # Do NOT use -t or -shortest; we want full video length
+            # Use -shortest to prevent infinite apad padding
+            # apad can create infinite silent audio without -shortest, causing encoder to never stop
+            # -shortest ensures encoding stops when video ends (shortest stream)
+            cmd.extend(['-shortest'])
             if self.config.faststart:
                 cmd.extend(['-movflags', '+faststart'])
             cmd.append(output_path)
@@ -872,7 +872,8 @@ class VideoProcessor:
                         '-pix_fmt', 'yuv420p'
                     ])
                     cmd_cpu.extend(['-tune', self.config.tune])
-                    # Don't trim video - use full video duration
+                    # Use -shortest to prevent infinite apad padding
+                    cmd_cpu.extend(['-shortest'])
                     if self.config.faststart:
                         cmd_cpu.extend(['-movflags', '+faststart'])
                     cmd_cpu.append(output_path)
