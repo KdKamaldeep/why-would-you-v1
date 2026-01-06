@@ -17,11 +17,39 @@ class VideoConfig:
     fps: int = 10  # Reduced from 15 to 10 for slower playback
     width: int = 768
     height: int = 1024
-    # Encoding options (optimize for smaller files)
-    codec: str = "libx265"           # Use HEVC for ~40-60% smaller files
-    crf: int = 23                     # Lower = higher quality. 23 is good for social media
-    preset: str = "medium"           # slower = smaller; keep reasonable CPU cost
-    tune: str = "grain"              # Valid for libx265 (psnr, ssim, grain, zerolatency, fastdecode, animation). For libx264, use "film"
+    # Encoding options (optimized for speed - AI shorts)
+    # DEV mode: veryfast preset, crf=24 (fastest, slightly lower quality)
+    # PROD mode: fast preset, crf=22 (balanced speed/quality)
+    # Set VIDEO_EXPORT_MODE=dev for faster exports during development
+    _export_mode: str = None  # Internal: will be set based on env var
+    
+    @property
+    def export_mode(self) -> str:
+        """Get export mode from environment or default to PROD."""
+        if self._export_mode:
+            return self._export_mode
+        return os.getenv("VIDEO_EXPORT_MODE", "prod").lower()
+    
+    @property
+    def codec(self) -> str:
+        """Always use libx264 for speed (HEVC is too slow for shorts)."""
+        return "libx264"
+    
+    @property
+    def preset(self) -> str:
+        """Get preset based on export mode."""
+        if self.export_mode == "dev":
+            return "veryfast"  # Fastest encoding
+        return "fast"  # Balanced speed/quality
+    
+    @property
+    def crf(self) -> int:
+        """Get CRF based on export mode."""
+        if self.export_mode == "dev":
+            return 24  # Slightly lower quality, faster
+        return 22  # High quality, still fast
+    
+    tune: str = "film"              # Valid for libx264 (film, animation, grain, stillimage, fastdecode, zerolatency)
     audio_bitrate: str = "96k"       # narration-friendly bitrate
     faststart: bool = True            # enable moov atom at front for streaming
 
@@ -30,19 +58,20 @@ class VideoProcessor:
     
     def __init__(self, config: VideoConfig):
         self.config = config
+        # Log encoding configuration
+        mode = config.export_mode
+        logger.info(f"📹 VideoProcessor initialized: mode={mode.upper()}, codec={config.codec}, preset={config.preset}, crf={config.crf}")
         
     def frames_to_video(self, frames_dir: str, output_path: str, fps: int = 10) -> str:  # Reduced default from 15 to 10
         """Convert frames directory to MP4 video. Tries GPU encoding first, falls back to CPU."""
         try:
-            # Try GPU NVENC first (much faster)
+            # Try GPU NVENC first (much faster - 5-10x speedup)
             try:
-                # Use h264_nvenc for H.264, hevc_nvenc for HEVC
-                nvenc_codec = "h264_nvenc" if "264" in self.config.codec else "hevc_nvenc"
                 cmd = [
                     'ffmpeg', '-y',
                     '-framerate', str(fps),
                     '-i', f'{frames_dir}/frame_%04d.png',
-                    '-c:v', nvenc_codec,
+                    '-c:v', 'h264_nvenc',
                     '-preset', 'p1',  # p1 = fastest, p7 = slowest (best quality)
                     '-rc', 'vbr',  # Variable bitrate mode
                     '-b:v', '10M',  # Target bitrate
@@ -53,37 +82,39 @@ class VideoProcessor:
                     cmd.extend(['-movflags', '+faststart'])
                 cmd.append(output_path)
                 
-                result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-                logger.info(f"✅ Video encoded using GPU NVENC ({nvenc_codec})")
+                logger.info("🚀 Attempting GPU encoding (h264_nvenc)...")
+                result = subprocess.run(cmd, check=True, capture_output=True, text=True, stderr=subprocess.PIPE)
+                logger.info(f"✅ Video encoded using GPU NVENC (h264_nvenc) - {output_path}")
                 return output_path
-            except (subprocess.CalledProcessError, FileNotFoundError) as e:
-                logger.warning(f"⚠️ GPU encoding failed: {e.stderr[:200] if hasattr(e, 'stderr') and e.stderr else str(e)}")
-                logger.info("🔄 Falling back to CPU encoding...")
+            except subprocess.CalledProcessError as e:
+                error_msg = e.stderr.decode('utf-8', errors='ignore') if isinstance(e.stderr, bytes) else (e.stderr or str(e))
+                logger.warning(f"⚠️ GPU NVENC encoding failed: {error_msg[:300]}")
+                logger.info("🔄 Falling back to CPU encoding (libx264)...")
+            except Exception as e:
+                logger.warning(f"⚠️ GPU encoding error: {e}")
+                logger.info("🔄 Falling back to CPU encoding (libx264)...")
             
-            # CPU fallback (slower but more compatible)
+            # CPU fallback (libx264 with optimized preset)
+            codec = self.config.codec
+            preset = self.config.preset
+            crf = self.config.crf
+            logger.info(f"💻 Encoding with CPU: codec={codec}, preset={preset}, crf={crf}")
             cmd = [
                 'ffmpeg', '-y',
                 '-framerate', str(fps),
                 '-i', f'{frames_dir}/frame_%04d.png',
-                '-c:v', self.config.codec,
-                '-preset', self.config.preset,
-                '-crf', str(self.config.crf),
+                '-c:v', codec,
+                '-preset', preset,
+                '-crf', str(crf),
+                '-tune', self.config.tune,
                 '-pix_fmt', 'yuv420p'
             ]
-            # Add tune parameter only for supported codecs
-            if self.config.codec == 'libx264':
-                cmd.extend(['-tune', 'film'])  # film is valid for libx264
-            elif self.config.codec == 'libx265':
-                cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
-            # Improve compatibility for HEVC in MP4 (especially on Safari)
-            if self.config.codec == 'libx265':
-                cmd.extend(['-tag:v', 'hvc1'])
             if self.config.faststart:
                 cmd.extend(['-movflags', '+faststart'])
             cmd.append(output_path)
             
             subprocess.run(cmd, check=True, capture_output=True, text=True)
-            logger.info(f"💻 Video encoded using CPU ({self.config.codec})")
+            logger.info(f"✅ Video encoded using CPU ({codec}, {preset}, crf={crf})")
             logger.info(f"Created video from frames: {output_path}")
             return output_path
             
@@ -211,11 +242,8 @@ class VideoProcessor:
                 '-c:a', 'aac',
                 '-b:a', self.config.audio_bitrate
             ]
-            # Add tune parameter only for supported codecs
-            if self.config.codec == 'libx264':
-                cmd.extend(['-tune', 'film'])  # film is valid for libx264
-            elif self.config.codec == 'libx265':
-                cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
+            # Add tune parameter for libx264
+            cmd.extend(['-tune', self.config.tune])  # film is default for libx264
             cmd.append(output_video)
             
             subprocess.run(cmd, check=True, capture_output=True)
@@ -386,11 +414,8 @@ class VideoProcessor:
                 '-crf', str(self.config.crf),
                 '-pix_fmt', 'yuv420p'
             ]
-            # Add tune parameter only for supported codecs
-            if self.config.codec == 'libx264':
-                cmd.extend(['-tune', 'film'])  # film is valid for libx264
-            elif self.config.codec == 'libx265':
-                cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
+            # Add tune parameter for libx264
+            cmd.extend(['-tune', self.config.tune])  # film is default for libx264
             cmd.append(output_path)
             
             subprocess.run(cmd, check=True, capture_output=True)
@@ -493,20 +518,24 @@ class VideoProcessor:
                 filter_complex = ";".join(filter_parts)
                 
                 # Build ffmpeg command with fade transitions
+                # Note: Transitions require re-encoding, but we use fast preset
+                codec = self.config.codec
+                preset = self.config.preset
+                crf = self.config.crf
+                logger.info(f"🎬 Applying {len(clips)-1} cross-dissolve transitions with {codec} (preset={preset}, crf={crf})...")
                 cmd = [
                     'ffmpeg', '-y'
                 ] + input_args + [
                     '-filter_complex', filter_complex,
                     '-map', '[vout]',
-                    '-c:v', self.config.codec,
-                    '-preset', self.config.preset,
-                    '-crf', str(self.config.crf),
+                    '-c:v', codec,
+                    '-preset', preset,
+                    '-crf', str(crf),
+                    '-tune', self.config.tune,
                     '-pix_fmt', 'yuv420p',
                     '-movflags', '+faststart',
                     temp_video
                 ]
-                
-                logger.info(f"🔄 Applying {len(clips)-1} cross-dissolve transitions...")
                 result = subprocess.run(cmd, check=True, capture_output=True, text=True)
                 if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
                     error_msg = result.stderr if result.stderr else "Unknown error"
@@ -630,19 +659,22 @@ class VideoProcessor:
                 audio_inputs.extend(['-i', background_music])
             
             # Build FFmpeg command - try GPU encoding first
-            # Try GPU NVENC first (much faster)
+            # Try GPU NVENC first (much faster - 5-10x speedup)
             use_gpu = False
             nvenc_codec = None
             try:
                 # Check if NVENC is available by trying to list encoders
                 check_cmd = ['ffmpeg', '-hide_banner', '-encoders']
                 result = subprocess.run(check_cmd, capture_output=True, text=True, timeout=5)
-                if 'h264_nvenc' in result.stdout or 'hevc_nvenc' in result.stdout:
+                if 'h264_nvenc' in result.stdout:
                     use_gpu = True
-                    nvenc_codec = "h264_nvenc" if "264" in self.config.codec or self.config.codec == "libx264" else "hevc_nvenc"
-                    logger.info(f"🚀 Attempting GPU encoding with {nvenc_codec}")
-            except Exception:
-                pass  # Fall back to CPU
+                    nvenc_codec = "h264_nvenc"  # Always use H.264 for speed
+                    logger.info(f"🚀 GPU NVENC detected - will use {nvenc_codec} for final encoding")
+                else:
+                    logger.info("💻 GPU NVENC not available - will use CPU encoding")
+            except Exception as e:
+                logger.warning(f"⚠️ Could not check for GPU encoders: {e}")
+                logger.info("💻 Will use CPU encoding")
             
             cmd = ['ffmpeg', '-y', '-i', temp_video] + audio_inputs
             
@@ -665,8 +697,13 @@ class VideoProcessor:
                 ])
             
             # Final output settings - try GPU first, fall back to CPU
+            codec = self.config.codec
+            preset = self.config.preset
+            crf = self.config.crf
+            
             if use_gpu and nvenc_codec:
-                # GPU encoding (much faster)
+                # GPU encoding (much faster - 5-10x speedup)
+                logger.info(f"🚀 Final encoding: GPU ({nvenc_codec})")
                 cmd.extend([
                     '-c:v', nvenc_codec,
                     '-preset', 'p1',  # p1 = fastest, p7 = slowest (best quality)
@@ -678,23 +715,17 @@ class VideoProcessor:
                     '-pix_fmt', 'yuv420p'
                 ])
             else:
-                # CPU encoding (slower but more compatible)
+                # CPU encoding (libx264 with optimized preset)
+                logger.info(f"💻 Final encoding: CPU ({codec}, preset={preset}, crf={crf})")
                 cmd.extend([
-                    '-c:v', self.config.codec,
-                    '-preset', self.config.preset,
-                    '-crf', str(self.config.crf),
+                    '-c:v', codec,
+                    '-preset', preset,
+                    '-crf', str(crf),
+                    '-tune', self.config.tune,
                     '-c:a', 'aac',
                     '-b:a', self.config.audio_bitrate,
                     '-pix_fmt', 'yuv420p'
                 ])
-                # Add tune parameter only for supported codecs
-                if self.config.codec == 'libx264':
-                    cmd.extend(['-tune', 'film'])  # film is valid for libx264
-                elif self.config.codec == 'libx265':
-                    cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
-                # Improve compatibility for HEVC in MP4 (especially on Safari)
-                if self.config.codec == 'libx265':
-                    cmd.extend(['-tag:v', 'hvc1'])
             
             # Use narration duration if available, otherwise video duration
             # This ensures video matches narration length (video was already extended if needed)
@@ -746,12 +777,7 @@ class VideoProcessor:
                         '-b:a', self.config.audio_bitrate,
                         '-pix_fmt', 'yuv420p'
                     ])
-                    if self.config.codec == 'libx264':
-                        cmd_cpu.extend(['-tune', 'film'])
-                    elif self.config.codec == 'libx265':
-                        cmd_cpu.extend(['-tune', self.config.tune])
-                    if self.config.codec == 'libx265':
-                        cmd_cpu.extend(['-tag:v', 'hvc1'])
+                    cmd_cpu.extend(['-tune', self.config.tune])
                     if target_duration is not None and target_duration > 0:
                         cmd_cpu.extend(['-t', f"{target_duration:.3f}"])
                     if self.config.faststart:
