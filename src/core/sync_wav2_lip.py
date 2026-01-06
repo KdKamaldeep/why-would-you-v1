@@ -57,7 +57,9 @@ def run_cmd(cmd: list[str], cwd: Optional[str] = None, capture_output: bool = Tr
         check=False
     )
     
-    return result.returncode, result.stdout, result.stderr
+    # Return stdout and stderr (stderr may be empty if merged)
+    stderr_output = result.stderr if result.stderr else ""
+    return result.returncode, result.stdout, stderr_output
 
 
 def normalize_video(input_video: str, output_video: str, fps: int) -> bool:
@@ -231,12 +233,21 @@ def run_wav2lip(
         if nosmooth:
             cmd.append('--nosmooth')
         
-        exit_code, stdout, stderr = run_cmd(cmd, cwd=wav2lip_dir)
+        logger.info(f"Running Wav2Lip command from: {wav2lip_dir_abs}")
+        logger.info(f"Command: {' '.join(cmd)}")
+        
+        exit_code, stdout, stderr = run_cmd(cmd, cwd=wav2lip_dir_abs)
         
         if exit_code != 0:
             logger.error(f"❌ Wav2Lip inference failed (exit code {exit_code})")
-            logger.debug(f"STDOUT:\n{stdout[-2000:] if len(stdout) > 2000 else stdout}")
-            logger.debug(f"STDERR:\n{stderr[-2000:] if len(stderr) > 2000 else stderr}")
+            logger.error(f"Command: {' '.join(cmd)}")
+            logger.error(f"Working directory: {wav2lip_dir_abs}")
+            if stdout:
+                logger.error(f"STDOUT (last 5000 chars):\n{stdout[-5000:] if len(stdout) > 5000 else stdout}")
+            if stderr:
+                logger.error(f"STDERR (last 5000 chars):\n{stderr[-5000:] if len(stderr) > 5000 else stderr}")
+            if not stdout and not stderr:
+                logger.error("No output captured from Wav2Lip - this may indicate a Python environment issue")
             return False
         
         logger.debug(f"✅ Wav2Lip inference completed: {output_video_abs}")
