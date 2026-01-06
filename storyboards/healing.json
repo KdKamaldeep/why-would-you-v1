@@ -1,4 +1,5 @@
 {
+"stories":[{
   "title": "The Healing That Should Not Have Worked",
   "description": "A cinematic origin story where ancient healing challenges everything modern audiences believe about medicine.",
   "total_duration": 42,
@@ -66,5 +67,6 @@
       "narration": "Modern medicine didn’t replace ancient healing. It finally learned how to measure it."
     }
   ]
+}]
 }
 
