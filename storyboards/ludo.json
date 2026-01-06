@@ -1,47 +1,47 @@
 {
   "stories": [
     {
-      "title": "Invented in India: Buttons",
-      "description": "An ancient Indian tailor explains how buttons were invented in India and became part of everyday clothing.",
+      "title": "Invented in India: Shampoo",
+      "description": "An ancient Indian healer explains how the idea of shampoo began in India as a ritual of health and care.",
       "total_duration": 24,
       "aspect_ratio": "9:16",
       "fps": 16,
       "scenes": [
         {
-          "id": "buttons_scene_01_intro",
+          "id": "shampoo_scene_01_hero_hook",
           "duration": 6,
-          "num_frames": 0,
-          "visual_reference": "identity_anchor_indus_tailor.png",
-          "visual_prompt": "Medium close-up of an ancient Indian tailor standing in his workshop, facing directly toward the camera. He wears a simple patterned robe tied at the waist, neatly groomed beard, calm confident expression. Wooden table with folded cloth and tools behind him. He is speaking directly to the camera, lips articulating clearly. Eyes locked on the lens. Front-facing camera only. Chest and face square to camera. No side view, no profile.",
-          "motion_prompt": "slow forward lean while speaking, camera tracking backward on straight axis, continuous mouth and jaw movement, gentle head nods, stable framing",
-          "narration": "मैं एक दर्ज़ी हूँ। मेरे लिए कपड़े केवल पहनावा नहीं, जीवन का हिस्सा हैं।"
+          "num_frames": 96,
+          "visual_reference": "identity_anchor_ancient_healer.png",
+          "visual_prompt": "Epic hero shot, ultra-cinematic medium close-up of an ancient Indian healer (male, 60–70 years old) in a lush herbal courtyard at dawn. Long silver-grey hair tied back, flowing beard, intense calm eyes, serene but powerful presence. Wearing traditional cotton robes. In front of him on a stone table lie fresh herbs, flowers, and a shallow bowl. Golden sunlight filters through leaves creating volumetric god-rays, floating dust and pollen particles. He is speaking directly to the camera while gently crushing herbs with his hands. Strong eye contact. Front-facing camera only. Chest and face square to camera. No side view, no profile, no angle change. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+          "motion_prompt": "slow powerful forward presence, rhythmic crushing of herbs, leaves and plants swaying in soft breeze, floating particles drifting, camera tracking backward on straight axis, continuous mouth and jaw movement while speaking, subtle cinematic camera breathing, no rotation, no orbit",
+          "narration": "जो बालों की देखभाल आज आप करते हैं… उसकी शुरुआत इसी धरती से हुई थी।"
         },
         {
-          "id": "buttons_scene_02_invention",
+          "id": "shampoo_scene_02_mixing_herbs",
           "duration": 6,
-          "num_frames": 0,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Same tailor continues speaking directly to the camera. Small shell and stone buttons rest on the table behind him. He does not look away. Eyes remain on the camera. Clear mouth movement while speaking. Front-facing camera only.",
-          "motion_prompt": "steady forward-facing hand movements near chest level, continuous lip movement, camera tracking backward on straight axis, no rotation",
-          "narration": "हज़ारों वर्ष पहले, हमने कपड़ों को बाँधने के लिए बटन बनाए — खोल और पत्थर से।"
+          "num_frames": 96,
+          "visual_reference": "identity_anchor_ancient_healer.png",
+          "visual_prompt": "Medium close-up of an ancient Indian healer (male, 60–70 years old) standing in a quiet herbal workspace. Long grey beard, calm focused expression, steady eyes. Wearing simple cotton robes. A stone bowl filled with water sits before him as he mixes crushed reetha, shikakai, and amla by hand. The liquid gradually darkens. He speaks directly to the camera with clear lip and jaw movement. Front-facing camera only. Chest and face square to camera. No side view, no profile. Warm natural lighting, shallow depth-of-field, ultra-realistic, no text, no watermark.",
+          "motion_prompt": "slow circular hand motion mixing herbs and water, gentle ripples forming on liquid surface, subtle head nods for emphasis, continuous speaking mouth movement, stable framing, camera tracking backward on straight axis",
+          "narration": "हज़ारों वर्ष पहले भारत में, हमने जड़ी-बूटियों को पानी में मिलाकर बालों की शुद्धि का तरीका खोजा।"
         },
         {
-          "id": "buttons_scene_03_daily_life",
+          "id": "shampoo_scene_03_extracting_liquid",
           "duration": 6,
-          "num_frames": 0,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium shot of the tailor speaking directly to the camera. Garments stitched with buttons hang neatly behind him. He maintains direct eye contact. Front-facing camera only. No angle change.",
-          "motion_prompt": "slow controlled forward-facing gestures, continuous speaking mouth movement, stable framing",
-          "narration": "इन बटनों ने कपड़ों को आसान बनाया — पहनना भी, उतारना भी। यही से रोज़मर्रा का पहनावा बदला।"
+          "num_frames": 96,
+          "visual_reference": "identity_anchor_ancient_healer.png",
+          "visual_prompt": "Medium close-up of an ancient Indian healer (male, 60–70 years old) carefully lifting the herbal liquid from a stone bowl with his hands. Long beard, thoughtful eyes, expression of quiet evaluation. Drops of liquid fall back into the bowl. He speaks directly to the camera, occasionally glancing at the liquid before returning eye contact. Front-facing camera only. No angle change. Warm earthy tones, cinematic realism, no text, no watermark.",
+          "motion_prompt": "slow lifting of liquid and letting it drip back into bowl, gentle inspection gestures, calm controlled body movement, continuous lip movement while speaking, stable framing",
+          "narration": "यह तरल केवल मिश्रण नहीं था — यह बालों और त्वचा के लिए औषधि थी।"
         },
         {
-          "id": "buttons_scene_04_modern_connection",
+          "id": "shampoo_scene_04_modern_connection",
           "duration": 6,
-          "num_frames": 0,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of the tailor speaking directly to the camera. Modern clothing silhouettes subtly blend into the background, showing continuity. Calm, knowing expression. Front-facing only.",
-          "motion_prompt": "very slow forward movement easing into stillness, gentle head nods of emphasis, continuous mouth movement, stable framing",
-          "narration": "आज आपकी शर्ट, आपका कुर्ता, आपका कोट — सब उसी विचार से जुड़े हैं। बटन, भारत की देन।"
+          "num_frames": 96,
+          "visual_reference": "identity_anchor_ancient_healer.png",
+          "visual_prompt": "Hero-style medium close-up of an ancient Indian healer (male, 60–70 years old) standing calmly with the herbal bowl before him. Long silver beard, knowing eyes, gentle smile of understanding. Behind him, the herbal liquid subtly blends into the faint silhouette of a modern shampoo bottle, symbolizing continuity through time. He speaks directly to the camera. Front-facing only. Chest and face square to camera. No side view. Cinematic lighting, shallow depth-of-field, no text, no watermark.",
+          "motion_prompt": "very slow forward movement easing into stillness, hands resting near the bowl, gentle nods of emphasis, continuous mouth movement, stable framing",
+          "narration": "आज जब आप शैम्पू का उपयोग करते हैं, आप भारत की उसी खोज को दोहराते हैं।"
         }
       ]
     }
