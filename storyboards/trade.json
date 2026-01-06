@@ -1,0 +1,65 @@
+{
+  "title": "Before Borders, The World Was One Road",
+  "total_duration": 38,
+  "aspect_ratio": "9:16",
+  "fps": 24,
+  "scenes": [
+    {
+      "id": "scene_01_world_motion",
+      "duration": 5,
+      "num_frames": 120,
+      "lip_sync": false,
+      "visual_prompt": "Wide cinematic shot of ancient trade caravans crossing deserts, ships sailing across oceans, carts moving through mountain passes. No visible faces.",
+      "motion_prompt": "slow cinematic glide, strong parallax, clouds drifting, flags fluttering, animals and wheels in continuous motion",
+      "narration": "Long before borders existed, the world was already moving together."
+    },
+    {
+      "id": "scene_02_witness_speaks",
+      "duration": 6,
+      "num_frames": 144,
+      "lip_sync": true,
+      "character": "witness",
+      "visual_prompt": "Medium close-up of an elderly historian walking slowly toward the camera, timeless robes, calm eyes, soft volumetric light.",
+      "motion_prompt": "slow forward walk, subtle head movement, steady camera, natural speaking motion",
+      "narration": "Trade connected people before politics ever divided them."
+    },
+    {
+      "id": "scene_03_world_spread",
+      "duration": 6,
+      "num_frames": 144,
+      "lip_sync": false,
+      "visual_prompt": "Wide aerial shot of ancient cities exchanging goods, glowing trade routes spreading across land and sea, no faces visible.",
+      "motion_prompt": "top-down cinematic drift, glowing paths expanding, ships and caravans moving simultaneously",
+      "narration": "Ideas traveled with spices, stories traveled with silk, and beliefs moved faster than armies."
+    },
+    {
+      "id": "scene_04_challenger_questions",
+      "duration": 6,
+      "num_frames": 144,
+      "lip_sync": true,
+      "character": "challenger",
+      "visual_prompt": "Medium close-up of a younger man standing still, questioning eyes, dramatic side lighting, dark background.",
+      "motion_prompt": "minimal motion, subtle breathing, steady gaze into camera",
+      "narration": "Then why do we believe separation came first?"
+    },
+    {
+      "id": "scene_05_world_consequence",
+      "duration": 7,
+      "num_frames": 168,
+      "lip_sync": false,
+      "visual_prompt": "Wide cinematic montage of maps forming, symbols spreading, ships docking, roads glowing across continents. No faces.",
+      "motion_prompt": "fast-to-slow time-lapse blend, layered parallax, expanding light trails",
+      "narration": "Because history remembers walls more easily than roads."
+    },
+    {
+      "id": "scene_06_witness_closing",
+      "duration": 8,
+      "num_frames": 192,
+      "lip_sync": true,
+      "character": "witness",
+      "visual_prompt": "Close-up of the witness stopping, looking directly into the camera, soft rim light defining the face.",
+      "motion_prompt": "very slow forward drift, controlled facial motion",
+      "narration": "But connection came first. And it always will."
+    }
+  ]
+}
