@@ -160,11 +160,13 @@ def main():
     logger.info("🧪 Testing video/audio compilation fix")
     logger.info("=" * 70)
     
-    # Initialize video processor
+    # Initialize video processor with DEV mode for smaller test files
     try:
         config = VideoConfig(fps=24, width=1280, height=720)
+        # Force dev mode for testing (smaller files, faster encoding)
+        config._export_mode = "dev"
         video_processor = VideoProcessor(config)
-        logger.info("✅ VideoProcessor initialized")
+        logger.info("✅ VideoProcessor initialized (DEV mode - smaller files)")
     except Exception as e:
         logger.error(f"❌ Failed to initialize VideoProcessor: {e}")
         return 1

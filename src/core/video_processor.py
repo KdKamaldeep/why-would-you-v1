@@ -769,16 +769,47 @@ class VideoProcessor:
             if use_gpu and nvenc_codec:
                 # GPU encoding (much faster - 5-10x speedup)
                 logger.info(f"🚀 Final encoding: GPU ({nvenc_codec})")
-                cmd.extend([
-                    '-c:v', nvenc_codec,
-                    '-preset', 'p1',  # p1 = fastest, p7 = slowest (best quality)
-                    '-rc', 'vbr',  # Variable bitrate mode
-                    '-b:v', '10M',  # Target bitrate
-                    '-maxrate', '20M',  # Max bitrate
-                    '-c:a', 'aac',
-                    '-b:a', self.config.audio_bitrate,
-                    '-pix_fmt', 'yuv420p'
-                ])
+                
+                # Use CRF mode for better quality/size ratio (NVENC supports constqp)
+                # CRF 23 = good quality, reasonable file size (similar to libx264 CRF 22)
+                # Fallback to lower bitrate VBR if CRF not supported
+                use_crf = self.config.export_mode == "dev" or os.getenv("NVENC_USE_CRF", "1").lower() in ("1", "true", "yes")
+                
+                if use_crf:
+                    # Use constant quality mode (better quality/size ratio)
+                    # NVENC CQ values: 0-51 (lower = better quality, larger files)
+                    # CQ 23 ≈ libx264 CRF 22, CQ 24 ≈ libx264 CRF 23
+                    target_cq = 24 if self.config.export_mode == "dev" else 23
+                    cmd.extend([
+                        '-c:v', nvenc_codec,
+                        '-preset', 'p1',  # p1 = fastest, p7 = slowest (best quality)
+                        '-rc', 'constqp',  # Constant quality mode
+                        '-cq', str(target_cq),  # Constant quality (0-51, lower = better)
+                        '-c:a', 'aac',
+                        '-b:a', self.config.audio_bitrate,
+                        '-pix_fmt', 'yuv420p'
+                    ])
+                    logger.info(f"   Using CQ mode (cq={target_cq}) for better quality/size ratio")
+                else:
+                    # Use VBR with bitrate based on export mode
+                    if self.config.export_mode == "dev":
+                        target_bitrate = '3M'  # Lower bitrate for dev mode
+                        max_bitrate = '6M'
+                    else:
+                        target_bitrate = '5M'  # Reduced from 10M for better file sizes
+                        max_bitrate = '10M'    # Reduced from 20M
+                    
+                    cmd.extend([
+                        '-c:v', nvenc_codec,
+                        '-preset', 'p1',  # p1 = fastest, p7 = slowest (best quality)
+                        '-rc', 'vbr',  # Variable bitrate mode
+                        '-b:v', target_bitrate,  # Target bitrate
+                        '-maxrate', max_bitrate,  # Max bitrate
+                        '-c:a', 'aac',
+                        '-b:a', self.config.audio_bitrate,
+                        '-pix_fmt', 'yuv420p'
+                    ])
+                    logger.info(f"   Using VBR mode (bitrate={target_bitrate}, max={max_bitrate})")
             else:
                 # CPU encoding (libx264 with optimized preset)
                 logger.info(f"💻 Final encoding: CPU ({codec}, preset={preset}, crf={crf})")
