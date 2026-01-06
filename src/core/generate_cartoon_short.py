@@ -318,40 +318,61 @@ class CartoonShortsGenerator:
                 actual_scene_durations = []  # Track actual audio durations
                 
                 # Generate audio clips from each scene's narration
+                # Track which scenes have blank narration (will use 49 frames instead of calculating from audio)
+                scenes_with_blank_narration = []
+                
                 for i, scene in enumerate(script['scenes']):
                     scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
                     narration_text = scene.get('narration', '')
+                    
+                    # Check if narration is blank (empty or only whitespace)
+                    is_blank_narration = not narration_text or not narration_text.strip()
+                    
+                    if is_blank_narration:
+                        logger.info(f"🎵 Scene {i+1}: Narration is blank - skipping TTS synthesis, will use 49 frames")
+                        scenes_with_blank_narration.append(i)
+                        # Create empty audio path for blank narration scenes
+                        scene_audio_paths.append("")
+                        # Calculate duration for 49 frames at wan_fps
+                        blank_duration = 73 / self.config.wan_fps
+                        actual_scene_durations.append(blank_duration)
+                        logger.info(f"🎵 Scene {i+1}: Using default duration {blank_duration:.2f}s (49 frames @ {self.config.wan_fps}fps)")
+                        continue
+                    
                     logger.info(f"🎵 Scene {i+1}: Processing narration ({len(narration_text)} characters)")
                     
                     # Get voice file from scene if available
+                    # Priority: scene voice > --voice argument > None
                     voice_file = None
-                    if 'voice' in scene:
-                        # Import narration converter to resolve voice files
+                    scene_voice_value = scene.get('voice')
+                    
+                    if scene_voice_value and scene_voice_value.strip():
+                        # Scene has a voice property - try to resolve it
                         from ..utils.narration_converter import NarrationConverter
                         converter = NarrationConverter()
-                        voice_file = converter.resolve_voice_file(scene['voice'])
+                        voice_file = converter.resolve_voice_file(scene_voice_value.strip())
                         if voice_file:
-                            logger.info(f"🎵 Scene {i+1}: Using voice file: {voice_file}")
-                            logger.info(f"🎵 Scene {i+1}: Voice property: '{scene['voice']}' -> resolved to: {voice_file}")
+                            logger.info(f"🎵 Scene {i+1}: Using scene voice: '{scene_voice_value}' -> {voice_file}")
                         else:
-                            logger.warning(f"🎵 Scene {i+1}: Voice file not found for '{scene['voice']}'")
+                            logger.warning(f"🎵 Scene {i+1}: Scene voice '{scene_voice_value}' not found, will fallback to --voice argument")
                     else:
-                        logger.info(f"🎵 Scene {i+1}: No voice property found in scene")
+                        logger.info(f"🎵 Scene {i+1}: No voice property in scene, will use --voice argument if provided")
                     
                     if not (self.config.reuse_existing and scene_audio.exists()):
                         logger.info(f"🎵 Scene {i+1}: Generating new audio clip...")
-                        # Priority: scene voice > --voice argument > None
-                        # Handle empty strings properly (empty string should be treated as None)
+                        # Determine final voice file: scene voice > --voice argument > None
                         final_voice_file = None
                         if voice_file:
+                            # Use scene voice if successfully resolved
                             final_voice_file = voice_file
                         elif self.config.voice_id and self.config.voice_id.strip():
+                            # Fallback to --voice argument
                             final_voice_file = self.config.voice_id.strip()
+                            logger.info(f"🎵 Scene {i+1}: Using --voice argument: {final_voice_file}")
+                        else:
+                            logger.info(f"🎵 Scene {i+1}: No voice specified (using default TTS voice)")
                         
-                        logger.info(f"🎵 Scene {i+1}: Voice file priority check:")
-                        logger.info(f"   Scene voice: {voice_file}")
-                        logger.info(f"   Config voice_id (--voice): {self.config.voice_id}")
-                        logger.info(f"   Final voice_clone_audio: {final_voice_file}")
+                        logger.info(f"🎵 Scene {i+1}: Final voice selection: {final_voice_file or 'default TTS voice'}")
                         generated_audio = self.voice_synthesizer.synthesize_voice(
                             [narration_text],
                             str(scene_audio),
@@ -367,6 +388,8 @@ class CartoonShortsGenerator:
                         logger.info(f"🎵 Scene {i+1}: Reusing existing audio: {scene_audio}")
                     
                     scene_audio_paths.append(str(scene_audio))
+                    # Duration will be detected in the next step
+                    actual_scene_durations.append(0.0)  # Placeholder, will be updated
                     logger.info(f"Scene {i+1}: Audio clip ready: {scene_audio}")
             
             # Detect length of each audio clip (no validation - will set num_frames based on audio length)
@@ -378,9 +401,16 @@ class CartoonShortsGenerator:
                     scene_num = i + 1
                     scene = script['scenes'][i]
                     
+                    # Skip blank narration scenes (already handled above with duration set)
+                    if i in scenes_with_blank_narration:
+                        logger.info(f"📏 Scene {scene_num}: Blank narration - using pre-calculated duration ({actual_scene_durations[i]:.2f}s)")
+                        total_audio_duration += actual_scene_durations[i]
+                        continue
+                    
                     logger.info(f"📏 Scene {scene_num}: Analyzing audio duration...")
                     actual_duration = self.video_processor.get_audio_duration(scene_audio)
-                    actual_scene_durations.append(actual_duration)
+                    # Update the duration at the correct index
+                    actual_scene_durations[i] = actual_duration
                     total_audio_duration += actual_duration
                     logger.info(f"Scene {scene_num}: Audio clip length: {actual_duration:.1f}s")
                 
@@ -501,8 +531,16 @@ class CartoonShortsGenerator:
                     # Calculate num_frames based on audio duration if available, otherwise use scene/config values
                     num_frames_to_use = None
                     
+                    # Check if narration is blank - if so, use 49 frames
+                    narration_text = scene.get('narration', '')
+                    is_blank_narration = not narration_text or not narration_text.strip()
+                    
+                    if is_blank_narration:
+                        # Use 49 frames for blank narration scenes
+                        num_frames_to_use = 49
+                        logger.info(f"🎬 Scene {i+1}: Blank narration - using 49 frames")
                     # If audio exists, calculate num_frames from actual audio duration
-                    if not self.config.skip_audio and i < len(actual_scene_durations):
+                    elif not self.config.skip_audio and i < len(actual_scene_durations):
                         actual_duration = actual_scene_durations[i]
                         scene_fps = self.config.wan_fps
                         # Calculate num_frames needed to match audio duration
