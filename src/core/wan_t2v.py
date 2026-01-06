@@ -45,23 +45,30 @@ def encode_video_ffmpeg(frames_dir, fps, output_path):
 
     # Try GPU NVENC first (FAST)
     try:
-        subprocess.run([
+        result = subprocess.run([
             "ffmpeg", "-y",
             "-framerate", str(fps),
             "-i", f"{frames_dir}/%06d.jpg",
             "-c:v", "h264_nvenc",
-            "-preset", "p1",
+            "-preset", "p1",  # p1 = fastest, p7 = slowest (best quality)
+            "-rc", "vbr",  # Variable bitrate mode
+            "-b:v", "10M",  # Target bitrate (adjust if needed)
+            "-maxrate", "20M",  # Max bitrate
             "-pix_fmt", "yuv420p",
             "-movflags", "+faststart",
             output_path
-        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        logger.info("✅ Video encoded using GPU NVENC")
+        ], check=True, capture_output=True, text=True)
+        logger.info("✅ Video encoded using GPU NVENC (h264_nvenc)")
         return
-    except Exception:
-        pass
+    except subprocess.CalledProcessError as e:
+        logger.warning(f"⚠️ NVENC encoding failed: {e.stderr[:500] if e.stderr else 'Unknown error'}")
+        logger.info("🔄 Falling back to CPU encoding...")
+    except Exception as e:
+        logger.warning(f"⚠️ NVENC encoding error: {e}")
+        logger.info("🔄 Falling back to CPU encoding...")
 
     # CPU fallback (still fast)
-    logger.info("⚠️ NVENC not available, using CPU encoding")
+    logger.info("💻 Using CPU encoding (libx264)")
     subprocess.run([
         "ffmpeg", "-y",
         "-framerate", str(fps),

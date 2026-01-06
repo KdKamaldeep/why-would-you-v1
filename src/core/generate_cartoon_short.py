@@ -595,7 +595,7 @@ class CartoonShortsGenerator:
                     if not self.config.skip_audio and i < len(scene_audio_paths) and scene_audio_paths[i]:
                         if scene_lip_sync:
                             # Run Wav2Lip - uses its own virtual environment Python
-                            wav2lip_enabled = os.getenv("WAV2LIP_ENABLED", "false").lower() in ("true", "1", "yes")
+                            wav2lip_enabled = os.getenv("WAV2LIP_ENABLED", "true").lower() in ("true", "1", "yes")
                             
                             if wav2lip_enabled:
                                 try:

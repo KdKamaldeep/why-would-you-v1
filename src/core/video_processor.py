@@ -32,8 +32,35 @@ class VideoProcessor:
         self.config = config
         
     def frames_to_video(self, frames_dir: str, output_path: str, fps: int = 10) -> str:  # Reduced default from 15 to 10
-        """Convert frames directory to MP4 video."""
+        """Convert frames directory to MP4 video. Tries GPU encoding first, falls back to CPU."""
         try:
+            # Try GPU NVENC first (much faster)
+            try:
+                # Use h264_nvenc for H.264, hevc_nvenc for HEVC
+                nvenc_codec = "h264_nvenc" if "264" in self.config.codec else "hevc_nvenc"
+                cmd = [
+                    'ffmpeg', '-y',
+                    '-framerate', str(fps),
+                    '-i', f'{frames_dir}/frame_%04d.png',
+                    '-c:v', nvenc_codec,
+                    '-preset', 'p1',  # p1 = fastest, p7 = slowest (best quality)
+                    '-rc', 'vbr',  # Variable bitrate mode
+                    '-b:v', '10M',  # Target bitrate
+                    '-maxrate', '20M',  # Max bitrate
+                    '-pix_fmt', 'yuv420p'
+                ]
+                if self.config.faststart:
+                    cmd.extend(['-movflags', '+faststart'])
+                cmd.append(output_path)
+                
+                result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                logger.info(f"✅ Video encoded using GPU NVENC ({nvenc_codec})")
+                return output_path
+            except (subprocess.CalledProcessError, FileNotFoundError) as e:
+                logger.warning(f"⚠️ GPU encoding failed: {e.stderr[:200] if hasattr(e, 'stderr') and e.stderr else str(e)}")
+                logger.info("🔄 Falling back to CPU encoding...")
+            
+            # CPU fallback (slower but more compatible)
             cmd = [
                 'ffmpeg', '-y',
                 '-framerate', str(fps),
@@ -55,7 +82,8 @@ class VideoProcessor:
                 cmd.extend(['-movflags', '+faststart'])
             cmd.append(output_path)
             
-            subprocess.run(cmd, check=True, capture_output=True)
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
+            logger.info(f"💻 Video encoded using CPU ({self.config.codec})")
             logger.info(f"Created video from frames: {output_path}")
             return output_path
             
@@ -601,7 +629,21 @@ class VideoProcessor:
             if have_music:
                 audio_inputs.extend(['-i', background_music])
             
-            # Build FFmpeg command
+            # Build FFmpeg command - try GPU encoding first
+            # Try GPU NVENC first (much faster)
+            use_gpu = False
+            nvenc_codec = None
+            try:
+                # Check if NVENC is available by trying to list encoders
+                check_cmd = ['ffmpeg', '-hide_banner', '-encoders']
+                result = subprocess.run(check_cmd, capture_output=True, text=True, timeout=5)
+                if 'h264_nvenc' in result.stdout or 'hevc_nvenc' in result.stdout:
+                    use_gpu = True
+                    nvenc_codec = "h264_nvenc" if "264" in self.config.codec or self.config.codec == "libx264" else "hevc_nvenc"
+                    logger.info(f"🚀 Attempting GPU encoding with {nvenc_codec}")
+            except Exception:
+                pass  # Fall back to CPU
+            
             cmd = ['ffmpeg', '-y', '-i', temp_video] + audio_inputs
             
             # Add audio mixing filter
@@ -622,34 +664,103 @@ class VideoProcessor:
                     '-vf', f'subtitles={subtitles_path}:force_style=\'FontSize=32,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1\''
                 ])
             
-            # Final output settings (size-focused)
-            cmd.extend([
-                '-c:v', self.config.codec,
-                '-preset', self.config.preset,
-                '-crf', str(self.config.crf),
-                '-c:a', 'aac',
-                '-b:a', self.config.audio_bitrate,
-                '-pix_fmt', 'yuv420p'
-            ])
-            # Add tune parameter only for supported codecs
-            if self.config.codec == 'libx264':
-                cmd.extend(['-tune', 'film'])  # film is valid for libx264
-            elif self.config.codec == 'libx265':
-                cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
+            # Final output settings - try GPU first, fall back to CPU
+            if use_gpu and nvenc_codec:
+                # GPU encoding (much faster)
+                cmd.extend([
+                    '-c:v', nvenc_codec,
+                    '-preset', 'p1',  # p1 = fastest, p7 = slowest (best quality)
+                    '-rc', 'vbr',  # Variable bitrate mode
+                    '-b:v', '10M',  # Target bitrate
+                    '-maxrate', '20M',  # Max bitrate
+                    '-c:a', 'aac',
+                    '-b:a', self.config.audio_bitrate,
+                    '-pix_fmt', 'yuv420p'
+                ])
+            else:
+                # CPU encoding (slower but more compatible)
+                cmd.extend([
+                    '-c:v', self.config.codec,
+                    '-preset', self.config.preset,
+                    '-crf', str(self.config.crf),
+                    '-c:a', 'aac',
+                    '-b:a', self.config.audio_bitrate,
+                    '-pix_fmt', 'yuv420p'
+                ])
+                # Add tune parameter only for supported codecs
+                if self.config.codec == 'libx264':
+                    cmd.extend(['-tune', 'film'])  # film is valid for libx264
+                elif self.config.codec == 'libx265':
+                    cmd.extend(['-tune', self.config.tune])  # grain, psnr, ssim, etc. for libx265
+                # Improve compatibility for HEVC in MP4 (especially on Safari)
+                if self.config.codec == 'libx265':
+                    cmd.extend(['-tag:v', 'hvc1'])
+            
             # Use narration duration if available, otherwise video duration
             # This ensures video matches narration length (video was already extended if needed)
             target_duration = narration_duration if narration_duration else video_duration
             if target_duration is not None and target_duration > 0:
                 cmd.extend(['-t', f"{target_duration:.3f}"])
             # Do NOT use -shortest; we want full narration length
-            if self.config.codec == 'libx265':
-                cmd.extend(['-tag:v', 'hvc1'])
             if self.config.faststart:
                 cmd.extend(['-movflags', '+faststart'])
             cmd.append(output_path)
             
             # Run FFmpeg command and check for errors
-            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            # Try GPU first, fall back to CPU if it fails
+            try:
+                if use_gpu and nvenc_codec:
+                    logger.info(f"🚀 Encoding final video with GPU ({nvenc_codec})...")
+                else:
+                    logger.info(f"💻 Encoding final video with CPU ({self.config.codec})...")
+                result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                if use_gpu and nvenc_codec:
+                    logger.info("✅ Final video encoded using GPU NVENC")
+                else:
+                    logger.info("✅ Final video encoded using CPU")
+            except subprocess.CalledProcessError as e:
+                # If GPU encoding failed, try CPU fallback
+                if use_gpu and nvenc_codec:
+                    error_output = e.stderr if e.stderr else "Unknown error"
+                    logger.warning(f"⚠️ GPU encoding failed: {error_output[:300]}")
+                    logger.info("🔄 Falling back to CPU encoding...")
+                    # Rebuild command with CPU codec
+                    cmd_cpu = ['ffmpeg', '-y', '-i', temp_video] + audio_inputs
+                    if have_music:
+                        cmd_cpu.extend([
+                            '-filter_complex', '[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad[aout]',
+                            '-map', '0:v',
+                            '-map', '[aout]'
+                        ])
+                    else:
+                        cmd_cpu.extend(['-map', '0:v', '-map', '1:a', '-af', 'apad'])
+                    if subtitles_path and os.path.exists(subtitles_path):
+                        cmd_cpu.extend([
+                            '-vf', f'subtitles={subtitles_path}:force_style=\'FontSize=32,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1\''
+                        ])
+                    cmd_cpu.extend([
+                        '-c:v', self.config.codec,
+                        '-preset', self.config.preset,
+                        '-crf', str(self.config.crf),
+                        '-c:a', 'aac',
+                        '-b:a', self.config.audio_bitrate,
+                        '-pix_fmt', 'yuv420p'
+                    ])
+                    if self.config.codec == 'libx264':
+                        cmd_cpu.extend(['-tune', 'film'])
+                    elif self.config.codec == 'libx265':
+                        cmd_cpu.extend(['-tune', self.config.tune])
+                    if self.config.codec == 'libx265':
+                        cmd_cpu.extend(['-tag:v', 'hvc1'])
+                    if target_duration is not None and target_duration > 0:
+                        cmd_cpu.extend(['-t', f"{target_duration:.3f}"])
+                    if self.config.faststart:
+                        cmd_cpu.extend(['-movflags', '+faststart'])
+                    cmd_cpu.append(output_path)
+                    result = subprocess.run(cmd_cpu, check=True, capture_output=True, text=True)
+                    logger.info("✅ Final video encoded using CPU (fallback)")
+                else:
+                    raise  # Re-raise if already using CPU
             
             # Verify output file was created successfully
             if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
