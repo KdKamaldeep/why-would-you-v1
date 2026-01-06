@@ -63,17 +63,16 @@ def find_video_clips(output_folder: Path) -> List[str]:
 
 
 def find_audio_clips(output_folder: Path) -> List[str]:
-    """Find all audio clips in the output folder."""
+    """Find all audio clips in the output folder. Only returns _pp (post-processed) versions."""
     audio_clips = []
+    seen_scenes = set()
     
-    # Look for audio_scene_*.wav files
-    for audio_file in output_folder.glob("audio_scene_*.wav"):
-        # Check for postprocessed version first
-        pp_file = output_folder / f"{audio_file.stem}_pp{audio_file.suffix}"
-        if pp_file.exists():
-            audio_clips.append(str(pp_file))
-        else:
-            audio_clips.append(str(audio_file))
+    # Look for audio_scene_*_pp.wav files (post-processed versions only)
+    for pp_audio_file in output_folder.glob("audio_scene_*_pp.wav"):
+        audio_clips.append(str(pp_audio_file))
+        # Track which scene this is to avoid duplicates
+        scene_num = pp_audio_file.stem.replace("audio_scene_", "").replace("_pp", "")
+        seen_scenes.add(scene_num)
     
     # Also check for pause audio files
     for pause_audio in output_folder.glob("pause_audio_*.aac"):
