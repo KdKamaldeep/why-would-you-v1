@@ -38,12 +38,12 @@ python -m src.interfaces.simple_cartoon_generator \
   --wan-width 768 \
   --wan-height 1344 \
   --wan-num-frames 25 \
-  --wan-fps 24 \
-  --wan-steps 24 \
+  --wan-fps 16 \
+  --wan-steps 18 \
   --wan-guidance 6 \
   --language hi \
   --gen-bulk \
-  --voice /workspace/why-would-you-v1/tts-speaker/srikant-friendly_-helpful-and-neutral.wav
+  --voice /workspace/why-would-you-v1/tts-speaker/grandpa.wav
     
 
 # With Hindi narration
