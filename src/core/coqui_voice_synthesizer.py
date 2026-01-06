@@ -688,17 +688,30 @@ class CoquiVoiceSynthesizer:
                     except Exception as e:
                         logger.warning(f"Text normalization warning: {e}")
                 
-                speaker_wav_arg = voice_clone_audio if (voice_clone_audio and os.path.exists(voice_clone_audio)) else None
-                logger.info(f"🎵 XTTS: speaker_wav_arg set to: {speaker_wav_arg}")
-                logger.info(f"🎵 XTTS: voice_clone_audio was: {voice_clone_audio}")
-                logger.info(f"🎵 XTTS: voice_clone_audio exists: {voice_clone_audio and os.path.exists(voice_clone_audio) if voice_clone_audio else False}")
-                
-                # Auto-discover a language-appropriate speaker WAV if none provided
-                if speaker_wav_arg is None:
+                # Honor voice_clone_audio if provided (from --voice argument)
+                # Only auto-discover if voice_clone_audio was NOT provided (None)
+                if voice_clone_audio:
+                    # User explicitly provided a voice file - use it or error
+                    if os.path.exists(voice_clone_audio):
+                        speaker_wav_arg = voice_clone_audio
+                        logger.info(f"🎵 Using provided voice file: {voice_clone_audio}")
+                    else:
+                        # User provided a path but file doesn't exist - this is an error, don't fall back to discovery
+                        logger.error(f"❌ Voice file not found: {voice_clone_audio}")
+                        logger.error(f"   Provided via --voice argument but file does not exist")
+                        raise FileNotFoundError(f"Voice file not found: {voice_clone_audio}")
+                else:
+                    # No voice file provided - auto-discover based on language
+                    speaker_wav_arg = None
                     auto_wav = self._discover_speaker_wav(self.config.language)
                     if auto_wav:
-                        logger.info(f"Using discovered speaker_wav for language '{self.config.language}': {auto_wav}")
+                        logger.info(f"🎵 Auto-discovered speaker_wav for language '{self.config.language}': {auto_wav}")
                         speaker_wav_arg = auto_wav
+                    else:
+                        logger.info(f"🎵 No speaker_wav found - will use default XTTS speaker")
+                
+                logger.info(f"🎵 XTTS: speaker_wav_arg set to: {speaker_wav_arg}")
+                logger.info(f"🎵 XTTS: voice_clone_audio was: {voice_clone_audio}")
                 
                 # Ensure a valid speaker is passed for XTTS if no reference wav
                 requested_speaker = (
