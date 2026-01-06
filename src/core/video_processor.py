@@ -8,6 +8,7 @@ import logging
 import subprocess
 from typing import List, Dict, Union
 from dataclasses import dataclass
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -449,6 +450,39 @@ class VideoProcessor:
     def compile_final_video(self, clips: List[str], narration_audio: Union[str, List[str]], background_music: str = None, subtitles_path: str = None, output_path: str = "output/final_short.mp4") -> str:
         """Compile final video with all components."""
         try:
+            # Check if any clips already have audio (e.g., lipsync videos)
+            # Wav2Lip outputs include audio, so we should use that instead of narration
+            clips_with_audio = []
+            for clip in clips:
+                try:
+                    # Check if clip has audio stream
+                    probe_cmd = [
+                        'ffprobe', '-v', 'error',
+                        '-select_streams', 'a',
+                        '-show_entries', 'stream=codec_type',
+                        '-of', 'default=nw=1:nk=1',
+                        clip
+                    ]
+                    result = subprocess.run(probe_cmd, capture_output=True, text=True, timeout=2)
+                    has_audio = 'audio' in result.stdout.lower() or (result.returncode == 0 and result.stdout.strip())
+                    clips_with_audio.append(has_audio)
+                    if has_audio:
+                        logger.info(f"🎵 Clip {Path(clip).name} already contains audio (likely lipsync video)")
+                except Exception:
+                    clips_with_audio.append(False)
+            
+            # If ALL clips have audio (e.g., all are lipsync videos), use their audio instead of narration
+            all_clips_have_audio = all(clips_with_audio) and len(clips_with_audio) > 0
+            
+            if all_clips_have_audio:
+                logger.info("🎵 All clips have audio (lipsync videos) - will use video audio instead of separate narration")
+                narration_audio_to_use = None  # Don't add narration, use audio from videos
+            elif any(clips_with_audio):
+                logger.warning(f"⚠️ Some clips have audio, some don't - using narration audio (may cause conflicts)")
+                narration_audio_to_use = narration_audio
+            else:
+                narration_audio_to_use = narration_audio
+            
             # Add cross-dissolve transitions between clips (0.25-0.4s, using 0.3s as default)
             transition_duration = 0.3  # 0.3s cross-dissolve (middle of 0.25-0.4s range)
             
@@ -510,9 +544,22 @@ class VideoProcessor:
                     concat_inputs.append(output_label)
                 
                 # Concatenate all faded clips
-                # Format: [v0][v1][v2]concat=n=3:v=1:a=0[vout]
+                # If all clips have audio (lipsync videos), include audio in concatenation
+                # Otherwise, only concatenate video (a=0 means no audio)
                 concat_inputs_str = "".join([f"[{label}]" for label in concat_inputs])
-                concat_filter = f"{concat_inputs_str}concat=n={len(clips)}:v=1:a=0[vout]"
+                if all_clips_have_audio:
+                    # Include audio in concatenation: v=1:a=1
+                    # Need to also extract audio from each clip
+                    audio_inputs = []
+                    for i, clip in enumerate(clips):
+                        audio_inputs.append(f"[{i}:a]")
+                    audio_concat = "".join(audio_inputs)
+                    concat_filter = f"{concat_inputs_str}concat=n={len(clips)}:v=1:a=0[vout];{audio_concat}concat=n={len(clips)}:v=0:a=1[aout]"
+                    logger.info("🎵 Concatenating clips with audio (lipsync videos)")
+                else:
+                    # Only concatenate video (no audio): v=1:a=0
+                    concat_filter = f"{concat_inputs_str}concat=n={len(clips)}:v=1:a=0[vout]"
+                    logger.info("🎵 Concatenating clips without audio (will add narration separately)")
 
                 filter_parts.append(concat_filter)
                 filter_complex = ";".join(filter_parts)
@@ -527,15 +574,30 @@ class VideoProcessor:
                     'ffmpeg', '-y'
                 ] + input_args + [
                     '-filter_complex', filter_complex,
-                    '-map', '[vout]',
+                ]
+                
+                # Map video and audio (if present) from filter output
+                if all_clips_have_audio:
+                    cmd.extend(['-map', '[vout]', '-map', '[aout]'])
+                else:
+                    cmd.extend(['-map', '[vout]'])
+                
+                cmd.extend([
                     '-c:v', codec,
                     '-preset', preset,
                     '-crf', str(crf),
                     '-tune', self.config.tune,
                     '-pix_fmt', 'yuv420p',
+                ])
+                
+                # Encode audio if present (from lipsync videos)
+                if all_clips_have_audio:
+                    cmd.extend(['-c:a', 'aac', '-b:a', self.config.audio_bitrate])
+                
+                cmd.extend([
                     '-movflags', '+faststart',
                     temp_video
-                ]
+                ])
                 result = subprocess.run(cmd, check=True, capture_output=True, text=True)
                 if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
                     error_msg = result.stderr if result.stderr else "Unknown error"
@@ -579,20 +641,20 @@ class VideoProcessor:
             except Exception:
                 video_duration = None
 
-            # If narration_audio is a list, first concatenate into one track
-            if isinstance(narration_audio, list):
+            # If narration_audio_to_use is a list, first concatenate into one track
+            if narration_audio_to_use and isinstance(narration_audio_to_use, list):
                 merged_narration = 'merged_narration.aac'
-                narration_audio = self.concat_audios(narration_audio, merged_narration)
+                narration_audio_to_use = self.concat_audios(narration_audio_to_use, merged_narration)
             
-            # Probe narration audio duration
+            # Probe narration audio duration (if we're using it)
             narration_duration = None
-            if narration_audio and os.path.exists(narration_audio):
+            if narration_audio_to_use and os.path.exists(narration_audio_to_use):
                 try:
                     probe_cmd = [
                         'ffprobe', '-v', 'error',
                         '-show_entries', 'format=duration',
                         '-of', 'default=nw=1:nk=1',
-                        narration_audio
+                        narration_audio_to_use
                     ]
                     result = subprocess.run(probe_cmd, check=True, capture_output=True)
                     narration_duration_str = result.stdout.decode('utf-8', errors='ignore').strip()
@@ -727,12 +789,10 @@ class VideoProcessor:
                     '-pix_fmt', 'yuv420p'
                 ])
             
-            # Use narration duration if available, otherwise video duration
-            # This ensures video matches narration length (video was already extended if needed)
-            target_duration = narration_duration if narration_duration else video_duration
-            if target_duration is not None and target_duration > 0:
-                cmd.extend(['-t', f"{target_duration:.3f}"])
-            # Do NOT use -shortest; we want full narration length
+            # Don't trim video after stitching - use full video duration
+            # Video was already synced/extended to match audio during scene processing
+            # Trimming here causes loss of content (~1 second)
+            # Do NOT use -t or -shortest; we want full video length
             if self.config.faststart:
                 cmd.extend(['-movflags', '+faststart'])
             cmd.append(output_path)
@@ -778,8 +838,7 @@ class VideoProcessor:
                         '-pix_fmt', 'yuv420p'
                     ])
                     cmd_cpu.extend(['-tune', self.config.tune])
-                    if target_duration is not None and target_duration > 0:
-                        cmd_cpu.extend(['-t', f"{target_duration:.3f}"])
+                    # Don't trim video - use full video duration
                     if self.config.faststart:
                         cmd_cpu.extend(['-movflags', '+faststart'])
                     cmd_cpu.append(output_path)

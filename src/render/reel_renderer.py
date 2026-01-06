@@ -155,6 +155,7 @@ def mix_audio(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     # Check if video needs vertical conversion
+    # Skip conversion if video is already at perfect shorts dimensions (768x1344)
     needs_vertical = False
     try:
         probe_cmd = [
@@ -169,7 +170,11 @@ def mix_audio(
         if len(info) >= 2 and info[0] and info[1]:
             width = int(info[0])
             height = int(info[1])
-            if width != out_w or height != out_h:
+            # Skip conversion if video is already perfect for shorts (768x1344) or matches target
+            if (width == 768 and height == 1344) or (width == out_w and height == out_h):
+                needs_vertical = False
+                logger.info(f"✅ Video already perfect for shorts: {width}x{height} - skipping conversion")
+            elif width != out_w or height != out_h:
                 needs_vertical = True
             else:
                 logger.info(f"✅ Video already in target format: {width}x{height}")
@@ -180,6 +185,7 @@ def mix_audio(
         needs_vertical = True
     
     # Convert to vertical if needed (with hook text support)
+    # Skip if video is already 768x1344 (perfect for shorts)
     if needs_vertical:
         temp_vertical = str(output_path.parent / "_temp_vertical.mp4")
         logger.info("📐 Converting video to vertical format first...")

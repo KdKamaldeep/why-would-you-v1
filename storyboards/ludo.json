@@ -1,0 +1,49 @@
+{
+  "stories": [
+    {
+      "title": "Invented in India: Buttons",
+      "description": "An ancient Indian tailor explains how buttons were invented in India and became part of everyday clothing.",
+      "total_duration": 24,
+      "aspect_ratio": "9:16",
+      "fps": 16,
+      "scenes": [
+        {
+          "id": "buttons_scene_01_intro",
+          "duration": 6,
+          "num_frames": 0,
+          "visual_reference": "identity_anchor_indus_tailor.png",
+          "visual_prompt": "Medium close-up of an ancient Indian tailor standing in his workshop, facing directly toward the camera. He wears a simple patterned robe tied at the waist, neatly groomed beard, calm confident expression. Wooden table with folded cloth and tools behind him. He is speaking directly to the camera, lips articulating clearly. Eyes locked on the lens. Front-facing camera only. Chest and face square to camera. No side view, no profile.",
+          "motion_prompt": "slow forward lean while speaking, camera tracking backward on straight axis, continuous mouth and jaw movement, gentle head nods, stable framing",
+          "narration": "मैं एक दर्ज़ी हूँ। मेरे लिए कपड़े केवल पहनावा नहीं, जीवन का हिस्सा हैं।"
+        },
+        {
+          "id": "buttons_scene_02_invention",
+          "duration": 6,
+          "num_frames": 0,
+          "visual_reference": "use_previous_scene_image_as_reference",
+          "visual_prompt": "Same tailor continues speaking directly to the camera. Small shell and stone buttons rest on the table behind him. He does not look away. Eyes remain on the camera. Clear mouth movement while speaking. Front-facing camera only.",
+          "motion_prompt": "steady forward-facing hand movements near chest level, continuous lip movement, camera tracking backward on straight axis, no rotation",
+          "narration": "हज़ारों वर्ष पहले, हमने कपड़ों को बाँधने के लिए बटन बनाए — खोल और पत्थर से।"
+        },
+        {
+          "id": "buttons_scene_03_daily_life",
+          "duration": 6,
+          "num_frames": 0,
+          "visual_reference": "use_previous_scene_image_as_reference",
+          "visual_prompt": "Medium shot of the tailor speaking directly to the camera. Garments stitched with buttons hang neatly behind him. He maintains direct eye contact. Front-facing camera only. No angle change.",
+          "motion_prompt": "slow controlled forward-facing gestures, continuous speaking mouth movement, stable framing",
+          "narration": "इन बटनों ने कपड़ों को आसान बनाया — पहनना भी, उतारना भी। यही से रोज़मर्रा का पहनावा बदला।"
+        },
+        {
+          "id": "buttons_scene_04_modern_connection",
+          "duration": 6,
+          "num_frames": 0,
+          "visual_reference": "use_previous_scene_image_as_reference",
+          "visual_prompt": "Medium close-up of the tailor speaking directly to the camera. Modern clothing silhouettes subtly blend into the background, showing continuity. Calm, knowing expression. Front-facing only.",
+          "motion_prompt": "very slow forward movement easing into stillness, gentle head nods of emphasis, continuous mouth movement, stable framing",
+          "narration": "आज आपकी शर्ट, आपका कुर्ता, आपका कोट — सब उसी विचार से जुड़े हैं। बटन, भारत की देन।"
+        }
+      ]
+    }
+  ]
+}
