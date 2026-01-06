@@ -496,14 +496,26 @@ class CartoonShortsGenerator:
                     if self.gemini_generator.available:
                         initial_image_path = self.output_dir / f"scene_{i+1}_initial_frame.png"
                         logger.info(f"🎨 Scene {i+1}: Generating initial frame with Gemini...")
-                        if previous_image_path:
+                        
+                        # Check if scene explicitly disables previous image reference
+                        prev_image_ref = scene.get('prev_image_ref', None)
+                        reference_image_to_use = None
+                        
+                        if prev_image_ref is False:
+                            # Explicitly disabled - don't use previous image
+                            logger.info(f"🖼️ Scene {i+1}: prev_image_ref=false - not using previous image as reference")
+                            reference_image_to_use = None
+                        elif previous_image_path:
+                            # Use previous image if available (default behavior when prev_image_ref is missing/null)
                             logger.info(f"🖼️ Scene {i+1}: Using previous image as reference for character consistency")
+                            reference_image_to_use = previous_image_path
+                        
                         generated_image = self.gemini_generator.generate_image(
                             prompt=visual_prompt,
                             output_path=str(initial_image_path),
                             width=self.config.wan_width,
                             height=self.config.wan_height,
-                            reference_image_path=previous_image_path
+                            reference_image_path=reference_image_to_use
                         )
                         if generated_image:
                             initial_image_path = generated_image
@@ -562,15 +574,14 @@ class CartoonShortsGenerator:
                         else:
                             logger.info(f"🎬 Scene {i+1}: Using num_frames from command-line: {num_frames_to_use}")
                     
-                    # Extract scene metadata for best frame extraction
+                    # Extract scene metadata
                     scene_id = scene.get('id', f"scene_{i+1}")
                     visual_reference = scene.get('visual_reference', None)
-                    best_frame_filename = scene.get('best_frame_filename', None)
                     # Generate slug from story title (sanitized for filename)
                     story_title = script.get('title', 'story')
                     slug = "".join(c for c in story_title if c.isalnum() or c in (' ', '-', '_')).strip().replace(' ', '_').lower()[:50]
                     
-                    # Generate video with optional best frame extraction
+                    # Generate video
                     # Pass initial_image_path to WAN for I2V mode if available
                     result = self.wan_generator.generate_video(
                         prompt=prompt,
@@ -581,7 +592,6 @@ class CartoonShortsGenerator:
                         scene_id=scene_id,
                         visual_reference=visual_reference,
                         slug=slug,
-                        best_frame_filename=best_frame_filename,
                         image=initial_image_path if initial_image_path else None
                     )
                     
@@ -589,11 +599,8 @@ class CartoonShortsGenerator:
                     if isinstance(result, dict):
                         video_path = result['video_path']
                         # Store metadata for downstream article generation
-                        if 'best_frame_path' in result:
-                            scene['best_frame_path'] = result['best_frame_path']
-                            scene['scene_id'] = result['scene_id']
-                            scene['visual_reference'] = result['visual_reference']
-                            logger.info(f"📸 Scene {i+1}: Best frame saved: {result['best_frame_path']}")
+                        scene['scene_id'] = result.get('scene_id')
+                        scene['visual_reference'] = result.get('visual_reference')
                     else:
                         # Backward compatibility: result is a string
                         video_path = result
