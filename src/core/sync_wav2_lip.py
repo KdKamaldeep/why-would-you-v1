@@ -147,7 +147,7 @@ def run_wav2lip(
     wav2lip_dir: str,
     checkpoint_path: str,
     python_cmd: Optional[str] = None,
-    pads: str = "0 20 0 0",
+    pads: list[int] = None,
     nosmooth: bool = True
 ) -> bool:
     """
@@ -160,13 +160,17 @@ def run_wav2lip(
         wav2lip_dir: Path to Wav2Lip repository root
         checkpoint_path: Path to Wav2Lip checkpoint file
         python_cmd: Python command to use (optional, uses WAV2LIP_PYTHON if not provided)
-        pads: Padding values for face detection (default: "0 20 0 0")
+        pads: Padding values for face detection as list of 4 integers [top, bottom, left, right] (default: [0, 20, 0, 0])
         nosmooth: Disable smoothing (default: True)
         
     Returns:
         True if successful, False otherwise
     """
     try:
+        # Use default pads if not provided
+        if pads is None:
+            pads = [0, 20, 0, 0]
+        
         # Use virtual environment Python if not specified
         if python_cmd is None:
             python_cmd = os.getenv("WAV2LIP_PYTHON", WAV2LIP_PYTHON)
@@ -219,6 +223,7 @@ def run_wav2lip(
             return False
         
         # Build command (matches working example exactly)
+        # --pads expects 4 separate integer arguments, not a string
         cmd = [
             python_cmd,
             '-u',  # Unbuffered output
@@ -227,7 +232,7 @@ def run_wav2lip(
             '--face', norm_video_abs,  # Absolute path
             '--audio', norm_audio_abs,  # Absolute path
             '--outfile', output_video_abs,  # Absolute path
-            '--pads', pads
+            '--pads', str(pads[0]), str(pads[1]), str(pads[2]), str(pads[3])  # 4 separate integer arguments
         ]
         
         if nosmooth:
@@ -266,7 +271,7 @@ def lipsync_wav2lip(
     wav2lip_dir: Optional[str] = None,
     checkpoint_path: Optional[str] = None,
     python_cmd: Optional[str] = None,
-    pads: str = "0 20 0 0",
+    pads: Optional[list[int]] = None,
     nosmooth: bool = True
 ) -> bool:
     """
@@ -281,8 +286,10 @@ def lipsync_wav2lip(
         out_video_mp4: Path to output lip-synced video file
         fps: Target frame rate for video normalization
         wav2lip_dir: Path to Wav2Lip repository root (default: from env or /workspace/Wav2Lip)
-        checkpoint_path: Path to Wav2Lip checkpoint file (default: from env or /workspace/Wav2Lip/checkpoints/wav2lip_gan.pth)
+        checkpoint_path: Path to Wav2Lip checkpoint file (default: from env or /workspace/Wav2Lip/checkpoints/Wav2Lip-SD-GAN.pt)
         python_cmd: Python command to use (default: from env or /workspace/Wav2Lip/venv/bin/python)
+        pads: Padding values for face detection as list [top, bottom, left, right] (default: [0, 20, 0, 0])
+        nosmooth: Disable smoothing (default: True)
         
     Returns:
         True if lip-sync succeeded and out_video_mp4 exists with non-trivial size, else False.
