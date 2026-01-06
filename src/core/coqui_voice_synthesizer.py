@@ -689,17 +689,31 @@ class CoquiVoiceSynthesizer:
                         logger.warning(f"Text normalization warning: {e}")
                 
                 # Honor voice_clone_audio if provided (from --voice argument)
-                # Only auto-discover if voice_clone_audio was NOT provided (None)
+                # Only auto-discover if voice_clone_audio was NOT provided (None or empty string)
+                # Normalize: treat empty string as None, strip whitespace from non-empty strings
+                voice_clone_audio_normalized = None
                 if voice_clone_audio:
+                    if isinstance(voice_clone_audio, str):
+                        stripped = voice_clone_audio.strip()
+                        if stripped:  # Only use if non-empty after stripping
+                            voice_clone_audio_normalized = stripped
+                    else:
+                        voice_clone_audio_normalized = voice_clone_audio
+                
+                logger.info(f"🎵 Voice file check:")
+                logger.info(f"   voice_clone_audio (raw): {repr(voice_clone_audio)}")
+                logger.info(f"   voice_clone_audio (normalized): {repr(voice_clone_audio_normalized)}")
+                
+                if voice_clone_audio_normalized:
                     # User explicitly provided a voice file - use it or error
-                    if os.path.exists(voice_clone_audio):
-                        speaker_wav_arg = voice_clone_audio
-                        logger.info(f"🎵 Using provided voice file: {voice_clone_audio}")
+                    if os.path.exists(voice_clone_audio_normalized):
+                        speaker_wav_arg = voice_clone_audio_normalized
+                        logger.info(f"🎵 Using provided voice file: {voice_clone_audio_normalized}")
                     else:
                         # User provided a path but file doesn't exist - this is an error, don't fall back to discovery
-                        logger.error(f"❌ Voice file not found: {voice_clone_audio}")
+                        logger.error(f"❌ Voice file not found: {voice_clone_audio_normalized}")
                         logger.error(f"   Provided via --voice argument but file does not exist")
-                        raise FileNotFoundError(f"Voice file not found: {voice_clone_audio}")
+                        raise FileNotFoundError(f"Voice file not found: {voice_clone_audio_normalized}")
                 else:
                     # No voice file provided - auto-discover based on language
                     speaker_wav_arg = None

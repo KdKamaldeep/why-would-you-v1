@@ -340,8 +340,18 @@ class CartoonShortsGenerator:
                     
                     if not (self.config.reuse_existing and scene_audio.exists()):
                         logger.info(f"🎵 Scene {i+1}: Generating new audio clip...")
-                        final_voice_file = voice_file or self.config.voice_id or None
-                        logger.info(f"🎵 Scene {i+1}: Final voice_clone_audio parameter: {final_voice_file}")
+                        # Priority: scene voice > --voice argument > None
+                        # Handle empty strings properly (empty string should be treated as None)
+                        final_voice_file = None
+                        if voice_file:
+                            final_voice_file = voice_file
+                        elif self.config.voice_id and self.config.voice_id.strip():
+                            final_voice_file = self.config.voice_id.strip()
+                        
+                        logger.info(f"🎵 Scene {i+1}: Voice file priority check:")
+                        logger.info(f"   Scene voice: {voice_file}")
+                        logger.info(f"   Config voice_id (--voice): {self.config.voice_id}")
+                        logger.info(f"   Final voice_clone_audio: {final_voice_file}")
                         generated_audio = self.voice_synthesizer.synthesize_voice(
                             [narration_text],
                             str(scene_audio),

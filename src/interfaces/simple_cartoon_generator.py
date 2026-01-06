@@ -108,7 +108,7 @@ def generate_cartoon(prompt, style="realistic", duration=30, language="en", enab
             music_volume=music_volume,
             voice_volume=voice_volume,
             verbose_ffmpeg=verbose_ffmpeg,
-            voice_id=voice_file or ""  # Path to reference speaker WAV for Coqui TTS
+            voice_id=voice_file if voice_file else ""  # Path to reference speaker WAV for Coqui TTS (empty string = no voice)
         )
         
         # Initialize generator
@@ -504,7 +504,7 @@ Storyboard Cast Format (with face images):
                     voice_volume=args.voice_volume,
                     verbose_ffmpeg=args.verbose_ffmpeg,
                     add_hooks=args.add_hooks,  # Enable hook text rendering
-                    voice_id=args.voice or ""  # Path to reference speaker WAV for Coqui TTS
+                    voice_id=args.voice if args.voice else ""  # Path to reference speaker WAV for Coqui TTS
                 )
                 
                 # Pre-initialize generator to load pipelines once
