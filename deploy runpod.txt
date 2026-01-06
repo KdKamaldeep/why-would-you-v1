@@ -162,3 +162,20 @@ python inference.py \
   --outfile /workspace/why-would-you-v1/outputs/test_sync/video_lipsync.mp4 \
   --pads 0 20 0 0 \
   --nosmooth
+  
+  
+Mandatory Layers for scrip generation
+
+Hero framing (epic / ultra-cinematic)
+
+Exact age, gender, presence
+
+Environment with symbolism
+
+Light description (time of day + volumetric behavior)
+
+Micro-motion (hands, cloth, particles)
+
+Camera discipline
+
+Negative constraints (no side view, no text, no watermark

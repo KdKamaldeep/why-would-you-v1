@@ -1,65 +1,69 @@
 {
-  "title": "Before Borders, The World Was One Road",
+  "title": "Before Borders, the World Was One Road",
+  "description": "A dual-character cinematic short where history is spoken by a witness, while the world moves in epic wides with voice-over.",
   "total_duration": 38,
   "aspect_ratio": "9:16",
   "fps": 24,
   "scenes": [
     {
-      "id": "scene_01_world_motion",
+      "id": "scene_01_world_motion_roads",
       "duration": 5,
       "num_frames": 120,
       "lip_sync": false,
-      "visual_prompt": "Wide cinematic shot of ancient trade caravans crossing deserts, ships sailing across oceans, carts moving through mountain passes. No visible faces.",
-      "motion_prompt": "slow cinematic glide, strong parallax, clouds drifting, flags fluttering, animals and wheels in continuous motion",
+      "character": null,
+      "visual_prompt": "Ultra-wide cinematic establishing shot of ancient trade routes at dawn. Long caravans of camels and ox-drawn carts moving steadily across golden deserts, mountain passes, and coastal roads. Ships with billowing sails glide across a calm ocean. No visible faces, no closeups of mouths. Massive scale. Atmospheric haze. Early sunlight grazing the terrain, creating long shadows and glowing edges. Floating dust, sand, and mist particles. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "slow cinematic aerial glide, strong depth parallax, continuous forward motion of caravans and ships at different depths, clouds drifting gently, flags and sails rippling naturally in the wind, stable camera, no shake",
       "narration": "Long before borders existed, the world was already moving together."
     },
     {
-      "id": "scene_02_witness_speaks",
+      "id": "scene_02_witness_speaks_nalanda",
       "duration": 6,
       "num_frames": 144,
       "lip_sync": true,
       "character": "witness",
-      "visual_prompt": "Medium close-up of an elderly historian walking slowly toward the camera, timeless robes, calm eyes, soft volumetric light.",
-      "motion_prompt": "slow forward walk, subtle head movement, steady camera, natural speaking motion",
-      "narration": "Trade connected people before politics ever divided them."
+      "visual_prompt": "Epic hero shot, ultra-cinematic medium close-up of an ancient Indian historian-sage (male, 65–70 years old) walking slowly toward the camera inside a vast stone corridor inspired by Nalanda University. Long silver-grey hair tied back, flowing beard, deeply lined wise face, calm but commanding eyes. Wearing simple off-white cotton robes with subtle fabric folds. Golden morning light streams through high stone arches, forming volumetric god-rays. Floating dust particles shimmer in the air. He is speaking directly to the camera while walking, strong eye contact. Front-facing camera only. Chest and face perfectly square to camera at all times. No side view, no profile, no angle change. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "slow reverent forward walk, camera tracking backward on a straight axis, subtle robe sway, natural speaking mouth and jaw motion, steady frame, no rotation, no orbit, no shake",
+      "narration": "Trade connected people before politics ever learned how to divide them."
     },
     {
-      "id": "scene_03_world_spread",
+      "id": "scene_03_world_spread_routes",
       "duration": 6,
       "num_frames": 144,
       "lip_sync": false,
-      "visual_prompt": "Wide aerial shot of ancient cities exchanging goods, glowing trade routes spreading across land and sea, no faces visible.",
-      "motion_prompt": "top-down cinematic drift, glowing paths expanding, ships and caravans moving simultaneously",
+      "character": null,
+      "visual_prompt": "Wide cinematic shot of ancient cities across continents transitioning seamlessly: Indian ports, Middle Eastern bazaars, Central Asian mountain passes, and Mediterranean harbors. Glowing trade routes subtly emerge across land and sea like faint golden threads. No visible faces, no closeups of mouths. Massive architectural scale. Warm sunlight blending into cool dusk tones. Mist, smoke, and atmospheric depth throughout. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "slow panoramic drift, layered parallax between foreground structures and distant terrain, glowing paths expanding outward, continuous movement of carts and ships, gentle environmental motion (smoke, mist, banners), stable camera",
       "narration": "Ideas traveled with spices, stories traveled with silk, and beliefs moved faster than armies."
     },
     {
-      "id": "scene_04_challenger_questions",
+      "id": "scene_04_challenger_questions_courtyard",
       "duration": 6,
       "num_frames": 144,
       "lip_sync": true,
       "character": "challenger",
-      "visual_prompt": "Medium close-up of a younger man standing still, questioning eyes, dramatic side lighting, dark background.",
-      "motion_prompt": "minimal motion, subtle breathing, steady gaze into camera",
+      "visual_prompt": "Ultra-cinematic medium close-up of a younger challenger (male, 35–40 years old) standing in a shadowed stone courtyard at twilight. Short dark hair, intense questioning eyes, thoughtful features, clean-shaven. Wearing a simple dark robe. Soft rim light outlines his face with cool blue-grey ambient light behind him. Subtle drifting fog in the background. He is speaking directly to the camera, strong eye contact. Front-facing camera only. Face and chest square to camera. No side view, no profile, no angle change. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "minimal motion, subtle breathing, micro eye movements, stable locked camera, natural speaking mouth and jaw motion, no shake",
       "narration": "Then why do we believe separation came first?"
     },
     {
-      "id": "scene_05_world_consequence",
+      "id": "scene_05_world_walls_memory",
       "duration": 7,
       "num_frames": 168,
       "lip_sync": false,
-      "visual_prompt": "Wide cinematic montage of maps forming, symbols spreading, ships docking, roads glowing across continents. No faces.",
-      "motion_prompt": "fast-to-slow time-lapse blend, layered parallax, expanding light trails",
+      "character": null,
+      "visual_prompt": "Epic wide cinematic montage: ancient walls rising, border lines appearing on old parchment maps, gates closing, roads fading beneath stone barriers. No visible faces, no closeups of mouths. Dust and debris floating in the air. Dramatic lighting with shifting shadows. Warm colors gradually draining into colder tones as division forms. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "slow dramatic push-in, time-lapse construction phases, shadows lengthening, particles drifting continuously, subtle camera breathing, no shake, no rotation",
       "narration": "Because history remembers walls more easily than roads."
     },
     {
-      "id": "scene_06_witness_closing",
+      "id": "scene_06_witness_closing_truth",
       "duration": 8,
       "num_frames": 192,
       "lip_sync": true,
       "character": "witness",
-      "visual_prompt": "Close-up of the witness stopping, looking directly into the camera, soft rim light defining the face.",
-      "motion_prompt": "very slow forward drift, controlled facial motion",
-      "narration": "But connection came first. And it always will."
+      "visual_prompt": "Epic hero close-up of the same ancient Indian historian-sage (male, 65–70 years old) stopping in the Nalanda-inspired stone corridor and facing the camera directly. Long silver-grey hair tied back, flowing beard, calm commanding eyes. Soft golden rim light creates a halo-like edge around his hair and shoulders. Volumetric god-rays and floating dust particles remain visible behind him. He is speaking directly to the camera with strong eye contact. Front-facing camera only. Face perfectly square to camera. No side view, no profile, no angle change. Ultra-realistic, cinematic, HDR lighting, no text, no watermark.",
+      "motion_prompt": "very slow forward drift, minimal head movement, controlled natural speaking mouth and jaw motion, subtle robe micro-movement, stable frame, no shake, no rotation, no orbit",
+      "narration": "Division is modern. Connection is ancient. And it will return."
     }
   ]
 }
