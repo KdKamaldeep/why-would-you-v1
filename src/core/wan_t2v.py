@@ -21,6 +21,67 @@ from PIL import Image
 
 logger = logging.getLogger(__name__)
 
+# Environment variables for optional FPS interpolation
+INTERPOLATE_FPS = os.getenv("INTERPOLATE_FPS", "0").lower() in ("1", "true", "yes")
+INTERPOLATE_TARGET_FPS = int(os.getenv("INTERPOLATE_TARGET_FPS", "24"))
+
+
+def interpolate_video_ffmpeg(input_path, output_path, target_fps=24):
+    """
+    Interpolate video FPS using ffmpeg minterpolate filter.
+    High-quality motion-compensated interpolation.
+    
+    Args:
+        input_path: Input video file path
+        output_path: Output video file path (will be overwritten)
+        target_fps: Target FPS for interpolation (default: 24)
+    
+    Raises:
+        RuntimeError: If ffmpeg is not found or interpolation fails
+        subprocess.CalledProcessError: If ffmpeg command fails
+    """
+    import subprocess
+    import shutil
+    
+    if shutil.which("ffmpeg") is None:
+        raise RuntimeError("ffmpeg not found")
+    
+    # High-quality minterpolate settings:
+    # - mi_mode=mci: Motion-compensated interpolation
+    # - mc_mode=aobmc: Adaptive overlapped block motion compensation
+    # - me_mode=bidir: Bidirectional motion estimation
+    # - vsbmc=1: Variable-size block motion compensation
+    filter_complex = (
+        f"minterpolate=fps={target_fps}:"
+        f"mi_mode=mci:"
+        f"mc_mode=aobmc:"
+        f"me_mode=bidir:"
+        f"vsbmc=1"
+    )
+    
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", str(input_path),
+        "-vf", filter_complex,
+        "-c:v", "libx264",
+        "-crf", "18",  # High quality
+        "-preset", "slow",  # Better compression efficiency
+        "-pix_fmt", "yuv420p",
+        "-movflags", "+faststart",
+        str(output_path)
+    ]
+    
+    result = subprocess.run(
+        cmd,
+        check=True,
+        capture_output=True,
+        text=True
+    )
+    
+    if result.returncode != 0:
+        error_msg = result.stderr[:500] if result.stderr else 'Unknown error'
+        raise subprocess.CalledProcessError(result.returncode, cmd, error_msg)
+
 
 def write_frames_fast(frames, out_dir):
     """Write frames as JPEG files quickly using OpenCV."""
@@ -813,6 +874,30 @@ class WanT2VGenerator:
             output = None
             
             logger.info(f"✅ Video generated successfully: {output_path}")
+            
+            # Optional FPS interpolation (if enabled via environment variable)
+            if INTERPOLATE_FPS:
+                logger.info("🎞️ FPS interpolation enabled via env")
+                
+                # Skip interpolation if already at or above target FPS
+                if self.fps >= INTERPOLATE_TARGET_FPS:
+                    logger.info(f"ℹ️ Skipping interpolation (already at target fps: {self.fps} >= {INTERPOLATE_TARGET_FPS})")
+                else:
+                    try:
+                        # Generate temporary interpolated file
+                        output_path_obj = Path(output_path)
+                        interp_path = output_path_obj.parent / f"{output_path_obj.stem}_interp{output_path_obj.suffix}"
+                        
+                        logger.info(f"🎞️ Interpolating from {self.fps}fps to {INTERPOLATE_TARGET_FPS}fps...")
+                        interpolate_video_ffmpeg(str(output_path), str(interp_path), target_fps=INTERPOLATE_TARGET_FPS)
+                        
+                        # Replace original with interpolated file
+                        import shutil
+                        shutil.move(str(interp_path), str(output_path))
+                        logger.info("✅ FPS interpolation complete")
+                    except Exception as e:
+                        logger.warning(f"⚠️ FPS interpolation failed, keeping original video: {e}")
+                        # Original video remains unchanged
             
             # Extract best frame if scene_id is provided
             result = {"video_path": str(output_path)}
