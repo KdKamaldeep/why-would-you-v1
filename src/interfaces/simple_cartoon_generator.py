@@ -450,6 +450,15 @@ Storyboard Cast Format (with face images):
             
             # Bulk generation mode
             if args.gen_bulk:
+                # Debug: Log voice argument to help diagnose issues
+                print(f"🔍 DEBUG: args.voice = {repr(args.voice)}")
+                print(f"🔍 DEBUG: args.voice type = {type(args.voice)}")
+                if args.voice:
+                    print(f"🔍 DEBUG: args.voice file exists: {os.path.exists(args.voice)}")
+                    print(f"🔍 DEBUG: args.voice absolute path: {os.path.abspath(args.voice) if args.voice else None}")
+                else:
+                    print(f"⚠️ WARNING: args.voice is None or empty! Check command line argument parsing.")
+                
                 storyboard_file = Path(args.storyboard)
                 if not storyboard_file.exists() or not storyboard_file.is_file():
                     print(f"❌ Storyboard file does not exist: {storyboard_file}")
@@ -506,6 +515,11 @@ Storyboard Cast Format (with face images):
                     add_hooks=args.add_hooks,  # Enable hook text rendering
                     voice_id=args.voice if args.voice else ""  # Path to reference speaker WAV for Coqui TTS
                 )
+                
+                # Debug: Verify voice_id was set correctly
+                print(f"🔍 DEBUG: base_config.voice_id = {repr(base_config.voice_id)}")
+                if base_config.voice_id:
+                    print(f"🔍 DEBUG: base_config.voice_id file exists: {os.path.exists(base_config.voice_id)}")
                 
                 # Pre-initialize generator to load pipelines once
                 print("📦 Loading WAN pipeline (singleton - will be reused)...")
