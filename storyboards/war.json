@@ -1,47 +1,47 @@
 {
   "stories": [
     {
-      "title": "When Zero Was Born in India",
-      "description": "An ancient Indian guru explains how zero was conceived in India and transformed human understanding.",
+      "title": "The Legend of Chaturanga",
+      "description": "Queen Mandodari narrates the legendary and historical origins of Chaturanga, the ancestor of chess.",
       "total_duration": 22,
       "aspect_ratio": "9:16",
       "fps": 16,
       "scenes": [
         {
-          "id": "scene_01_hook_question",
+          "id": "scene_01_mandodari_intro",
           "duration": 5,
           "num_frames": 0,
-          "visual_reference": "identity_anchor_mathematician.png",
-          "visual_prompt": "Medium close-up of an ancient Indian guru (around 65–70 years old) walking slowly and directly toward the camera along a stone corridor inspired by Nalanda University. Male, long white and grey beard, deeply lined face, serene and wise eyes, high forehead, calm spiritual authority. Wearing simple saffron and off-white robes, rudraksha beads around the neck, holding palm-leaf manuscripts. He is clearly speaking while walking, lips articulating speech, mouth and jaw moving naturally, eyes engaging directly with the camera. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle.",
-          "motion_prompt": "slow reverent forward walk, camera tracking backward on straight axis, no rotation, no orbit, continuous speaking mouth and jaw movement, gentle head nods, stable framing",
-          "narration": "We count one, two, three. But once, the world did not know how to count nothing."
+          "visual_reference": "identity_anchor_mandodari.png",
+          "visual_prompt": "Medium close-up of Queen Mandodari, regal yet calm, facing directly toward the camera. Ancient Indian royal attire with elegant but restrained jewelry. Composed expression, wise eyes, gentle authority. She is speaking clearly, lips articulating naturally. Front-facing camera only. Chest and face square to camera. No side view, no profile view.",
+          "motion_prompt": "slow graceful forward movement, subtle head nods while speaking, camera tracking backward on straight axis, no rotation, stable framing",
+          "narration": "I am Mandodari, queen of Lanka. My husband lived for war, and his mind knew no rest."
         },
         {
-          "id": "scene_02_problem_of_nothing",
+          "id": "scene_02_game_as_distraction",
           "duration": 5,
           "num_frames": 0,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Same ancient Indian guru, still walking directly toward the camera. The stone corridor shows faint chalk marks of numbers carved into the walls. He continues speaking clearly with calm authority. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side or angled views.",
-          "motion_prompt": "steady slow forward walk, camera tracking backward on straight axis, continuous speaking mouth movement, subtle eyebrow emphasis, stable framing",
-          "narration": "For a long time, there was no name for nothing. Without it, great calculations were impossible."
+          "visual_prompt": "Mandodari continues speaking while walking through a palace corridor carved with symbols of war and strategy. Calm yet purposeful expression. Front-facing camera only. Chest and face square to camera at all times.",
+          "motion_prompt": "steady forward walk, gentle hand emphasis while speaking, camera tracking backward on straight axis, continuous mouth movement, stable framing",
+          "narration": "To turn his thoughts away from endless battle, I shaped war into thought. A game of strategy, not destruction."
         },
         {
-          "id": "scene_03_india_discovers_zero",
+          "id": "scene_03_chaturanga_legend",
           "duration": 6,
           "num_frames": 0,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium shot of the same guru walking directly toward the camera in an open stone courtyard with pillars. Young disciples study quietly in the background. The guru speaks with certainty, lips articulating each word clearly. Front-facing camera only. No side view or profile.",
-          "motion_prompt": "dignified forward walk, subtle hand emphasis while speaking, camera tracking backward on straight axis, gentle background motion, stable framing",
-          "narration": "In India, scholars gave nothing a form. Zero was not emptiness anymore. It became a number with meaning and rules."
+          "visual_prompt": "Mandodari stands before an ancient board set on a stone table, still facing the camera while speaking. Subtle carvings of elephants, horses, chariots, and soldiers appear around the board. Front-facing only.",
+          "motion_prompt": "slow controlled gestures toward the board while speaking, minimal body movement, camera stable on straight axis, continuous lip movement",
+          "narration": "The game was called Chaturanga. Four divisions of war — elephants, horses, chariots, and foot soldiers — each with its own strength."
         },
         {
-          "id": "scene_04_world_transformed",
+          "id": "scene_04_legend_meets_history",
           "duration": 6,
           "num_frames": 0,
           "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Medium close-up of the guru beneath a stone archway carved with ancient symbols and maps. He slowly comes to rest, facing the camera, speaking peacefully with steady eye contact. Front-facing camera only. Chest and face square to the camera at all times.",
-          "motion_prompt": "slow walk easing into stillness while facing camera, continuous mouth movement, gentle head nods, camera settles smoothly on straight axis, stable framing",
-          "narration": "From this idea came powerful mathematics, astronomy, and science. The modern world stands on this single discovery."
+          "visual_prompt": "Medium close-up of Mandodari beneath a stone archway, expression reflective and wise. Ancient military diagrams are carved into the walls behind her. She speaks calmly, directly to the viewer. Front-facing camera only.",
+          "motion_prompt": "very slow forward movement easing into stillness, gentle head nods, continuous mouth movement, camera settles smoothly, stable framing",
+          "narration": "Some call my story a legend. Yet in the courts of ancient India, the same four divisions shaped real armies. What began as strategy became a game — and the world now calls it chess."
         }
       ]
     }
