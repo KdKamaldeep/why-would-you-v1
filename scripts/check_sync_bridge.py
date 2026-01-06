@@ -507,13 +507,13 @@ Examples:
     parser.add_argument(
         '--fps',
         type=int,
-        default=24,
+        default=16,
         help='Frames per second (default: 24)'
     )
     parser.add_argument(
         '--steps',
         type=int,
-        default=30,
+        default=18,
         help='Number of inference steps (default: 30)'
     )
     parser.add_argument(
