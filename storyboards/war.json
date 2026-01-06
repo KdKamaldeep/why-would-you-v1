@@ -14,7 +14,7 @@
           "visual_reference": "identity_anchor_mandodari.png",
           "visual_prompt": "Medium close-up of Queen Mandodari, regal yet calm, facing directly toward the camera. Ancient Indian royal attire with elegant but restrained jewelry. Composed expression, wise eyes, gentle authority. She is speaking clearly, lips articulating naturally. Front-facing camera only. Chest and face square to camera. No side view, no profile view.",
           "motion_prompt": "slow graceful forward movement, subtle head nods while speaking, camera tracking backward on straight axis, no rotation, stable framing",
-          "narration": "I am Mandodari, queen of Lanka. My husband lived for war, and his mind knew no rest."
+          "narration": "मैं मंडोदरी हूँ, लंका की रानी। मेरे पति का मन सदा युद्ध में उलझा रहता था।"
         },
         {
           "id": "scene_02_game_as_distraction",
@@ -23,7 +23,7 @@
           "visual_reference": "use_previous_scene_image_as_reference",
           "visual_prompt": "Mandodari continues speaking while walking through a palace corridor carved with symbols of war and strategy. Calm yet purposeful expression. Front-facing camera only. Chest and face square to camera at all times.",
           "motion_prompt": "steady forward walk, gentle hand emphasis while speaking, camera tracking backward on straight axis, continuous mouth movement, stable framing",
-          "narration": "To turn his thoughts away from endless battle, I shaped war into thought. A game of strategy, not destruction."
+          "narration": "उनके मन को युद्ध से हटाने के लिए, मैंने युद्ध को विचार में बदल दिया। विनाश नहीं, बल्कि रणनीति का एक खेल।"
         },
         {
           "id": "scene_03_chaturanga_legend",
@@ -32,7 +32,7 @@
           "visual_reference": "use_previous_scene_image_as_reference",
           "visual_prompt": "Mandodari stands before an ancient board set on a stone table, still facing the camera while speaking. Subtle carvings of elephants, horses, chariots, and soldiers appear around the board. Front-facing only.",
           "motion_prompt": "slow controlled gestures toward the board while speaking, minimal body movement, camera stable on straight axis, continuous lip movement",
-          "narration": "The game was called Chaturanga. Four divisions of war — elephants, horses, chariots, and foot soldiers — each with its own strength."
+          "narration": "इस खेल को चतुरंग कहा गया। युद्ध की चार शक्तियाँ — हाथी, घोड़े, रथ और पैदल सैनिक — हर एक की अपनी भूमिका थी।"
         },
         {
           "id": "scene_04_legend_meets_history",
@@ -41,7 +41,7 @@
           "visual_reference": "use_previous_scene_image_as_reference",
           "visual_prompt": "Medium close-up of Mandodari beneath a stone archway, expression reflective and wise. Ancient military diagrams are carved into the walls behind her. She speaks calmly, directly to the viewer. Front-facing camera only.",
           "motion_prompt": "very slow forward movement easing into stillness, gentle head nods, continuous mouth movement, camera settles smoothly, stable framing",
-          "narration": "Some call my story a legend. Yet in the courts of ancient India, the same four divisions shaped real armies. What began as strategy became a game — and the world now calls it chess."
+          "narration": "कुछ लोग इसे केवल एक कथा मानते हैं। लेकिन प्राचीन भारत के दरबारों में यही चार अंग वास्तविक सेनाओं की नींव थे। जो रणनीति से शुरू हुआ, वह खेल बना — और आज दुनिया उसे शतरंज कहती है।"
         }
       ]
     }
