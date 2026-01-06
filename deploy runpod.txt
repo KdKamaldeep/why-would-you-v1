@@ -34,7 +34,7 @@ python -m src.interfaces.simple_cartoon_generator \
  
 python -m src.interfaces.simple_cartoon_generator \
   --prompt "Sunset over mountains" \
-  --storyboard storyboards/ludo.json \
+  --storyboard storyboards/trade.json \
   --wan-width 768 \
   --wan-height 1344 \
   --wan-num-frames 25 \
@@ -111,19 +111,29 @@ python scripts/check_sync_bridge.py \
 
 # Custom settings
 python scripts/check_sync_bridge.py \
-  --video-prompt "Medium close-up of an ancient Indian guru (around 65–70 years old) walking slowly and directly toward the camera along a stone corridor inspired by Nalanda University. Male, long white and grey beard, deeply lined face, serene and wise eyes, high forehead, calm spiritual authority. Wearing simple saffron and off-white robes, rudraksha beads around the neck, holding palm-leaf manuscripts. He is clearly speaking while walking, lips articulating speech, mouth and jaw moving naturally, eyes engaging directly with the camera. Front-facing camera only. Character always faces directly toward the camera. Chest and face square to the camera at all times. No side view. No profile view. No over-the-shoulder angle. Avoid side angle, avoid profile view, avoid cinematic side shot, avoid shoulder turn, avoid angled face 4K.
-" \
-  --audio-text "We all count numbers — one, two, three.
-But long ago, humanity was missing the most powerful number of all." \
+  --video-prompt "Hero shot, ultra-cinematic medium close-up of an ancient Indian guru (65–70 years old) walking slowly and confidently toward the camera. Powerful, iconic presence. Male with a long flowing white-and-grey beard, deeply lined wise face, calm but commanding eyes, high forehead radiating spiritual authority. Skin texture ultra-detailed, realistic pores and wrinkles.
+
+Wearing elegant saffron and off-white robes with subtle fabric folds, rudraksha beads around the neck, holding ancient palm-leaf manuscripts. Robes gently sway with movement. Clearly speaking while walking — lips, mouth, and jaw articulating speech naturally and continuously. Strong eye contact with the camera at all times.
+
+Environment: majestic ancient Nalanda University–inspired stone corridor with towering carved pillars, symmetrical architecture, glowing oil lamps along the walls, floating dust particles catching golden volumetric light. Warm cinematic lighting with soft god-rays streaming from behind, creating a halo-like rim light around the character. Background slightly defocused for depth-of-field, but visually rich and awe-inspiring.
+
+Camera & framing: front-facing hero shot only. Camera locked on straight axis, chest and face perfectly square to camera. No angle change, no rotation, no orbit. No side view, no profile view, no shoulder turn, no cinematic side shot. Stable framing with subtle cinematic camera breathing only.
+
+Motion: slow reverent forward walk, smooth camera tracking backward on the same axis, natural head and beard movement, no sudden motion. High realism, dramatic yet serene tone.
+
+Style & quality: ultra-realistic, cinematic, IMAX-level clarity, 4K detail, high dynamic range, natural skin tones. No cartoon style, no fantasy glow, no text, no watermark." \
+  --audio-text "We all count numbers — one, two, three. But long ago, humanity was missing the most powerful number of all." \
   --output-dir outputs/test_sync \
   --width 1344 \
-  --height 768 \ 
-  --num-frames 200 
+  --height 768 \
+  --num-frames 144 \
   --fps 24 \
+  --sync-fps 24 \
   --language en \
-  --voice-file /workspace/why-would-you-v1/tts-speaker/voice-male.wav
-  --use-wav2lip
-  --steps 24
+  --voice-file /workspace/why-would-you-v1/tts-speaker/voice-male.wav \
+  --steps 24 \
+  --verbose
+
   
 For wav2lip these requiremts will work 
 
