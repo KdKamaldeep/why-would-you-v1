@@ -1,0 +1,32 @@
+ffmpeg \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/scenes/scene_1_synced.mp4 \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/audio_scene_1_pp.wav \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/scenes/scene_2_lipsync.mp4 \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/audio_scene_2_pp.wav \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/scenes/scene_3_synced.mp4 \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/audio_scene_3_pp.wav \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/scenes/scene_4_lipsync.mp4 \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/audio_scene_4_pp.wav \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/scenes/scene_5_synced.mp4 \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/audio_scene_5_pp.wav \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/scenes/scene_6_lipsync.mp4 \
+-i /workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/audio_scene_6_pp.wav \
+-filter_complex "\
+[0:v]setpts=PTS-STARTPTS,fps=24[v0]; \
+[2:v]setpts=PTS-STARTPTS,fps=24[v1]; \
+[4:v]setpts=PTS-STARTPTS,fps=24[v2]; \
+[6:v]setpts=PTS-STARTPTS,fps=24[v3]; \
+[8:v]setpts=PTS-STARTPTS,fps=24[v4]; \
+[10:v]setpts=PTS-STARTPTS,fps=24[v5]; \
+[1:a]aresample=48000,asetpts=PTS-STARTPTS[a0]; \
+[3:a]aresample=48000,asetpts=PTS-STARTPTS[a1]; \
+[5:a]aresample=48000,asetpts=PTS-STARTPTS[a2]; \
+[7:a]aresample=48000,asetpts=PTS-STARTPTS[a3]; \
+[9:a]aresample=48000,asetpts=PTS-STARTPTS[a4]; \
+[11:a]aresample=48000,asetpts=PTS-STARTPTS[a5]; \
+[v0][a0][v1][a1][v2][a2][v3][a3][v4][a4][v5][a5]concat=n=6:v=1:a=1[v][a]" \
+-map "[v]" -map "[a]" \
+-c:v libx264 -pix_fmt yuv420p -preset slow -crf 18 \
+-c:a aac -b:a 192k \
+-movflags +faststart \
+/workspace/why-would-you-v1/output/The_Healing_That_Should_Not_Have_Worked/final.mp4

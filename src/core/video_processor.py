@@ -471,11 +471,17 @@ class VideoProcessor:
                 except Exception:
                     clips_with_audio.append(False)
             
+            # Check if narration_audio is a list matching clips (one audio per clip)
+            # This allows pairing each video with its corresponding audio for proper sync
+            narration_is_paired = isinstance(narration_audio, list) and len(narration_audio) == len(clips)
+            
             # Always use narration audio if provided, regardless of whether clips have audio
             # This ensures consistent audio across all clips
             if narration_audio:
                 narration_audio_to_use = narration_audio
-                if all(clips_with_audio) and len(clips_with_audio) > 0:
+                if narration_is_paired:
+                    logger.info(f"🎵 Using paired audio (one audio file per video clip) for proper synchronization")
+                elif all(clips_with_audio) and len(clips_with_audio) > 0:
                     logger.info("🎵 All clips have audio, but narration audio provided - will use narration audio for consistency")
                 elif any(clips_with_audio):
                     logger.info("🎵 Some clips have audio, but narration audio provided - will use narration audio for consistency")
@@ -491,11 +497,123 @@ class VideoProcessor:
                     logger.warning("⚠️ No narration audio provided and clips have no audio - output will be silent")
                     narration_audio_to_use = None
             
+            # Special case: If narration_audio is a list matching clips, use paired approach
+            # This pairs each video with its corresponding audio for proper synchronization
+            if narration_is_paired and len(clips) > 1:
+                logger.info(f"🎬 Using paired video/audio approach for {len(clips)} clips (proper synchronization)")
+                
+                # Build FFmpeg command with alternating video and audio inputs
+                cmd = ['ffmpeg', '-y']
+                
+                # Add all inputs (alternating video and audio)
+                for i, clip in enumerate(clips):
+                    cmd.extend(['-i', clip])
+                    if i < len(narration_audio):
+                        cmd.extend(['-i', narration_audio[i]])
+                
+                # Build filter_complex for normalization and concatenation
+                # Normalize video: setpts=PTS-STARTPTS, fps=24
+                # Normalize audio: aresample=48000, asetpts=PTS-STARTPTS
+                filter_parts = []
+                for i in range(len(clips)):
+                    # Video normalization
+                    filter_parts.append(f"[{i*2}:v]setpts=PTS-STARTPTS,fps={self.config.fps}[v{i}]")
+                    # Audio normalization
+                    if i < len(narration_audio):
+                        filter_parts.append(f"[{i*2+1}:a]aresample=48000,asetpts=PTS-STARTPTS[a{i}]")
+                
+                # Build concat inputs
+                concat_video_inputs = "".join([f"[v{i}]" for i in range(len(clips))])
+                concat_audio_inputs = "".join([f"[a{i}]" for i in range(len(clips))])
+                concat_filter = f"{concat_video_inputs}{concat_audio_inputs}concat=n={len(clips)}:v=1:a=1[v][a]"
+                filter_parts.append(concat_filter)
+                
+                filter_complex = ";".join(filter_parts)
+                
+                temp_video = "temp_video.mp4"
+                cmd.extend([
+                    '-filter_complex', filter_complex,
+                    '-map', '[v]',
+                    '-map', '[a]',
+                    '-c:v', 'libx264',
+                    '-preset', 'fast',
+                    '-crf', '22',
+                    '-pix_fmt', 'yuv420p',
+                    '-c:a', 'aac',
+                    '-b:a', '192k',
+                    '-movflags', '+faststart',
+                    temp_video
+                ])
+                
+                result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                
+                if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
+                    error_msg = result.stderr if result.stderr else "Unknown error"
+                    raise RuntimeError(f"Failed to create paired video: {error_msg}")
+                
+                logger.info(f"✅ Created paired video/audio successfully")
+                
+                # For paired approach, temp_video already has audio mixed in
+                # Just need to handle background music and subtitles if needed, then finalize
+                # Skip the duration synchronization and audio mixing sections below
+                final_temp_video = temp_video
+                
+                # Handle background music if provided
+                if background_music and os.path.exists(background_music):
+                    logger.info("🎵 Adding background music to paired video...")
+                    music_video = "temp_video_with_music.mp4"
+                    cmd = [
+                        'ffmpeg', '-y',
+                        '-i', temp_video,
+                        '-i', background_music,
+                        '-filter_complex', '[0:a]volume=0.85[a1];[1:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest[aout]',
+                        '-map', '0:v',
+                        '-map', '[aout]',
+                        '-c:v', 'copy',
+                        '-c:a', 'aac',
+                        '-b:a', '192k',
+                        '-shortest',
+                        music_video
+                    ]
+                    subprocess.run(cmd, check=True, capture_output=True, text=True)
+                    final_temp_video = music_video
+                
+                # Handle subtitles if provided
+                if subtitles_path and os.path.exists(subtitles_path):
+                    logger.info("📝 Adding subtitles to paired video...")
+                    subtitle_video = "temp_video_with_subtitles.mp4"
+                    cmd = [
+                        'ffmpeg', '-y',
+                        '-i', final_temp_video,
+                        '-vf', f'subtitles={subtitles_path}:force_style=\'FontSize=32,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1\'',
+                        '-c:v', 'libx264',
+                        '-preset', 'fast',
+                        '-crf', '22',
+                        '-c:a', 'copy',
+                        subtitle_video
+                    ]
+                    subprocess.run(cmd, check=True, capture_output=True, text=True)
+                    final_temp_video = subtitle_video
+                
+                # Copy final video to output path
+                import shutil
+                shutil.copy2(final_temp_video, output_path)
+                
+                # Cleanup
+                try:
+                    if final_temp_video != temp_video and os.path.exists(final_temp_video):
+                        os.remove(final_temp_video)
+                    if os.path.exists(temp_video):
+                        os.remove(temp_video)
+                except:
+                    pass
+                
+                logger.info(f"✅ Compiled final video with paired audio: {output_path}")
+                return output_path
             # Simple video stitching - no transitions, just concatenate
-            if len(clips) == 0:
+            elif len(clips) == 0:
                 raise ValueError("No video clips provided")
-            
-            if len(clips) == 1:
+            elif len(clips) == 1:
                 # Single clip - strip audio if narration is provided
                 temp_video = "temp_video.mp4"
                 if narration_audio_to_use:
@@ -604,14 +722,16 @@ class VideoProcessor:
             except Exception:
                 video_duration = None
 
-            # If narration_audio_to_use is a list, first concatenate into one track
-            if narration_audio_to_use and isinstance(narration_audio_to_use, list):
+            # If narration_audio_to_use is a list (and not paired), first concatenate into one track
+            # Paired audio is handled above in the special case, so skip merging here
+            if narration_audio_to_use and isinstance(narration_audio_to_use, list) and not narration_is_paired:
                 merged_narration = 'merged_narration.aac'
                 narration_audio_to_use = self.concat_audios(narration_audio_to_use, merged_narration)
             
-            # Probe narration audio duration (if we're using it)
+            # Skip duration synchronization for paired approach (already handled in filter_complex)
+            # Probe narration audio duration (if we're using it and not paired)
             narration_duration = None
-            if narration_audio_to_use and os.path.exists(narration_audio_to_use):
+            if narration_audio_to_use and not narration_is_paired and os.path.exists(narration_audio_to_use):
                 try:
                     probe_cmd = [
                         'ffprobe', '-v', 'error',
