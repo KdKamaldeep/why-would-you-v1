@@ -150,9 +150,6 @@ def test_compile_video(
         logger.warning("⚠️ No video clips found - skipping test")
         return False
     
-    if not audio_clips:
-        logger.warning("⚠️ No audio clips found - will test without audio")
-    
     # Show what we're testing
     logger.info("\n📋 Video clips:")
     for i, clip in enumerate(video_clips, 1):
@@ -162,19 +159,22 @@ def test_compile_video(
         logger.info("\n📋 Audio clips:")
         for i, audio in enumerate(audio_clips, 1):
             logger.info(f"   {i}. {Path(audio).name}")
+    else:
+        logger.info("\n📋 Audio clips: None (will use audio from video files if available)")
     
     # Create test output path
     test_output = output_folder / f"test_compiled_{test_name}.mp4"
     
     try:
         logger.info(f"\n🔄 Testing compile_final_video...")
-        logger.info(f"   Input: {len(video_clips)} videos, {len(audio_clips)} audios")
+        logger.info(f"   Input: {len(video_clips)} videos, {len(audio_clips)} narration audios")
         logger.info(f"   Output: {test_output}")
         
-        # Test with audio_clips as a list (the fix we're testing)
+        # Always add audio when available - pass audio_clips if found, None otherwise
+        # compile_final_video will use video's embedded audio (from lipsync files) if narration_audio is None
         result = video_processor.compile_final_video(
             clips=video_clips,
-            narration_audio=audio_clips if audio_clips else None,  # Pass as list to test the fix
+            narration_audio=audio_clips if audio_clips else None,  # Pass audio clips if available
             background_music=None,
             subtitles_path=None,
             output_path=str(test_output)
