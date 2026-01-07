@@ -483,14 +483,11 @@ class VideoProcessor:
             else:
                 narration_audio_to_use = narration_audio
             
-            # Add cross-dissolve transitions between clips (0.25-0.4s, using 0.3s as default)
-            transition_duration = 0.3  # 0.3s cross-dissolve (middle of 0.25-0.4s range)
+            # Simple video stitching - no transitions, just concatenate
+            if len(clips) == 0:
+                raise ValueError("No video clips provided")
             
-            if len(clips) <= 1:
-                # Single clip or no clips - no transitions needed
-                if len(clips) == 0:
-                    raise ValueError("No video clips provided")
-                
+            if len(clips) == 1:
                 # Single clip - just copy it
                 temp_video = "temp_video.mp4"
                 cmd = [
@@ -502,126 +499,55 @@ class VideoProcessor:
                 ]
                 subprocess.run(cmd, check=True, capture_output=True, text=True)
             else:
-                # Multiple clips - apply cross-dissolve transitions using fade filters
-                # Apply fade-out to end of clips (except last) and fade-in to start (except first)
-                # Then concatenate - creates smooth cross-dissolve effect
-                logger.info(f"🎬 Applying cross-dissolve transitions ({transition_duration}s) between {len(clips)} clips...")
+                # Multiple clips - simple concatenation (no transitions, no re-encoding)
+                logger.info(f"🎬 Stitching {len(clips)} video clips together (no transitions)...")
                 
-                # Get durations of all clips
-                clip_durations = []
-                for clip in clips:
-                    duration = self.get_video_duration(clip)
-                    clip_durations.append(duration)
-                
-                # Build complex filter with fade in/out for cross-dissolve effect
                 temp_video = "temp_video.mp4"
-                input_args = []
-                filter_parts = []
-                concat_inputs = []
+                concat_file = "concat_list.txt"
                 
-                # Add all clips as inputs and apply fade filters
-                for i, clip in enumerate(clips):
-                    input_args.extend(['-i', clip])
-                    clip_dur = clip_durations[i]
-                    
-                    # Build fade filter for this clip
-                    fade_filter = f"[{i}:v]"
-                    
-                    # Add fade-in to start (except first clip)
-                    if i > 0:
-                        fade_filter += f"fade=t=in:st=0:d={transition_duration},"
-                    
-                    # Add fade-out to end (except last clip)
-                    if i < len(clips) - 1:
-                        fade_start = max(0, clip_dur - transition_duration)
-                        fade_filter += f"fade=t=out:st={fade_start}:d={transition_duration},"
-                    
-                    # Remove trailing comma and set output label
-                    fade_filter = fade_filter.rstrip(',')
-                    output_label = f"v{i}"
-                    fade_filter += f"[{output_label}]"
-                    filter_parts.append(fade_filter)
-                    concat_inputs.append(output_label)
+                # Create concat file
+                with open(concat_file, 'w') as f:
+                    for clip in clips:
+                        f.write(f"file '{clip}'\n")
                 
-                # Concatenate all faded clips
-                # If all clips have audio (lipsync videos), include audio in concatenation
-                # Otherwise, only concatenate video (a=0 means no audio)
-                concat_inputs_str = "".join([f"[{label}]" for label in concat_inputs])
+                # Use concat demuxer for fast, lossless concatenation
+                # If all clips have audio (lipsync videos), include audio
                 if all_clips_have_audio:
-                    # Include audio in concatenation: v=1:a=1
-                    # Need to also extract audio from each clip
-                    audio_inputs = []
-                    for i, clip in enumerate(clips):
-                        audio_inputs.append(f"[{i}:a]")
-                    audio_concat = "".join(audio_inputs)
-                    concat_filter = f"{concat_inputs_str}concat=n={len(clips)}:v=1:a=0[vout];{audio_concat}concat=n={len(clips)}:v=0:a=1[aout]"
-                    logger.info("🎵 Concatenating clips with audio (lipsync videos)")
-                else:
-                    # Only concatenate video (no audio): v=1:a=0
-                    concat_filter = f"{concat_inputs_str}concat=n={len(clips)}:v=1:a=0[vout]"
-                    logger.info("🎵 Concatenating clips without audio (will add narration separately)")
-
-                filter_parts.append(concat_filter)
-                filter_complex = ";".join(filter_parts)
-                
-                # Build ffmpeg command with fade transitions
-                # Note: Transitions require re-encoding, but we use fast preset
-                codec = self.config.codec
-                preset = self.config.preset
-                crf = self.config.crf
-                logger.info(f"🎬 Applying {len(clips)-1} cross-dissolve transitions with {codec} (preset={preset}, crf={crf})...")
-                cmd = [
-                    'ffmpeg', '-y'
-                ] + input_args + [
-                    '-filter_complex', filter_complex,
-                ]
-                
-                # Map video and audio (if present) from filter output
-                if all_clips_have_audio:
-                    cmd.extend(['-map', '[vout]', '-map', '[aout]'])
-                else:
-                    cmd.extend(['-map', '[vout]'])
-                
-                cmd.extend([
-                    '-c:v', codec,
-                    '-preset', preset,
-                    '-crf', str(crf),
-                    '-tune', self.config.tune,
-                    '-pix_fmt', 'yuv420p',
-                ])
-                
-                # Encode audio if present (from lipsync videos)
-                if all_clips_have_audio:
-                    cmd.extend(['-c:a', 'aac', '-b:a', self.config.audio_bitrate])
-                
-                cmd.extend([
-                    '-movflags', '+faststart',
-                    temp_video
-                ])
-                result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-                if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
-                    error_msg = result.stderr if result.stderr else "Unknown error"
-                    logger.error(f"❌ FFmpeg fade transition failed: {error_msg}")
-                    # Fallback to simple concat if fade fails
-                    logger.warning("⚠️ Falling back to simple concatenation without transitions")
-                    concat_file = "concat_list.txt"
-                    with open(concat_file, 'w') as f:
-                        for clip in clips:
-                            f.write(f"file '{clip}'\n")
+                    logger.info("🎵 Stitching clips with audio (lipsync videos)")
                     cmd = [
                         'ffmpeg', '-y',
                         '-f', 'concat',
                         '-safe', '0',
                         '-i', concat_file,
-                        '-c', 'copy',
+                        '-c', 'copy',  # Copy streams without re-encoding (fast, lossless)
                         '-movflags', '+faststart',
                         temp_video
                     ]
-                    subprocess.run(cmd, check=True, capture_output=True, text=True)
-                    try:
-                        os.remove(concat_file)
-                    except:
-                        pass
+                else:
+                    logger.info("🎵 Stitching clips without audio (will add narration separately)")
+                    cmd = [
+                        'ffmpeg', '-y',
+                        '-f', 'concat',
+                        '-safe', '0',
+                        '-i', concat_file,
+                        '-c', 'copy',  # Copy streams without re-encoding (fast, lossless)
+                        '-movflags', '+faststart',
+                        temp_video
+                    ]
+                
+                result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                
+                # Clean up concat file
+                try:
+                    os.remove(concat_file)
+                except:
+                    pass
+                
+                if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
+                    error_msg = result.stderr if result.stderr else "Unknown error"
+                    raise RuntimeError(f"Failed to stitch videos: {error_msg}")
+                
+                logger.info(f"✅ Stitched {len(clips)} clips successfully")
             
             # Verify temp video was created successfully
             if not os.path.exists(temp_video) or os.path.getsize(temp_video) == 0:
