@@ -588,57 +588,88 @@ class VideoProcessor:
                 except Exception:
                     narration_duration = None
             
-            # If narration is longer than video, loop the video to match narration length
-            if video_duration and narration_duration and narration_duration > video_duration:
-                logger.info(f"📹 Video ({video_duration:.2f}s) is shorter than narration ({narration_duration:.2f}s)")
-                logger.info(f"🔄 Looping video to match narration length...")
-                
-                # Calculate how many loops needed
-                loops_needed = int(narration_duration / video_duration) + 1
-                logger.info(f"   Looping video {loops_needed} times to cover {narration_duration:.2f}s")
-                
-                # Create a concat file with the video repeated
-                loop_concat_file = "loop_concat_list.txt"
-                with open(loop_concat_file, 'w') as f:
-                    for _ in range(loops_needed):
-                        f.write(f"file '{temp_video}'\n")
-                
-                # Create looped video
-                looped_video = "temp_video_looped.mp4"
-                loop_cmd = [
-                    'ffmpeg', '-y',
-                    '-f', 'concat',
-                    '-safe', '0',
-                    '-i', loop_concat_file,
-                    '-c', 'copy',
-                    '-movflags', '+faststart',
-                    looped_video
-                ]
-                subprocess.run(loop_cmd, check=True, capture_output=True)
-                
-                # Trim to exact narration duration
-                final_looped_video = "temp_video_final.mp4"
-                trim_cmd = [
-                    'ffmpeg', '-y',
-                    '-i', looped_video,
-                    '-t', f"{narration_duration:.3f}",
-                    '-c', 'copy',
-                    final_looped_video
-                ]
-                subprocess.run(trim_cmd, check=True, capture_output=True)
-                
-                # Replace temp_video with looped version
-                try:
-                    os.remove(temp_video)
-                    os.rename(final_looped_video, temp_video)
-                    os.remove(looped_video)
-                    os.remove(loop_concat_file)
-                except Exception as e:
-                    logger.warning(f"Could not clean up loop files: {e}")
-                
-                # Update video duration to match narration
-                video_duration = narration_duration
-                logger.info(f"✅ Video extended to {video_duration:.2f}s to match narration")
+            # Synchronize video and narration audio durations
+            if video_duration and narration_duration:
+                duration_diff = abs(video_duration - narration_duration)
+                if duration_diff > 0.1:  # More than 0.1s difference
+                    if narration_duration > video_duration:
+                        # Narration is longer - loop video to match
+                        logger.info(f"📹 Video ({video_duration:.2f}s) is shorter than narration ({narration_duration:.2f}s)")
+                        logger.info(f"🔄 Looping video to match narration length...")
+                        
+                        # Calculate how many loops needed
+                        loops_needed = int(narration_duration / video_duration) + 1
+                        logger.info(f"   Looping video {loops_needed} times to cover {narration_duration:.2f}s")
+                        
+                        # Create a concat file with the video repeated
+                        loop_concat_file = "loop_concat_list.txt"
+                        with open(loop_concat_file, 'w') as f:
+                            for _ in range(loops_needed):
+                                f.write(f"file '{temp_video}'\n")
+                        
+                        # Create looped video
+                        looped_video = "temp_video_looped.mp4"
+                        loop_cmd = [
+                            'ffmpeg', '-y',
+                            '-f', 'concat',
+                            '-safe', '0',
+                            '-i', loop_concat_file,
+                            '-c', 'copy',
+                            '-movflags', '+faststart',
+                            looped_video
+                        ]
+                        subprocess.run(loop_cmd, check=True, capture_output=True)
+                        
+                        # Trim to exact narration duration
+                        final_looped_video = "temp_video_final.mp4"
+                        trim_cmd = [
+                            'ffmpeg', '-y',
+                            '-i', looped_video,
+                            '-t', f"{narration_duration:.3f}",
+                            '-c', 'copy',
+                            final_looped_video
+                        ]
+                        subprocess.run(trim_cmd, check=True, capture_output=True)
+                        
+                        # Replace temp_video with looped version
+                        try:
+                            os.remove(temp_video)
+                            os.rename(final_looped_video, temp_video)
+                            os.remove(looped_video)
+                            os.remove(loop_concat_file)
+                        except Exception as e:
+                            logger.warning(f"Could not clean up loop files: {e}")
+                        
+                        # Update video duration to match narration
+                        video_duration = narration_duration
+                        logger.info(f"✅ Video extended to {video_duration:.2f}s to match narration")
+                    else:
+                        # Video is longer - trim video to match narration
+                        logger.info(f"📹 Video ({video_duration:.2f}s) is longer than narration ({narration_duration:.2f}s)")
+                        logger.info(f"✂️ Trimming video to match narration length...")
+                        
+                        trimmed_video = "temp_video_trimmed.mp4"
+                        trim_cmd = [
+                            'ffmpeg', '-y',
+                            '-i', temp_video,
+                            '-t', f"{narration_duration:.3f}",
+                            '-c', 'copy',
+                            trimmed_video
+                        ]
+                        subprocess.run(trim_cmd, check=True, capture_output=True)
+                        
+                        # Replace temp_video with trimmed version
+                        try:
+                            os.remove(temp_video)
+                            os.rename(trimmed_video, temp_video)
+                        except Exception as e:
+                            logger.warning(f"Could not clean up trim file: {e}")
+                        
+                        # Update video duration to match narration
+                        video_duration = narration_duration
+                        logger.info(f"✅ Video trimmed to {video_duration:.2f}s to match narration")
+                else:
+                    logger.info(f"✅ Video ({video_duration:.2f}s) and narration ({narration_duration:.2f}s) durations match")
 
             # Prepare audio inputs
             # Use narration_audio_to_use (already processed - string or None, not a list)
@@ -669,17 +700,30 @@ class VideoProcessor:
             
             cmd = ['ffmpeg', '-y', '-i', temp_video] + audio_inputs
             
-            # Add audio mixing filter
+            # Add audio mixing filter with proper synchronization
             if have_music:
-                # Mix narration and bgm to the longest, then pad to ensure audio covers full video duration
-                cmd.extend([
-                    '-filter_complex', '[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad[aout]',
-                    '-map', '0:v',
-                    '-map', '[aout]'
-                ])
+                # Mix narration and bgm, pad to match video duration exactly
+                # Use duration=longest for mixing, then pad to video duration
+                if video_duration:
+                    cmd.extend([
+                        '-filter_complex', f'[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad=whole_dur={video_duration:.3f}[aout]',
+                        '-map', '0:v',
+                        '-map', '[aout]'
+                    ])
+                else:
+                    # Fallback if duration unknown
+                    cmd.extend([
+                        '-filter_complex', '[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad[aout]',
+                        '-map', '0:v',
+                        '-map', '[aout]'
+                    ])
             else:
-                # Single narration track: pad with silence to ensure full coverage
-                cmd.extend(['-map', '0:v', '-map', '1:a', '-af', 'apad'])
+                # Single narration track: pad with silence to match video duration exactly
+                if video_duration:
+                    cmd.extend(['-map', '0:v', '-map', '1:a', '-af', f'apad=whole_dur={video_duration:.3f}'])
+                else:
+                    # Fallback if duration unknown
+                    cmd.extend(['-map', '0:v', '-map', '1:a', '-af', 'apad'])
             
             # Add subtitle overlay if provided
             if subtitles_path and os.path.exists(subtitles_path):
@@ -749,10 +793,10 @@ class VideoProcessor:
                     '-pix_fmt', 'yuv420p'
                 ])
             
-            # Use -shortest to prevent infinite apad padding
-            # apad can create infinite silent audio without -shortest, causing encoder to never stop
-            # -shortest ensures encoding stops when video ends (shortest stream)
-            cmd.extend(['-shortest'])
+            # Use -shortest to ensure proper synchronization
+            # Since we've already matched durations, -shortest ensures encoding stops at the right time
+            # This prevents any timing drift between video and audio
+            cmd.extend(['-shortest', '-async', '1'])
             if self.config.faststart:
                 cmd.extend(['-movflags', '+faststart'])
             cmd.append(output_path)
@@ -778,13 +822,25 @@ class VideoProcessor:
                     # Rebuild command with CPU codec
                     cmd_cpu = ['ffmpeg', '-y', '-i', temp_video] + audio_inputs
                     if have_music:
-                        cmd_cpu.extend([
-                            '-filter_complex', '[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad[aout]',
-                            '-map', '0:v',
-                            '-map', '[aout]'
-                        ])
+                        # Mix narration and bgm, pad to match video duration exactly
+                        if video_duration:
+                            cmd_cpu.extend([
+                                '-filter_complex', f'[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad=whole_dur={video_duration:.3f}[aout]',
+                                '-map', '0:v',
+                                '-map', '[aout]'
+                            ])
+                        else:
+                            cmd_cpu.extend([
+                                '-filter_complex', '[1:a]volume=0.85[a1];[2:a]volume=0.15[a2];[a1][a2]amix=inputs=2:duration=longest,apad[aout]',
+                                '-map', '0:v',
+                                '-map', '[aout]'
+                            ])
                     else:
-                        cmd_cpu.extend(['-map', '0:v', '-map', '1:a', '-af', 'apad'])
+                        # Single narration track: pad with silence to match video duration exactly
+                        if video_duration:
+                            cmd_cpu.extend(['-map', '0:v', '-map', '1:a', '-af', f'apad=whole_dur={video_duration:.3f}'])
+                        else:
+                            cmd_cpu.extend(['-map', '0:v', '-map', '1:a', '-af', 'apad'])
                     if subtitles_path and os.path.exists(subtitles_path):
                         cmd_cpu.extend([
                             '-vf', f'subtitles={subtitles_path}:force_style=\'FontSize=32,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1\''
@@ -798,8 +854,8 @@ class VideoProcessor:
                         '-pix_fmt', 'yuv420p'
                     ])
                     cmd_cpu.extend(['-tune', self.config.tune])
-                    # Use -shortest to prevent infinite apad padding
-                    cmd_cpu.extend(['-shortest'])
+                    # Use -shortest and -async for proper synchronization
+                    cmd_cpu.extend(['-shortest', '-async', '1'])
                     if self.config.faststart:
                         cmd_cpu.extend(['-movflags', '+faststart'])
                     cmd_cpu.append(output_path)
