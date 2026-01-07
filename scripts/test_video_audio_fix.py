@@ -47,19 +47,69 @@ def find_output_folders(base_path: str = "output") -> List[Path]:
 
 
 def find_video_clips(output_folder: Path) -> List[str]:
-    """Find all video clips in the scenes directory."""
+    """Find all video clips in the scenes directory.
+    Prioritizes lip_sync files, then synced files, then base files.
+    """
     scenes_dir = output_folder / "scenes"
     if not scenes_dir.exists():
         return []
     
-    video_clips = []
-    for video_file in scenes_dir.glob("*.mp4"):
-        # Skip intermediate files
-        if "_synced" in video_file.name or "_lipsync" in video_file.name:
-            continue
-        video_clips.append(str(video_file))
+    # Collect all scene files and prioritize
+    scene_files = {}
+    for video_file in scenes_dir.glob("scene_*.mp4"):
+        scene_num = None
+        file_type = None
+        
+        # Extract scene number and file type
+        if "_lipsync" in video_file.name:
+            # scene_1_lipsync.mp4
+            parts = video_file.stem.split("_")
+            if len(parts) >= 2:
+                try:
+                    scene_num = int(parts[1])
+                    file_type = "lipsync"
+                except ValueError:
+                    continue
+        elif "_synced" in video_file.name:
+            # scene_1_synced.mp4
+            parts = video_file.stem.split("_")
+            if len(parts) >= 2:
+                try:
+                    scene_num = int(parts[1])
+                    file_type = "synced"
+                except ValueError:
+                    continue
+        else:
+            # scene_1.mp4 (base file)
+            parts = video_file.stem.split("_")
+            if len(parts) >= 2:
+                try:
+                    scene_num = int(parts[1])
+                    file_type = "base"
+                except ValueError:
+                    continue
+        
+        if scene_num is not None:
+            # Priority: lipsync > synced > base
+            if scene_num not in scene_files:
+                scene_files[scene_num] = {}
+            scene_files[scene_num][file_type] = str(video_file)
     
-    return sorted(video_clips)
+    # Select best file for each scene (lipsync > synced > base)
+    video_clips = []
+    for scene_num in sorted(scene_files.keys()):
+        files = scene_files[scene_num]
+        if "lipsync" in files:
+            video_clips.append(files["lipsync"])
+            logger.debug(f"Scene {scene_num}: Using lipsync file")
+        elif "synced" in files:
+            video_clips.append(files["synced"])
+            logger.debug(f"Scene {scene_num}: Using synced file")
+        elif "base" in files:
+            video_clips.append(files["base"])
+            logger.debug(f"Scene {scene_num}: Using base file")
+    
+    return video_clips
 
 
 def find_audio_clips(output_folder: Path) -> List[str]:
