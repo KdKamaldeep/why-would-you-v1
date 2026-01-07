@@ -471,32 +471,52 @@ class VideoProcessor:
                 except Exception:
                     clips_with_audio.append(False)
             
-            # If ALL clips have audio (e.g., all are lipsync videos), use their audio instead of narration
-            all_clips_have_audio = all(clips_with_audio) and len(clips_with_audio) > 0
-            
-            if all_clips_have_audio:
-                logger.info("🎵 All clips have audio (lipsync videos) - will use video audio instead of separate narration")
-                narration_audio_to_use = None  # Don't add narration, use audio from videos
-            elif any(clips_with_audio):
-                logger.warning(f"⚠️ Some clips have audio, some don't - using narration audio (may cause conflicts)")
+            # Always use narration audio if provided, regardless of whether clips have audio
+            # This ensures consistent audio across all clips
+            if narration_audio:
                 narration_audio_to_use = narration_audio
+                if all(clips_with_audio) and len(clips_with_audio) > 0:
+                    logger.info("🎵 All clips have audio, but narration audio provided - will use narration audio for consistency")
+                elif any(clips_with_audio):
+                    logger.info("🎵 Some clips have audio, but narration audio provided - will use narration audio for consistency")
+                else:
+                    logger.info("🎵 Using narration audio (clips have no audio)")
             else:
-                narration_audio_to_use = narration_audio
+                # No narration audio provided - check if we can use video audio
+                all_clips_have_audio = all(clips_with_audio) and len(clips_with_audio) > 0
+                if all_clips_have_audio:
+                    logger.info("🎵 No narration audio provided - will use audio from video clips (lipsync videos)")
+                    narration_audio_to_use = None
+                else:
+                    logger.warning("⚠️ No narration audio provided and clips have no audio - output will be silent")
+                    narration_audio_to_use = None
             
             # Simple video stitching - no transitions, just concatenate
             if len(clips) == 0:
                 raise ValueError("No video clips provided")
             
             if len(clips) == 1:
-                # Single clip - just copy it
+                # Single clip - strip audio if narration is provided
                 temp_video = "temp_video.mp4"
-                cmd = [
-                    'ffmpeg', '-y',
-                    '-i', clips[0],
-                    '-c', 'copy',
-                    '-movflags', '+faststart',
-                    temp_video
-                ]
+                if narration_audio_to_use:
+                    # Extract video only (no audio) when narration is provided
+                    cmd = [
+                        'ffmpeg', '-y',
+                        '-i', clips[0],
+                        '-c:v', 'copy',  # Copy video only
+                        '-an',  # No audio (we'll add narration separately)
+                        '-movflags', '+faststart',
+                        temp_video
+                    ]
+                else:
+                    # Copy everything (including audio if present)
+                    cmd = [
+                        'ffmpeg', '-y',
+                        '-i', clips[0],
+                        '-c', 'copy',
+                        '-movflags', '+faststart',
+                        temp_video
+                    ]
                 subprocess.run(cmd, check=True, capture_output=True, text=True)
             else:
                 # Multiple clips - simple concatenation (no transitions, no re-encoding)
@@ -511,29 +531,46 @@ class VideoProcessor:
                         f.write(f"file '{clip}'\n")
                 
                 # Use concat demuxer for fast, lossless concatenation
-                # If all clips have audio (lipsync videos), include audio
-                if all_clips_have_audio:
-                    logger.info("🎵 Stitching clips with audio (lipsync videos)")
+                # Always extract video only (no audio) when narration_audio is provided
+                # This ensures we use narration audio consistently
+                if narration_audio_to_use:
+                    logger.info("🎵 Stitching clips (video only - will add narration audio separately)")
                     cmd = [
                         'ffmpeg', '-y',
                         '-f', 'concat',
                         '-safe', '0',
                         '-i', concat_file,
-                        '-c', 'copy',  # Copy streams without re-encoding (fast, lossless)
+                        '-c:v', 'copy',  # Copy video stream only
+                        '-an',  # No audio (we'll add narration separately)
                         '-movflags', '+faststart',
                         temp_video
                     ]
                 else:
-                    logger.info("🎵 Stitching clips without audio (will add narration separately)")
-                    cmd = [
-                        'ffmpeg', '-y',
-                        '-f', 'concat',
-                        '-safe', '0',
-                        '-i', concat_file,
-                        '-c', 'copy',  # Copy streams without re-encoding (fast, lossless)
-                        '-movflags', '+faststart',
-                        temp_video
-                    ]
+                    # No narration audio - preserve audio from clips if available
+                    all_clips_have_audio = all(clips_with_audio) and len(clips_with_audio) > 0
+                    if all_clips_have_audio:
+                        logger.info("🎵 Stitching clips with audio (lipsync videos, no narration provided)")
+                        cmd = [
+                            'ffmpeg', '-y',
+                            '-f', 'concat',
+                            '-safe', '0',
+                            '-i', concat_file,
+                            '-c', 'copy',  # Copy all streams (video + audio)
+                            '-movflags', '+faststart',
+                            temp_video
+                        ]
+                    else:
+                        logger.info("🎵 Stitching clips without audio (no audio in clips, no narration provided)")
+                        cmd = [
+                            'ffmpeg', '-y',
+                            '-f', 'concat',
+                            '-safe', '0',
+                            '-i', concat_file,
+                            '-c:v', 'copy',  # Copy video only
+                            '-an',  # No audio
+                            '-movflags', '+faststart',
+                            temp_video
+                        ]
                 
                 result = subprocess.run(cmd, check=True, capture_output=True, text=True)
                 
