@@ -134,7 +134,8 @@ def test_musetalk_wan_coqui(
         logger.info(f"\n🎬 Step 2: Generating video with WAN (I2V mode)...")
         logger.info(f"   Using Gemini-generated image: {image_path}")
         
-        wan_generator = WanT2VGenerator()
+        # Initialize WAN generator with fps (fps is set during initialization, not in generate_video)
+        wan_generator = WanT2VGenerator(fps=fps)
         
         try:
             result = wan_generator.generate_video(
@@ -142,7 +143,6 @@ def test_musetalk_wan_coqui(
                 output_path=str(video_path),
                 seed=None,
                 num_frames=num_frames,
-                fps=fps,
                 image=str(image_path)  # Pass Gemini-generated image to enable I2V mode
             )
             
