@@ -70,64 +70,78 @@ def test_musetalk_wan_coqui(
     logger.info(f"Device: {device}")
     logger.info("=" * 80)
     
-    # Step 1: Generate video with WAN
-    logger.info("\n🎬 Step 1: Generating video with WAN...")
-    wan_generator = WanT2VGenerator()
-    
+    # Step 1: Generate video with WAN (skip if already exists)
     video_path = output_path / "wan_video.mp4"
-    try:
-        result = wan_generator.generate_video(
-            prompt=prompt,
-            output_path=str(video_path),
-            seed=None,
-            num_frames=num_frames,
-            fps=fps
-        )
-        
-        # Handle return type: dict (with metadata) or string (backward compatible)
-        if isinstance(result, dict):
-            actual_video_path = result.get('video_path', str(video_path))
-        else:
-            actual_video_path = result if result else str(video_path)
-        
-        if not Path(actual_video_path).exists():
-            logger.error(f"❌ WAN video generation failed: {actual_video_path} does not exist")
-            return False
-        
-        logger.info(f"✅ WAN video generated: {actual_video_path}")
-        video_path = Path(actual_video_path)
-        
-    except Exception as e:
-        logger.error(f"❌ WAN video generation failed: {e}")
-        import traceback
-        logger.debug(traceback.format_exc())
-        return False
     
-    # Step 2: Generate audio with Coqui TTS
-    logger.info("\n🎵 Step 2: Generating audio with Coqui TTS...")
-    try:
-        coqui_config = CoquiVoiceConfig()
-        coqui_synthesizer = CoquiVoiceSynthesizer(config=coqui_config)
+    if video_path.exists():
+        logger.info(f"\n🎬 Step 1: WAN video already exists, skipping generation...")
+        logger.info(f"   Using existing video: {video_path}")
+        file_size = video_path.stat().st_size / (1024 * 1024)  # MB
+        logger.info(f"   File size: {file_size:.2f} MB")
+    else:
+        logger.info("\n🎬 Step 1: Generating video with WAN...")
+        wan_generator = WanT2VGenerator()
         
-        audio_path = output_path / "coqui_audio.wav"
-        synthesized_audio = coqui_synthesizer.synthesize_voice(
-            narration_lines=[text],
-            output_path=str(audio_path),
-            speaker=voice
-        )
-        
-        if not Path(synthesized_audio).exists():
-            logger.error(f"❌ Coqui audio generation failed: {synthesized_audio} does not exist")
+        try:
+            result = wan_generator.generate_video(
+                prompt=prompt,
+                output_path=str(video_path),
+                seed=None,
+                num_frames=num_frames,
+                fps=fps
+            )
+            
+            # Handle return type: dict (with metadata) or string (backward compatible)
+            if isinstance(result, dict):
+                actual_video_path = result.get('video_path', str(video_path))
+            else:
+                actual_video_path = result if result else str(video_path)
+            
+            if not Path(actual_video_path).exists():
+                logger.error(f"❌ WAN video generation failed: {actual_video_path} does not exist")
+                return False
+            
+            logger.info(f"✅ WAN video generated: {actual_video_path}")
+            video_path = Path(actual_video_path)
+            
+        except Exception as e:
+            logger.error(f"❌ WAN video generation failed: {e}")
+            import traceback
+            logger.debug(traceback.format_exc())
             return False
-        
-        logger.info(f"✅ Coqui audio generated: {synthesized_audio}")
-        audio_path = Path(synthesized_audio)
-        
-    except Exception as e:
-        logger.error(f"❌ Coqui audio generation failed: {e}")
-        import traceback
-        logger.debug(traceback.format_exc())
-        return False
+    
+    # Step 2: Generate audio with Coqui TTS (skip if already exists)
+    audio_path = output_path / "coqui_audio.wav"
+    
+    if audio_path.exists():
+        logger.info(f"\n🎵 Step 2: Coqui audio already exists, skipping generation...")
+        logger.info(f"   Using existing audio: {audio_path}")
+        file_size = audio_path.stat().st_size / (1024 * 1024)  # MB
+        logger.info(f"   File size: {file_size:.2f} MB")
+    else:
+        logger.info("\n🎵 Step 2: Generating audio with Coqui TTS...")
+        try:
+            coqui_config = CoquiVoiceConfig()
+            coqui_synthesizer = CoquiVoiceSynthesizer(config=coqui_config)
+            
+            synthesized_audio = coqui_synthesizer.synthesize_voice(
+                narration_lines=[text],
+                output_path=str(audio_path),
+                speaker=voice
+            )
+            
+            if not Path(synthesized_audio).exists():
+                logger.error(f"❌ Coqui audio generation failed: {synthesized_audio} does not exist")
+                return False
+            
+            logger.info(f"✅ Coqui audio generated: {synthesized_audio}")
+            audio_path = Path(synthesized_audio)
+            
+        except Exception as e:
+            logger.error(f"❌ Coqui audio generation failed: {e}")
+            import traceback
+            logger.debug(traceback.format_exc())
+            return False
     
     # Step 3: Apply MuseTalk lip sync
     logger.info("\n🎙️ Step 3: Applying MuseTalk lip sync...")
