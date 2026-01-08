@@ -300,7 +300,7 @@ Examples:
     parser.add_argument(
         "--num-frames",
         type=int,
-        default=50,
+        default=49,
         help="Number of frames to generate (default: 50)"
     )
     
