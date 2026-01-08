@@ -31,6 +31,7 @@ Usage:
 import argparse
 import logging
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -274,23 +275,114 @@ def convert_video_fps(input_video: str, output_video: str, target_fps: int = 25)
         raise
 
 
+def get_audio_duration(audio_path: str) -> float:
+    """
+    Get audio duration in seconds using ffprobe.
+    
+    Args:
+        audio_path: Path to audio file
+        
+    Returns:
+        Duration in seconds
+    """
+    try:
+        cmd = [
+            'ffprobe', '-v', 'quiet', '-show_entries', 'format=duration',
+            '-of', 'csv=p=0', audio_path
+        ]
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        duration = float(result.stdout.strip())
+        return duration
+    except Exception as e:
+        logger.warning(f"Failed to get audio duration: {e}")
+        return 0.0
+
+
+def apply_voice_speed(input_audio: str, output_audio: str, speed: float = 1.0) -> str:
+    """
+    Apply voice speed adjustment to audio using ffmpeg atempo filter.
+    
+    Args:
+        input_audio: Path to input audio file
+        output_audio: Path to output audio file
+        speed: Speed multiplier (1.0 = normal, 0.8 = slower, 1.2 = faster)
+        
+    Returns:
+        Path to output audio file
+    """
+    if speed == 1.0:
+        # No change needed, just copy
+        shutil.copy2(input_audio, output_audio)
+        return output_audio
+    
+    logger.info(f"🎚️ Applying voice speed: {speed}x")
+    
+    # Create output directory if needed
+    Path(output_audio).parent.mkdir(parents=True, exist_ok=True)
+    
+    # ffmpeg atempo filter supports range 0.5-2.0
+    # For values outside this range, chain multiple atempo filters
+    if speed < 0.5 or speed > 2.0:
+        # Chain multiple atempo filters
+        # e.g., for 0.4: use atempo=0.5,atempo=0.8
+        # e.g., for 3.0: use atempo=2.0,atempo=1.5
+        tempo_filters = []
+        remaining_speed = speed
+        while remaining_speed < 0.5:
+            tempo_filters.append('atempo=0.5')
+            remaining_speed *= 2.0
+        while remaining_speed > 2.0:
+            tempo_filters.append('atempo=2.0')
+            remaining_speed /= 2.0
+        if abs(remaining_speed - 1.0) > 0.01:
+            tempo_filters.append(f'atempo={remaining_speed:.3f}')
+        filter_chain = ','.join(tempo_filters)
+    else:
+        filter_chain = f'atempo={speed:.3f}'
+    
+    cmd = [
+        'ffmpeg', '-y',
+        '-i', input_audio,
+        '-af', filter_chain,
+        '-c:a', 'pcm_s16le',  # Keep PCM format
+        output_audio
+    ]
+    
+    try:
+        result = subprocess.run(
+            cmd,
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        logger.info(f"✅ Voice speed applied: {output_audio}")
+        return output_audio
+    except subprocess.CalledProcessError as e:
+        logger.error(f"❌ Failed to apply voice speed: {e}")
+        if e.stderr:
+            logger.error(f"STDERR: {e.stderr[-500:]}")
+        raise
+
+
 def generate_audio_with_coqui(
     text: str,
     output_path: str,
     language: str = "en",
-    voice_clone_audio: str = None
+    voice_clone_audio: str = None,
+    voice_speed: float = 1.0
 ) -> str:
     """
-    Generate audio using Coqui TTS.
+    Generate audio using Coqui TTS and apply voice speed.
     
     Args:
         text: Text to synthesize
         output_path: Path to save the audio
         language: Language code (default: "en")
         voice_clone_audio: Path to reference audio for voice cloning (optional)
+        voice_speed: Speed multiplier for audio (default: 1.0)
         
     Returns:
-        Path to generated audio file
+        Path to generated audio file (with speed applied)
     """
     logger.info("=" * 60)
     logger.info("🎵 Generating audio with Coqui TTS...")
@@ -300,6 +392,9 @@ def generate_audio_with_coqui(
     output_path_obj = Path(output_path)
     output_path_obj.parent.mkdir(parents=True, exist_ok=True)
     
+    # Generate audio to temporary file first
+    temp_audio = str(output_path_obj.parent / f"{output_path_obj.stem}_temp.wav")
+    
     # Initialize Coqui TTS
     voice_config = CoquiVoiceConfig(language=language)
     voice_synthesizer = CoquiVoiceSynthesizer(voice_config)
@@ -307,10 +402,23 @@ def generate_audio_with_coqui(
     # Generate audio
     audio_path = voice_synthesizer.synthesize_voice(
         narration_lines=[text],
-        output_path=output_path,
+        output_path=temp_audio,
         speaker=None,
         voice_clone_audio=voice_clone_audio
     )
+    
+    # Apply voice speed if not 1.0
+    if voice_speed != 1.0:
+        audio_path = apply_voice_speed(audio_path, output_path, voice_speed)
+        # Clean up temp file
+        try:
+            os.remove(temp_audio)
+        except:
+            pass
+    else:
+        # No speed change, just rename/move
+        shutil.move(audio_path, output_path)
+        audio_path = output_path
     
     logger.info(f"✅ Audio generated: {audio_path}")
     return audio_path
@@ -553,6 +661,12 @@ Examples:
         default=None,
         help='Path to reference audio file for voice cloning (optional)'
     )
+    parser.add_argument(
+        '--voice-speed',
+        type=float,
+        default=1.0,
+        help='Voice speed multiplier (default: 1.0, 0.8 = slower, 1.2 = faster)'
+    )
     
     # Wav2Lip settings
     parser.add_argument(
@@ -596,6 +710,55 @@ Examples:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    # Determine audio path first (needed for frame calculation)
+    if args.audio_path:
+        audio_path = args.audio_path
+        if not check_file_exists(audio_path, "Audio file"):
+            logger.error("❌ Audio file not found. Please provide a valid --audio-path or use --audio-text to generate.")
+            sys.exit(1)
+        logger.info("⏭️  Using existing audio file")
+        
+        # Apply voice speed if not 1.0
+        if args.voice_speed != 1.0:
+            logger.info(f"🎚️ Applying voice speed {args.voice_speed}x to existing audio...")
+            speed_adjusted_audio = str(output_dir / "audio_speed_adjusted.wav")
+            audio_path = apply_voice_speed(audio_path, speed_adjusted_audio, args.voice_speed)
+    elif args.audio_text:
+        audio_path = str(output_dir / "audio.wav")
+        if check_file_exists(audio_path, "Audio file"):
+            logger.info("⏭️  Skipping audio generation (file already exists)")
+            # Still apply voice speed if needed
+            if args.voice_speed != 1.0:
+                logger.info(f"🎚️ Applying voice speed {args.voice_speed}x to existing audio...")
+                speed_adjusted_audio = str(output_dir / "audio_speed_adjusted.wav")
+                audio_path = apply_voice_speed(audio_path, speed_adjusted_audio, args.voice_speed)
+        else:
+            audio_path = generate_audio_with_coqui(
+                text=args.audio_text,
+                output_path=audio_path,
+                language=args.language,
+                voice_clone_audio=args.voice_file,
+                voice_speed=args.voice_speed
+            )
+    else:
+        logger.error("❌ Either --audio-text or --audio-path must be provided")
+        sys.exit(1)
+    
+    # Calculate num_frames based on audio duration and voice speed
+    # When voice-speed is applied, audio duration changes, so we need to account for it
+    calculated_num_frames = args.num_frames
+    if args.video_prompt:  # Only calculate if we're generating video
+        audio_duration = get_audio_duration(audio_path)
+        if audio_duration > 0:
+            # Calculate frames needed: duration * fps
+            # Voice speed is already applied to audio, so duration reflects the speed
+            calculated_num_frames = int(audio_duration * args.fps)
+            logger.info(f"📊 Audio duration: {audio_duration:.2f}s")
+            logger.info(f"📊 Calculated num_frames: {calculated_num_frames} (based on audio duration @ {args.fps}fps)")
+            logger.info(f"📊 Voice speed: {args.voice_speed}x (already applied to audio)")
+        else:
+            logger.warning("⚠️ Could not determine audio duration, using default num_frames")
+    
     # Determine video path
     if args.video_path:
         video_path = args.video_path
@@ -613,7 +776,7 @@ Examples:
                 output_path=video_path,
                 width=args.width,
                 height=args.height,
-                num_frames=args.num_frames,
+                num_frames=calculated_num_frames,  # Use calculated frames based on audio
                 fps=args.fps,
                 num_inference_steps=args.steps,
                 guidance_scale=args.guidance,
@@ -623,28 +786,6 @@ Examples:
             )
     else:
         logger.error("❌ Either --video-prompt or --video-path must be provided")
-        sys.exit(1)
-    
-    # Determine audio path
-    if args.audio_path:
-        audio_path = args.audio_path
-        if not check_file_exists(audio_path, "Audio file"):
-            logger.error("❌ Audio file not found. Please provide a valid --audio-path or use --audio-text to generate.")
-            sys.exit(1)
-        logger.info("⏭️  Skipping audio generation (using existing file)")
-    elif args.audio_text:
-        audio_path = str(output_dir / "audio.wav")
-        if check_file_exists(audio_path, "Audio file"):
-            logger.info("⏭️  Skipping audio generation (file already exists)")
-        else:
-            audio_path = generate_audio_with_coqui(
-                text=args.audio_text,
-                output_path=audio_path,
-                language=args.language,
-                voice_clone_audio=args.voice_file
-            )
-    else:
-        logger.error("❌ Either --audio-text or --audio-path must be provided")
         sys.exit(1)
     
     # Run lipsync if not skipped (only Wav2Lip supported)

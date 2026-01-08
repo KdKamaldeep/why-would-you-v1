@@ -1,7 +1,7 @@
 {
   "stories": [
     {
-      "title": "How Digital Payments Work at Light Speed",
+      "title": "How Digital Payments Work at Light Speed (Hindi)",
       "total_duration": 38,
       "aspect_ratio": "9:16",
       "fps": 24,
@@ -13,9 +13,9 @@
           "lip_sync": false,
           "character": "narrator",
           "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
-          "visual_prompt": "Ultra-cinematic modern outdoor market scene full of energy and motion. One dominant narrator stands in the foreground, sharply in focus. In the background, multiple people are actively using smartphones—one scanning a QR code, another tapping to pay, another checking a phone. Subtle glowing light streaks and soft energy pulses briefly appear around phones, suggesting invisible digital activity. Light rays move rapidly between phones and upward into the air. Natural daylight, realistic modern environment, cinematic depth of field, no text, no logos, no watermark.",
+          "visual_prompt": "Ultra-cinematic modern outdoor market scene full of energy and motion. One dominant narrator stands in the foreground, sharply in focus. In the background, multiple people are actively using smartphones—one scanning a QR code, another tapping to pay, another checking a phone. Subtle glowing light streaks and soft energy pulses briefly appear around phones, suggesting invisible digital activity. Light rays move rapidly between phones and upward into the air. Natural daylight, realistic modern environment, cinematic depth of field, no logos, no watermark.",
           "motion_prompt": "dynamic background crowd motion, hands moving quickly on phones, brief light streaks flashing and flowing rapidly, subtle energy pulses, slight cinematic camera push-in toward narrator, narrator remains calm and steady",
-          "narration": "फोन टैप किया… कुछ ही सेकंड में पेमेंट। लेकिन यह सिस्टम असल में काम कैसे करता है?"
+          "narration": "फोन टैप किया… और सेकंडों में पेमेंट हो गया। लेकिन ये जादू नहीं… सिस्टम है। ये काम कैसे करता है?"
         },
         {
           "id": "scene_02_sending_payment",
@@ -24,9 +24,9 @@
           "lip_sync": false,
           "character": "narrator",
           "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
-          "visual_prompt": "Same outdoor market location. In the background, a customer holds a smartphone clearly visible, showing a clean generic payment screen with an amount displayed, such as 250 units, and a simple send action. No real app UI, no logos. Narrator remains dominant in the foreground. Cinematic realism, shallow depth of field, natural daylight, no text, no watermark.",
+          "visual_prompt": "Same outdoor market location. In the background, a customer holds a smartphone clearly visible, showing a clean generic payment screen with a simple amount like 250 and a clear send/confirm action. No real app UI, no logos. Narrator remains dominant in the foreground. Cinematic realism, shallow depth of field, natural daylight, no watermark.",
           "motion_prompt": "finger tapping send on phone, subtle phone glow, calm narrator posture, stable camera",
-          "narration": "सब कुछ तब शुरू होता है, जब कोई राशि दर्ज करके भेजने का बटन दबाता है।"
+          "narration": "सब कुछ शुरू होता है… जब आप रकम डालते हो… और 'पे' या 'सेंड' दबाते हो।"
         },
         {
           "id": "scene_03_light_speed_transfer",
@@ -35,9 +35,9 @@
           "lip_sync": false,
           "character": "narrator",
           "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
-          "visual_prompt": "As the payment is sent, elegant glowing light rays and flowing energy lines rise from the sender’s phone and travel rapidly through the air, symbolizing secure digital signals moving across connected systems. The narrator stays calm in the foreground. Light effects are abstract, smooth, and cinematic, not sci-fi weapons. Realistic modern environment, no text, no logos, no watermark.",
+          "visual_prompt": "As the payment is sent, elegant glowing light rays and flowing energy lines rise from the sender’s phone and travel rapidly through the air, symbolizing secure digital signals moving across connected systems. The narrator stays calm in the foreground. Light effects are abstract, smooth, and cinematic, not sci-fi weapons. Realistic modern environment, no logos, no watermark.",
           "motion_prompt": "smooth light rays traveling quickly, gentle glow pulses, stable narrator, no camera shake",
-          "narration": "सुरक्षित डिजिटल सिग्नल सिस्टम और बैंकों के बीच बिजली की रफ्तार से यात्रा करते हैं।"
+          "narration": "फिर आपका फोन एक सुरक्षित मैसेज बनाता है… और ये मैसेज सर्वर तक जाता है। वहाँ चेक होता है—पिन सही है? बैलेंस है? और रिक्वेस्ट असली है?"
         },
         {
           "id": "scene_04_receiving_payment",
@@ -46,9 +46,9 @@
           "lip_sync": false,
           "character": "narrator",
           "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
-          "visual_prompt": "Same location. A shopkeeper looks at their smartphone. The screen clearly shows a generic confirmation with the same amount received. No real app UI or logos. Light rays gently converge into the phone and fade. Narrator remains dominant in frame. Cinematic realism, natural daylight, no text, no watermark.",
+          "visual_prompt": "Same location. A shopkeeper looks at their smartphone. The screen clearly shows a generic confirmation with the same amount received, like 250 received, and a success check mark. No real app UI or logos. Light rays gently converge into the phone and fade. Narrator remains dominant in frame. Cinematic realism, natural daylight, no watermark.",
           "motion_prompt": "phone confirmation appearing, soft glow fading, slight nod from receiver, calm background motion",
-          "narration": "और कुछ ही सेकंड में पैसा सीधे रिसीवर के खाते में पहुँच जाता है।"
+          "narration": "जैसे ही सब सही निकलता है… तुरंत कन्फर्मेशन जाता है… और रिसीवर के फोन पर 'रिसीव्ड' दिख जाता है।"
         },
         {
           "id": "scene_05_reflection_close",
@@ -57,9 +57,9 @@
           "lip_sync": false,
           "character": "narrator",
           "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
-          "visual_prompt": "Cinematic close-medium shot of the narrator in the same outdoor market environment. Background softly blurred. No digital effects now. Calm, thoughtful mood. Natural daylight, realistic modern setting, no text, no watermark.",
+          "visual_prompt": "Cinematic close-medium shot of the narrator in the same outdoor market environment. Background softly blurred. No digital effects now. Calm, thoughtful mood. Natural daylight, realistic modern setting, no logos, no watermark.",
           "motion_prompt": "slow subtle head movement, ambient background motion",
-          "narration": "ना कोई नकद पैसा चलता है… और ना ही कोई ऐप पैसा अपने पास रखती है।"
+          "narration": "ध्यान रहे… कोई ऐप पैसा अपने पास नहीं रखती। पैसा सीधे आपके बैंक से… सामने वाले के बैंक में जाता है।"
         },
         {
           "id": "scene_06_closing_thought",
@@ -68,9 +68,9 @@
           "lip_sync": false,
           "character": "narrator",
           "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
-          "visual_prompt": "Wide cinematic shot of the outdoor market continuing its normal rhythm. People walk, trade, smile, and put phones away. Natural sunlight, calm atmosphere. Cinematic realism, no text, no watermark.",
+          "visual_prompt": "Wide cinematic shot of the outdoor market continuing its normal rhythm. People walk, trade, smile, and put phones away. Natural sunlight, calm atmosphere. Cinematic realism, no logos, no watermark.",
           "motion_prompt": "gentle crowd movement, stable camera, soft ambient motion",
-          "narration": "सिस्टम लगातार काम करता रहता है… और ज़िंदगी बिना रुके चलती रहती है।"
+          "narration": "और इसलिए… सिस्टम बैकग्राउंड में चलता रहता है… और ज़िंदगी बिना रुके आगे बढ़ती रहती है।"
         }
       ]
     }

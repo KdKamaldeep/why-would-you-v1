@@ -12,6 +12,8 @@ import logging
 import tempfile
 import warnings
 import numpy as np
+import subprocess
+import shutil
 from typing import List, Optional, Dict, Any
 from pathlib import Path
 import torch
@@ -87,6 +89,78 @@ _tts_model_cache = {}
 
 # Cache for speaker WAV conditioning latents (keyed by file path + language)
 _speaker_wav_cache = {}
+
+# Cache for cleaned speaker audio files (keyed by original file path)
+_cleaned_speaker_cache = {}
+
+
+def clean_speaker_audio(input_audio: str, output_audio: Optional[str] = None) -> str:
+    """
+    Normalize and clean speaker audio file for Coqui TTS.
+    
+    Applies:
+    - Mono conversion (1 channel)
+    - Resample to 22050 Hz
+    - 16-bit sample format
+    - Highpass filter at 80Hz
+    - Lowpass filter at 12000Hz
+    - Loudness normalization
+    
+    Args:
+        input_audio: Path to input audio file
+        output_audio: Path to output cleaned audio (optional, auto-generated if None)
+        
+    Returns:
+        Path to cleaned audio file
+    """
+    # Check cache first
+    if input_audio in _cleaned_speaker_cache:
+        cached_path = _cleaned_speaker_cache[input_audio]
+        if os.path.exists(cached_path):
+            logger.info(f"♻️ Using cached cleaned speaker audio: {cached_path}")
+            return cached_path
+    
+    # Generate output path if not provided
+    if output_audio is None:
+        input_path = Path(input_audio)
+        output_audio = str(input_path.parent / f"{input_path.stem}_clean{input_path.suffix}")
+    
+    # Create output directory if needed
+    Path(output_audio).parent.mkdir(parents=True, exist_ok=True)
+    
+    logger.info(f"🧹 Cleaning and normalizing speaker audio: {input_audio} -> {output_audio}")
+    
+    # Apply cleaning filters
+    cmd = [
+        'ffmpeg', '-y',
+        '-i', input_audio,
+        '-ac', '1',  # Mono (1 channel)
+        '-ar', '22050',  # Sample rate 22050 Hz
+        '-sample_fmt', 's16',  # 16-bit sample format
+        '-af', 'highpass=f=80,lowpass=f=12000,loudnorm',  # Filters: highpass, lowpass, loudness normalization
+        output_audio
+    ]
+    
+    try:
+        result = subprocess.run(
+            cmd,
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        logger.info(f"✅ Speaker audio cleaned: {output_audio}")
+        
+        # Cache the cleaned file path
+        _cleaned_speaker_cache[input_audio] = output_audio
+        
+        return output_audio
+    except subprocess.CalledProcessError as e:
+        logger.error(f"❌ Failed to clean speaker audio: {e}")
+        if e.stderr:
+            logger.error(f"STDERR: {e.stderr[-500:]}")
+        # Fallback: return original file if cleaning fails
+        logger.warning(f"⚠️ Using original audio file (cleaning failed): {input_audio}")
+        return input_audio
 
 
 def get_tts_instance(config: Optional["CoquiVoiceConfig"] = None, force_reload: bool = False):
@@ -707,8 +781,9 @@ class CoquiVoiceSynthesizer:
                 if voice_clone_audio_normalized:
                     # User explicitly provided a voice file - use it or error
                     if os.path.exists(voice_clone_audio_normalized):
-                        speaker_wav_arg = voice_clone_audio_normalized
-                        logger.info(f"🎵 Using provided voice file: {voice_clone_audio_normalized}")
+                        # Clean and normalize the speaker audio before using
+                        speaker_wav_arg = clean_speaker_audio(voice_clone_audio_normalized)
+                        logger.info(f"🎵 Using provided voice file (cleaned): {speaker_wav_arg}")
                     else:
                         # User provided a path but file doesn't exist - this is an error, don't fall back to discovery
                         logger.error(f"❌ Voice file not found: {voice_clone_audio_normalized}")
@@ -719,8 +794,9 @@ class CoquiVoiceSynthesizer:
                     speaker_wav_arg = None
                     auto_wav = self._discover_speaker_wav(self.config.language)
                     if auto_wav:
-                        logger.info(f"🎵 Auto-discovered speaker_wav for language '{self.config.language}': {auto_wav}")
-                        speaker_wav_arg = auto_wav
+                        # Clean and normalize the auto-discovered speaker audio
+                        speaker_wav_arg = clean_speaker_audio(auto_wav)
+                        logger.info(f"🎵 Auto-discovered speaker_wav for language '{self.config.language}' (cleaned): {speaker_wav_arg}")
                     else:
                         logger.info(f"🎵 No speaker_wav found - will use default XTTS speaker")
                 
@@ -885,12 +961,14 @@ class CoquiVoiceSynthesizer:
                 # Optional: create a named speaker from provided audio for YourTTS-like models
                 if voice_clone_audio and os.path.exists(voice_clone_audio):
                     logger.info(f"Cloning voice (registry) from: {voice_clone_audio}")
+                    # Clean and normalize the speaker audio before copying to registry
+                    cleaned_audio = clean_speaker_audio(voice_clone_audio)
                     speaker_name = os.path.splitext(os.path.basename(voice_clone_audio))[0]
                     speaker_dir = os.path.join(self.config.voice_dir, speaker_name)
                     os.makedirs(speaker_dir, exist_ok=True)
-                    import shutil
                     speaker_audio_path = os.path.join(speaker_dir, "speaker.wav")
-                    shutil.copy2(voice_clone_audio, speaker_audio_path)
+                    shutil.copy2(cleaned_audio, speaker_audio_path)
+                    logger.info(f"✅ Copied cleaned speaker audio to registry: {speaker_audio_path}")
                     current_speaker = speaker_name
 
                 # First attempt: whole text

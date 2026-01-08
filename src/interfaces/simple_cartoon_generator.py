@@ -47,7 +47,7 @@ def get_model_path_for_type(model_type: str) -> str | None:
     # It downloads automatically on first use to Hugging Face cache
     return None
 
-def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=False, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False, voice_file=None, auto_sub=False):
+def generate_cartoon(prompt, style="realistic", duration=30, language="en", enable_prompt_enhancement=False, video_format="shorts", wan_width=832, wan_height=480, wan_num_frames=49, wan_fps=12, wan_steps=30, wan_guidance=6.0, wan_negative_prompt="text, subtitles, watermark, blurry, low quality, cartoon, anime, manga, illustration, painting, drawing, sketch, bad anatomy, distorted, deformed, ugly", seed=None, create_reel=True, vertical_mode="pad", reel_width=1080, reel_height=1920, reel_fps=30, music_path=None, music_volume=0.12, voice_volume=1.0, verbose_ffmpeg=False, voice_file=None, auto_sub=False, voice_speed=1.0):
     """Generate a video reel with the given prompt."""
     try:
         # Import the main generator
@@ -107,6 +107,7 @@ def generate_cartoon(prompt, style="realistic", duration=30, language="en", enab
             music_path=music_path,
             music_volume=music_volume,
             voice_volume=voice_volume,
+            voice_speed=voice_speed,
             verbose_ffmpeg=verbose_ffmpeg,
             voice_id=voice_file if voice_file else ""  # Path to reference speaker WAV for Coqui TTS (empty string = no voice)
         )
@@ -394,6 +395,13 @@ Storyboard Cast Format (with face images):
     )
     
     parser.add_argument(
+        "--voice-speed",
+        type=float,
+        default=1.0,
+        help="Voice speed multiplier (default: 1.0, 0.8 = slower, 1.2 = faster)"
+    )
+    
+    parser.add_argument(
         "--verbose-ffmpeg",
         action="store_true",
         help="Print FFmpeg commands for debugging"
@@ -511,6 +519,7 @@ Storyboard Cast Format (with face images):
                     music_path=args.music,
                     music_volume=args.music_volume,
                     voice_volume=args.voice_volume,
+                    voice_speed=args.voice_speed,
                     verbose_ffmpeg=args.verbose_ffmpeg,
                     add_hooks=args.add_hooks,  # Enable hook text rendering
                     voice_id=args.voice if args.voice else ""  # Path to reference speaker WAV for Coqui TTS
@@ -741,6 +750,7 @@ Storyboard Cast Format (with face images):
                 music_path=args.music,
                 music_volume=args.music_volume,
                 voice_volume=args.voice_volume,
+                voice_speed=args.voice_speed,
                 verbose_ffmpeg=args.verbose_ffmpeg,
                 voice_id=args.voice or ""  # Path to reference speaker WAV for Coqui TTS
             )
@@ -777,7 +787,8 @@ Storyboard Cast Format (with face images):
             music_volume=args.music_volume,
             voice_volume=args.voice_volume,
             verbose_ffmpeg=args.verbose_ffmpeg,
-            voice_file=args.voice
+            voice_file=args.voice,
+            voice_speed=args.voice_speed
         )
     
     if output_path:

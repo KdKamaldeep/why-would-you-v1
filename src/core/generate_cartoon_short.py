@@ -70,6 +70,71 @@ def postprocess_voice(input_wav: str, output_wav: str) -> str:
         logger.error(f"Voice postprocessing error: {e}")
         return input_wav
 
+
+def apply_voice_speed(input_audio: str, output_audio: str, speed: float = 1.0) -> str:
+    """
+    Apply voice speed adjustment to audio using ffmpeg atempo filter.
+    
+    Args:
+        input_audio: Path to input audio file
+        output_audio: Path to output audio file
+        speed: Speed multiplier (1.0 = normal, 0.8 = slower, 1.2 = faster)
+        
+    Returns:
+        Path to output audio file
+    """
+    if speed == 1.0:
+        # No change needed, just copy
+        import shutil
+        shutil.copy2(input_audio, output_audio)
+        return output_audio
+    
+    logger.info(f"🎚️ Applying voice speed: {speed}x")
+    
+    # Create output directory if needed
+    Path(output_audio).parent.mkdir(parents=True, exist_ok=True)
+    
+    # ffmpeg atempo filter supports range 0.5-2.0
+    # For values outside this range, chain multiple atempo filters
+    if speed < 0.5 or speed > 2.0:
+        # Chain multiple atempo filters
+        tempo_filters = []
+        remaining_speed = speed
+        while remaining_speed < 0.5:
+            tempo_filters.append('atempo=0.5')
+            remaining_speed *= 2.0
+        while remaining_speed > 2.0:
+            tempo_filters.append('atempo=2.0')
+            remaining_speed /= 2.0
+        if abs(remaining_speed - 1.0) > 0.01:
+            tempo_filters.append(f'atempo={remaining_speed:.3f}')
+        filter_chain = ','.join(tempo_filters)
+    else:
+        filter_chain = f'atempo={speed:.3f}'
+    
+    cmd = [
+        'ffmpeg', '-y',
+        '-i', input_audio,
+        '-af', filter_chain,
+        '-c:a', 'pcm_s16le',  # Keep PCM format
+        output_audio
+    ]
+    
+    try:
+        result = subprocess.run(
+            cmd,
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        logger.info(f"✅ Voice speed applied: {output_audio}")
+        return output_audio
+    except subprocess.CalledProcessError as e:
+        logger.error(f"❌ Failed to apply voice speed: {e}")
+        if e.stderr:
+            logger.error(f"STDERR: {e.stderr[-500:]}")
+        raise
+
 @dataclass
 class VideoConfig:
     """Configuration for video generation."""
@@ -121,6 +186,7 @@ class VideoConfig:
     music_path: Optional[str] = None  # Background music path
     music_volume: float = 0.12  # Music volume (0.0-1.0)
     voice_volume: float = 1.0  # Voice volume (0.0-1.0)
+    voice_speed: float = 1.0  # Voice speed multiplier (1.0 = normal, 0.8 = slower, 1.2 = faster)
     verbose_ffmpeg: bool = False  # Print FFmpeg commands
 
     def __post_init__(self):
@@ -321,6 +387,10 @@ class CartoonShortsGenerator:
                 # Track which scenes have blank narration (will use 49 frames instead of calculating from audio)
                 scenes_with_blank_narration = []
                 
+                # Log voice speed setting
+                if self.config.voice_speed != 1.0:
+                    logger.info(f"🎚️ Voice speed setting: {self.config.voice_speed}x (will be applied to all audio clips)")
+                
                 for i, scene in enumerate(script['scenes']):
                     scene_audio = self.output_dir / f"audio_scene_{i+1}.wav"
                     narration_text = scene.get('narration', '')
@@ -384,8 +454,26 @@ class CartoonShortsGenerator:
                         logger.info(f"🎵 Scene {i+1}: Audio generation completed: {scene_audio}")
                         processed_audio = postprocess_voice(str(scene_audio), str(scene_audio.parent / f"{scene_audio.stem}_pp{scene_audio.suffix}"))
                         scene_audio = Path(processed_audio)
+                        
+                        # Apply voice speed if not 1.0
+                        if self.config.voice_speed != 1.0:
+                            speed_adjusted_audio = str(scene_audio.parent / f"{scene_audio.stem}_speed{scene_audio.suffix}")
+                            speed_adjusted_audio = apply_voice_speed(str(scene_audio), speed_adjusted_audio, self.config.voice_speed)
+                            scene_audio = Path(speed_adjusted_audio)
+                            logger.info(f"🎚️ Scene {i+1}: Voice speed {self.config.voice_speed}x applied")
                     else:
                         logger.info(f"🎵 Scene {i+1}: Reusing existing audio: {scene_audio}")
+                        # Still apply voice speed if not 1.0 (even for reused audio)
+                        if self.config.voice_speed != 1.0:
+                            speed_adjusted_audio = str(scene_audio.parent / f"{scene_audio.stem}_speed{scene_audio.suffix}")
+                            # Check if speed-adjusted version already exists
+                            if not Path(speed_adjusted_audio).exists():
+                                speed_adjusted_audio = apply_voice_speed(str(scene_audio), speed_adjusted_audio, self.config.voice_speed)
+                                scene_audio = Path(speed_adjusted_audio)
+                                logger.info(f"🎚️ Scene {i+1}: Voice speed {self.config.voice_speed}x applied to reused audio")
+                            else:
+                                scene_audio = Path(speed_adjusted_audio)
+                                logger.info(f"🎚️ Scene {i+1}: Using existing speed-adjusted audio: {scene_audio}")
                     
                     scene_audio_paths.append(str(scene_audio))
                     # Duration will be detected in the next step
