@@ -571,6 +571,37 @@ def composite_synced_video(
         shutil.rmtree(temp_dir, ignore_errors=True)
 
 
+def sharpen_video(input_video: str, output_video: str) -> None:
+    """
+    Sharpen video using ffmpeg filters for better quality.
+    
+    Args:
+        input_video: Path to input video file
+        output_video: Path to output video file
+    """
+    logger.info(f"Sharpening video: {input_video} -> {output_video}")
+    
+    # Create output directory if needed
+    Path(output_video).parent.mkdir(parents=True, exist_ok=True)
+    
+    # Apply sharpening filters: gblur -> unsharp -> noise reduction
+    cmd = [
+        'ffmpeg', '-y',
+        '-i', input_video,
+        '-vf', 'gblur=sigma=0.35,unsharp=7:7:0.65,noise=alls=5:allf=t',
+        '-c:v', 'libx264',
+        '-preset', 'veryfast',
+        '-crf', '18',
+        '-pix_fmt', 'yuv420p',
+        output_video
+    ]
+    
+    exit_code, stdout, stderr = run_cmd(cmd)
+    ensure_ok(exit_code == 0, f"❌ Video sharpening failed:\n{stderr}")
+    
+    logger.info(f"✅ Video sharpened: {output_video}")
+
+
 def preprocess_audio(input_audio: str, output_audio: str, sample_rate: int) -> None:
     """
     Preprocess audio: convert to mono, resample, PCM 16-bit.
@@ -903,13 +934,20 @@ Examples:
         logger.info("=" * 60)
         logger.info("Step 5: Compositing synced video back into original frames")
         logger.info("=" * 60)
+        temp_composited_video = os.path.join(temp_dir, 'temp_composited.mp4')
         composite_synced_video(
             args.video_path,
             temp_synced_video,
-            args.out_path,
+            temp_composited_video,
             crop_params,
             args.fps
         )
+        
+        # Step 6: Sharpen video for better quality
+        logger.info("=" * 60)
+        logger.info("Step 6: Sharpening video")
+        logger.info("=" * 60)
+        sharpen_video(temp_composited_video, args.out_path)
         
         logger.info("=" * 60)
         logger.info("✅ Synchronization completed successfully!")

@@ -1,0 +1,74 @@
+{
+  "title": "How Digital Payments Work at Light Speed",
+  "total_duration": 38,
+  "aspect_ratio": "9:16",
+  "fps": 24,
+  "scenes": [
+    {
+      "id": "scene_01_hook_question",
+      "duration": 5,
+      "num_frames": 120,
+      "lip_sync": false,
+      "character": "narrator",
+      "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
+      "visual_prompt": "Ultra-cinematic modern outdoor market scene full of energy and motion. One dominant narrator stands in the foreground, sharply in focus. In the background, multiple people are actively using smartphones—one scanning a QR code, another tapping to pay, another checking a phone. Subtle glowing light streaks and soft energy pulses briefly appear around phones, suggesting invisible digital activity. Light rays move rapidly between phones and upward into the air. Natural daylight, realistic modern environment, cinematic depth of field, no text, no logos, no watermark.",
+      "motion_prompt": "dynamic background crowd motion, hands moving quickly on phones, brief light streaks flashing and flowing rapidly, subtle energy pulses, slight cinematic camera push-in toward narrator, narrator remains calm and steady",
+      "narration": "Phone tap. Seconds mein payment. Lekin system kaam kaise karta hai?"
+    },
+    {
+      "id": "scene_02_sending_payment",
+      "duration": 7,
+      "num_frames": 168,
+      "lip_sync": false,
+      "character": "narrator",
+      "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
+      "visual_prompt": "Same outdoor market location. In the background, a customer holds a smartphone clearly visible, showing a clean generic payment screen with an amount displayed, such as 250 units, and a simple send action. No real app UI, no logos. Narrator remains dominant in the foreground. Cinematic realism, shallow depth of field, natural daylight, no text, no watermark.",
+      "motion_prompt": "finger tapping send on phone, subtle phone glow, calm narrator posture, stable camera",
+      "narration": "Sab kuch start hota hai jab koi amount enter karke send karta hai."
+    },
+    {
+      "id": "scene_03_light_speed_transfer",
+      "duration": 8,
+      "num_frames": 192,
+      "lip_sync": false,
+      "character": "narrator",
+      "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
+      "visual_prompt": "As the payment is sent, elegant glowing light rays and flowing energy lines rise from the sender’s phone and travel rapidly through the air, symbolizing secure digital signals moving across connected systems. The narrator stays calm in the foreground. Light effects are abstract, smooth, and cinematic, not sci-fi weapons. Realistic modern environment, no text, no logos, no watermark.",
+      "motion_prompt": "smooth light rays traveling quickly, gentle glow pulses, stable narrator, no camera shake",
+      "narration": "Secure signals systems aur banks ke beech lightning speed se travel karte hain."
+    },
+    {
+      "id": "scene_04_receiving_payment",
+      "duration": 7,
+      "num_frames": 168,
+      "lip_sync": false,
+      "character": "narrator",
+      "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
+      "visual_prompt": "Same location. A shopkeeper looks at their smartphone. The screen clearly shows a generic confirmation with the same amount received. No real app UI or logos. Light rays gently converge into the phone and fade. Narrator remains dominant in frame. Cinematic realism, natural daylight, no text, no watermark.",
+      "motion_prompt": "phone confirmation appearing, soft glow fading, slight nod from receiver, calm background motion",
+      "narration": "Aur kuch seconds mein paisa directly receiver ke account mein aa jata hai."
+    },
+    {
+      "id": "scene_05_reflection_close",
+      "duration": 6,
+      "num_frames": 144,
+      "lip_sync": false,
+      "character": "narrator",
+      "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
+      "visual_prompt": "Cinematic close-medium shot of the narrator in the same outdoor market environment. Background softly blurred. No digital effects now. Calm, thoughtful mood. Natural daylight, realistic modern setting, no text, no watermark.",
+      "motion_prompt": "slow subtle head movement, ambient background motion",
+      "narration": "Na koi cash move hota hai. Na koi app paisa hold karti hai."
+    },
+    {
+      "id": "scene_06_closing_thought",
+      "duration": 5,
+      "num_frames": 120,
+      "lip_sync": false,
+      "character": "narrator",
+      "voice": "/workspace/why-would-you-v1/tts-speaker/voice-male.wav",
+      "visual_prompt": "Wide cinematic shot of the outdoor market continuing its normal rhythm. People walk, trade, smile, and put phones away. Natural sunlight, calm atmosphere. Cinematic realism, no text, no watermark.",
+      "motion_prompt": "gentle crowd movement, stable camera, soft ambient motion",
+      "narration": "System kaam karta rehta hai… aur zindagi smoothly chalti rehti hai."
+    }
+  ]
+}
