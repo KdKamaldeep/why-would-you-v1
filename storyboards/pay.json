@@ -1,8 +1,7 @@
 {
   "stories": [
     {
-      "title": "How Digital Payments Work at Light Speed (Hindi) — Locked Narrator",
-      "description": "A single front-facing Indian lady narrator explains how digital payments work, with one locked identity reference across all scenes.",
+      "title": "How Digital Payments Work at Light Speed",
       "total_duration": 38,
       "aspect_ratio": "9:16",
       "fps": 24,
@@ -10,62 +9,98 @@
         {
           "id": "scene_01_hook_question",
           "duration": 5,
-          "num_frames": 0,
-          "lip_sync": true,
-          "visual_reference": "identity_anchor_indian_lady_v1.png",
-          "visual_prompt": "Medium close-up of a modern Indian woman narrator (age 35–40), calm and confident, facing directly toward the camera. Natural Indian facial features, medium brown skin tone, expressive eyes, neat hair, modern solid-color kurta or blazer-style top. She is speaking clearly, lips articulating naturally. No microphone, no handheld objects. Front-facing camera only. Chest and face square to camera. No side view, no profile view. Background: ultra-cinematic outdoor market with people using smartphones, one scanning a QR code, another tapping to pay, another checking a phone. Natural daylight, cinematic depth of field, no logos, no watermark.",
-          "motion_prompt": "subtle forward movement, gentle head nods while speaking, background crowd motion, camera tracking backward on straight axis, no rotation, stable framing",
-          "narration": "आपने फोन टैप किया और कुछ ही सेकंड में भुगतान हो गया। लेकिन यह जादू नहीं है, यह एक पूरा सिस्टम है। यह सिस्टम इतने तेज़ी से काम कैसे करता है?"
+          "num_frames": 120,
+          "lip_sync": false,
+          "character": "narrator",
+          "voice": "/workspace/why-would-you-v1/tts-speaker/voice-female.wav",
+          "voice_speed": 1.2,
+          "visual_prompt": "Ultra-cinematic modern outdoor market scene. A confident Indian woman narrator (late 20s to early 30s) stands in the foreground, facing directly toward the camera, speaking clearly. Calm, expressive face, natural makeup, smart casual modern outfit. Strong eye contact with the camera. In the background, people actively use smartphones for payments. Natural daylight, shallow depth of field, cinematic realism, no text, no logos, no watermark.",
+          "motion_prompt": "subtle head and lip movement while speaking, gentle hand gestures, slight cinematic camera push-in, dynamic background crowd motion",
+          "narration": "फोन टैप किया… कुछ ही सेकंड में पेमेंट। लेकिन यह सिस्टम असल में काम कैसे करता है?",
+          "narration_chunks": [
+            "फोन टैप किया… और कुछ ही सेकंड में पेमेंट।",
+            "लेकिन यह सिस्टम असल में काम कैसे करता है?"
+          ]
         },
         {
           "id": "scene_02_sending_payment",
           "duration": 7,
-          "num_frames": 0,
-          "lip_sync": true,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Same location. The same Indian woman narrator continues speaking while staying front-facing to camera. No microphone, no handheld objects. Chest and face square to camera at all times. In the background, a customer holds a smartphone with a clean generic payment screen showing an amount like 250 and a clear pay/send action. No real app UI, no logos. Natural daylight, cinematic realism, no watermark.",
-          "motion_prompt": "steady forward walk, gentle hand emphasis while speaking, background finger tapping on phone, camera tracking backward on straight axis, continuous mouth movement, stable framing",
-          "narration": "सब कुछ तब शुरू होता है, जब आप रकम दर्ज करते हैं और भुगतान का बटन दबाते हैं। आपका फोन उस जानकारी को सुरक्षित तरीके से पैक करता है, ताकि कोई बीच में उसे बदल न सके।"
+          "num_frames": 168,
+          "lip_sync": false,
+          "character": "narrator",
+          "voice": "/workspace/why-would-you-v1/tts-speaker/voice-female.wav",
+          "voice_speed": 1.2,
+          "visual_prompt": "Same outdoor market location. The same female narrator remains dominant in the foreground, facing the camera and speaking. In the background, a customer holds a smartphone showing a generic payment amount and send action. Cinematic realism, natural daylight, shallow depth of field, no text, no watermark.",
+          "motion_prompt": "finger tapping send on phone in background, narrator speaking calmly to camera, stable camera",
+          "narration": "सब कुछ तब शुरू होता है, जब कोई राशि दर्ज करके भेजने का बटन दबाता है।",
+          "narration_chunks": [
+            "सब कुछ तब शुरू होता है…",
+            "जब कोई राशि दर्ज करके भेजने का बटन दबाता है।"
+          ]
         },
         {
           "id": "scene_03_light_speed_transfer",
           "duration": 8,
-          "num_frames": 0,
-          "lip_sync": true,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Same narrator remains dominant in the foreground, speaking directly to the viewer, front-facing only. No microphone. Chest and face square to camera. Background: elegant glowing light rays and flowing energy lines rise from the sender’s phone and travel rapidly through the air, symbolizing secure digital signals moving across connected systems and servers. Light effects are smooth and cinematic, not sci-fi weapons. Realistic modern market environment, no logos, no watermark.",
-          "motion_prompt": "smooth light rays traveling quickly, gentle glow pulses, narrator steady with controlled gestures, camera stable on straight axis, continuous lip movement",
-          "narration": "फिर यह रिक्वेस्ट नेटवर्क के ज़रिए सर्वर तक जाती है। वहाँ सिस्टम जांच करता है कि पिन कोड सही है, खाते में पर्याप्त बैलेंस है, और रिक्वेस्ट असली है। सब कुछ सही होते ही आगे की मंजूरी तुरंत मिल जाती है।"
+          "num_frames": 192,
+          "lip_sync": false,
+          "character": "narrator",
+          "voice": "/workspace/why-would-you-v1/tts-speaker/voice-female.wav",
+          "voice_speed": 1.2,
+          "visual_prompt": "Female narrator remains front-facing and speaking directly to camera. Elegant glowing light rays rise from a phone in the background and travel rapidly through the air, symbolizing secure digital signals. Effects are abstract and cinematic, not sci-fi. Modern environment, no text, no logos.",
+          "motion_prompt": "smooth flowing light rays, narrator steady and speaking, no camera shake",
+          "narration": "सुरक्षित डिजिटल सिग्नल सिस्टम और बैंकों के बीच बिजली की रफ्तार से यात्रा करते हैं।",
+          "narration_chunks": [
+            "सुरक्षित डिजिटल सिग्नल निकलते हैं…",
+            "और सिस्टम व बैंकों के बीच बिजली की रफ्तार से यात्रा करते हैं।"
+          ]
         },
         {
           "id": "scene_04_receiving_payment",
           "duration": 7,
-          "num_frames": 0,
-          "lip_sync": true,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Same location. The narrator remains front-facing in the foreground, speaking calmly with direct eye contact. No microphone. Chest and face square to camera. Background: a shopkeeper checks a smartphone showing a generic confirmation with the same amount received like 250 received and a success check mark. No real app UI, no logos. Light rays gently converge into the phone and fade. Natural daylight, cinematic realism, no watermark.",
-          "motion_prompt": "phone confirmation appearing, soft glow fading, slight nod from receiver, narrator steady while speaking, camera stable on straight axis, continuous lip movement",
-          "narration": "जैसे ही पुष्टि होती है, रिसीवर के फोन पर तुरंत संदेश आ जाता है कि भुगतान मिल गया। इसी दौरान पैसा सीधे एक बैंक से दूसरे बैंक में दर्ज हो जाता है।"
+          "num_frames": 168,
+          "lip_sync": false,
+          "character": "narrator",
+          "voice": "/workspace/why-would-you-v1/tts-speaker/voice-female.wav",
+          "voice_speed": 1.2,
+          "visual_prompt": "Female narrator speaking directly to camera in the foreground. In the background, a shopkeeper looks at a phone showing a generic payment received confirmation. Soft light converges into the phone and fades. Natural daylight, cinematic realism, no text, no watermark.",
+          "motion_prompt": "confirmation glow in background, narrator calm and expressive, slight nod from receiver",
+          "narration": "और कुछ ही सेकंड में पैसा सीधे रिसीवर के खाते में पहुँच जाता है।",
+          "narration_chunks": [
+            "और कुछ ही सेकंड में…",
+            "पैसा सीधे रिसीवर के खाते में पहुँच जाता है।"
+          ]
         },
         {
           "id": "scene_05_reflection_close",
           "duration": 6,
-          "num_frames": 0,
-          "lip_sync": true,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Cinematic close-medium shot of the same Indian woman narrator, reflective and reassuring, speaking directly to the viewer. Front-facing only, chest and face square to camera. No microphone, no objects. Background softly blurred market environment, no digital effects. Natural daylight, realistic modern setting, no logos, no watermark.",
-          "motion_prompt": "very slow forward movement easing into stillness, gentle head nods, continuous mouth movement, camera settles smoothly, stable framing",
-          "narration": "ध्यान रहे, कोई ऐप आपका पैसा अपने पास नहीं रखती। ऐप केवल संदेश आगे बढ़ाती है, और असली लेन-देन आपके बैंक और सामने वाले के बैंक के बीच होता है।"
+          "num_frames": 144,
+          "lip_sync": false,
+          "character": "narrator",
+          "voice": "/workspace/why-would-you-v1/tts-speaker/voice-female.wav",
+          "voice_speed": 1.2,
+          "visual_prompt": "Close-medium cinematic shot of the same female narrator, directly facing the camera and speaking. Thoughtful expression. Background softly blurred. No digital effects. Natural daylight, realistic modern setting.",
+          "motion_prompt": "slow subtle head movement, natural facial expressions",
+          "narration": "ना कोई नकद पैसा चलता है… और ना ही कोई ऐप पैसा अपने पास रखती है।",
+          "narration_chunks": [
+            "ना कोई नकद पैसा चलता है…",
+            "और ना ही कोई ऐप पैसा अपने पास रखती है।"
+          ]
         },
         {
           "id": "scene_06_closing_thought",
           "duration": 5,
-          "num_frames": 0,
-          "lip_sync": true,
-          "visual_reference": "use_previous_scene_image_as_reference",
-          "visual_prompt": "Wide cinematic shot of the outdoor market continuing its normal rhythm. The same narrator remains visible and front-facing in the foreground while finishing her line. No side angles. People walk, trade, smile, and put phones away in the background. Natural sunlight, calm atmosphere. Cinematic realism, no logos, no watermark.",
-          "motion_prompt": "gentle crowd movement, narrator steady front-facing while speaking, camera stable on straight axis, soft ambient motion",
-          "narration": "इसीलिए यह सिस्टम हर समय बैकग्राउंड में चलता रहता है, और हमारी ज़िंदगी बिना रुके आगे बढ़ती रहती है।"
+          "num_frames": 120,
+          "lip_sync": false,
+          "character": "narrator",
+          "voice": "/workspace/why-would-you-v1/tts-speaker/voice-female.wav",
+          "voice_speed": 1.2,
+          "visual_prompt": "Wide cinematic shot. The female narrator remains visible, facing the camera, while the market continues normally in the background. People walk, trade, smile, and put phones away. Natural sunlight, calm atmosphere.",
+          "motion_prompt": "gentle crowd movement, narrator steady and confident, stable camera",
+          "narration": "सिस्टम लगातार काम करता रहता है… और ज़िंदगी बिना रुके चलती रहती है।",
+          "narration_chunks": [
+            "सिस्टम लगातार काम करता रहता है…",
+            "और ज़िंदगी बिना रुके चलती रहती है।"
+          ]
         }
       ]
     }
