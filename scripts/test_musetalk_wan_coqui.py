@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from src.core.wan_t2v import WanT2VGenerator
 from src.core.coqui_voice_synthesizer import CoquiVoiceSynthesizer, CoquiVoiceConfig
 from src.core.sync_musetalk import lipsync_musetalk
+from src.core.gemini_image_generator import GeminiImageGenerator
 
 # Configure logging
 logging.basicConfig(
@@ -42,19 +43,23 @@ def test_musetalk_wan_coqui(
     fps: int = 24,
     num_frames: int = 50,
     voice: Optional[str] = None,
-    device: str = "cuda"
+    device: str = "cuda",
+    image_width: int = 768,
+    image_height: int = 1344
 ):
     """
-    Test MuseTalk lip sync with WAN and Coqui.
+    Test MuseTalk lip sync with WAN I2V and Coqui.
     
     Args:
-        prompt: Text prompt for WAN video generation
+        prompt: Text prompt for Gemini image generation and WAN video generation
         text: Text to synthesize with Coqui TTS
         output_dir: Output directory for generated files
         fps: Frames per second for video
         num_frames: Number of frames to generate
         voice: Voice name for Coqui TTS (optional)
         device: Device to use for MuseTalk ("cuda" or "cpu")
+        image_width: Width for Gemini-generated image (default: 768)
+        image_height: Height for Gemini-generated image (default: 1344)
     """
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -68,18 +73,60 @@ def test_musetalk_wan_coqui(
     logger.info(f"FPS: {fps}")
     logger.info(f"Num frames: {num_frames}")
     logger.info(f"Device: {device}")
+    logger.info(f"Image dimensions: {image_width}x{image_height}")
     logger.info("=" * 80)
     
-    # Step 1: Generate video with WAN (skip if already exists)
+    # Step 1: Generate image with Gemini (skip if already exists)
+    image_path = output_path / "gemini_image.png"
+    
+    if image_path.exists():
+        logger.info(f"\n🎨 Step 1: Gemini image already exists, skipping generation...")
+        logger.info(f"   Using existing image: {image_path}")
+        file_size = image_path.stat().st_size / (1024 * 1024)  # MB
+        logger.info(f"   File size: {file_size:.2f} MB")
+    else:
+        logger.info(f"\n🎨 Step 1: Generating image with Gemini...")
+        logger.info(f"   Prompt: {prompt}")
+        
+        try:
+            gemini_generator = GeminiImageGenerator()
+            
+            if not gemini_generator.available:
+                logger.error("❌ Gemini image generation not available. Check GEMINI_API_KEY environment variable.")
+                return False
+            
+            generated_image_path = gemini_generator.generate_image(
+                prompt=prompt,
+                output_path=str(image_path),
+                width=image_width,
+                height=image_height
+            )
+            
+            if not generated_image_path or not Path(generated_image_path).exists():
+                logger.error(f"❌ Gemini image generation failed: {generated_image_path}")
+                return False
+            
+            logger.info(f"✅ Gemini image generated: {generated_image_path}")
+            image_path = Path(generated_image_path)
+            
+        except Exception as e:
+            logger.error(f"❌ Gemini image generation failed: {e}")
+            import traceback
+            logger.debug(traceback.format_exc())
+            return False
+    
+    # Step 2: Generate video with WAN I2V (skip if already exists)
     video_path = output_path / "wan_video.mp4"
     
     if video_path.exists():
-        logger.info(f"\n🎬 Step 1: WAN video already exists, skipping generation...")
+        logger.info(f"\n🎬 Step 2: WAN video already exists, skipping generation...")
         logger.info(f"   Using existing video: {video_path}")
         file_size = video_path.stat().st_size / (1024 * 1024)  # MB
         logger.info(f"   File size: {file_size:.2f} MB")
     else:
-        logger.info("\n🎬 Step 1: Generating video with WAN...")
+        logger.info(f"\n🎬 Step 2: Generating video with WAN (I2V mode)...")
+        logger.info(f"   Using Gemini-generated image: {image_path}")
+        
         wan_generator = WanT2VGenerator()
         
         try:
@@ -88,7 +135,8 @@ def test_musetalk_wan_coqui(
                 output_path=str(video_path),
                 seed=None,
                 num_frames=num_frames,
-                fps=fps
+                fps=fps,
+                image=str(image_path)  # Pass Gemini-generated image to enable I2V mode
             )
             
             # Handle return type: dict (with metadata) or string (backward compatible)
@@ -110,16 +158,16 @@ def test_musetalk_wan_coqui(
             logger.debug(traceback.format_exc())
             return False
     
-    # Step 2: Generate audio with Coqui TTS (skip if already exists)
+    # Step 3: Generate audio with Coqui TTS (skip if already exists)
     audio_path = output_path / "coqui_audio.wav"
     
     if audio_path.exists():
-        logger.info(f"\n🎵 Step 2: Coqui audio already exists, skipping generation...")
+        logger.info(f"\n🎵 Step 3: Coqui audio already exists, skipping generation...")
         logger.info(f"   Using existing audio: {audio_path}")
         file_size = audio_path.stat().st_size / (1024 * 1024)  # MB
         logger.info(f"   File size: {file_size:.2f} MB")
     else:
-        logger.info("\n🎵 Step 2: Generating audio with Coqui TTS...")
+        logger.info("\n🎵 Step 3: Generating audio with Coqui TTS...")
         try:
             coqui_config = CoquiVoiceConfig()
             coqui_synthesizer = CoquiVoiceSynthesizer(config=coqui_config)
@@ -143,8 +191,8 @@ def test_musetalk_wan_coqui(
             logger.debug(traceback.format_exc())
             return False
     
-    # Step 3: Apply MuseTalk lip sync
-    logger.info("\n🎙️ Step 3: Applying MuseTalk lip sync...")
+    # Step 4: Apply MuseTalk lip sync
+    logger.info("\n🎙️ Step 4: Applying MuseTalk lip sync...")
     try:
         output_video_path = output_path / "final_musetalk_lipsync.mp4"
         
@@ -181,6 +229,7 @@ def test_musetalk_wan_coqui(
     logger.info("\n" + "=" * 80)
     logger.info("✅ Test completed successfully!")
     logger.info("=" * 80)
+    logger.info(f"Gemini image: {image_path}")
     logger.info(f"WAN video: {video_path}")
     logger.info(f"Coqui audio: {audio_path}")
     logger.info(f"Final output: {output_video_path}")
@@ -195,8 +244,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Basic test
-  python scripts/test_musetalk_wan_coqui.py --prompt "A cat playing piano" --text "Hello, this is a test."
+  # Basic test (Gemini generates image, then WAN I2V)
+  python scripts/test_musetalk_wan_coqui.py \\
+    --prompt "A cat playing piano" \\
+    --text "Hello, this is a test."
 
   # Custom output directory and settings
   python scripts/test_musetalk_wan_coqui.py \\
@@ -205,6 +256,8 @@ Examples:
     --output-dir output/my_test \\
     --fps 24 \\
     --num-frames 50 \\
+    --image-width 768 \\
+    --image-height 1344 \\
     --device cuda
         """
     )
@@ -259,6 +312,20 @@ Examples:
         help="Device to use for MuseTalk (default: cuda)"
     )
     
+    parser.add_argument(
+        "--image-width",
+        type=int,
+        default=768,
+        help="Width for Gemini-generated image (default: 768)"
+    )
+    
+    parser.add_argument(
+        "--image-height",
+        type=int,
+        default=1344,
+        help="Height for Gemini-generated image (default: 1344)"
+    )
+    
     args = parser.parse_args()
     
     success = test_musetalk_wan_coqui(
@@ -268,7 +335,9 @@ Examples:
         fps=args.fps,
         num_frames=args.num_frames,
         voice=args.voice,
-        device=args.device
+        device=args.device,
+        image_width=args.image_width,
+        image_height=args.image_height
     )
     
     sys.exit(0 if success else 1)
