@@ -1,0 +1,30 @@
+{
+  "settings": {
+    "num_frames": 481,
+    "frame_rate": 24,
+    "cfg_guidance_scale": 3.5,
+    "num_inference_steps": 30
+  },
+  "prompts": [
+    {
+      "title": "Lia Space Observation",
+      "prompt": "Cinematic medium shot inside the Stardust cockpit. Dr. Lia is mesmerized by the view of the planet Eldoria. She wears a high-tech headset, the violet glow of the planet reflecting in her eyes. Her mouth moves in perfect sync as she whispers: 'It’s more beautiful than the satellite scans ever showed. It’s breathing, Jax. The whole planet is breathing.' Audio: Soft, breathless female voice with high clarity, accompanied by the low hum of the ship's life support systems."
+    },
+    {
+      "title": "Lia Landing Readings",
+      "prompt": "Close-up of Dr. Lia in her pilot seat as the ship descends through teal clouds. Holographic displays flicker across her face. She looks at the data with intense excitement, her mouth moving in perfect sync as she says: 'Look at those readings! The oxygen is pure, and the bio-signatures... they're off the charts!' Audio: Enthusiastic female voice, slightly shaky from the ship's vibration, with muffled thruster sounds in the background."
+    },
+    {
+      "title": "Jax First Steps",
+      "prompt": "Tracking shot of Captain Jax stepping off the ship's ramp onto glowing turquoise moss. He holds a plasma rifle, looking around warily. He turns his head slightly back toward the ship, his mouth moving in perfect sync as he speaks: 'Stay behind me, Lia. It’s pretty, but we don't know what bites yet.' Audio: Grunt, followed by a gruff, cautious male voice with a slight radio filter effect over natural forest ambience."
+    },
+    {
+      "title": "Lia Nervous System Theory",
+      "prompt": "Extreme close-up of Dr. Lia as she kneels by a glowing alien plant. The light from the plant pulses against her skin. She looks at Jax with a look of realization, her mouth moving in perfect sync as she whispers: 'It’s not just a forest, Jax... it’s a nervous system. Look at how it reacts to us.' Audio: Intimate, quiet female voice with the sound of crystalline leaves chiming softly in the wind."
+    },
+    {
+      "title": "Jax Serpent Reveal",
+      "prompt": "Cinematic medium-wide shot of Captain Jax standing before a colossal glowing tree. A massive emerald serpent eye opens in the background. Jax lowers his weapon slowly, his face full of awe, his mouth moving in perfect sync as he says: 'Lia... I think the planet just found us.' Audio: Low-pitched, steady male voice, followed by a deep, melodic resonant hum from the alien serpent."
+    }
+  ]
+}

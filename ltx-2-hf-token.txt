@@ -15,11 +15,23 @@ mkdir -p /workspace/LTX-2/models/gemma
 
 hf auth login
 
+# Distilled model
 hf download Lightricks/LTX-2 \
   ltx-2-19b-distilled-fp8.safetensors \
   ltx-2-spatial-upscaler-x2-1.0.safetensors \
   ltx-2-19b-distilled-lora-384.safetensors \
   --local-dir /workspace/LTX-2/models/ltx2
+
+*********************Non Distilled*********************
+hf download Lightricks/LTX-2 \
+  ltx-2-19b-dev-fp8.safetensors \
+  ltx-2-spatial-upscaler-x2-1.0.safetensors \
+  --local-dir /workspace/LTX-2/models/ltx2
+  
+hf download Lightricks/LTX-2 \
+  ltx-2-19b-distilled-lora-384.safetensors \
+  --local-dir /workspace/LTX-2/models/ltx2
+*********************Non Distilled*********************
 
 
 hf download google/gemma-3-12b-it-qat-q4_0-unquantized \
@@ -53,20 +65,43 @@ python -m ltx_pipelines.distilled \
   --gemma-root /workspace/LTX-2/models/gemma \
   --lora /workspace/LTX-2/models/ltx2/ltx-2-19b-distilled-lora-384.safetensors 1.0 \
   --enable-fp8 \
-  --prompt "A confident woman stands calmly on a wide sandy beach, facing the camera at a slight angle. She maintains steady eye contact, her expression relaxed, expressive, and engaging. Her posture is natural and grounded, shoulders relaxed, conveying confidence and warmth.
-
-She wears a light, flowing dress suitable for a beach setting, the fabric moving gently with the ocean breeze. Her hair flows softly, strands lifting and settling naturally with the wind, adding subtle motion.
-
-The background shows an expansive ocean stretching to the horizon, with gentle waves rolling in. Soft foam forms near the shoreline. In the distance, the sea and sky blend smoothly, creating depth and openness. No distractions in the foreground; background elements are slightly blurred for cinematic focus.
-
-The camera is static or slowly pushing in, framed from chest-up to medium shot. No cuts, no jumps. Motion is subtle and continuous—natural wind movement, soft water motion, and gentle body micro-movements.
-
-Lighting is warm and cinematic, like golden hour near sunset. Soft sunlight highlights facial features and fabric texture, with realistic shadows and natural skin tones. Colors are rich but realistic—blue ocean, warm sand, soft sky gradients.
-
-Depth of field is shallow to medium, keeping the woman sharp while the beach and ocean remain softly blurred. Overall mood is peaceful, cinematic, intimate, and uplifting, with realistic motion and natural environmental sound compatibility." \
+  --prompt "" \
   --seed 7 \
   --height 1344 --width 768 \
   --num-frames 97 \
   --frame-rate 24 \
   --output-path /workspace/LTX-2/test_short.mp4
+  
+  
+set +H
+
+read -r -d '' PROMPT <<'EOF'
+Cinematic close-up of a female aerospace engineer in a dimly lit mission control center. The cool blue glow of computer monitors reflects in her eyes. She wears a headset and looks relieved, her mouth moving in perfect sync as she speaks a long message: 'Mission Control, this is Lead Engineer Sarah. Touchdown is confirmed. We are officially on the surface of Mars and all systems are showing green across the board. It has been a long journey, but we are finally home.' Behind her, the out-of-focus control room erupts into blurred movement and muffled cheering. Soft rim lighting highlights her face. Audio: Clear, professional female voice with a slight crackle of radio static, over the ambient hum of server fans and distant applause.
+EOF
+
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
+python -m ltx_pipelines.ti2vid_two_stages \
+  --checkpoint-path /workspace/LTX-2/models/ltx2/ltx-2-19b-dev-fp8.safetensors \
+  --distilled-lora /workspace/LTX-2/models/ltx2/ltx-2-19b-distilled-lora-384.safetensors 0.8 \
+  --spatial-upsampler-path /workspace/LTX-2/models/ltx2/ltx-2-spatial-upscaler-x2-1.0.safetensors \
+  --enable-fp8 \
+  --gemma-root /workspace/LTX-2/models/gemma \
+  --height 704 --width 1216 \
+  --num-frames 241 \
+  --frame-rate 24 \
+  --num-inference-steps 35 \
+  --cfg-guidance-scale 4.0 \
+  --prompt "$PROMPT" \
+  --output-path /workspace/output.mp4	
+
+  
+  
+************server****************
+pip install fastapi uvicorn pydantic
+uvicorn server:app --host 0.0.0.0 --port 8000
+************server****************
+
+
+export PYTHONPATH=/workspace/LTX-2/packages/ltx-pipelines/src:/workspace/LTX-2/packages/ltx-core/src:$PYTHONPATH
+
 
