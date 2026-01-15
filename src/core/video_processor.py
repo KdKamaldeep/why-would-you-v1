@@ -522,10 +522,9 @@ class VideoProcessor:
                     if i < len(narration_audio):
                         filter_parts.append(f"[{i*2+1}:a]aresample=48000,asetpts=PTS-STARTPTS[a{i}]")
                 
-                # Build concat inputs
-                concat_video_inputs = "".join([f"[v{i}]" for i in range(len(clips))])
-                concat_audio_inputs = "".join([f"[a{i}]" for i in range(len(clips))])
-                concat_filter = f"{concat_video_inputs}{concat_audio_inputs}concat=n={len(clips)}:v=1:a=1[v][a]"
+                # Build concat inputs - must alternate video and audio (v0, a0, v1, a1, ...)
+                concat_inputs = "".join([f"[v{i}][a{i}]" for i in range(len(clips))])
+                concat_filter = f"{concat_inputs}concat=n={len(clips)}:v=1:a=1[v][a]"
                 filter_parts.append(concat_filter)
                 
                 filter_complex = ";".join(filter_parts)

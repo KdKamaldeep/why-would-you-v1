@@ -734,40 +734,108 @@ class CartoonShortsGenerator:
                     
                     # Run lip sync if audio is available and scene has lip_sync enabled
                     scene_lip_sync = scene.get('lip_sync', False)
+                    # Check which lip sync method to use (can be 'wav2lip', 'musetalk', or 'auto')
+                    lip_sync_method = scene.get('lip_sync_method', os.getenv("LIP_SYNC_METHOD", "auto")).lower()
                     
                     if not self.config.skip_audio and i < len(scene_audio_paths) and scene_audio_paths[i]:
                         if scene_lip_sync:
-                            # Run Wav2Lip - uses its own virtual environment Python
-                            wav2lip_enabled = os.getenv("WAV2LIP_ENABLED", "true").lower() in ("true", "1", "yes")
+                            # Determine which lip sync method to use
+                            use_musetalk = False
+                            use_wav2lip = False
                             
-                            if wav2lip_enabled:
-                                try:
-                                    wav2lip_output = str(clip_path).replace('.mp4', '_lipsync.mp4')
-                                    logger.info(f"🎙️ Scene {i+1}: lip_sync=ON → Running Wav2Lip...")
-                                    
-                                    # Pass None to use default paths from sync_wav2_lip.py (which uses env vars or hardcoded defaults)
-                                    success = lipsync_wav2lip(
-                                        in_video_mp4=str(video_path),
-                                        in_audio_wav=scene_audio_paths[i],
-                                        out_video_mp4=wav2lip_output,
-                                        fps=self.config.wan_fps,
-                                        wav2lip_dir=None,  # Use default from sync_wav2_lip.py
-                                        checkpoint_path=None,  # Use default from sync_wav2_lip.py
-                                        python_cmd=None  # Use Wav2Lip venv Python (default: /workspace/Wav2Lip/venv/bin/python)
-                                    )
-                                    
-                                    if success:
-                                        video_path = wav2lip_output
-                                        logger.info(f"Scene {i+1}: lip_sync=ON → SUCCESS ({Path(wav2lip_output).name})")
-                                    else:
-                                        reason = "Wav2Lip inference failed"
+                            if lip_sync_method == "musetalk":
+                                use_musetalk = True
+                            elif lip_sync_method == "wav2lip":
+                                use_wav2lip = True
+                            else:  # "auto" - try MuseTalk first, fallback to Wav2Lip
+                                musetalk_enabled = os.getenv("MUSETALK_ENABLED", "true").lower() in ("true", "1", "yes")
+                                wav2lip_enabled = os.getenv("WAV2LIP_ENABLED", "true").lower() in ("true", "1", "yes")
+                                
+                                if musetalk_enabled:
+                                    use_musetalk = True
+                                elif wav2lip_enabled:
+                                    use_wav2lip = True
+                            
+                            # Try MuseTalk first if enabled
+                            if use_musetalk:
+                                musetalk_enabled = os.getenv("MUSETALK_ENABLED", "true").lower() in ("true", "1", "yes")
+                                if musetalk_enabled:
+                                    try:
+                                        from src.core.sync_musetalk import lipsync_musetalk
+                                        
+                                        musetalk_output = str(clip_path).replace('.mp4', '_lipsync.mp4')
+                                        logger.info(f"🎙️ Scene {i+1}: lip_sync=ON → Running MuseTalk...")
+                                        
+                                        success = lipsync_musetalk(
+                                            in_video_mp4=str(video_path),
+                                            in_audio_wav=scene_audio_paths[i],
+                                            out_video_mp4=musetalk_output,
+                                            fps=self.config.wan_fps,
+                                            musetalk_dir=None,  # Use default from sync_musetalk.py
+                                            python_cmd=None,  # Use MuseTalk venv Python
+                                            bbox_shift=0,  # Default bbox shift
+                                            device="cuda"  # Use GPU if available
+                                        )
+                                        
+                                        if success:
+                                            video_path = musetalk_output
+                                            logger.info(f"Scene {i+1}: lip_sync=ON → SUCCESS (MuseTalk: {Path(musetalk_output).name})")
+                                        else:
+                                            reason = "MuseTalk inference failed"
+                                            # Fallback to Wav2Lip if auto mode
+                                            if lip_sync_method == "auto" and use_wav2lip:
+                                                logger.warning(f"Scene {i+1}: MuseTalk failed, trying Wav2Lip fallback...")
+                                                use_musetalk = False  # Will try Wav2Lip below
+                                            else:
+                                                logger.warning(f"Scene {i+1}: lip_sync=ON → FAILED (fallback to {Path(video_path).name}): {reason}")
+                                    except ImportError:
+                                        logger.warning(f"⚠️ Scene {i+1}: MuseTalk module not available. Falling back to Wav2Lip.")
+                                        use_musetalk = False
+                                    except Exception as e:
+                                        reason = f"Error: {str(e)}"
+                                        # Fallback to Wav2Lip if auto mode
+                                        if lip_sync_method == "auto" and use_wav2lip:
+                                            logger.warning(f"Scene {i+1}: MuseTalk error, trying Wav2Lip fallback...")
+                                            use_musetalk = False  # Will try Wav2Lip below
+                                        else:
+                                            logger.warning(f"Scene {i+1}: lip_sync=ON → FAILED (fallback to {Path(video_path).name}): {reason}")
+                                else:
+                                    logger.warning(f"⚠️ Scene {i+1}: MUSETALK_ENABLED is not set to 'true'. Skipping MuseTalk.")
+                                    if use_wav2lip:
+                                        use_musetalk = False  # Will try Wav2Lip below
+                            
+                            # Try Wav2Lip if MuseTalk not used or failed
+                            if use_wav2lip and not use_musetalk:
+                                wav2lip_enabled = os.getenv("WAV2LIP_ENABLED", "true").lower() in ("true", "1", "yes")
+                                
+                                if wav2lip_enabled:
+                                    try:
+                                        wav2lip_output = str(clip_path).replace('.mp4', '_lipsync.mp4')
+                                        logger.info(f"🎙️ Scene {i+1}: lip_sync=ON → Running Wav2Lip...")
+                                        
+                                        # Pass None to use default paths from sync_wav2_lip.py (which uses env vars or hardcoded defaults)
+                                        success = lipsync_wav2lip(
+                                            in_video_mp4=str(video_path),
+                                            in_audio_wav=scene_audio_paths[i],
+                                            out_video_mp4=wav2lip_output,
+                                            fps=self.config.wan_fps,
+                                            wav2lip_dir=None,  # Use default from sync_wav2_lip.py
+                                            checkpoint_path=None,  # Use default from sync_wav2_lip.py
+                                            python_cmd=None  # Use Wav2Lip venv Python (default: /workspace/Wav2Lip/venv/bin/python)
+                                        )
+                                        
+                                        if success:
+                                            video_path = wav2lip_output
+                                            logger.info(f"Scene {i+1}: lip_sync=ON → SUCCESS (Wav2Lip: {Path(wav2lip_output).name})")
+                                        else:
+                                            reason = "Wav2Lip inference failed"
+                                            logger.warning(f"Scene {i+1}: lip_sync=ON → FAILED (fallback to {Path(video_path).name}): {reason}")
+                                    except Exception as e:
+                                        reason = f"Error: {str(e)}"
                                         logger.warning(f"Scene {i+1}: lip_sync=ON → FAILED (fallback to {Path(video_path).name}): {reason}")
-                                except Exception as e:
-                                    reason = f"Error: {str(e)}"
-                                    logger.warning(f"Scene {i+1}: lip_sync=ON → FAILED (fallback to {Path(video_path).name}): {reason}")
-                            else:
-                                logger.warning(f"⚠️ Scene {i+1}: WAV2LIP_ENABLED is not set to 'true'. Skipping lip sync.")
-                                logger.info(f"Scene {i+1}: lip_sync=ON but WAV2LIP_ENABLED=false → skipped")
+                                else:
+                                    logger.warning(f"⚠️ Scene {i+1}: WAV2LIP_ENABLED is not set to 'true'. Skipping lip sync.")
+                                    logger.info(f"Scene {i+1}: lip_sync=ON but WAV2LIP_ENABLED=false → skipped")
                         else:
                             logger.info(f"Scene {i+1}: lip_sync=OFF → skipped")
                     

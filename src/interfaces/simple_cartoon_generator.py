@@ -402,6 +402,14 @@ Storyboard Cast Format (with face images):
     )
     
     parser.add_argument(
+        "--lip-sync-method",
+        type=str,
+        choices=["auto", "wav2lip", "musetalk"],
+        default="auto",
+        help="Lip sync method to use: 'auto' (try MuseTalk first, fallback to Wav2Lip), 'wav2lip' (Wav2Lip only), or 'musetalk' (MuseTalk only). Default: auto"
+    )
+    
+    parser.add_argument(
         "--verbose-ffmpeg",
         action="store_true",
         help="Print FFmpeg commands for debugging"
@@ -490,6 +498,9 @@ Storyboard Cast Format (with face images):
                     sys.exit(1)
                 
                 print(f"📁 Found {len(stories)} stories in {storyboard_file.name}")
+                
+                # Set lip sync method as environment variable so it's available in generate_cartoon_short.py
+                os.environ["LIP_SYNC_METHOD"] = args.lip_sync_method
                 
                 # Initialize pipelines once (singleton pattern ensures they're shared)
                 print("🔄 Initializing pipelines (will be reused for all stories)...")
@@ -716,6 +727,9 @@ Storyboard Cast Format (with face images):
             # Determine if reel should be created
             create_reel = not args.no_reel and (args.format == "reel" or args.vertical)
             
+            # Set lip sync method as environment variable so it's available in generate_cartoon_short.py
+            os.environ["LIP_SYNC_METHOD"] = args.lip_sync_method
+            
             config = VideoConfig(
                 prompt=args.prompt,
                 duration=args.duration,
@@ -762,6 +776,9 @@ Storyboard Cast Format (with face images):
     else:
         # Determine if reel should be created
         create_reel = not args.no_reel and (args.format == "reel" or args.vertical)
+        
+        # Set lip sync method as environment variable so it's available in generate_cartoon_short.py
+        os.environ["LIP_SYNC_METHOD"] = args.lip_sync_method
         
         output_path = generate_cartoon(
             args.prompt, 
