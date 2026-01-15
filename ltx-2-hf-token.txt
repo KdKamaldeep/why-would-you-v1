@@ -1,0 +1,54 @@
+hf token - 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
+
+
+git clone https://github.com/Lightricks/LTX-2.git
+cd LTX-2
+
+pip install uv
+uv sync --frozen
+
+source .venv/bin/activate
+
+
+mkdir -p /workspace/LTX-2/models/ltx2
+mkdir -p /workspace/LTX-2/models/gemma
+
+huggingface-cli login
+
+huggingface-cli download Lightricks/LTX-2 \
+  ltx-2-19b-distilled-fp8.safetensors \
+  ltx-2-spatial-upscaler-x2-1.0.safetensors \
+  ltx-2-19b-distilled-lora-384.safetensors \
+  --local-dir /workspace/LTX-2/models/ltx2
+
+
+huggingface-cli download google/gemma-3-12b-it-qat-q4_0-unquantized \
+  --local-dir /workspace/LTX-2/models/gemma
+
+uv sync --extra xformers
+
+
+cat > /workspace/LTX-2/run_distilled_cli.py <<'PY'
+import sys
+import runpy
+
+# This runs the repo's distilled pipeline entry exactly as intended.
+# It expects CLI args like --checkpoint-path etc.
+if __name__ == "__main__":
+    runpy.run_module("ltx_pipelines.distilled", run_name="__main__")
+PY
+
+
+python -m ltx_pipelines.distilled \
+  --checkpoint-path /workspace/LTX-2/models/ltx2/ltx-2-19b-distilled-fp8.safetensors \
+  --spatial-upsampler-path /workspace/LTX-2/models/ltx2/ltx-2-spatial-upscaler-x2-1.0.safetensors \
+  --gemma-root /workspace/LTX-2/models/gemma \
+  --lora /workspace/LTX-2/models/ltx2/ltx-2-19b-distilled-lora-384.safetensors 1.0 \
+  --enable-fp8 \
+  --prompt "A woman speaking to camera in a busy outdoor market, handheld, cinematic, daylight." \
+  --seed 7 \
+  --height 1344 --width 768 \
+  --num-frames 41 \
+  --frame-rate 16 \
+  --output-path /workspace/LTX-2/test_short.mp4
+
